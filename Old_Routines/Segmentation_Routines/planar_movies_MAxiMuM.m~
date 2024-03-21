@@ -1,0 +1,293 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% segment_MAxiMuM.m
+% J. Demas 11/21/2019
+%
+% For each plane in MAxiMuM volume, motion correct and make a movie
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+clear
+close all;
+clc
+    
+addpath(genpath('/raid0/PROCESSING_SCRIPTS/Tiff_Processing/'))
+addpath(genpath('/raid0/PROCESSING_SCRIPTS/Segmentation_Routines/CaImAn-MATLAB-master/'))
+addpath(genpath('motion_correction/'))
+
+path = '/vmd/jeff_demas/MAxiMuM_data/20191217/MH79/';
+% file = 'mh89_2mm_FOV_50_550um_depth_250mW_som_stimuli_9min_00001';
+file = 'MH79_0p3mm_FOV_no_stim_100_200um_depth_106mW_9min_00001';
+MULTIFILE = 3;
+
+tmppath = '/raid0/MATLAB_TMP/';
+tmpfname = [file '_TMP'];
+
+tic % start the master clock
+
+disp('Beginning processing routine...')
+
+%% (I) Load in file, correct scan phase, add tilt, trim, save to temp, and determine chunking
+if MULTIFILE>0
+    searchFile = [tmppath tmpfname '_00001.mat'];
+else
+    searchFile = [tmppath tmpfname '.mat'];
+end
+
+if exist(searchFile,'file')>0
+    disp('Temporary file already exists, moving directly to motion correction...')
+    
+    if MULTIFILE>0
+        data = matfile([tmppath tmpfname '_00001.mat'],'Writable',true);
+    else
+        data = matfile([tmppath tmpfname '.mat'],'Writable',true);
+    end
+    fullVolumeSize = data.fullVolumeSize;
+    pixelResolution = data.pixelResolution;
+    volumeRate = data.volumeRate;
+    
+else
+    dind = strfind(path,'2019');
+    yyyyMMdd = path(dind:dind+7);
+    expDate = datetime(yyyyMMdd,'InputFormat','yyyyMMdd');
+    switchDate = datetime('20191111','InputFormat','yyyyMMdd');
+
+    if expDate>switchDate
+        trim = 1;
+        disp('Data recorded after ROI position switch, trimming accordingly.')
+    else
+        trim = 0;
+        disp('Data recorded prior to ROI position switch, NO TRIMMING APPLIED.')
+    end
+
+    disp('Beginning volume load in...')
+
+    % Use file name to determine FOV, resolution, volume_rate, and # of ROIs
+    if size(strfind(file,'hemisphere'),1) > 0
+        % Hemisphere
+        volumeRate = 4.69;
+        pixelResolution = 5;
+        numROI = 5;
+        patchOvp = 4;
+
+    elseif size(strfind(file,'2mm'),1) > 0
+        % 2 mm
+        volumeRate = 6.45;
+        pixelResolution = 2.75;
+        numROI = 5;
+        patchOvp = 9;
+
+    elseif size(strfind(file,'0p6mm'),1) > 0
+        % 0.6 mm
+        volumeRate = 9.61;
+        pixelResolution = 1;
+        numROI = 4;
+        patchOvp = 25;
+
+    elseif size(strfind(file,'0p9mm'),1) > 0
+        % 0.9 mm
+        volumeRate = 36.89;
+        pixelResolution = 3;
+        numROI = 2;
+        patchOvp = 8;
+
+    elseif size(strfind(file,'3mm'),1) > 0 && size(strfind(file,'0p3mm'),1) == 0
+        % 3 mm
+        volumeRate = 7.69;
+        pixelResolution = 5;
+        numROI = 5;
+        patchOvp = 5;
+
+    elseif size(strfind(file,'3p6mm'),1) > 0
+        % 3.6 mm
+        volumeRate = 5.38;
+        pixelResolution = 5;
+        numROI = 6;
+        patchOvp = 5;
+    
+    elseif size(strfind(file,'0p3mm'),1) > 0
+        % 0.3 mm
+        volumeRate = 9.61;
+        pixelResolution = 0.5;
+        numROI = 4;
+        patchOvp = 50;
+        
+    else
+        disp('File name does not contain valid FOV pointers.')   
+    end 
+
+    if MULTIFILE > 0
+        for ccc = 1:MULTIFILE
+            disp(['Loading volume ' num2str(ccc) ' of ' num2str(MULTIFILE) ' from tif...'])
+            vol = ProcessROITiff([path file '_0000' num2str(ccc) '.tif'],1:numROI,trim); % load from tif
+   
+            disp('Volume loaded. Reordering volume...')
+
+            order = [1 5:10 2 11:17 3 18:23 4 24:30];
+            order = fliplr(order);
+
+            vol = vol(:,:,order,:); 
+
+            tt = toc/3600;
+            disp(['Volume loaded and processed. Elapsed time: ' num2str(tt) ' hours. Saving volume to temp...'])
+
+            fullVolumeSize = size(vol);
+
+            savefast([tmppath tmpfname '_0000' num2str(ccc) '.mat'],'vol','volumeRate','pixelResolution','fullVolumeSize');
+            clear vol
+        end
+        
+    else
+         disp('Loading volume from tif...')
+        if exist([path file '.mat'],'file')>0
+            vol = load([path file '.mat']); % load from mat file
+        else
+            vol = ProcessROITiff([path file '.tif'],1:numROI,trim); % load from tif
+        end
+        disp('Volume loaded. Reordering volume...')
+
+        order = [1 5:10 2 11:17 3 18:23 4 24:30];
+        order = fliplr(order);
+
+        vol = vol(:,:,order,:); 
+
+        tt = toc/3600;
+        disp(['Volume loaded and processed. Elapsed time: ' num2str(tt) ' hours. Saving volume to temp...'])
+
+        fullVolumeSize = size(vol);
+
+        savefast([tmppath tmpfname '.mat'],'vol','volumeRate','pixelResolution','fullVolumeSize');
+        data = matfile([tmppath tmpfname '.mat'],'Writable',true);
+        clear vol
+    
+    end
+    
+end
+
+%% (II) Process each plane
+numberOfPlanes = fullVolumeSize(3);
+Tfile = fullVolumeSize(4);
+d1file = fullVolumeSize(1);
+d2file = fullVolumeSize(2);
+
+CN = zeros(d1file,d2file,numberOfPlanes);
+YM = CN;
+YMx = CN;
+
+for aaa = 1:numberOfPlanes
+    
+    disp(['PROCESSING PLANE ' num2str(aaa) ' OF ' num2str(numberOfPlanes) '...'])
+
+    Y = zeros(d1file,d2file,Tfile*MULTIFILE);
+    if MULTIFILE>0
+        for ddd = 1:MULTIFILE
+            data = matfile([tmppath tmpfname '_0000' num2str(ddd) '.mat'],'Writable',true);
+            Y(:,:,(ddd-1)*Tfile+1:ddd*Tfile) = reshape(data.vol(:,:,aaa,:),d1file,d2file,Tfile);
+        end
+        
+    else
+        Y = reshape(data.vol(:,:,aaa,:),d1file,d2file,Tfile);
+    end
+
+    tt = toc/3600;
+    disp(['Current plane loaded. Time elapsed: ' num2str(tt) ' hours. Beginning motion correction...'])
+    
+    %% (IIa) Scan phase correction
+    disp('Correcting scan phase...')
+    correction = returnScanOffset2(mean(Y,3),1);
+    Y = fixScanPhase(Y,correction,1);
+    sizY = size(Y);
+    d1 = sizY(1);
+    d2 = sizY(2);
+    T = sizY(3);
+    
+    %% (IIb) Motion correction
+    addpath(genpath('motion_correction/'))
+
+    gcp;
+
+    % Rigid motion correction using NoRMCorre algorithm:    
+    options_rigid = NoRMCorreSetParms(...
+        'd1',d1,...
+        'd2',d2,...
+        'bin_width',24,...       % Bin width for motion correction
+        'max_shift',round(40/pixelResolution),...        % Max shift in px
+        'us_fac',20,...
+        'init_batch',120,...     % Initial batch size
+        'correct_bidir',false... % Correct bidirectional scanning
+        );
+    
+    
+    [M1,shifts1,~,~] = normcorre_batch(Y,options_rigid);
+
+    disp('Rigid motion correction complete. Beginning non-rigid motion correction...')
+    
+    shifts_r = squeeze(cat(3,shifts1(:).shifts));
+    shifts_v = movvar(shifts_r,24,1);
+    [~,minv_idx] = mink(shifts_v,120,1);
+    best_idx = unique(reshape(minv_idx,1,[]));
+    template_good = mean(M1(:,:,best_idx),3);
+
+    % No rigid motion correction using the good tamplate from the rigid
+    % correction.
+      options_nonrigid = NoRMCorreSetParms(...
+        'd1',d1,...
+        'd2',d2,...
+        'bin_width',24,...
+        'max_shift',round(40/pixelResolution),...
+        'us_fac',20,...
+        'init_batch',120,...
+        'correct_bidir',false...
+        );
+    
+    % Data from the motion correction that will be used for the CNMF
+    [M2,shifts2,~,~] = normcorre_batch(Y,options_nonrigid,template_good);
+    
+    disp('Calculating motion correction metrics...')
+
+    shifts_r = squeeze(cat(3,shifts1(:).shifts));
+    shifts_nr = cat(ndims(shifts2(1).shifts)+1,shifts2(:).shifts);
+    shifts_nr = reshape(shifts_nr,[],ndims(Y)-1,T);
+    shifts_x = squeeze(shifts_nr(:,1,:))';
+    shifts_y = squeeze(shifts_nr(:,2,:))';
+
+    [cY,~,~] = motion_metrics(Y,10);
+    [cM1,~,~] = motion_metrics(M1,10);
+    [cM2,~,~] = motion_metrics(M2,10);
+
+    motionCorrectionFigure = figure;
+
+    ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2); legend('raw data','rigid','non-rigid'); title('correlation coefficients','fontsize',14,'fontweight','bold')
+            set(gca,'Xtick',[])
+    ax2 = subplot(312); %plot(shifts_x); hold on; 
+    plot(shifts_r(:,1),'--k','linewidth',2); title('displacements along x','fontsize',14,'fontweight','bold')
+            set(gca,'Xtick',[])
+    ax3 = subplot(313); %plot(shifts_y); hold on; 
+    plot(shifts_r(:,2),'--k','linewidth',2); title('displacements along y','fontsize',14,'fontweight','bold')
+            xlabel('timestep','fontsize',14,'fontweight','bold')
+    linkaxes([ax1,ax2,ax3],'x')
+
+    % Figure: Motion correction Metrics
+    outputDir = [tmppath '/' file  '/'];
+    mkdir(outputDir)
+    saveas(motionCorrectionFigure,[outputDir '_motion_correction_metrics_plane_' num2str(aaa) '.fig']);
+    close(motionCorrectionFigure)
+    
+    Y = M2;
+    clear M2 M1 cM1 cM2 template_good shifts1 shifts2 shifts_nr shifts_r shifts_x shifts_y cY
+
+    tt = toc/3600;
+    disp(['Motion correction complete. Time elapsed: ' num2str(tt) ' hours. Constructing movie for plane ' num2str(aaa) ' of ' num2str(numberOfPlanes) '...'])
+    
+    outputDir = [tmppath '/' file  '/'];
+    mkdir(outputDir)
+    
+    avg = floor(volumeRate/3);
+    makeMovie(movmean(Y,3,3),[outputDir 'movie_plane_' num2str(aaa) '.avi'],20,1,round(volumeRate*60))
+    
+    CN(:,:,aaa) = correlation_image(Y);
+    YM(:,:,aaa) = mean(Y,3);
+    YMx(:,:,aaa) = max(Y,[],3);
+end
+
+save([outputDir 'planar_projections.mat'],'CN','YM','YMx')

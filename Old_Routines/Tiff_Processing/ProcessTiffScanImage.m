@@ -1,0 +1,126 @@
+function [imageData] = ProcessTiffScanImage(filename, roisOrder)
+
+% folderpath: path to the folder
+% roisOrder: order for the multiple rois exmple [3 1 2]
+
+addpath('C:\Users\myadmin\Documents\MATLAB\ScanImageTiffReader\share\matlab\SI2016bR1_2017-09-28-140040_defde478ed\')
+
+% %% Get names of the tif files inside the folder.
+% names = dir([folderpath,'/','*.tif']);
+% number_files = length(names);
+% 
+% %Folder to save the data Analysis
+% name_of_folder = 'Analysis';
+% % mkdir(folderpath,name_of_folder)
+% 
+% %name to the folder
+% name_to_the_folder = [folderpath,'/',name_of_folder,'/'];
+
+% for ii = 1:number_files
+
+
+%    % Take only the name of the file
+%    [~,nameFile,~] = fileparts(names(ii).name);
+% 
+%    nameFileTiff = [nameFile,'.tif'];
+% 
+%    nameFileAvi = [name_to_the_folder,nameFile,'.avi'];
+%    nameFileMat = [name_to_the_folder,nameFile,'_image','.mat'];
+%    nameFileFig = [name_to_the_folder,nameFile,'_fig','.fig'];
+%    nameFileHdf5 = [name_to_the_folder,nameFile,'_data','.hdf5'];clc
+%    nameFileHeader = [name_to_the_folder,nameFile,'_header','.mat'];
+% 
+%    % Displaying
+%    disp(['Processing ',nameFile,'...']);
+
+
+%    [roiData, roiGroup, header, ~] = scanimage.util.getMroiDataFromTiff([folderpath,'/',nameFileTiff]);
+[roiData, roiGroup, header, ~] = scanimage.util.getMroiDataFromTiff(filename);
+% Save header for the file
+%    save(nameFileHeader,'header','-v7.3');
+
+frameRate = round(header.SI.hRoiManager.scanVolumeRate*3);
+
+%% Videos and save the data
+
+% Video
+%     myVideo = VideoWriter(nameFileAvi);
+%     myVideo.FrameRate = frameRate;
+%     open(myVideo)
+
+
+strip = 1;
+frame = 1;
+
+image_temp = roiData{1,strip}.imageData{1,1}{1,frame}{1,1};
+
+imageData = [];
+totalFrame = length(roiData{1}.imageData{1});
+
+%    figure(10)
+
+val = round(totalFrame/50);
+
+for frame = 1:totalFrame
+    
+    if frame/val == round(frame/val)
+        disp(['Processing frame:' ,num2str(frame),' of ',num2str(totalFrame)]);
+    end
+    
+   image_temp = [];
+   % strip = [9 8 7 6 1 2 3 4 5]
+   for strip = roisOrder
+
+       image_temp = cat(2,image_temp,single(roiData{1,strip}.imageData{1,1}{1,frame}{1,1}));
+
+
+   end
+
+%          imagesc(image_temp,[0 50])
+%          axis equal
+%          colormap gray
+%          axis off
+%    % pause(0.1)
+    imageData = cat(3,imageData,image_temp);
+%          drawnow
+%
+%         % write video
+%         fraxdme = getframe;
+%         writeVideo(myVideo,frame)
+%     disp(frame)
+end
+
+%     close(myVideo)
+
+%%
+%    disp('Saving the data...')
+%    save(nameFileMat,'imageData','-v7.3')
+% 
+%    %% Mean image
+%    mean_image = mean(imageData,3);
+% 
+%    % Display
+%    fig = figure(20);
+%    imagesc(mean_image);
+%    axis equal
+%    colormap gray
+%    caxis([0 400])
+%    %xlim([0 5000])
+%    ylabel('')
+%    set(gca,'FontSize',20)
+%    axis off
+%    savefig(fig,nameFileFig);
+
+% Hdf5
+%     try
+%         name = nameFileHdf5;
+%
+%         [x,y,t] = size(imageData);
+%         h5create([name,‘.hdf5’],‘/mov’,[x y t]);
+%         h5disp([name,‘.hdf5’])
+%         h5write([name,‘.hdf5’], ‘/mov’, imageData);
+%     end
+%
+%    clear imageData
+
+% end
