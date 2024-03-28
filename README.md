@@ -1,12 +1,22 @@
+# benchmark_full_pipeline
+This is a version of the codebase where the pipeline can run to completion.
+
+Main changes:
+- Split preProcessMAxiMuM.m -> convert_tiff_to_volume.m & motion_correct_volume.m
+- Delete logs that errored before a meaninful procedure
+- Append _error to logs that errored during a meaninful procedure
+- save as .mat -> .h5
+- remove the cast to float16 (needed for registration)
+
 # MAxiMuM CaImAn pipeline
 
 This is a copy of the original MAxiMuM processing pipeline (small updates since the paper by Jason), including some older/extra pieces of code. The core software is in: https://github.com/jmmanley/MAxiMuM_processing_tools
 
 # PROTOCOL FOR RUNNING PRE-PROCESSING AND CAIMAN SOURCE EXTRACTION ON LIGHT BEADS MICROSCOPY DATA
 
-All code/software written by Jeffrey Demas: https://github.com/vazirilab/MAxiMuM_processing_tools 
+All code/software written by Jeffrey Demas: https://github.com/vazirilab/MAxiMuM_processing_tools
 
-Jeff has a more extensive “in house” version of this code. Jason has a copy on Github: https://github.com/vazirilab/scaling_analysis/tree/main/caiman_pipeline 
+Jeff has a more extensive “in house” version of this code. Jason has a copy on Github: https://github.com/vazirilab/scaling_analysis/tree/main/caiman_pipeline
 
 Jeff traditionally ran this code for his short datasets (~10 minutes) on the virtual machines. Here I will give a guide to processing longer datasets (1 hour) on the HPC cluster’s bigmem node.
 
