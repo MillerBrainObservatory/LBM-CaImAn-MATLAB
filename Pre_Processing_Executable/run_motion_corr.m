@@ -58,22 +58,23 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
 
     % Check if at least one relevant file is found
     if isempty(relevantFileNames)
-        error('No relevant files found.');
+        error('No relevant files found in filePath: %d \n', filePath);
     end
 
     % Pull dimensions from the file
-    % Previous versions of this code relied on a few details:
-    % 1) When extracting the images from the .tif, the dimensionality stays the same for each file, so that can be kept in memory
-    % Now, we need to extract this information from the first file.
-    data = matfile(fullfile(filePath, relevantFileNames{1}), 'Writable',true);
-    volumeRate = data.volumeRate;
-    sizY = data.fullVolumeSize;
-    pixelResolution = data.pixelResolution;
-    d1 = sizY(1);
-    d2 = sizY(2);
-    numberOfPlanes = sizY(3);
+    data_first = matfile(fullfile(filePath, relevantFileNames{1}), 'Writable',true);
+    volumeRate = data_first.volumeRate;
+    sizY = data_first.fullVolumeSize;
+    pixelResolution = data_first.pixelResolution;
+    d1_first = sizY(1);
+    d2_first = sizY(2);
+    numberOfPlanes_first = sizY(3);
+    if ~(numberOfPlanes_first >= endPlane)
+        error("Not enough planes to process given user supplied argument: %d as endPlane when only %d planes exist in this dataset.", endPlane, numberOfPlanes_first);
+    end
 
     T = sizY(4);
+    totalT = T*length(relevantFileNames);
 
     % fileInfo = h5info(fullfile(filePath, relevantFileNames{1}), '/data');
     % d1 = fileInfo.Dataspace.Size(1);
@@ -82,7 +83,7 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
     % T = fileInfo.Dataspace.Size(4); % Number of time points per file
 
     % preallocate based on the total number of time points across all files
-    Y = zeros(d1, d2, T*length(relevantFileNames), 'single');
+    Y = zeros(d1_first, d2_first, totalT, 'single');
     for plane_idx = startPlane:endPlane
         sprintf('Loading plane %s', num2str(plane_idx))
         for file_idx = 1:numel(relevantFileNames)
@@ -103,7 +104,7 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
             % sizY = h5readatt(h5FilePath, dataset, 'fullVolumeSize');
 
             % Insert the read data into the pre-allocated array Y
-            Y(:, :, (file_idx-1)*T+1:file_idx*T) = single(reshape(data.vol(:, :, plane_idx, :), d1, d2, T));
+            Y(:, :, (file_idx-1)*T+1:file_idx*T) = single(reshape(data.vol(:, :, plane_idx, :), d1_first, d2_first, totalT));
         end
 
         fprintf(fid, '%s Beginning processing for plane %s with %s matlab workers.', datetime, plane_idx);
@@ -114,8 +115,8 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
 
         % Rigid motion correction using NoRMCorre algorithm:
         options_rigid = NoRMCorreSetParms(...
-            'd1',d1,...
-            'd2',d2,...
+            'd1',d1_first,...
+            'd2',d2_first,...
             'bin_width',200,...       % Bin width for motion correction
             'max_shift',round(20/pixelResolution),...        % Max shift in px
             'us_fac',20,...
@@ -138,8 +139,8 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
         % No rigid motion correction using the good tamplate from the rigid
         % correction.
           options_nonrigid = NoRMCorreSetParms(...
-            'd1',d1,...
-            'd2',d2,...
+            'd1',d1_first,...
+            'd2',d2_first,...
             'bin_width',24,...
             'max_shift',round(20/pixelResolution),...
             'us_fac',20,...
