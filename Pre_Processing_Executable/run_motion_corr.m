@@ -128,7 +128,7 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
         shifts_r = squeeze(cat(3,shifts1(:).shifts));
         shifts_v = movvar(shifts_r,24,1);
     %     [~,minv_idx] = mink(shifts_v,120,1);
-        [srt,minv_idx] = sort(shifts_v,120); 
+        [srt,minv_idx] = sort(shifts_v,120);
         best_idx = unique(reshape(minv_idx,1,[]));
         template_good = mean(M1(:,:,best_idx),3);
 
@@ -163,16 +163,16 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
 
         ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2); legend('raw data','rigid','non-rigid'); title('correlation coefficients','fontsize',14,'fontweight','bold')
                 set(gca,'Xtick',[])
-        ax2 = subplot(312); %plot(shifts_x); hold on; 
+        ax2 = subplot(312); %plot(shifts_x); hold on;
         plot(shifts_r(:,1),'--k','linewidth',2); title('displacements along x','fontsize',14,'fontweight','bold')
                 set(gca,'Xtick',[])
-        ax3 = subplot(313); %plot(shifts_y); hold on; 
+        ax3 = subplot(313); %plot(shifts_y); hold on;
         plot(shifts_r(:,2),'--k','linewidth',2); title('displacements along y','fontsize',14,'fontweight','bold')
                 xlabel('timestep','fontsize',14,'fontweight','bold')
         linkaxes([ax1,ax2,ax3],'x')
 
         % Figure: Motion correction Metrics
-        saveas(motionCorrectionFigure,[filePath 'motion_corr_metrics_plane_' num2str(aaa) '.fig']);
+        saveas(motionCorrectionFigure,[filePath 'motion_corr_metrics_plane_' num2str(plane_idx) '.fig']);
         close(motionCorrectionFigure)
 
         Y = M2;
@@ -181,7 +181,7 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
         tt = toc/3600;
         disp(['Motion correction complete. Time elapsed: ' num2str(tt) ' hours. Saving to disk...'])
 
-        outputFile = [filePath fileNameRoot '_plane_' num2str(aaa) '.mat'];
+        outputFile = [filePath fileNameRoot '_plane_' num2str(plane_idx) '.mat'];
 
         Ym = mean(Y,3);
 
@@ -192,7 +192,7 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
         formatSpec = '%s Motion Correction Complete. Beginning next plane...\n';
         fprintf(fid,formatSpec,date);
     end
-    
+
     %% (III) Delete Remnants
     disp('All planes processed...')
     % for xyz = 1:numFiles
@@ -205,9 +205,9 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
     %         else % single file recording, append '.tif' to end
     %             fileName = [fileNameRoot '.tif'];
     %     end
-    % 
+    %
     %     delete([filePath fileName(1:end-3) 'mat'])
-    % 
+    %
     % end
     t = toc;
     disp(['Routine complete. Total run time ' num2str(t./3600) ' hours.'])
