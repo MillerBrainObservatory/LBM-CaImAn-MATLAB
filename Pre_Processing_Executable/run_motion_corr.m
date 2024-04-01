@@ -26,106 +26,90 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
-    if ~exist([filePath fileNameRoot '_00001.mat'],'file')
-        disp([filePath fileNameRoot '_00001.mat'])
-        error('File does not exist.')
+    logFileName = sprintf('matlab_log_%d_%02d_%02d_%02d_%02d.txt', clck(1), clck(2), clck(3), clck(4), clck(5));
+    logFullPath = fullfile(filePath, logFileName);
+    fid = fopen(logFullPath, 'w');
+
+    poolobj = gcp('nocreate');
+    if ~isempty(poolobj)
+        disp('Removing existing parallel pool.');
+        delete(poolobj);
     end
 
     tic
+    addpath(genpath(fullfile('CaImAn-MATLAB-master', 'CaImAn-MATLAB-master')));
+    addpath(genpath(fullfile('motion_correction/')));
 
     clck = clock; % use current time and date to make a log file
-    fid = fopen(fullfile(filePath,['matlab_log_' num2str(clck(1)) '_' num2str(clck(2)) '_' num2str(clck(3)) '_' num2str(clck(4)) '_' num2str(clck(5)) '.txt']),'w');    
-    poolobj = gcp('nocreate')
-   
-    if ~isemtpy(poolobj)
-        disp('Removing existing parallel pool.')
-        delete(poolobj)
+    disp('Beginning processing routine.');
+    numCores = max(str2double(numCores), 23); % Ensure at least 23 cores or use specified number.
+
+    fprintf(fid, '%s Beginning processing routine...\n', datetime);
+
+    files = dir(fullfile(filePath, '*.mat'));
+    fileNames = {files.name};
+    relevantFiles = contains(fileNames, fileNameRoot) & ~contains(fileNames, 'plane');
+    relevantFileNames = fileNames(relevantFiles);
+    sprintf('Number of files to process: %d', num2str(length(relevantFileNames)))
+
+    for fname=1:length(relevantFiles)
+        disp(fname)
     end
 
-    addpath(genpath(fullfile('CaImAn-MATLAB-master','CaImAn-MATLAB-master')));
-    addpath(genpath(fullfile('ScanImage_Utilities/')));
-    addpath(genpath(fullfile('motion_correction\')));
-    %% Determine how many files there are
-
-    disp('Beginning processing routine.')
-    if str2double(numCores) == 0 || size(str2double(numCores),1) == 0
-        numCores = 23;
-    else
-        numCores = str2double(numCores);
+    % Check if at least one relevant file is found
+    if isempty(relevantFileNames)
+        error('No relevant files found.');
     end
-    
-    disp('Starting the parallel pool...')
 
-    poolobj = parpool('local',numCores);
-    tmpDir = tempname();
-    mkdir(tmpDir);
-    poolobj.Cluster.JobStorageLocation = tmpDir;    
+    % Pull dimensions from the file
+    data = matfile(fullfile(filePath, relevantFileNames{1}), 'Writable',true);
+    volumeRate = data.volumeRate;
+    sizY = data.fullVolumeSize;
+    pixelResolution = data.pixelResolution;
+    d1 = sizY(1);
+    d2 = sizY(2);
+    numberOfPlanes = sizY(3);
 
-    date = datetime(now,'ConvertFrom','datenum');
-    formatSpec = '%s Beginning processing routine...\n';
-    fprintf(fid,formatSpec,date);
+    T = sizY(4);
 
+    % fileInfo = h5info(fullfile(filePath, relevantFileNames{1}), '/data');
+    % d1 = fileInfo.Dataspace.Size(1);
+    % d2 = fileInfo.Dataspace.Size(2);
+    % num_planes = fileInfo.Dataspace.Size(3);
+    % T = fileInfo.Dataspace.Size(4); % Number of time points per file
 
-    xx = dir(fullfile(filePath,'*.mat'));
-    N = {xx.name};
-    X = contains(N, fileNameRoot) & ~contains(N, 'plane');
-    numFiles = sum(X);
-    if numFiles > 1
-        multiFile = true;
-    else 
-        multiFile = false;
-    end 
+    % preallocate based on the total number of time points across all files
+    Y = zeros(d1, d2, T*length(relevantFileNames), 'single');
+    for plane_idx = startPlane:endPlane
+        sprintf('Loading plane %s', num2str(plane_idx))
+        for file_idx = 1:numel(relevantFileNames)
+            %% TODO: Make sure we have enough memory to store the frames from each file
 
-    % load initial file dims: assumes they will be the same for each file
-    mat = matfile([filePath fileNameRoot '_00001.mat']);
-    d1file = mat.fullVolumeSize(1,1);
-    d2file = mat.fullVolumeSize(1,2);
-    Tfile = mat.fullVolumeSize(1,4);
-    numberOfPlanes = mat.fullVolumeSize(1,3);
-    pixelResolution = mat.pixelResolution;
-    volumeRate = mat.volumeRate;
+            currentFileName = relevantFileNames{file_idx};
 
-    startPlane = max(startPlane, 1);
-    endPlane = min(endPlane, numberOfPlanes);
-    for aaa = startPlane:endPlane
-        disp(['PROCESSING PLANE ' num2str(aaa) ' OF ' num2str(endPlane - startPlane) '...'])
-        Y = zeros(d1file,d2file,Tfile*numFiles,'single');
-        for ddd = 1:numFiles
-            if multiFile
-                if ddd < 10
-                    matfilename = [filePath fileNameRoot '_0000' num2str(ddd) '.mat'];
-                else
-                    matfilename = [filePath fileNameRoot '_000' num2str(ddd) '.mat'];
-                end
-            else
-                matfilename = [filePath fileNameRoot '.mat'];
-            end
+            %% TODO: Incorperate
+            % h5FilePath = fullfile(filePath, currentFileName);
+            % dataset = '/data';
+            % start = [1, 1, plane_idx, 1];
+            % count = [d1, d2, 1, total_T];
+            %
+            % % only the plane of interest for all timepoints from the current file
+            % data = h5read(h5FilePath, '/data', [1, 1, plane_idx, 1], [d1, d2, 1, T]);
+            % pixelResolution = h5readatt(h5FilePath, dataset, 'pixelResolution');
+            % volumeRate = h5readatt(h5FilePath, dataset, 'volumeRate');
+            % sizY = h5readatt(h5FilePath, dataset, 'fullVolumeSize');
 
-            data = matfile(matfilename,'Writable',true);
-            Y(:,:,(ddd-1)*Tfile+1:ddd*Tfile) = single(reshape(data.vol(:,:,aaa,:),d1file,d2file,Tfile));
+            % Insert the read data into the pre-allocated array Y
+            Y(:, :, (file_idx-1)*T+1:file_idx*T) = single(reshape(data.vol(:, :, plane_idx, :), d1, d2, T));
         end
-     
-        tt = toc/3600;
-        disp(['Current plane loaded. Time elapsed: ' num2str(tt) ' hours. Beginning motion correction...'])
-        
-        date = datetime(now,'ConvertFrom','datenum');
-        formatSpec = '%s Beginning processing for plane %u...\n';
-        fprintf(fid,formatSpec,date,aaa);
-        
-        sizY = size(Y);
-        d1 = sizY(1);
-        d2 = sizY(2);
-        T = sizY(3);
-        Y = Y-min(Y(:));
+
+        fprintf(fid, '%s Beginning processing for plane %s with %s matlab workers.', datetime, plane_idx);
 
         if size(gcp("nocreate"),1)==0
-            poolobj=parpool("Processes", numCores);
-            tmpDir = tempname();
-            mkdir(tmpDir);
-            poolobj.Cluster.JobStorageLocation = tmpDir;
+            parpool(numCores);
         end
-        %% Motion correction
-        % Rigid motion correction using NoRMCorre algorithm:    
+
+        % Rigid motion correction using NoRMCorre algorithm:
         options_rigid = NoRMCorreSetParms(...
             'd1',d1,...
             'd2',d2,...
