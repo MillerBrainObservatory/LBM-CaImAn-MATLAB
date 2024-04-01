@@ -3,8 +3,8 @@
 %
 % J.D. 05/19/2020
 % F.O. 03/04/2024 - Added 24core option. Need checks for storage capacity.
-% 
-% For each file, import raw .tif files, assemble ROIs, 
+%
+% For each file, import raw .tif files, assemble ROIs,
 % correct scan phase, re-order planes, and save a memory-mapped file.
 % Access each plane in each file and concatenate in time
 % Motion correct each plane and save to separate .tif files.
@@ -19,14 +19,15 @@
 % Each motion-corrected plane is saved as a separate .mat file with the following fields:
 % Y: single plane recording data (x,y,T) (single)
 % Ym: mean projection image of Y (x,y) (single)
-% sizY: array with size of dimension of Y (1,3) 
+% sizY: array with size of dimension of Y (1,3)
 % volumeRate: volume rate of the recording (1,1) (Hz)
 % pixelResolution: size of each pixel in microns (1,1) (um)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
-<<<<<<< HEAD
+
+    clck = clock;
     logFileName = sprintf('matlab_log_%d_%02d_%02d_%02d_%02d.txt', clck(1), clck(2), clck(3), clck(4), clck(5));
     logFullPath = fullfile(filePath, logFileName);
     fid = fopen(logFullPath, 'w');
@@ -35,19 +36,12 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
     if ~isempty(poolobj)
         disp('Removing existing parallel pool.');
         delete(poolobj);
-=======
-    if ~exist([filePath fileNameRoot '_00001.mat'],'file')
-        disp([filePath fileNameRoot '_00001.mat'])
-        error('File does not exist.')
-    fid = fopen(logFullPath, 'w');
->>>>>>> a0e497ffa0b0895f50819dc0ab5b283faa7907d2
     end
 
     tic
     addpath(genpath(fullfile('CaImAn-MATLAB-master', 'CaImAn-MATLAB-master')));
     addpath(genpath(fullfile('motion_correction/')));
 
-    clck = clock; % use current time and date to make a log file
     disp('Beginning processing routine.');
     numCores = max(str2double(numCores), 23); % Ensure at least 23 cores or use specified number.
 
@@ -69,6 +63,9 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
     end
 
     % Pull dimensions from the file
+    % Previous versions of this code relied on a few details:
+    % 1) When extracting the images from the .tif, the dimensionality stays the same for each file, so that can be kept in memory
+    % Now, we need to extract this information from the first file.
     data = matfile(fullfile(filePath, relevantFileNames{1}), 'Writable',true);
     volumeRate = data.volumeRate;
     sizY = data.fullVolumeSize;
