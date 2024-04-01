@@ -29,6 +29,7 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
     if ~exist([filePath fileNameRoot '_00001.mat'],'file')
         disp([filePath fileNameRoot '_00001.mat'])
         error('File does not exist.')
+    fid = fopen(logFullPath, 'w');
     end
 
     tic
