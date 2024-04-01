@@ -26,6 +26,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
+<<<<<<< HEAD
     logFileName = sprintf('matlab_log_%d_%02d_%02d_%02d_%02d.txt', clck(1), clck(2), clck(3), clck(4), clck(5));
     logFullPath = fullfile(filePath, logFileName);
     fid = fopen(logFullPath, 'w');
@@ -34,6 +35,12 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
     if ~isempty(poolobj)
         disp('Removing existing parallel pool.');
         delete(poolobj);
+=======
+    if ~exist([filePath fileNameRoot '_00001.mat'],'file')
+        disp([filePath fileNameRoot '_00001.mat'])
+        error('File does not exist.')
+    fid = fopen(logFullPath, 'w');
+>>>>>>> a0e497ffa0b0895f50819dc0ab5b283faa7907d2
     end
 
     tic
