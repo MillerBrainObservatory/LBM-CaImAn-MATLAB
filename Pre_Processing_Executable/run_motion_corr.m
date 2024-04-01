@@ -26,8 +26,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
-
-    clck = clock;
+    tic;
+    clck = clock; % Generate a timestamp for the log file name.
     logFileName = sprintf('matlab_log_%d_%02d_%02d_%02d_%02d.txt', clck(1), clck(2), clck(3), clck(4), clck(5));
     logFullPath = fullfile(filePath, logFileName);
     fid = fopen(logFullPath, 'w');
@@ -38,7 +38,6 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
         delete(poolobj);
     end
 
-    tic
     addpath(genpath(fullfile('CaImAn-MATLAB-master', 'CaImAn-MATLAB-master')));
     addpath(genpath(fullfile('motion_correction/')));
 
@@ -51,7 +50,7 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
     fileNames = {files.name};
     relevantFiles = contains(fileNames, fileNameRoot) & ~contains(fileNames, 'plane');
     relevantFileNames = fileNames(relevantFiles);
-    sprintf('Number of files to process: %d', num2str(length(relevantFileNames)))
+    sprintf('Number of files to process: %d \n', num2str(length(relevantFileNames)))
 
     for fname=1:length(relevantFiles)
         disp(fname)
@@ -197,22 +196,7 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
         fprintf(fid,formatSpec,date);
     end
 
-    %% (III) Delete Remnants
     disp('All planes processed...')
-    % for xyz = 1:numFiles
-    %     if multiFile % if multiple files, append '_0000x.tif' or '_000xx.tif'
-    %             if xyz < 10
-    %                 fileName = [fileNameRoot '_0000' num2str(xyz) '.tif'];
-    %             else
-    %                 fileName = [fileNameRoot '_000'  num2str(xyz) '.tif'];
-    %             end
-    %         else % single file recording, append '.tif' to end
-    %             fileName = [fileNameRoot '.tif'];
-    %     end
-    %
-    %     delete([filePath fileName(1:end-3) 'mat'])
-    %
-    % end
     t = toc;
     disp(['Routine complete. Total run time ' num2str(t./3600) ' hours.'])
     date = datetime(now,'ConvertFrom','datenum');
