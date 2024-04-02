@@ -59,6 +59,8 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
     % Check if at least one relevant file is found
     if isempty(relevantFileNames)
         error('No relevant files found in filePath: %d \n', filePath);
+    else
+        numFiles = length(relevantFileNames);
     end
 
     % Pull dimensions from the file
