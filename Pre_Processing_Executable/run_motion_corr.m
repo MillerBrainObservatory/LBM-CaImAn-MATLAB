@@ -68,15 +68,15 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
     volumeRate = data_first.volumeRate;
     sizY = data_first.fullVolumeSize;
     pixelResolution = data_first.pixelResolution;
-    d1_first = sizY(1);
-    d2_first = sizY(2);
     numberOfPlanes_first = sizY(3);
+    d1 = sizY(1);
+    d2 = sizY(2);
+    T = sizY(4);
+    totalT = T*length(relevantFileNames);
+
     if ~(numberOfPlanes_first >= endPlane)
         error("Not enough planes to process given user supplied argument: %d as endPlane when only %d planes exist in this dataset.", endPlane, numberOfPlanes_first);
     end
-
-    T = sizY(4);
-    totalT = T*length(relevantFileNames);
 
     % fileInfo = h5info(fullfile(filePath, relevantFileNames{1}), '/data');
     % d1 = fileInfo.Dataspace.Size(1);
@@ -85,20 +85,17 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
     % T = fileInfo.Dataspace.Size(4); % Number of time points per file
 
     % preallocate based on the total number of time points across all files
-    Y = zeros(d1_first, d2_first, totalT, 'single');
+    % For each file, grab all data for this plane.
+    Y = zeros(sizY(1), sizY(2), T*numFiles, 'single');
     for plane_idx = startPlane:endPlane
         sprintf('Loading plane %s', num2str(plane_idx))
         for file_idx = 1:numel(relevantFileNames)
-            %% TODO: Make sure we have enough memory to store the frames from each file
 
-            currentFileName = relevantFileNames{file_idx};
-
-            %% TODO: Incorperate
             % h5FilePath = fullfile(filePath, currentFileName);
             % dataset = '/data';
             % start = [1, 1, plane_idx, 1];
             % count = [d1, d2, 1, total_T];
-            %
+
             % % only the plane of interest for all timepoints from the current file
             % data = h5read(h5FilePath, '/data', [1, 1, plane_idx, 1], [d1, d2, 1, T]);
             % pixelResolution = h5readatt(h5FilePath, dataset, 'pixelResolution');
@@ -106,7 +103,15 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
             % sizY = h5readatt(h5FilePath, dataset, 'fullVolumeSize');
 
             % Insert the read data into the pre-allocated array Y
-            Y(:, :, (file_idx-1)*T+1:file_idx*T) = single(reshape(data.vol(:, :, plane_idx, :), d1_first, d2_first, totalT));
+            currentFileName = relevantFileNames{file_idx};
+            currentMatFile = matfile(fullfile(filePath, currentFileName), "Writable",true);
+            currentVolumeSize = currentMatFile.fullVolumeSize;
+            Y(:, :, (file_idx-1)*T+1:file_idx*T) = single( ...
+                reshape( ...
+                    currentMatFile.vol(:, :, plane_idx, :), ...
+                    currentVolumeSize(1), ...       % d1
+                    currentVolumeSize(2), ...       % d2
+                    currentVolumeSize(4)));         % T
         end
 
         fprintf(fid, '%s Beginning processing for plane %s with %s matlab workers.', datetime, plane_idx);
@@ -117,8 +122,8 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
 
         % Rigid motion correction using NoRMCorre algorithm:
         options_rigid = NoRMCorreSetParms(...
-            'd1',d1_first,...
-            'd2',d2_first,...
+            'd1',d1,...
+            'd2',d2,...
             'bin_width',200,...       % Bin width for motion correction
             'max_shift',round(20/pixelResolution),...        % Max shift in px
             'us_fac',20,...
@@ -141,8 +146,8 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
         % No rigid motion correction using the good tamplate from the rigid
         % correction.
           options_nonrigid = NoRMCorreSetParms(...
-            'd1',d1_first,...
-            'd2',d2_first,...
+            'd1',d1,...
+            'd2',d2,...
             'bin_width',24,...
             'max_shift',round(20/pixelResolution),...
             'us_fac',20,...
