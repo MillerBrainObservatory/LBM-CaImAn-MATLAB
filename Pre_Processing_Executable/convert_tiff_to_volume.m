@@ -1,6 +1,6 @@
 function convert_tiff_to_volume(filePath, saveDirPath, diagnosticFlag)
 % Convert a ScanImage.tif file or or series of files into a collated 4D
-% volume.
+% volume. 
 %
 % NOTE: Only raw .tif files from one session should be in the filePath
 %
@@ -43,20 +43,18 @@ else
         if isempty(files)
             error('No suitable files found for processing in: \n  %s', filePath);
         elseif length(files)>1
-            if exist([filePath fileNameRoot '_00001.tif'],'file') > 0
-                xx = dir(fullfile(filePath,'*.tif'));
-                N = {xx.name};
-                X = ~cellfun('isempty', strfind(N, fileNameRoot));
-                numFiles = sum(X);
-                multiFile = true;
-            end
+            xx = dir(fullfile(filePath,'*.tif'));
+            N = {xx.name};
+            X = ~cellfun('isempty', strfind(N, "_000"));
+            numFiles = sum(X);
+            multiFile = true;
         elseif length(files)==1
             multiFile = false;
-            numFiles = 1;
+            numFiles = 1; 
         end
         fileNames = {files.name};
         filteredFileNames = fileNames(~contains(lower(fileNames), 'plane'));
-
+    
         filesToProcess = {}; % keep track of processed files
         for i = 1:length(filteredFileNames)
             currentFileName = filteredFileNames{i};
@@ -72,27 +70,26 @@ else
                 sprintf('Ignoring file %s ', currentFileName)
             end
         end
-
+  
         if isempty(filesToProcess)
             error('No suitable files found for processing in: \n  %s', filePath);
         end
 
         %%  (I) Assemble ROI's from ScanImage
         %%% Loop through raw .tif files and reassemble planes/frames.
-        numFiles = length(filesToProcess);
         for ijk = 1:numFiles
             disp(['Loading file ' num2str(ijk) ' of ' num2str(numFiles) '...'])
             date = datetime(now,'ConvertFrom','datenum');
             formatSpec = '%s Beginning file %u...\n';
             fprintf(fid,formatSpec,date,ijk);
-
+        
             % Use the currentFileName from filesToProcess
             currentFileName = filesToProcess{ijk};
-
+            
             [vol, volumeRate, pixelResolution] = assembleCorrectedROITiff(fullfile(filePath, currentFileName));
             tt = toc/3600;
             disp(['Volume loaded and processed. Elapsed time: ' num2str(tt) ' hours. Saving volume to temp...'])
-
+        
             %% Save volume as .mat/hdf5 and additional information as attributes
             matfilename = fullfile(saveDirPath, [currentFileName(1:end-4) '.mat']);
             numberOfPlanes = 30;
@@ -105,14 +102,14 @@ else
             else
                 disp('Number of planes not recognized.')
             end
-
+    
             vol = vol(:,:,order,:);
             fullVolumeSize = size(vol);
             savefast(matfilename,'vol','volumeRate','pixelResolution','fullVolumeSize');
 
             tt = toc/3600;
             disp(['Volume loaded, processed, and saved to disk. Elapsed time: ' num2str(tt) ' hours. Processing next volume...'])
-
+        
             clear vol
             pause(0.5)
         end
@@ -123,7 +120,7 @@ else
         else
             fprintf('Error in %s at line %d: %s\n', ME.stack(1).name, ME.stack(1).line, ME.message);
         end
-
+        
         % delete the logfile before erroring out
         fclose(fid);
         fprintf('Deleting logfile: %s', logFullPath)
