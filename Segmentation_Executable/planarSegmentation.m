@@ -151,11 +151,10 @@ else
             addpath(genpath(fullfile('CaImAn-MATLAB-master','CaImAn-MATLAB-master')))
             addpath(genpath(fullfile('motion_correction/')))
 
-            [d1,d2,T] = size(data);                                % dimensions of dataset
-            d = d1*d2;                                          % total number of pixels
+            [d1,d2,T] = size(data);                             
+            d = d1*d2; % total number of samples
 
             FrameRate = volume_rate;
-
             tau = ceil(7.5./pixel_resolution);
 
             if pixel_resolution>3
