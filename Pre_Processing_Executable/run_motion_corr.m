@@ -1,31 +1,41 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% run_motion_corr.m
+function motionCorrectPlane(filePath, fileNameRoot, numCores, startPlane, endPlane)
+% MOTIONCORRECTPLANE Perform rigid and non-rigid motion correction on imaging data.
 %
-% J.D. 05/19/2020
-% F.O. 03/04/2024 - Added 24core option. Need checks for storage capacity.
+% This function processes imaging data by loading individual processed planes,
+% performing rigid motion correction to use as a template for patched non-rigid
+% motion correction. Each motion-corrected plane is saved separately.
 %
-% For each file, import raw .tif files, assemble ROIs,
-% correct scan phase, re-order planes, and save a memory-mapped file.
-% Access each plane in each file and concatenate in time
-% Motion correct each plane and save to separate .tif files.
+% Updates:
+%   J.D. - 05/19/2020 - Original implementation.
+%   F.O. - 03/04/2024 - Added support for 24 cores, included storage capacity checks.
 %
-% Use the 'filePath' input argument to point to a local folder with raw
-% .tif files
+% Inputs:
+%   filePath      - Directory containing raw .tif files.
+%   fileNameRoot  - Root name for files in the directory. This code appends '_00001.tif'
+%                   to this root name, so this suffix should be removed from the root.
+%   numCores      - Number of cores to use for computation. If more than 24, it defaults to 23.
+%   startPlane    - The starting plane index for processing.
+%   endPlane      - The ending plane index for processing.
 %
-% Use the 'fileNameRoot' input argument to point toward the root for each
-% file in the directory. The code will appeand '_00001.tif' to the end, so
-% remove this suffix from the root.
-%
-% Each motion-corrected plane is saved as a separate .mat file with the following fields:
-% Y: single plane recording data (x,y,T) (single)
-% Ym: mean projection image of Y (x,y) (single)
-% sizY: array with size of dimension of Y (1,3)
-% volumeRate: volume rate of the recording (1,1) (Hz)
-% pixelResolution: size of each pixel in microns (1,1) (um)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Outputs:
+%   Each motion-corrected plane is saved as a .mat file containing:
+%   - shifts: 2D motion vectors as single precision.
+%   - metadata: Struct containing all relevant metadata for this session.
+% 
+% Notes:
+%   Only .mat files containing processed volumes should be in the filePath.
+%   Any .mat files with "plane" in the filename will be skipped to avoid
+%           processing a previously motion-correted plane.
+arguments
+    filePath (1,:) char                    % Path to the directory with input files.
+    fileNameRoot (1,:) char                % Base name for input files.
+    numCores (1,1) double {mustBeInteger, mustBePositive, mustBeLessThanOrEqual(numCores,24)} = 1
+    startPlane (1,1) double {mustBeInteger, mustBePositive} = 1
+    endPlane (1,1) double {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(endPlane,startPlane)} = 1
+end
+    addpath(genpath(fullfile("utils/")));
+    addpath(genpath(fullfile('motion_correction/')));
 
-function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
     tic;
     clck = clock; % Generate a timestamp for the log file name.
     logFileName = sprintf('matlab_log_%d_%02d_%02d_%02d_%02d.txt', clck(1), clck(2), clck(3), clck(4), clck(5));
@@ -38,94 +48,107 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
         delete(poolobj);
     end
 
-    addpath(genpath(fullfile('CaImAn-MATLAB-master', 'CaImAn-MATLAB-master')));
-    addpath(genpath(fullfile('motion_correction/')));
-
     disp('Beginning processing routine.');
-    numCores = max(str2double(numCores), 23); % Ensure at least 23 cores or use specified number.
-
+    numCores = max(numCores, 23);
     fprintf(fid, '%s Beginning processing routine...\n', datetime);
-
+    
     files = dir(fullfile(filePath, '*.mat'));
+    if isempty(files)
+        error('No suitable tiff files found in: \n  %s', filePath);
+    end
+
+    multiFile = length(files) > 1;
+    filesToProcess = {}; % keep track of processed files
+    for i = 1:length(files)
+        currentFileName = files(i).name;
+        % match _0000N.tif, where N = #files, at the end of the filename
+        if multiFile && ~isempty(regexp(currentFileName, '.*_\d{5}\.mat$', 'once'))
+            filesToProcess{end+1} = currentFileName;
+            sprintf('Adding %s ...', currentFileName)
+        elseif ~multiFile
+            sprintf('Only file to process: %s ', currentFileName)
+            filesToProcess{end+1} = currentFileName;
+            break;
+        else
+            sprintf('Ignoring file %s ', currentFileName)
+        end
+    end
+
+     if isempty(filesToProcess)
+        error('No suitable files found for processing in: \n  %s', filePath);
+     end 
+ 
+    % Filter out motion correction output files containing "plane" in the filename 
     fileNames = {files.name};
     relevantFiles = contains(fileNames, fileNameRoot) & ~contains(fileNames, 'plane');
     relevantFileNames = fileNames(relevantFiles);
-    sprintf('Number of files to process: %d \n', num2str(length(relevantFileNames)))
+    sprintf('Number of files to process: %s \n', num2str(length(relevantFileNames)))
 
     for fname=1:length(relevantFiles)
         disp(fname)
     end
-
+    
     % Check if at least one relevant file is found
     if isempty(relevantFileNames)
         error('No relevant files found in filePath: %d \n', filePath);
-    else
-        numFiles = length(relevantFileNames);
+    end
+    
+    numFiles = length(relevantFileNames);
+
+    % Pull metadata file
+    metadata_matfile = matfile(fullfile(filePath, relevantFileNames{1}), 'Writable',true);
+    metadata = metadata_matfile.metadata;
+
+    pixel_resolution = metadata.pixel_resolution;
+    sizY = metadata.volume_size;
+    d1Planes = metadata.volume_size(3);
+    d1file = metadata.volume_size(1);
+    d2file = metadata.volume_size(2);
+    Tfile = metadata.volume_size(4);
+    totalT = Tfile*length(relevantFileNames);
+
+    if ~(d1Planes >= endPlane)
+        error("Not enough planes to process given user supplied argument: %d as endPlane when only %d planes exist in this dataset.", endPlane, d1Planes);
     end
 
-    % Pull dimensions from the file
-    data_first = matfile(fullfile(filePath, relevantFileNames{1}), 'Writable',true);
-    volumeRate = data_first.volumeRate;
-    sizY = data_first.fullVolumeSize;
-    pixelResolution = data_first.pixelResolution;
-    numberOfPlanes_first = sizY(3);
-    d1 = sizY(1);
-    d2 = sizY(2);
-    T = sizY(4);
-    totalT = T*length(relevantFileNames);
-
-    if ~(numberOfPlanes_first >= endPlane)
-        error("Not enough planes to process given user supplied argument: %d as endPlane when only %d planes exist in this dataset.", endPlane, numberOfPlanes_first);
-    end
-
+    % To use H5:
     % fileInfo = h5info(fullfile(filePath, relevantFileNames{1}), '/data');
     % d1 = fileInfo.Dataspace.Size(1);
     % d2 = fileInfo.Dataspace.Size(2);
     % num_planes = fileInfo.Dataspace.Size(3);
     % T = fileInfo.Dataspace.Size(4); % Number of time points per file
-
+    
     % preallocate based on the total number of time points across all files
     % For each file, grab all data for this plane.
-    Y = zeros(sizY(1), sizY(2), T*numFiles, 'single');
     for plane_idx = startPlane:endPlane
         sprintf('Loading plane %s', num2str(plane_idx))
+        Y = zeros(sizY(1), sizY(2), totalT, 'single');
         for file_idx = 1:numel(relevantFileNames)
-
-            % h5FilePath = fullfile(filePath, currentFileName);
-            % dataset = '/data';
-            % start = [1, 1, plane_idx, 1];
-            % count = [d1, d2, 1, total_T];
-
-            % % only the plane of interest for all timepoints from the current file
-            % data = h5read(h5FilePath, '/data', [1, 1, plane_idx, 1], [d1, d2, 1, T]);
-            % pixelResolution = h5readatt(h5FilePath, dataset, 'pixelResolution');
-            % volumeRate = h5readatt(h5FilePath, dataset, 'volumeRate');
-            % sizY = h5readatt(h5FilePath, dataset, 'fullVolumeSize');
-
-            % Insert the read data into the pre-allocated array Y
             currentFileName = relevantFileNames{file_idx};
-            currentMatFile = matfile(fullfile(filePath, currentFileName), "Writable",true);
-            currentVolumeSize = currentMatFile.fullVolumeSize;
-            Y(:, :, (file_idx-1)*T+1:file_idx*T) = single( ...
-                reshape( ...
-                    currentMatFile.vol(:, :, plane_idx, :), ...
-                    currentVolumeSize(1), ...       % d1
-                    currentVolumeSize(2), ...       % d2
-                    currentVolumeSize(4)));         % T
+            data = matfile(fullfile(filePath, currentFileName), "Writable",true);
+            Y(:,:,(file_idx-1)*Tfile+1:file_idx*Tfile) = single(reshape(data.vol(:,:,plane_idx,:),d1file,d2file,Tfile));
         end
 
+        sizY = size(Y);
+        d1 = sizY(1);
+        d2 = sizY(2);
+        T = sizY(3);
+
+        Y = Y-min(Y(:));
+        
         fprintf(fid, '%s Beginning processing for plane %s with %s matlab workers.', datetime, plane_idx);
 
         if size(gcp("nocreate"),1)==0
             parpool(numCores);
         end
 
-        % Rigid motion correction using NoRMCorre algorithm:
+        %% Motion correction: Create Template                 
+        max_shift = round(20/pixel_resolution);
         options_rigid = NoRMCorreSetParms(...
             'd1',d1,...
             'd2',d2,...
             'bin_width',200,...       % Bin width for motion correction
-            'max_shift',round(20/pixelResolution),...        % Max shift in px
+            'max_shift',round(20/pixel_resolution),...        % Max shift in px
             'us_fac',20,...
             'init_batch',200,...     % Initial batch size
             'correct_bidir',false... % Correct bidirectional scanning
@@ -135,73 +158,51 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
         date = datetime(now,'ConvertFrom','datenum');
         formatSpec = '%s Rigid MC Complete, beginning non-rigid mc...\n';
         fprintf(fid,formatSpec,date);
-
+        
+        % create the template using X/Y shift displacements
         shifts_r = squeeze(cat(3,shifts1(:).shifts));
         shifts_v = movvar(shifts_r,24,1);
-    %     [~,minv_idx] = mink(shifts_v,120,1);
-        [srt,minv_idx] = sort(shifts_v,120);
+        [srt,minv_idx] = sort(shifts_v,120); 
         best_idx = unique(reshape(minv_idx,1,[]));
         template_good = mean(M1(:,:,best_idx),3);
-
-        % No rigid motion correction using the good tamplate from the rigid
+        
+        % Non-rigid motion correction using the good tamplate from the rigid
         % correction.
           options_nonrigid = NoRMCorreSetParms(...
-            'd1',d1,...
-            'd2',d2,...
+            'd1',d1file,...
+            'd2',d2file,...
             'bin_width',24,...
-            'max_shift',round(20/pixelResolution),...
+            'max_shift', max_shift,...
             'us_fac',20,...
             'init_batch',120,...
             'correct_bidir',false...
             );
 
-        % Data from the motion correction that will be used for the CNMF
-        [M2,shifts2,~,~] = normcorre_batch(Y,options_nonrigid,template_good);
+        % DFT subpixel registration - results used in CNMF
+        % [M2,shifts2,~,~] = normcorre_batch(Y,options_nonrigid,template_good);
 
-        disp('Calculating motion correction metrics...')
+        % Returns a [2xnum_frames] vector of shifts in x and y 
+        [shifts, ~, ~] = rigid_mcorr(Y,'template', template_good, 'max_shift', max_shift, 'subtract_median', false, 'upsampling', 20);
+        outputFile = [filePath 'mc_vectors_plane_' num2str(plane_idx) '.mat'];
 
-        shifts_r = squeeze(cat(3,shifts1(:).shifts));
-        shifts_nr = cat(ndims(shifts2(1).shifts)+1,shifts2(:).shifts);
-        shifts_nr = reshape(shifts_nr,[],ndims(Y)-1,T);
-        shifts_x = squeeze(shifts_nr(:,1,:))';
-        shifts_y = squeeze(shifts_nr(:,2,:))';
-
-        [cY,~,~] = motion_metrics(Y,10);
-        [cM1,~,~] = motion_metrics(M1,10);
-        [cM2,~,~] = motion_metrics(M2,10);
-
-        motionCorrectionFigure = figure;
-
-        ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2); legend('raw data','rigid','non-rigid'); title('correlation coefficients','fontsize',14,'fontweight','bold')
-                set(gca,'Xtick',[])
-        ax2 = subplot(312); %plot(shifts_x); hold on;
-        plot(shifts_r(:,1),'--k','linewidth',2); title('displacements along x','fontsize',14,'fontweight','bold')
-                set(gca,'Xtick',[])
-        ax3 = subplot(313); %plot(shifts_y); hold on;
-        plot(shifts_r(:,2),'--k','linewidth',2); title('displacements along y','fontsize',14,'fontweight','bold')
-                xlabel('timestep','fontsize',14,'fontweight','bold')
-        linkaxes([ax1,ax2,ax3],'x')
-
-        % Figure: Motion correction Metrics
-        saveas(motionCorrectionFigure,[filePath 'motion_corr_metrics_plane_' num2str(plane_idx) '.fig']);
-        close(motionCorrectionFigure)
-
-        Y = M2;
-        clear M2 M1 cM1 cM2 template_good shifts1 shifts2 shifts_nr shifts_r shifts_x shifts_y cY
-
-        tt = toc/3600;
-        disp(['Motion correction complete. Time elapsed: ' num2str(tt) ' hours. Saving to disk...'])
-
-        outputFile = [filePath fileNameRoot '_plane_' num2str(plane_idx) '.mat'];
-
-        Ym = mean(Y,3);
-
-        savefast(outputFile,'Y','volumeRate','sizY','pixelResolution','Ym')
+        savefast(outputFile, 'metadata', 'shifts');
 
         disp('Data saved, beginning next plane...')
         date = datetime(now,'ConvertFrom','datenum');
         formatSpec = '%s Motion Correction Complete. Beginning next plane...\n';
         fprintf(fid,formatSpec,date);
+
+        clear M1 cM1 cM2 cY cMT template_good shifts* %M2
+
+        % disp('Calculating motion correction metrics...')
+
+        % apply vectors to movie
+        % mov_from_vec = translateFrames(Y, t_shifts);
+   
+        % [cY,~,~] = motion_metrics(Y,10);
+        % [cM1,~,~] = motion_metrics(M1,10);
+        % % [cM2,~,~] = motion_metrics(M2,10);
+        % [cMT,~,~] = motion_metrics(mov_from_vec,10);
     end
 
     disp('All planes processed...')
@@ -210,5 +211,4 @@ function run_motion_corr(filePath,fileNameRoot,numCores, startPlane, endPlane)
     date = datetime(now,'ConvertFrom','datenum');
     formatSpec = '%s Routine complete.';
     fprintf(fid,formatSpec,date);
-
 end
