@@ -1,6 +1,7 @@
 %% Load Data 
 
 clc
+clear
 addpath(genpath(fullfile("Pre_Processing_Executable/ScanImage_Utilities/SI2016bR1_2017-09-28-140040_defde478ed/")))
 filename = 'C:\Users\RBO\Documents\MATLAB\benchmarks\high_resolution\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif';
 [roiData2, roiGroup2, header2, ~] = scanimage.util.getMroiDataFromTiff(filename); 
@@ -78,7 +79,7 @@ for plane = 1:2
 end
 
 %% Original 
-
+[roiData, roiGroup, header, ~] = scanimage.util.getMroiDataFromTiff(filename); % load in data throuhg scanimage utility
 imageData = zeros(dim1, dim2, numChannels, num_frames, 'int16');
 for channel = 1:numChannels
     frameTemp = zeros(dim1, dim2, num_frames, 'int16');
@@ -95,6 +96,7 @@ for channel = 1:numChannels
     % h5write(filename, dataset_name, stripTemp, [1 1 1 channel], size(stripTemp);
 end
 
+
 %% Vectorized Approach
 tStart = tic;
 T = zeros(1, 3);
@@ -103,10 +105,8 @@ DATA = [DATA{:}];
 DATA = [DATA{:}];
 DATA = reshape(DATA, 1, 1, num_frames, numChannels, num_rois); % leave space for trimmed data
 tMid1 = toc(tStart);
-fprintf('Collapsing array, data shape: %s\n', num2str(size(DATA)));
 DATA = cell2mat(DATA);
 tMid2 = toc(tStart);
-fprintf('Converting to numeric array, data shape: %s\n', num2str(size(DATA)));
 DATA = num2cell(permute(DATA, [1 2 3 5 4]), [1 2 3 4]);
 DATA = cat(4, DATA{:});
 tEnd = toc(tStart);
