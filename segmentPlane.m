@@ -2,12 +2,10 @@
 %
 % planarSegmentation.m
 %
-% Jeff 09/22/2019
-%
 % Note: All inputs should be character strings.
 %
-% Use the 'path' input argument to point to a local folder with motion-corrected, 
-% pre-processed and ROI re-assembled MAxiMuM data. 
+% Use the 'path' input argument to point to a local folder with motion-corrected,
+% pre-processed and ROI re-assembled MAxiMuM data.
 %
 % The 'diagnosticFlag' argument, when set to '1', will report all .mat files in
 % the directory specified by 'path'.
@@ -26,16 +24,16 @@
 % Required fields for each file to be processed:
 % Y: single plane recording data (x,y,T) (single)
 % Ym: mean projection image of Y (x,y) (single)
-% sizY: array with size of dimension of Y (1,3) 
+% sizY: array with size of dimension of Y (1,3)
 % volumeRate: volume rate of the recording (1,1) (Hz)
 % pixelResolution: size of each pixel in microns (1,1) (um)
-% 'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')   
+% 'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')
 
 % Outputs:
 % T_keep: neuronal time series (Km,T) (single)
 % Ac_keep: neuronal footprints (2*tau+1,2*tau+1,Km) (single)
 % C_keep: denoised time series (Km,T) (single)
-% Km: number of neurons found (1,1) 
+% Km: number of neurons found (1,1)
 % Cn: correlation image (x,y) (single)
 % b: background spatial components (x*y,3) (single)
 % f: background temporal components (3,T) (single)
@@ -56,7 +54,7 @@ end
 
 if strcmp(diagnosticFlag,'1') % if the diagnostic flag is set to 1, spit out contents of directory specified by 'path'
     dir([path,'*.mat'])
-    
+
 else
     files = dir([path, '*.mat']); % find all .mat files in the data directory
     numFiles = size(files,1);
@@ -80,26 +78,26 @@ else
     filestem = files(1).name; % often there are other .mat files in the directory, we assume the 1st file is processed MAxiMuM data and base the template for the names of all files off it
     inds = strfind(filestem,'_');
     filestem = filestem(1:inds(end));
-    
+
     if size(files,1)>16 % determine if it's a 15 or 30 plane MAxiMuM recording
         numFiles = 30;
-    else 
+    else
         numFiles = 15;
     end
-       
+
     % use defaults or determine range of planes to process based on input arguments
     if str2double(startPlane) == 0 || size(str2double(startPlane),1) == 0
         startPlane = 1;
     else
         startPlane = str2double(startPlane);
     end
-        
+
     if str2double(endPlane) == 0 || size(str2double(endPlane),1) == 0
         endPlane = numFiles;
     else
         endPlane = str2double(endPlane);
     end
-    
+
     % use default (12) cores or specify based on input argument
     if str2double(numCores) == 0 || size(str2double(numCores),1) == 0
         numCores = 12;
@@ -108,9 +106,9 @@ else
     end
 
     numFiles = endPlane-startPlane+1;
-    
+
     for abc = startPlane:endPlane
-        try 
+        try
             disp(['Beginning calculations for plane ' num2str(abc) ' of ' num2str(numFiles) '...'])
             date = datetime(now,'ConvertFrom','datenum');
             formatSpec = '%s BEGINNING PLANE %u\n';
@@ -121,8 +119,8 @@ else
             file = [filestem num2str(abc)];
 
             % load data
-            d = load(fullfile(path, [file '.mat']));            
-            data = d.Y;           
+            d = load(fullfile(path, [file '.mat']));
+            data = d.Y;
             pixel_resolution = d.pixelResolution;
             volume_rate = d.volumeRate;
 
@@ -151,7 +149,7 @@ else
             addpath(genpath(fullfile('CaImAn-MATLAB-master','CaImAn-MATLAB-master')))
             addpath(genpath(fullfile('motion_correction/')))
 
-            [d1,d2,T] = size(data);                             
+            [d1,d2,T] = size(data);
             d = d1*d2; % total number of samples
 
             FrameRate = volume_rate;
@@ -159,7 +157,7 @@ else
 
             if pixel_resolution>3
                 dist = 1.5;
-            else 
+            else
                 dist = 1.25;
             end
 
@@ -180,20 +178,20 @@ else
             patches = construct_patches(sizY(1:end-1),patch_size,overlap);
 
             K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2); % number of components based on assumption of 9.2e4 neurons/mm^3
-            
+
             % Set caiman parameters
-            options = CNMFSetParms(...   
+            options = CNMFSetParms(...
             'd1',d1,'d2',d2,...                         % dimensionality of the FOV
             'deconv_method','constrained_foopsi',...    % neural activity deconvolution method
-            'temporal_iter',3,...                       % number of block-coordinate descent steps 
+            'temporal_iter',3,...                       % number of block-coordinate descent steps
             'maxIter',15,...                            % number of NMF iterations during initialization
             'spatial_method','regularized',...          % method for updating spatial components
-            'df_prctile',20,...                         % take the median of background fluorescence to compute baseline fluorescence 
-            'p',p,...                                   % order of AR dynamics    
+            'df_prctile',20,...                         % take the median of background fluorescence to compute baseline fluorescence
+            'p',p,...                                   % order of AR dynamics
             'gSig',tau,...                              % half size of neuron
-            'merge_thr',merge_thresh,...                % merging threshold  
-            'nb',1,...                                  % number of background components  
-            'gnb',3,...         
+            'merge_thr',merge_thresh,...                % merging threshold
+            'nb',1,...                                  % number of background components
+            'gnb',3,...
             'min_SNR',min_SNR,...                       % minimum SNR threshold
             'space_thresh',space_thresh ,...            % space correlation threshold
             'decay_time',0.5,...                        % decay time of transients, GCaMP6s
@@ -215,18 +213,18 @@ else
             date = datetime(now,'ConvertFrom','datenum');
             formatSpec = '%s Initial CNMF complete.\n';
             fprintf(fid,formatSpec,date,abc);
-            
+
             % Classify components
             disp('Beginning component classification...')
             [rval_space,rval_time,max_pr,sizeA,keep0,~,traces] = classify_components_jeff(data,A,C,b,f,YrA,options);
             date = datetime(now,'ConvertFrom','datenum');
             formatSpec = '%s Component classification complete.\n';
             fprintf(fid,formatSpec,date,abc);
-            
+
             Cn =  correlation_image(data);
-            
+
             % Spatial acceptance test:
-            ind_corr = (rval_space > space_thresh) & (sizeA >= options.min_size_thr) & (sizeA <= options.max_size_thr);                     
+            ind_corr = (rval_space > space_thresh) & (sizeA >= options.min_size_thr) & (sizeA <= options.max_size_thr);
 
             % Event exceptionality:
             fitness = compute_event_exceptionality(traces,options.N_samples_exc,options.robust_std);
@@ -239,27 +237,27 @@ else
             C_keep = C(keep,:);
             Km = size(C_keep,1);  % total number of components
             rVals = rval_space(keep);
-            
+
             t1 = toc;
-            disp(['CNMF complete. Process took ' num2str((t1-t0)./60) ' minutes. Updating temporal components...']);            
+            disp(['CNMF complete. Process took ' num2str((t1-t0)./60) ' minutes. Updating temporal components...']);
 
             P.p = 0;
             options.nb = options.gnb;
             [C_keep,f,~,~,R_keep] = update_temporal_components(reshape(data,d,T),A_keep,b,C_keep,f,P,options);
 
             t2 = toc;
-    
-            disp(['Temporal components updated. Process took ' num2str((t2-t1)./60) ' minutes. Extracting raw fluorescence traces...']);            
+
+            disp(['Temporal components updated. Process took ' num2str((t2-t1)./60) ' minutes. Extracting raw fluorescence traces...']);
             date = datetime(now,'ConvertFrom','datenum');
             formatSpec = '%s Temporal components updated.\n';
             fprintf(fid,formatSpec,date,abc);
-            
+
             if size(A_keep,2) < 2 % Calculate "raw" traces in terms of delta F/F0
                 [T_keep,F0] = detrend_df_f([A_keep,ones(d1*d2,1)],[b,ones(d1*d2,1)],[C_keep;ones(1,T)],[f;-min(min(min(data)))*ones(1,T)],[R_keep; ones(1,T)],options);
             else
                 [T_keep,F0] = detrend_df_f(A_keep,[b,ones(d1*d2,1)],C_keep,[f;-min(min(min(data)))*ones(1,T)],R_keep,options);
             end
-                        
+
             t3 = toc;
             disp(['Components detrended. Process took = ' num2str((t3-t2)./60) ' minutes.'])
             date = datetime(now,'ConvertFrom','datenum');
@@ -268,7 +266,7 @@ else
 
             % Convert sparse A matrix to full 3D matrix
             [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2);  % Ac_keep has dims. [2*tau+1,2*tau+1,K] where each element Ki is a 2D map centered on centroid of component acx(Ki),axy(Ki), and acm(Ki) = sum(sum(Ac_keep(:,:,Ki))
-            
+
             % Convert ouputs to single to reduce memory consumption
             Ym = single(mean(data,3));
             Cn = single(Cn);
@@ -277,7 +275,7 @@ else
             f = single(f);
 
             % Save data
-            savefast(fullfile(save_path, ['caiman_output_plane_' num2str(abc) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')   
+            savefast(fullfile(save_path, ['caiman_output_plane_' num2str(abc) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')
 
             t4 = toc;
             disp(['Segmentation complete and data saved. Total time elapsed for current iteration ' num2str(t4./60) ' minutes.'])
@@ -286,7 +284,7 @@ else
             fprintf(fid,formatSpec,date,abc);
 
             clearvars -except abc numFiles files path save_path fid filestem numCores startPlane endPlane poolobj
-            
+
         catch ME
             date = datetime(now,'ConvertFrom','datenum');
             errorMessage = sprintf('%s Error in function %s() at line %d. Error Message: %s', ...
@@ -308,37 +306,36 @@ else
     fprintf(fid,formatSpec,date,abc);
     fclose(fid);
 
+    function [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2)
+        %% Convert the sparse matrix A_keep to a full 3D matrix that can be saved to hdf5
+    tau = tau(1);
+    x = 1:d2;
+    y = 1:d1;
+    [X,Y] = meshgrid(x,y);
+    Ac_keep = zeros(4*tau+1,4*tau+1,size(A_keep,2),'single');
+
+    acx = zeros(1,size(A_keep,2));
+    acy = acx;
+    acm = acx;
+
+    parfor ijk = 1:size(A_keep,2)
+
+        AOI = reshape(single(full(A_keep(:,ijk))),d1,d2);
+        cx = round(trapz(trapz(X.*AOI))./trapz(trapz(AOI)));
+        cy = round(trapz(trapz(Y.*AOI))./trapz(trapz(AOI)));
+
+        acx(ijk) = cx;
+        acy(ijk) = cy;
+        acm(ijk) = sum(AOI(:));
+
+        sx = max([cx-2*tau 1]); % handle cases where neuron is closer than 3*tau pixels to edge of FOV
+        sy = max([cy-2*tau 1]);
+        ex = min([cx+2*tau d2]);
+        ey = min([cy+2*tau d1]);
+
+        AOIc = nan(4*tau+1,4*tau+1);
+        AOIc(1:(ey-sy+1),1:(ex-sx+1)) = AOI(sy:ey,sx:ex);
+        Ac_keep(:,:,ijk) = single(AOIc);
+    end
 end
 
-function [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2)
-
-tau = tau(1);
-
-x = 1:d2;
-y = 1:d1;
-[X,Y] = meshgrid(x,y);
-Ac_keep = zeros(4*tau+1,4*tau+1,size(A_keep,2),'single');
-
-acx = zeros(1,size(A_keep,2));
-acy = acx;
-acm = acx;
-
-parfor ijk = 1:size(A_keep,2)
-    
-    AOI = reshape(single(full(A_keep(:,ijk))),d1,d2);
-    cx = round(trapz(trapz(X.*AOI))./trapz(trapz(AOI)));
-    cy = round(trapz(trapz(Y.*AOI))./trapz(trapz(AOI)));
-    
-    acx(ijk) = cx;
-    acy(ijk) = cy;
-    acm(ijk) = sum(AOI(:));
-    
-    sx = max([cx-2*tau 1]); % handle cases where neuron is closer than 3*tau pixels to edge of FOV
-    sy = max([cy-2*tau 1]);
-    ex = min([cx+2*tau d2]);
-    ey = min([cy+2*tau d1]);
-    
-    AOIc = nan(4*tau+1,4*tau+1);
-    AOIc(1:(ey-sy+1),1:(ex-sx+1)) = AOI(sy:ey,sx:ex);
-    Ac_keep(:,:,ijk) = single(AOIc);
-end
