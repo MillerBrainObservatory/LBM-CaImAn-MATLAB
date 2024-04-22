@@ -17,21 +17,24 @@ Pipeline Setup
 - Required Toolboxes:
   - Parallel Computing Toolbox
   - Statistics and Machine Learning Toolbox
-  - Image Processing Toolbox (for imtranslate speedup)
+  - Image Processing Toolbox
 
-Clone the repository and set up the environment::
+In a terminal, clone the repository and `cd`:
+
+.. code-block:: bash
 
     git clone https://github.com/ru-rbo/caiman_matlab.git
     cd caiman_matlab
 
 **Usage Instructions**:
 
-The pipeline comprises several key processing stages outlined below. Ensure all raw data (.tif files) and processed files (.mat files) are appropriately placed as required for each stage.
+This pipeline takes a directory as the primary input.
 
 1. Pre-processing:
 
-   Convert raw ScanImage .tif files into a 4D volume format for further processing::
+   Convert raw ScanImage .tif files into a 4D format for further processing::
 
+.. code-block:: MATLAB
        datapath = 'C:\\Users\\LBM_User\\Data\\Session1\\';  # Directory containing raw .tif files
        savepath = 'C:\\Users\\LBM_User\\Data\\Session1\\extracted_volumes\\';  # Output directory for 4D volumes
        convertScanImageTiffToVolume(datapath, savepath, 0);
@@ -40,6 +43,7 @@ The pipeline comprises several key processing stages outlined below. Ensure all 
 
    Perform both rigid and non-rigid motion correction using the Normcorre algorithm to stabilize the imaging data::
 
+.. code-block:: MATLAB
        filePath = 'C:\\Data\\';  # Path to the directory containing .mat files for processing
        fileNameRoot = 'session1_';  # Base filename to match for processing
        motionCorrectPlane(filePath, fileNameRoot, 24, 1, 10);  # Process from plane 1 to 10 using 24 cores
@@ -48,6 +52,7 @@ The pipeline comprises several key processing stages outlined below. Ensure all 
 
    Segment the motion-corrected data and extract neuronal signals::
 
+.. code-block:: MATLAB
        path = 'C:\\Users\\LBM_User\\Data\\Session1\\motion_corrected\\';
        planarSegmentation(path, 0, 1, 10, 24);  # Segment data from planes 1 to 10 using 24 cores
 
@@ -55,6 +60,7 @@ The pipeline comprises several key processing stages outlined below. Ensure all 
 
    Ensure correct alignment of the imaging planes and calibrate the system using provided utilities::
 
+.. code-block:: MATLAB
        calculate_offset('C:\\Data\\calibration\\');  # Path to calibration data
        compare_planes_new('C:\\Data\\session1\\aligned\\');  # Path to data for final alignment
 
