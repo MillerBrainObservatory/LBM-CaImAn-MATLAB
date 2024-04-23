@@ -146,7 +146,7 @@ yo = yo-min(yo);
 
 for ijk = 2:28
     
-    disp(['Beginning calculation for plane ' num2str(ijk) ' of 30...'])
+    disp(['Beginning calculation for plane ' num2str(ijk)])
     
     pm = load([path 'caiman_output_plane_' num2str(ijk) '.mat']);
     
@@ -319,19 +319,19 @@ saveas(gcf,[path 'all_neuron_r_distribution.fig'])
 %%
 disp('Planes collated. Saving data...')
 savefast([path 'collated_caiman_output_minSNR_' strrep(num2str(min_snr),'.','p') '.mat'],'T_all','nx','ny','nz','C_all','offsets')
-disp('Routine complete.')
-
-NN = std(T_all - movmean(T_all,Nsamples,2),[],2);
-MM = max(movmean(T_all,Nsamples,2),[],2);
-Z = MM./NN;
-
-figure; histogram(Z,0:0.2:20)
-xlabel('Z-score')
-ylabel('Neurons')
-saveas(gcf,[path 'all_neuron_Zscore.fig'])
-
-figure
-histogram(100.*max(T_all,[],2))
-xlabel('Max \DeltaF/F_0 (%)')
-ylabel('Neurons')
-saveas(gcf,[path 'all_neuron_maxDF.fig'])
+% disp('Routine complete.')
+% 
+% NN = std(T_all - movmean(T_all,Nsamples,2),[],2);
+% MM = max(movmean(T_all,Nsamples,2),[],2);
+% Z = MM./NN;
+% 
+% figure; histogram(Z,0:0.2:20)
+% xlabel('Z-score')
+% ylabel('Neurons')
+% saveas(gcf,[path 'all_neuron_Zscore.fig'])
+% 
+% figure
+% histogram(100.*max(T_all,[],2))
+% xlabel('Max \DeltaF/F_0 (%)')
+% ylabel('Neurons')
+% saveas(gcf,[path 'all_neuron_maxDF.fig'])
