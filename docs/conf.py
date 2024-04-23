@@ -19,5 +19,5 @@ html_static_path = ['_static']
 extensions = ["sphinx.ext.autodoc", "sphinxcontrib.matlab", "numpydoc", "sphinx.ext.intersphinx"]
 primary_domain = "mat"
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "packages", "exclude"]
 html_theme = "default"
