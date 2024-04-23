@@ -1,39 +1,39 @@
-function [imageData,frameRate,pixelResolution] = assembleCorrectedROITiff(filename)
-    addpath(fullfile(""));
-
-    [roiData, roiGroup, header, ~] = scanimage.util.getMroiDataFromTiff(filename); % load in data throuhg scanimage utility
-    numROIs = numel(roiData); % number of ROIs (ASSUMES THEY ARE ORDERED LEFT TO RIGHT)
-    totalFrame = length(roiData{1}.imageData{1}); % total number of frames in data set
-    totalChannel = length(roiData{1}.imageData); % number of channels
-    frameRate = header.SI.hRoiManager.scanVolumeRate;
-    sizeXY = roiGroup.rois(1,1).scanfields.sizeXY;
-    FOV = 157.5.*sizeXY;
-    numPX = roiGroup.rois(1,1).scanfields.pixelResolutionXY;
-    pixelResolution = mean(FOV./numPX);
-
-    %% Assemble frames
-    imageData = [];
-    for channel = 1:totalChannel
-        disp(['Assembling channel ' num2str(channel) ' of ' num2str(totalChannel) '...'])
-        frameTemp = [];
-        for strip = 1:numROIs
-
-            % Generate the time series of each ROI in the data
-            stripTemp = [];
-            for frame = 1:totalFrame
-                stripTemp = cat(4,stripTemp,single(roiData{1,strip}.imageData{1,channel}{1,frame}{1,1}));
+function [imageData,metadata] = assembleCorrectedROITiff(varargin) 
+    if nargin == 1
+        filename = varargin{1};
+        if ~isfile(filename)
+            [f, p] = uigetfile({'*.tif;*.tiff'},'Select Image File');
+            if f == 0
+                most.idioms.warn('Invalid arguments'); 
+                return;
             end
-            corr = returnScanOffset(stripTemp,1); % find offset correction
-            stripTemp = fixScanPhase(stripTemp,corr,1); % fix scan phase
-            val = round(size(stripTemp,1)*0.03); % trim excess
-            stripTemp = stripTemp(val:end,7:138,:,:);
-
-            frameTemp = cat(2,frameTemp,stripTemp); % create each frame
-
+            filename = fullfile(p,f); 
         end
+        % tic
+        % [header, aout] = scanimage.util.opentif(filename);
+        % toc
+        [roiData, roiGroup, header, ~] = scanimage.util.getMroiDataFromTiff(filename);
+    else
+        disp('No filename provided');
+	    return;
+    end
 
-        imageData = single(cat(3,imageData,frameTemp));
+    metadata = get_metadata(filename);
+    val = round(metadata.num_pixel_xy(2)*0.03);
 
+    imageData = zeros(metadata.img_size_y, metadata.img_size_x, metadata.num_planes, metadata.num_frames, 'int16');
+    for plane = 1:metadata.num_planes
+        frameTemp = zeros(metadata.img_size_y, metadata.img_size_x, metadata.num_frames, 'int16');
+        for roi_idx = 1:metadata.num_rois
+            stripTemp = cell2mat(permute(cellfun(@(x) x{1}, roiData{1, roi_idx}.imageData{1, plane}, 'UniformOutput', false), [1, 3, 2]));
+            corr = returnScanOffset2(stripTemp,1); % find offset correction
+            stripTemp = fixScanPhase(stripTemp,corr,1); % fix scan phase
+            stripTemp = stripTemp(val:end,metadata.strip_width_slice,:,:);
+            frameTemp(:, (roi_idx-1)*length(metadata.strip_width_slice)+1:roi_idx*length(metadata.strip_width_slice), :) = stripTemp;
+        end
+        % Add to preallocated array
+        % ..or, save straight to H5
+        imageData(:, :, plane, :) = frameTemp;
     end
 end
 
