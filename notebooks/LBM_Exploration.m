@@ -15,12 +15,11 @@ addpath(genpath(fullfile("Pre_Processing_Executable/ScanImage_Utilities/SI2016bR
 base = "C:\Users\RBO\Documents\MATLAB\benchmarks\";
 
 filepaths = {
-    fullfile('C:\Users\RBO\Documents\MATLAB\benchmarks\test\mh89_hemisphere_FOV_50_550um_depth_250mW_dual_stimuli_30min_00001_00001.tif');
-    % 'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\mh89_hemisphere_FOV_50_550um_depth_250mW_dual_stimuli_30min_00001_00001.tif'; %singlehemi
-    % 'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif'; % highres
-    % 'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\MH70_0p9mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif'; % highspeed
-    % 'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.tif'; % bihemi
-
+    % fullfile('C:\Users\RBO\Documents\MATLAB\benchmarks\test\mh89_hemisphere_FOV_50_550um_depth_250mW_dual_stimuli_30min_00001_00001.tif');
+    'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\mh89_hemisphere_FOV_50_550um_depth_250mW_dual_stimuli_30min_00001_00001.tif'; %singlehemi
+    'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif'; % highres
+    'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\MH70_0p9mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif'; % highspeed
+    'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.tif'; % bihemi
     };
 
 lbm_data = cell(size(filepaths));
@@ -50,8 +49,7 @@ end
 %% Interactive Widget
 exploreImageFrames(lbm_data);
 
-%% Jeffs Extraction
-
+%% Extract neuronal footprints to add to dataset
 for d=1:length(lbm_data)
     dataset = lbm_data{d};
     datapath = dataset.path;
@@ -65,7 +63,7 @@ for d=1:length(lbm_data)
 end
 
 
-%% With Edge Detection
+%% Edge Detection
 figure(4);
 plane = 1;
 frame = 2;
@@ -350,37 +348,7 @@ function [data] = extract_roi_data(filepath)
 
 end
 
-
-function to_movie(data, frameRate, fileName)
-    % Check if fileName is provided, if not set a default name
-    if nargin < 3
-        fileName = 'outputVideo.avi';
-    end
-    
-    % Create a VideoWriter object to write the video file
-    v = VideoWriter(fileName, 'Uncompressed AVI');
-    v.FrameRate = frameRate;
-    open(v);
-    
-    % Determine the number of frames (time steps)
-    numFrames = size(data, 3);
-    
-    % Create each frame of the movie
-    for t = 1:numFrames
-
-        % Extract the frame at time t
-        frame = data(:,:,t);
- 
-        % Write the frame to the video
-        writeVideo(v, frame);
-    end
-    
-    % Close the VideoWriter object
-    close(v);
-    disp(['Video saved as ', fileName]);
-end
-
- %% Debug
+ %% Debug: get info out of a .tif quickly
 
 % [~, data] = scanimage.util.opentif('/data2/fpo/data/mh89_hemisphere_FOV_50_550um_depth_250mW_dual_stimuli_30min_00001_00001.tif');
 % data = squeeze(data(:, :, 1, 1));
