@@ -1,4 +1,7 @@
 function [imageData,metadata] = assembleCorrectedROITiff(varargin) 
+    [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
+    addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/SI2016bR1_2017-09-28-140040_defde478ed/')));
+    addpath(genpath("utils"));
     if nargin == 1
         filename = varargin{1};
         if ~isfile(filename)

@@ -11,8 +11,6 @@ else
 end
 
 %% 1) Pre-Processing
-
-
 % should only contain .tif files from a single session
 datapath = 'C:\Users\RBO\Documents\MATLAB\benchmarks\high_resolution\';
 

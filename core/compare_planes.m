@@ -1,19 +1,4 @@
-clear
 clc
-
-choice = menu('Select NAS:','v-data1','v-data2','v-data3');
-
-addpath(genpath('\\v-storage\vazirilab_medium_data\jeff_demas\PROCESSING_SCRIPTS\CaImAn_utilities'))
-
-switch choice
-    case 1
-        path = '\\v-storage.rockefeller.edu\vazirilab_medium_data\jeff_demas\MAxiMuM_data\';
-    case 2
-        path = '\\v-storage2.rockefeller.edu\v-data2\jeff_demas\MAxiMuM_data\';
-    case 3
-        disp('Drive is not configured for use yet.')
-end
-
 path = uigetdir(path);
 path = [path '/'];
 
