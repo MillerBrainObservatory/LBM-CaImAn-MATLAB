@@ -3,17 +3,14 @@
 Light Beads Microscopy (LBM) Pipeline
 =====================================
 
-Full analysis pipeline for LBM recordings. For a theoretical background of the LBM technology, see the reference `paper_`
+Full analysis pipeline for LBM recordings. For a theoretical background of the LBM technology, see the reference `publication`_
 
 Quickstart
 ----------
 
-.. note::
-
-   TODO - Win, WSL2, Linux, Unix, 1-time copy paste in terminal
-
 .. code-block:: bash
 
+    # TODO - Win, WSL2, Linux, Unix, 1-time copy paste in terminal
     # Optional, but helpful to put this in /home/<Username>Documents/MATLAB
     $ cd ~/Documents/MATLAB
     $ git clone https://github.com/ru-rbo/caiman_matlab.git
@@ -90,7 +87,7 @@ Additional Resources
 
 .. _CaImAn: https://github.com/flatironinstitute/CaImAn-MATLAB/
 .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
-.. _paper: https://www.nature.com/articles/s41592-021-01239-8/
+.. _publication: https://www.nature.com/articles/s41592-021-01239-8/
 .. _MROI: https://docs.scanimage.org/Premium%2BFeatures/Multiple%2BRegion%2Bof%2BInterest%2B%28MROI%29.html#multiple-region-of-interest-mroi-imaging/
 .. _DataSheet: https://docs.google.com/spreadsheets/d/13Vfz0NTKGSZjDezEIJYxymiIZtKIE239BtaqeqnaK-0/edit#gid=1933707095/
 .. _MBO: https://mbo.rockefeller.edu/
