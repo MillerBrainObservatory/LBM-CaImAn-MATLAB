@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% planarSegmentation.m
+% segmentPlane.m
 %
 % Note: All inputs should be character strings.
 %
@@ -43,7 +43,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function planarSegmentation(path,diagnosticFlag,startPlane,endPlane,numCores)
+function segmentPlane(path,diagnosticFlag,startPlane,endPlane,numCores)
 
 %% Load image stack
 

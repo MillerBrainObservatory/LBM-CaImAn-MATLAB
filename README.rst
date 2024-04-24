@@ -3,19 +3,31 @@
 Light Beads Microscopy (LBM) Pipeline
 =====================================
 
-Full analysis pipeline for LBM recordings. For a theoretical background of the LBM technology, `see the reference paper`_LBM
+Full analysis pipeline for LBM recordings. For a theoretical background of the LBM technology, see the reference `paper_`
+
+Quickstart
+----------
+
+.. note::
+
+   TODO - Win, WSL2, Linux, Unix, 1-time copy paste in terminal
+
+.. code-block:: bash
+
+    # Optional, but helpful to put this in /home/<Username>Documents/MATLAB
+    $ cd ~/Documents/MATLAB
+    $ git clone https://github.com/ru-rbo/caiman_matlab.git
+    $ cd caiman_matlab
 
 Algorithms
 ----------
 
-- `CaImAn-MATLAB`_ segmentation and neuronal source extraction.
+- `CNMF`_ segmentation and neuronal source extraction.
 - `NoRMCorre`_ for piecewise rigid motion correction.
 - `constrained-foopsi`_ constrained deconvolution spike inference.
 
-
-Pipeline Setup
---------------
-**Software Requirements:**
+Software Requirements
+---------------------
 
 - MATLAB (Tested on 2023a, 2023b, 2024b)
 - Required Toolboxes:
@@ -24,13 +36,6 @@ Pipeline Setup
   - Image Processing Toolbox
 
 
-Quickstart
-----------
-
-.. code-block:: bash
-
-    git clone https://github.com/ru-rbo/caiman_matlab.git
-    cd caiman_matlab
 
 Usage
 -----
@@ -62,7 +67,7 @@ Usage
 .. code-block:: MATLAB
 
        path = 'C:\\Users\\LBM_User\\Data\\Session1\\motion_corrected\\';
-       planarSegmentation(path, 0, 1, 10, 24);  # Segment data from planes 1 to 10 using 24 cores
+       segmentPlane(path, 0, 1, 10, 24);  # Segment data from planes 1 to 10 using 24 cores
 
 4. Calibration and Alignment:
 
@@ -73,6 +78,9 @@ Usage
        compare_planes_new('C:\\Data\\session1\\aligned\\');  # Path to data for final alignment
 
 
+Additional Resources
+--------------------
+
 `ScanImage`_
 `LBM`_
 `MROI`_
@@ -82,28 +90,11 @@ Usage
 
 .. _CaImAn: https://github.com/flatironinstitute/CaImAn-MATLAB/
 .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
-.. _LBM: https://www.nature.com/articles/s41592-021-01239-8/
+.. _paper: https://www.nature.com/articles/s41592-021-01239-8/
 .. _MROI: https://docs.scanimage.org/Premium%2BFeatures/Multiple%2BRegion%2Bof%2BInterest%2B%28MROI%29.html#multiple-region-of-interest-mroi-imaging/
 .. _DataSheet: https://docs.google.com/spreadsheets/d/13Vfz0NTKGSZjDezEIJYxymiIZtKIE239BtaqeqnaK-0/edit#gid=1933707095/
 .. _MBO: https://mbo.rockefeller.edu/
 .. _Slides: https://docs.google.com/presentation/d/1A2aytY5kBhnfDHIzNcO6uzFuV0OJFq22b7uCKJG_m0g/edit#slide=id.g2bd33d5af40_1_0/
-.. _NoRMCorre: https://github.com/flatironinstitute/NoRMCorre
-.. _Deconvolution: https://github.com/epnev/constrained-foopsi/
-
-References
-----------
-
-Manuel Guizar (2024).
-    Efficient subpixel image registration by cross-correlation (https://www.mathworks.com/matlabcentral/fileexchange/18401-efficient-subpixel-image-registration-by-cross-correlation),
-    MATLAB Central File Exchange. Retrieved April 23, 2024.
-
-@article{pnevmatikakis2017normcorre,
-    title={NoRMCorre: An online algorithm for piecewise rigid motion correction of calcium imaging data},
-    author={Pnevmatikakis, Eftychios A and Giovannucci, Andrea},
-    journal={Journal of neuroscience methods},
-    volume={291},
-    pages={83--94},
-    year={2017},
-    publisher={Elsevier}
-}
-
+.. _NoRMCorre: https://github.com/flatironinstitute/NoRMCorre/
+.. _constrained-foopsi: https://github.com/epnev/constrained-foopsi/
+.. _startup: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html

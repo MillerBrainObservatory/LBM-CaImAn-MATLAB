@@ -1,5 +1,4 @@
 function motionCorrectPlane(filePath, fileNameRoot, numCores, startPlane, endPlane)
-    function motionCorrectPlane(filePath, fileNameRoot, numCores, startPlane, endPlane)
 % MOTIONCORRECTPLANE Perform rigid and non-rigid motion correction on imaging data.
 %
 % This function processes imaging data by sequentially loading individual

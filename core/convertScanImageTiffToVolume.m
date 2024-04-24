@@ -1,8 +1,8 @@
 function convertScanImageTiffToVolume(filePath, saveDirPath, diagnosticFlag)
 %CONVERTSCANIMAGETIFFTOVOLUME Convert a MAxiMuM_Ez ScanImage .tif file into a 4D
-%volume.
-%   This function converts raw scanimage multi-roi .tif files from a single session into a single 4D volume.
-%   Only raw .tif files from one session should be in the filePath directory.
+% volume.
+% This function converts raw scanimage multi-roi .tif files from a single session into a single 4D volume.
+% Only raw .tif files from one session should be in the filePath directory.
 % Current ScanImage Version: 2016
 arguments
     filePath (1,:) char  % The directory containing the raw .tif files

@@ -1,4 +1,4 @@
-function [inputTable,outputTable] = args(name)
+function [inputTable,outputTable] = displayArgs(name)
 %%
 arguments (Input)
 	name	(1,1)	string
@@ -129,11 +129,11 @@ function [argClass,argSize,valfun,hasdef,defval] = getval(arg)
 		hasdef		(1,1)	char
 		defval		(1,1)	cell
 	end
-	
+
 	argClass = "";
 	argSize = {double.empty(1,0)};
 	valfun = {string.empty(1,0)};
-	
+
 	if ~isempty(arg.DefaultValue)
 		if arg.DefaultValue.IsConstant
 			hasdef = 'y';
@@ -196,7 +196,7 @@ function argSizeStr = sizelabel(sz)
 	% N = numel(sz);
 	% qfun = @(X) strrep(X,"Inf","[?]");
 	% matfun = @(X) qfun(compose("%i by %i 2D array",X));
-	
+
 	% if isequal(sz, [1 1]),		argSizeStr = "scalar";
 	% elseif isequal(sz,[inf 1]),	argSizeStr = "column vector";
 	% elseif isequal(sz,[1 inf]),	argSizeStr = "row vector";
