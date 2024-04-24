@@ -3,13 +3,27 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to caiman_matlab's documentation!
-=========================================
+core
+====
+This is the test data module.
+
+.. currentmodule:: core
+
+.. automodule:: core
+
+   :mod:`core` contains the primary LBM functionality.
+
+   motionCorrectPlane
+   ------------------
+   Piecewise-rigid motion correction.
+
+   .. autofunction:: motionCorrectPlane
+       :show-inheritance:
+       :members:
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
 
 
 Indices and tables
@@ -18,3 +32,5 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+`MATLAB Module Index <mat-modindex.html>`_
