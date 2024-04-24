@@ -1,8 +1,11 @@
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join("..", "..")))
-matlab_src_dir = os.path.abspath("../core")
+os.path.abspath(os.path.join("..", "core/utils"))
+sys.path.insert(0, os.path.abspath(os.path.join("..", "core")))
+matlab_src_dir = os.path.abspath("../core/")
+# print(f'{x}')
+
 primary_domain = "mat"
 matlab_auto_link="basic"
 matlab_short_links = True
@@ -25,5 +28,5 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "packages", "exclude"]
 html_theme = "nature"
 html_short_title="LBM"
 html_static_path = ["_static"]
-html_logo = "_statc/favicon.ico"
+html_logo = "_static/favicon.ico"
 

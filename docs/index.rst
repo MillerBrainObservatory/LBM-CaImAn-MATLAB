@@ -3,21 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-core
-====
-This is the test data module.
+.. currentmodule:: .
 
-.. currentmodule:: core
+Functions
+=========
 
-   :mod:`core` contains the primary LBM functionality.
+Core LBM functionality.
 
-   motionCorrectPlane
-   ------------------
-   Piecewise-rigid motion correction.
+.. autofunction:: motionCorrectPlane
 
-   .. autofunction:: motionCorrectPlane
-       :show-inheritance:
-       :members:
+.. autofunction:: convertScanImageTiffToVolume
+
+.. autofunction:: segmentPlane
+
 
 .. toctree::
    :maxdepth: 2
