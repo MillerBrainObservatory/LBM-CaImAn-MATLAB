@@ -52,37 +52,54 @@ Requirements
 Installation
 ============
 
-Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is
-similar independent of OS.
+Modern versions of MATLAB (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.
 
-.. note:: Windows vs WSL
 
-    If you have MATLAB installed on Windows, you won't be able to run commands from within WSL (i.e. //wsl.localhost/)
-    due to the separate filesystems. Pay attention to which environment you install.
+**Find matlab install location**::
 
-Windows
--------
+    By default, MATLAB is installed in the following locations:
+    Windows (64-bit):
+        - C:\Program Files\MATLAB\R20XXx (64-bit MATLAB)
+        - C:\Program Files (x86)\MATLAB\R20XXx (32-bit MATLAB)
+    Windows (32-bit):
+        - C:\Program Files\MATLAB\R20XXx
+    Linux:
+        - /usr/local/MATLAB/R20XXx
+    Mac:
+        - /Applications/MATLAB_R20XXx.app
 
-The easiest method to download this repository with git is via `mysys <https://gitforwindows.org/>`_
-Or just download the code from code/Download.zip above and unzip to a directory of your choosing.
+To find your install location:
 
-Unix (Linux/Mac)
-----------------
+.. code-block:: MATLAB
 
-The location of the installation is often in `~/Documents/MATLAB/`.
-If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI.
+   >> matlabroot
+    ans =
+        'C:\Program Files\MATLAB\R2023b'
 
-WSL2 (Windows Subsystem for Linux)
-----------------------------------
+The location of the installation is often desirably placed in `~/Documents/MATLAB/`, as this is on the MATLAB path.
+If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI or:
 
-If you have MATLAB installed on Windows and wish to use this repository from a WSL instance, see `this`_ discussion.
-WSL2 is helpful for access to unix tools, in such cases you should keep the repository on the Windows `C:// drive`, and access via:
+.. code-block:: MATLAB
+
+   >> addpath(genpath("path/to/caiman_matlab"))
+
+Windows/WSL2
+------------
+
+If you have MATLAB installed on Windows, you won't be able to run commands from within WSL (i.e. //wsl.localhost/)
+due to the separate filesystems. Pay attention to which environment you install (see `this`_ discussion).
+
+The easiest installation method is one of the following:
+
+    - install with git is via `mysys <https://gitforwindows.org/>`_
+
+    - download the code from code/Download.zip button on github and unzip to a directory of your choosing **on the windows C:// path** and access via:
+
 
 .. code-block:: bash
 
    $ cd /mnt/c/Users/<Username>/<project-install-path>
 
-This pipeline has been not been tested with MATLAB inside a WSL environment.
 
 In Linux, Mac, WSL or mysys, clone with the pre-installed git client:
 
@@ -101,9 +118,17 @@ Usage
 If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order
 of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user.
 
-| Example for all frames in 1 files: sessionX_00001.tiff
-| Example for all frames in 2 files: sessionX_00001_00001.tiff - sessionX_00001_00002.tiff
-| Example for all frames in 10 files: sessionX_00001.tiff - sessionX_00001_00010.tiff
+Example for all frames in 1 files:
+
+    sessionX_00001.tiff
+
+Example for all frames in 2 files:
+
+    sessionX_00001_00001.tiff - sessionX_00001_00002.tiff
+
+Example for all frames in 10 files:
+
+    sessionX_00001.tiff - sessionX_00001_00010.tiff
 
 - Each session (series of .tiff files) should be in same directory.
 - No other .tiff files should be in this directory. If this happens, an error will throw.
