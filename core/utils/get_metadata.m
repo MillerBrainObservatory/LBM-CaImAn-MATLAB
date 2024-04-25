@@ -1,28 +1,32 @@
 function [metadata_out] = get_metadata(filename)
-%GET_METADATA   Extract metadata quickly from a ScanImage TIFF file from just
-%               the filename
-%   >> metadata = get_metadata("fullfile("../benchmarks/high_resolution/MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif"))
-%      metadata =     
-%            struct with fields:
-%                        center_xy: [-1.4286 0]
-%                          size_xy: [0.9524 3.8095]
-%                     num_pixel_xy: [144 600]
-%                     image_length: 2478
-%                      image_width: 145
-%                       num_frames: 1730
-%                       num_planes: 30
-%                  lines_per_frame: 144
-%                  pixels_per_line: 128
-%     num_lines_between_scanfields: 24
-%                       frame_rate: 9.6081
-%             objective_resolution: 157.5000
-%                              fov: [150 600]
-%                 pixel_resolution: 1.0208
-%                       img_size_y: 583
-%                       img_size_x: 528
-%   
-
-% Read TIFF file and extract ROI information from the 'Artist' tag
+%GET_METADATA Extract metadata quickly from a ScanImage TIFF file.
+% 
+% Read and parse Tiff metadata stored in the .tiff header
+% and ScanImage metadata stored in the 'Artist' tag which contains ROI sizes/locations and scanning configuration
+% details in a JSON format.
+%
+% Parameters
+% ----------
+% filename : char
+%     The full path to the TIFF file from which metadata will be extracted.
+%
+% Returns
+% -------
+% metadata_out : struct
+%     A struct containing metadata such as center and size of the scan field,
+%     pixel resolution, image dimensions, number of frames, frame rate, and
+%     additional ROI data extracted from the TIFF file.
+%
+% Examples
+% --------
+% metadata = get_metadata("path/to/file.tif");
+%
+% Requires
+% --------
+% - Image Processing Toolbox
+% - MOST toolbox for JSON decoding or an alternative JSON parser
+%
+% See also TIFF, MOST.JSON.LOADJSON
 hTiff = Tiff(filename);
 roiStr = hTiff.getTag('Artist'); % Metadata in JSON format stored by ScanImage in the 'Artist' tag
 roiStr(roiStr == 0) = []; % Remove null termination from string
