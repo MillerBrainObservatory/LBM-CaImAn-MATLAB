@@ -10,9 +10,14 @@ For background, theory and design of LBM technology, see the reference `publicat
 
 Currently, this pipeline is optimized to extract data aquired through the `ScanImage`_ software package.
 
-See the DataSheet_ for benchmarks, parameters and filesizes.
-See these `google slides`_ for images and descriptions of the inner workings of this pipeline.
-Additional information on how to collaborate with the Miller Brain Observatory at the MBO website_.
+Resources
+---------
+
+- DataSheet_: benchmarks, parameters and filesizes.
+
+- `google slides`_ : images and descriptions of the inner workings of this pipeline.
+
+- Additional information on how to collaborate with the Miller Brain Observatory at the MBO website_.
 
 Steps
 -----
@@ -95,9 +100,9 @@ due to the separate filesystems. Pay attention to which environment you install 
 
 The easiest installation method is one of the following:
 
-    - install with git is via `mysys <https://gitforwindows.org/>`_
+- install with git is via `mysys <https://gitforwindows.org/>`_
 
-    - download the code from code/Download.zip button on github and unzip to a directory of your choosing **on the windows C:// path** and access via:
+- download the code from code/Download.zip button on github and unzip to a directory of your choosing **on the windows C:// path** and access via:
 
 
 .. code-block:: bash
@@ -124,36 +129,36 @@ Pre-processing
 
 The raw output of an ScanImage MROI acquisition is a `tiff` (or series of tiffs) with metadata attached to the `artist` tag where:
 
-    - Each ROI’s image is stacked one on top of the other vertically.
+- Each ROI’s image is stacked one on top of the other vertically.
 
-    - Each plane is written before moving onto the next frame, e.g.:
+- Each plane is written before moving onto the next frame, e.g.:
 
-        - plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.
+- plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.
 
-    - Frames may be split across multiple files if this option is specified the ScanImage configuration.
+- Frames may be split across multiple files if this option is specified the ScanImage configuration.
 
-| If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user.
+If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user:
 
 Single File:
 - sessionX_00001.tiff
 
 Multi File (<10):
-    - sessionX_00001_00001.tiff
-    - sessionX_00001_00002.tiff
+- sessionX_00001_00001.tiff
+- sessionX_00001_00002.tiff
 
 Multi File (>=10):
-    - sessionX_00001_00001.tiff
-    - sessionX_00001_00002.tiff
-    - ...
-    - sessionX_00001_00010.tiff
+- sessionX_00001_00001.tiff
+- sessionX_00001_00002.tiff
+- ...
+- sessionX_00001_00010.tiff
 
 Be careful to make sure that:
 
-    - Each session (series of .tiff files) should be in same directory.
+- Each session (series of .tiff files) should be in same directory.
 
-    - No other .tiff files should be in this directory. If this happens, an error will throw.
+- No other .tiff files should be in this directory. If this happens, an error will throw.
 
-De-interleaving planes/frames (zT) is done via `core/convertScanImageTiffToVolume.m`
+De-interleaving planes/frames is done via :code:`convertScanImageTiffToVolume`
 
 | Run 'help <function>' in the command window for a detailed overview on function parameters, outputs and examples.
 
