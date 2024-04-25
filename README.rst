@@ -3,7 +3,7 @@
 Light Beads Microscopy Pipeline
 ===============================
 
-.. image:: overlays.png
+.. image:: docs/_static/overlays.png
    :width: 40pt
 
 A pipeline for processing light beads microscopy (LBM) datasets.
