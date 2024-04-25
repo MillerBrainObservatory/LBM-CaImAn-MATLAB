@@ -10,8 +10,12 @@ For background, theory and design of LBM technology, see the reference `publicat
 
 Currently, this pipeline is optimized to extract data aquired through the `ScanImage`_ software package.
 
+See the DataSheet_ for benchmarks, parameters and filesizes.
+See these `google slides`_ for images and descriptions of the inner workings of this pipeline.
+Additional information on how to collaborate with the Miller Brain Observatory at the MBO website_.
+
 Steps
-_____
+-----
 
 There are 4 steps corresponding to 4 core functions (more details in `Usage`_):
 
@@ -72,9 +76,9 @@ To find your install location:
 
 .. code-block:: MATLAB
 
-   >> matlabroot
-    ans =
-        'C:\Program Files\MATLAB\R2023b'
+    >> matlabroot
+        ans =
+            'C:\Program Files\MATLAB\R2023b'
 
 The location of the installation is often desirably placed in `~/Documents/MATLAB/`, as this is on the MATLAB path.
 If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI or:
@@ -115,28 +119,45 @@ In Linux, Mac, WSL or mysys, clone with the pre-installed git client:
 Usage
 =====
 
-If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order
-of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user.
+Pre-processing
+--------------
 
-Example for all frames in 1 files:
+The raw output of an ScanImage MROI acquisition is a `tiff` (or series of tiffs) with metadata attached to the `artist` tag where:
 
-    sessionX_00001.tiff
+    - Each ROI’s image is stacked one on top of the other vertically.
 
-Example for all frames in 2 files:
+    - Each plane is written before moving onto the next frame, e.g.:
 
-    sessionX_00001_00001.tiff - sessionX_00001_00002.tiff
+        - plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.
 
-Example for all frames in 10 files:
+    - Frames may be split across multiple files if this option is specified the ScanImage configuration.
 
-    sessionX_00001.tiff - sessionX_00001_00010.tiff
+| If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user.
 
-- Each session (series of .tiff files) should be in same directory.
-- No other .tiff files should be in this directory. If this happens, an error will throw.
+Single File:
+- sessionX_00001.tiff
 
+Multi File (<10):
+    - sessionX_00001_00001.tiff
+    - sessionX_00001_00002.tiff
 
-**Inline Help from MATLAB Editor:**
+Multi File (>=10):
+    - sessionX_00001_00001.tiff
+    - sessionX_00001_00002.tiff
+    - ...
+    - sessionX_00001_00010.tiff
+
+Be careful to make sure that:
+
+    - Each session (series of .tiff files) should be in same directory.
+
+    - No other .tiff files should be in this directory. If this happens, an error will throw.
+
+De-interleaving planes/frames (zT) is done via `core/convertScanImageTiffToVolume.m`
 
 | Run 'help <function>' in the command window for a detailed overview on function parameters, outputs and examples.
+
+.. _convertScanImageTiffToVolume:
 
 .. code-block:: MATLAB
 
@@ -173,47 +194,146 @@ Example for all frames in 10 files:
 
       Examples
       --------
-      convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 0);
-      convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 1); % Diagnostic mode
+      .. code-block:: MATLAB
+
+            % Path to data, path to save data, diagnostic flag
+            convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 0);
+            convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 1); % just display files
 
       See also fileparts, addpath, genpath, isfolder, dir, fullfile, error, regexp, savefast
 
+**Output**
 
-.. _extraction:
+- After successfully running `convertScanImageTiffToVolume`, there will be a series of `.mat` files matching the number of raw `.tiff` files.
+- Each `.mat` contains the following fields:
+    - Y: 4D (x,y,z,t) volume
+    - metadata: struct of metadata retrieved through `get_metadata`
 
-The output of an ScanImage MROI acquisition is a `tiff` (or series of tiffs) with metadata attached to the `artist` tag.
-In the resulting `tiff`, each ROI’s image is stacked one on top of the other vertically.
-
-1. Pre-processing:
-
-Convert raw ScanImage .tif files into a 4D format for further processing. This will produce
-a `.mat` file equally sized ( a tad smaller due to the metadata attached to every frame being removed ) to your
-raw input data.
-
-.. code-block:: MATLAB
-
-    datapath = 'C:\\Users\\LBM_User\\Data\\Session1\\';  # Directory containing raw .tif files
-    savepath = 'C:\\Users\\LBM_User\\Data\\Session1\\extracted_volumes\\';  # Output directory for 4D volumes
-    convertScanImageTiffToVolume(datapath, savepath, 0);
+See `notebooks/Strip_Exploration` for a walkthrough on how ScanImage trims pixels and concatenates adjacent strips into a single image.
 
 2. Motion Correction:
 
-Perform both piecewise-rigid motion correction using `NormCORRe`_ to stabilize the imaging data
+Perform both piecewise-rigid motion correction using `NormCORRe`_ to stabilize the imaging data.
+
+For input, use the same directory as `savePath` parameter in `convertScanImageTiffToVolume`_.
 
 .. code-block:: MATLAB
 
-    filePath = 'C:\\Data\\';  # Path to the directory containing .mat files for processing
-    fileNameRoot = 'session1_';  # Base filename to match for processing
-    motionCorrectPlane(filePath, fileNameRoot, 24, 1, 10);  # Process from plane 1 to 10 using 24 cores
+    >> help motionCorrectPlane
+      motionCorrectPlane Perform rigid and non-rigid motion correction on imaging data.
+
+      This function processes imaging data by sequentially loading individual
+      processed planes, applying rigid motion correction to generate a template,
+      followed by patched non-rigid motion correction. Each motion-corrected plane
+      is saved separately with relevant shifts and metadata.
+
+      Parameters
+      ----------
+      filePath : char
+          Path to the directory containing the raw .tif files.
+      numCores : double, integer, positive
+          Number of cores to use for computation. The value is limited to a maximum
+          of 24 cores. If more than 24, it defaults to 23.
+      startPlane : double, integer, positive
+          The starting plane index for processing.
+      endPlane : double, integer, positive
+          The ending plane index for processing. Must be greater than or equal to
+          startPlane.
+
+      Returns
+      -------
+      Each motion-corrected plane is saved as a .mat file containing the following:
+      shifts : array
+          2D motion vectors as single precision.
+      metadata : struct
+          Struct containing all relevant metadata for the session.
+
+      Notes
+      -----
+      - Only .mat files containing processed volumes should be in the filePath.
+      - Any .mat files with "plane" in the filename will be skipped to avoid
+        re-processing a previously motion-corrected plane.
+
+      See also addpath, gcp, dir, error, fullfile, fopen, regexp, contains, matfile, savefast
+
+This function uses NoRMCorre for piecewise-rigid motion correction resulting in shifts for each patch. The output is a 2D column vector [x, y]
+with shifts that allow you to reconstruct the motion-corrected movie with `core.utils.translateFrames`.
+
+.. code-block:: MATLAB
+
+   >> help translateFrames
+
+     translateFrames Translate image frames based on provided translation vectors.
+
+      This function applies 2D translations to an image time series based on
+      a series of translation vectors, one per frame. Each frame is translated
+      independently, and the result is returned as a 3D stack of
+      (Height x Width x num_frames) translated frames.
+
+      Inputs:
+        Y - A 3D time series of image frames (Height x Width x Number of Frames).
+        t_shifts - An Nx2 matrix of translation vectors for each frame (N is the number of frames).
+
+      Output:
+        translatedFrames - A 3D array of translated image frames, same size and type as Y.
+
+See `notebooks/MC_Exploration` for a walkthrough on analyzing motion-corrected videos.
 
 3. Segmentation and Deconvolution:
 
-Segment the motion-corrected data and extract neuronal signals
+Segment the motion-corrected data and extract neuronal signals.
 
 .. code-block:: MATLAB
 
-    path = 'C:\\Users\\LBM_User\\Data\\Session1\\motion_corrected\\';
-    segmentPlane(path, 0, 1, 10, 24);  # Segment data from planes 1 to 10 using 24 cores
+   >> help segmentPlane
+
+      segmentPlane Segment imaging data using CaImAn for motion-corrected data.
+
+      This function applies the CaImAn algorithm to segment neurons from
+      motion-corrected, pre-processed and ROI re-assembled MAxiMuM data.
+      The processing is conducted for specified planes, and the results
+      are saved to disk.
+
+      Parameters
+      ----------
+      path : char
+          The path to the local folder containing the motion-corrected data.
+      diagnosticFlag : char
+          When set to '1', the function reports all .mat files in the directory
+          specified by 'path'. Otherwise, it processes files for neuron segmentation.
+      startPlane : char
+          The starting plane index for processing. A non-numeric input or '0' sets
+          it to default (1).
+      endPlane : char
+          The ending plane index for processing. A non-numeric input or '0' sets
+          it to default (maximum available planes).
+      numCores : char
+          The number of cores to use for parallel processing. A non-numeric input
+          or '0' sets it to the default value (12).
+
+      Outputs
+      -------
+        - T_keep: neuronal time series [Km, T] (single)
+        - Ac_keep: neuronal footprints [2*tau+1, 2*tau+1, Km] (single)
+        - C_keep: denoised time series [Km, T] (single)
+        - Km: number of neurons found (single)
+        - Cn: correlation image [x, y] (single)
+        - b: background spatial components [x*y, 3] (single)
+        - f: background temporal components [3, T] (single)
+        - acx: centroid in x direction for each neuron [1, Km] (single)
+        - acy: centroid in y direction for each neuron [1, Km] (single)
+        - acm: sum of component pixels for each neuron [1, Km] (single)
+
+      Notes
+      -----
+        - The function handles large datasets by processing each plane serially.
+        - Ensure your RAM capacity exceeds the size of a single plane.
+        - The segmentation settings are based on the assumption of 9.2e4 neurons/mm^3
+            density in the imaged volume as seen in the mouse cortex.
+
+      See also addpath, fullfile, dir, load, savefast
+
+Segmentation has the largest computational and time requirements.
 
 4. Calibration and Alignment:
 
@@ -230,11 +350,7 @@ Additional Resources
 --------------------
 
 `ScanImage`_
-`LBM`_
 `MROI`_
-`DataSheet`_
-`MBO`_
-`Slides`_
 
 Copyright (C) 2024 Elizabeth. R. Miller Brain Observatory | The Rockefeller University. All rights reserved.
 
@@ -243,8 +359,8 @@ Copyright (C) 2024 Elizabeth. R. Miller Brain Observatory | The Rockefeller Univ
 .. _publication: https://www.nature.com/articles/s41592-021-01239-8/
 .. _MROI: https://docs.scanimage.org/Premium%2BFeatures/Multiple%2BRegion%2Bof%2BInterest%2B%28MROI%29.html#multiple-region-of-interest-mroi-imaging/
 .. _DataSheet: https://docs.google.com/spreadsheets/d/13Vfz0NTKGSZjDezEIJYxymiIZtKIE239BtaqeqnaK-0/edit#gid=1933707095/
-.. _MBO: https://mbo.rockefeller.edu/
-.. _Slides: https://docs.google.com/presentation/d/1A2aytY5kBhnfDHIzNcO6uzFuV0OJFq22b7uCKJG_m0g/edit#slide=id.g2bd33d5af40_1_0/
+.. _website: https://mbo.rockefeller.edu/
+.. _google slides: https://docs.google.com/presentation/d/1A2aytY5kBhnfDHIzNcO6uzFuV0OJFq22b7uCKJG_m0g/edit#slide=id.g2bd33d5af40_1_0/
 .. _NoRMCorre: https://github.com/flatironinstitute/NoRMCorre/
 .. _constrained-foopsi: https://github.com/epnev/constrained-foopsi/
 .. _startup: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html
