@@ -13,7 +13,7 @@ Currently, this pipeline is optimized to extract data aquired through the `ScanI
 Steps
 _____
 
-There are 4 steps corresponding to 4 core functions (more details in `Usage`_:
+There are 4 steps corresponding to 4 core functions (more details in `Usage`_):
 
 1. Convert ScanImage .Tiff to 4D [x, y, z, t] array.
     - convertScanImageTiffToVolume
