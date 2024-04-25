@@ -16,11 +16,19 @@ Core LBM functionality.
 
 .. autofunction:: segmentPlane
 
+.. autofunction:: utils.validateRequirements
+
+.. autofunction:: utils.writePlaneh5
+
+.. autofunction:: utils.validate_components
+
+.. autofunction:: utils.translateFrames
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   guide
 
 Indices and tables
 ==================
@@ -28,5 +36,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-`MATLAB Module Index <mat-modindex.html>`_

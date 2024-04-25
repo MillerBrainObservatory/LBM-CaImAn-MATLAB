@@ -15,7 +15,8 @@
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Light Beads Microscopy Pipeline" href="guide.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -23,6 +24,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="guide.html" title="Light Beads Microscopy Pipeline"
+             accesskey="N">next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">LBM</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Functions</a></li> 
       </ul>
@@ -38,7 +42,7 @@
 <p>Core LBM functionality.</p>
 <dl class="mat function">
 <dt class="sig sig-object mat" id="motionCorrectPlane">
-<span class="sig-name descname"><span class="pre">motionCorrectPlane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filePath</span></em>, <em class="sig-param"><span class="pre">fileNameRoot</span></em>, <em class="sig-param"><span class="pre">numCores</span></em>, <em class="sig-param"><span class="pre">startPlane</span></em>, <em class="sig-param"><span class="pre">endPlane</span></em><span class="sig-paren">)</span><a class="headerlink" href="#motionCorrectPlane" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">motionCorrectPlane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filePath</span></em>, <em class="sig-param"><span class="pre">numCores</span></em>, <em class="sig-param"><span class="pre">startPlane</span></em>, <em class="sig-param"><span class="pre">endPlane</span></em><span class="sig-paren">)</span><a class="headerlink" href="#motionCorrectPlane" title="Permalink to this definition">¶</a></dt>
 <dd><p>MOTIONCORRECTPLANE Perform rigid and non-rigid motion correction on imaging data.</p>
 <p>This function processes imaging data by sequentially loading individual
 processed planes, applying rigid motion correction to generate a template,
@@ -48,9 +52,6 @@ is saved separately with relevant shifts and metadata.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>filePath</strong><span class="classifier">char</span></dt><dd><p>Path to the directory containing the raw .tif files.</p>
-</dd>
-<dt><strong>fileNameRoot</strong><span class="classifier">char</span></dt><dd><p>Base name for files in the directory. This code appends ‘_00001.tif’ to
-this root name, so this suffix should be removed from the root.</p>
 </dd>
 <dt><strong>numCores</strong><span class="classifier">double, integer, positive</span></dt><dd><p>Number of cores to use for computation. The value is limited to a maximum
 of 24 cores. If more than 24, it defaults to 23.</p>
@@ -84,20 +85,87 @@ re-processing a previously motion-corrected plane.</p></li>
 <dl class="mat function">
 <dt class="sig sig-object mat" id="convertScanImageTiffToVolume">
 <span class="sig-name descname"><span class="pre">convertScanImageTiffToVolume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filePath</span></em>, <em class="sig-param"><span class="pre">saveDirPath</span></em>, <em class="sig-param"><span class="pre">diagnosticFlag</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convertScanImageTiffToVolume" title="Permalink to this definition">¶</a></dt>
-<dd><p>CONVERTSCANIMAGETIFFTOVOLUME Convert a MAxiMuM_Ez ScanImage .tif file into a 4D
-volume.
-This function converts raw scanimage multi-roi .tif files from a single session into a single 4D volume.
-Only raw .tif files from one session should be in the filePath directory.
-Current ScanImage Version: 2016</p>
+<dd><p>CONVERTSCANIMAGETIFFTOVOLUME Convert ScanImage .tif files into a 4D volume.</p>
+<p>Convert raw <a class="reference external" href="https://www.mbfbioscience.com/products/scanimage/">ScanImage</a> multi-roi .tif files from a single session
+into a single 4D volume (x, y, z, t). It’s designed to process files for the
+ScanImage Version: 2016 software.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filePath</strong><span class="classifier">char</span></dt><dd><p>The directory containing the raw .tif files. Only raw .tif files from one
+session should be in the directory.</p>
+</dd>
+<dt><strong>saveDirPath</strong><span class="classifier">char, optional</span></dt><dd><p>The directory where processed files will be saved. It is created if it does
+not exist. Defaults to the filePath if not provided.</p>
+</dd>
+<dt><strong>diagnosticFlag</strong><span class="classifier">double, logical, optional</span></dt><dd><p>If set to 1, the function displays the files in the command window and does
+not continue processing. Defaults to 0.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The function adds necessary paths for ScanImage utilities and processes each .tif
+file found in the specified directory. It checks if the directory exists, handles
+multiple or single file scenarios, and can optionally report the directory’s contents
+based on the diagnosticFlag.</p>
+<p>Each file processed is logged, assembled into a 4D volume, and saved in a specified
+directory as a .mat file with accompanying metadata. The function also manages errors
+by cleaning up and providing detailed error messages if something goes wrong during
+processing.</p>
+<p class="rubric">Examples</p>
+<p>convertScanImageTiffToVolume(‘C:/data/session1/’, ‘C:/processed/’, 0);
+convertScanImageTiffToVolume(‘C:/data/session1/’, ‘C:/processed/’, 1); % Diagnostic mode</p>
+<p>See also <code class="docutils literal notranslate"><span class="pre">FILEPARTS</span></code>, <code class="docutils literal notranslate"><span class="pre">ADDPATH</span></code>, <code class="docutils literal notranslate"><span class="pre">GENPATH</span></code>, <code class="docutils literal notranslate"><span class="pre">ISFOLDER</span></code>, <code class="docutils literal notranslate"><span class="pre">DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">FULLFILE</span></code>, <code class="docutils literal notranslate"><span class="pre">ERROR</span></code>, <code class="docutils literal notranslate"><span class="pre">REGEXP</span></code>, <code class="docutils literal notranslate"><span class="pre">SAVEFAST</span></code></p>
 </dd></dl>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="segmentPlane">
 <span class="sig-name descname"><span class="pre">segmentPlane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">path</span></em>, <em class="sig-param"><span class="pre">diagnosticFlag</span></em>, <em class="sig-param"><span class="pre">startPlane</span></em>, <em class="sig-param"><span class="pre">endPlane</span></em>, <em class="sig-param"><span class="pre">numCores</span></em><span class="sig-paren">)</span><a class="headerlink" href="#segmentPlane" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load image stack</p>
+<dd></dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="validateRequirements">
+<span class="sig-name descname"><span class="pre">validateRequirements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#validateRequirements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report missing toolboxes</p>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="writePlaneh5">
+<span class="sig-name descname"><span class="pre">writePlaneh5</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#writePlaneh5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="validate_components">
+<span class="sig-name descname"><span class="pre">validate_components</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#validate_components" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="translateFrames">
+<span class="sig-name descname"><span class="pre">translateFrames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">Y</span></em>, <em class="sig-param"><span class="pre">shifts_2D</span></em><span class="sig-paren">)</span><a class="headerlink" href="#translateFrames" title="Permalink to this definition">¶</a></dt>
+<dd><p>TRANSLATEFRAMES Translate image frames based on provided translation vectors.</p>
+<p>This function applies 2D translations to an image time series based on
+a series of translation vectors, one per frame. Each frame is translated
+independently, and the result is returned as a 3D stack of
+(Height x Width x num_frames) translated frames.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>Y - A 3D time series of image frames (Height x Width x Number of Frames).
+t_shifts - An Nx2 matrix of translation vectors for each frame (N is the number of frames).</p>
+</dd>
+<dt>Output:</dt><dd><p>translatedFrames - A 3D array of translated image frames, same size and type as Y.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guide.html">Light Beads Microscopy Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guide.html#steps">Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guide.html#installation">Installation</a></li>
+</ul>
 </div>
 </section>
 <section id="indices-and-tables">
@@ -107,7 +175,6 @@ Current ScanImage Version: 2016</p>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-<p><a class="reference external" href="mat-modindex.html">MATLAB Module Index</a></p>
 </section>
 
 
@@ -127,6 +194,11 @@ Current ScanImage Version: 2016</p>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="guide.html"
+                          title="next chapter">Light Beads Microscopy Pipeline</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -157,6 +229,9 @@ Current ScanImage Version: 2016</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="guide.html" title="Light Beads Microscopy Pipeline"
+             >next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">LBM</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Functions</a></li> 
       </ul>

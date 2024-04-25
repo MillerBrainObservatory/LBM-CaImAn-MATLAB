@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Light Beads Microscopy Pipeline &#8212; caiman_matlab  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">LBM</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Light Beads Microscopy Pipeline</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="light-beads-microscopy-pipeline">
+<span id="overview"></span><h1>Light Beads Microscopy Pipeline<a class="headerlink" href="#light-beads-microscopy-pipeline" title="Permalink to this heading">¶</a></h1>
+<p>A pipeline for processing light beads microscopy (LBM) datasets.</p>
+<p>LBM is a <em>scalable</em>, <em>spatiotemporally optimal</em> aquisition approach limited only by flourescence lifetime.
+For background, theory and design of LBM technology, see the reference <a class="reference external" href="https://www.nature.com/articles/s41592-021-01239-8/">publication</a>.</p>
+<p>Currently, this pipeline is optimized to extract data aquired through the <a class="reference external" href="https://www.mbfbioscience.com/products/scanimage/">ScanImage</a> software package.</p>
+<section id="steps">
+<h2>Steps<a class="headerlink" href="#steps" title="Permalink to this heading">¶</a></h2>
+<p>There are 4 steps corresponding to 4 core functions (more details in <a class="reference internal" href="#usage">Usage</a>:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>Convert ScanImage .Tiff to 4D [x, y, z, t] array.</dt><dd><ul class="simple">
+<li><p>convertScanImageTiffToVolume</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Piecewise rigid motion correction.</dt><dd><ul class="simple">
+<li><p>motionCorrectPlane</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Plane-by-plane 2D neuronal segmentation and deconvolution.</dt><dd><ul class="simple">
+<li><p>segmentPlane</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Z Offset Correction.</dt><dd><ul class="simple">
+<li><p>segmentPlane</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<section id="data-extraction">
+<span id="extraction"></span><h3>Data Extraction<a class="headerlink" href="#data-extraction" title="Permalink to this heading">¶</a></h3>
+<p>The output of an ScanImage MROI acquisition is a <cite>tiff</cite> (or series of tiffs, see <a href="#id4"><span class="problematic" id="id5">caveat_</span></a>)
+with metadata attached to the <cite>artist</cite> tag.
+In the resulting <cite>tiff</cite>, each ROI’s image is stacked one on top of the other vertically.</p>
+</section>
+<section id="algorithms">
+<span id="id1"></span><h3>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a href="#id6"><span class="problematic" id="id7">`CNMF`_</span></a> segmentation and neuronal source extraction.</p></li>
+<li><p><a class="reference external" href="https://github.com/flatironinstitute/NoRMCorre/">NoRMCorre</a> piecewise rigid motion correction.</p></li>
+<li><p><a class="reference external" href="https://github.com/epnev/constrained-foopsi/">constrained-foopsi</a> constrained deconvolution spike inference.</p></li>
+</ul>
+</section>
+<section id="requirements">
+<span id="id2"></span><h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>MATLAB (Tested on 2023a, 2023b, 2024b)</p></li>
+<li><dl class="simple">
+<dt>Toolboxes:</dt><dd><ul>
+<li><p>Parallel Computing Toolbox</p></li>
+<li><p>Statistics and Machine Learning Toolbox</p></li>
+<li><p>Image Processing Toolbox</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="installation">
+<span id="id3"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h1>
+<p>Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is
+similar independent of OS.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you have MATLAB installed on Windows, you won’t be able to run commands from within WSL (i.e. //wsl.localhost/)
+due to the separate filesystems. Pay attention to which environment you install.</p>
+</div>
+<p>The easiest method to download this repository with git is via <a class="reference external" href="https://gitforwindows.org/">mysys</a>
+Or just download the code from code/Download.zip above and unzip to a directory of your choosing.</p>
+<p>The location of the installation is often in <cite>~/Documents/MATLAB/</cite>.
+If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI.</p>
+<p>If you have MATLAB installed on Windows and wish to use this repository from a WSL instance, see <a href="#id8"><span class="problematic" id="id9">`this`_</span></a> discussion.
+WSL2 is helpful for access to unix tools, in such cases you should keep the repository on the Windows <cite>C:// drive</cite>, and access via:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/mnt/c/Users/&lt;Username&gt;/&lt;project-install-path&gt;
+</pre></div>
+</div>
+<p>This pipeline has been tested on WSL2, Ubuntu 22.04. Though any debian-based distribution should work.</p>
+<p>For unix environments:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>~/Documents/MATLAB
+$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ru-rbo/caiman_matlab.git
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>caiman_matlab
+$<span class="w"> </span>matlab
+</pre></div>
+</div>
+<p id="usage">If the user choses to split frames across multiple <cite>.tiff</cite> files, there will be multiple tiff files in ascending order
+of an suffix appended to the filename: <cite>_000N</cite>, where n=number of files chosen by the user.</p>
+<ul class="simple">
+<li><p>Each session (series of .tiff files) should be in same directory.</p></li>
+<li><p>No other .tiff files should be in this directory. If this happens, an error will throw.</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>For detailed documentation in your MATLAB editor, use:</p>
+<p>&gt;&gt; help FunctionName
+&gt;&gt; help convertScanImageTiffToVolume</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TODO</span><span class="p">:</span> <span class="n">render</span> <span class="n">the</span> <span class="n">matlab</span> <span class="n">output</span><span class="p">,</span> <span class="n">link</span> <span class="n">to</span> <span class="n">wiki</span>
+</pre></div>
+</div>
+</div>
+<ol class="arabic simple">
+<li><p>Pre-processing:</p></li>
+</ol>
+<p>Convert raw ScanImage .tif files into a 4D format for further processing</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">datapath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;C:\\Users\\LBM_User\\Data\\Session1\\&#39;</span><span class="p">;</span><span class="w">  </span>#<span class="w"> </span><span class="n">Directory</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="p">.</span><span class="n">tif</span><span class="w"> </span><span class="n">files</span>
+<span class="nb">savepath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;C:\\Users\\LBM_User\\Data\\Session1\\extracted_volumes\\&#39;</span><span class="p">;</span><span class="w">  </span>#<span class="w"> </span><span class="n">Output</span><span class="w"> </span><span class="n">directory</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>4<span class="n">D</span><span class="w"> </span><span class="n">volumes</span>
+<span class="n">convertScanImageTiffToVolume</span><span class="p">(</span><span class="n">datapath</span><span class="p">,</span><span class="w"> </span><span class="nb">savepath</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Motion Correction:</p></li>
+</ol>
+<p>Perform both piecewise-rigid motion correction using <a class="reference external" href="https://github.com/flatironinstitute/NoRMCorre/">NormCORRe</a> to stabilize the imaging data</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">filePath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;C:\\Data\\&#39;</span><span class="p">;</span><span class="w">  </span>#<span class="w"> </span><span class="n">Path</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">directory</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="p">.</span><span class="n">mat</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">processing</span>
+<span class="n">fileNameRoot</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;session1_&#39;</span><span class="p">;</span><span class="w">  </span>#<span class="w"> </span><span class="n">Base</span><span class="w"> </span><span class="n">filename</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">match</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">processing</span>
+<span class="n">motionCorrectPlane</span><span class="p">(</span><span class="n">filePath</span><span class="p">,</span><span class="w"> </span><span class="n">fileNameRoot</span><span class="p">,</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">  </span>#<span class="w"> </span><span class="n">Process</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">plane</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="n">using</span><span class="w"> </span><span class="mi">24</span><span class="w"> </span><span class="n">cores</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Segmentation and Deconvolution:</p></li>
+</ol>
+<p>Segment the motion-corrected data and extract neuronal signals:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">code</span><span class="o">-</span><span class="n">block</span><span class="p">::</span> <span class="n">MATLAB</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>path = ‘C:\Users\LBM_User\Data\Session1\motion_corrected\’;
+segmentPlane(path, 0, 1, 10, 24);  # Segment data from planes 1 to 10 using 24 cores</p>
+</div></blockquote>
+<ol class="arabic simple" start="4">
+<li><p>Calibration and Alignment:</p></li>
+</ol>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">calculate_offset</span><span class="p">(</span><span class="s">&#39;C:\\Data\\calibration\\&#39;</span><span class="p">);</span><span class="w">  </span>#<span class="w"> </span><span class="n">Path</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">calibration</span><span class="w"> </span><span class="n">data</span>
+<span class="n">compare_planes_new</span><span class="p">(</span><span class="s">&#39;C:\\Data\\session1\\aligned\\&#39;</span><span class="p">);</span><span class="w">  </span>#<span class="w"> </span><span class="n">Path</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">final</span><span class="w"> </span><span class="n">alignment</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://www.mbfbioscience.com/products/scanimage/">ScanImage</a>
+<a href="#id10"><span class="problematic" id="id11">`LBM`_</span></a>
+<a class="reference external" href="https://docs.scanimage.org/Premium%2BFeatures/Multiple%2BRegion%2Bof%2BInterest%2B%28MROI%29.html#multiple-region-of-interest-mroi-imaging/">MROI</a>
+<a class="reference external" href="https://docs.google.com/spreadsheets/d/13Vfz0NTKGSZjDezEIJYxymiIZtKIE239BtaqeqnaK-0/edit#gid=1933707095/">DataSheet</a>
+<a class="reference external" href="https://mbo.rockefeller.edu/">MBO</a>
+<a class="reference external" href="https://docs.google.com/presentation/d/1A2aytY5kBhnfDHIzNcO6uzFuV0OJFq22b7uCKJG_m0g/edit#slide=id.g2bd33d5af40_1_0/">Slides</a></p>
+<p>Copyright (C) 2024 Elizabeth. R. Miller Brain Observatory | The Rockefeller University. All rights reserved.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/favicon.ico" alt="Logo"/>
+            </a></p>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Light Beads Microscopy Pipeline</a><ul>
+<li><a class="reference internal" href="#steps">Steps</a><ul>
+<li><a class="reference internal" href="#data-extraction">Data Extraction</a></li>
+<li><a class="reference internal" href="#algorithms">Algorithms</a></li>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/guide.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h4>Quick search</h4>
+    <div>
+    <form class="search" action="search.html" method="get">
+      <input type="text" style="width: inherit;" name="q" />
+      <input type="submit" value="search" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">LBM</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Light Beads Microscopy Pipeline</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2024, Elizabeth R. Miller Brain Observatory (MBO) | The Rockefeller University. All Rights Reserved..
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>
