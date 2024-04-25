@@ -3,12 +3,14 @@
 Light Beads Microscopy Pipeline
 ===============================
 
+
 A pipeline for processing light beads microscopy (LBM) datasets.
 
 LBM is a *scalable*, *spatiotemporally optimal* aquisition approach limited only by flourescence lifetime.
 For background, theory and design of LBM technology, see the reference `publication`_.
 
 Currently, this pipeline is optimized to extract data aquired through the `ScanImage`_ software package.
+
 
 Resources
 ---------
@@ -216,7 +218,8 @@ De-interleaving planes/frames is done via :code:`convertScanImageTiffToVolume`
 
 See `notebooks/Strip_Exploration` for a walkthrough on how ScanImage trims pixels and concatenates adjacent strips into a single image.
 
-2. Motion Correction:
+Motion-correction
+-----------------
 
 Perform both piecewise-rigid motion correction using `NormCORRe`_ to stabilize the imaging data.
 
@@ -284,7 +287,8 @@ with shifts that allow you to reconstruct the motion-corrected movie with `core.
 
 See `notebooks/MC_Exploration` for a walkthrough on analyzing motion-corrected videos.
 
-3. Segmentation and Deconvolution:
+Segmentation and Deconvolution
+------------------------------
 
 Segment the motion-corrected data and extract neuronal signals.
 
@@ -340,7 +344,8 @@ Segment the motion-corrected data and extract neuronal signals.
 
 Segmentation has the largest computational and time requirements.
 
-4. Calibration and Alignment:
+Z Calibration and Alignment
+---------------------------
 
     You will need to be in a GUI environment for this step. Calculate offset will show you two
     images, click the feature that matches in both images.
@@ -350,14 +355,7 @@ Segmentation has the largest computational and time requirements.
    calculate_offset('C:\\Data\\calibration\\');  # Path to calibration data
    compare_planes_new('C:\\Data\\session1\\aligned\\');  # Path to data for final alignment
 
-
-Additional Resources
---------------------
-
-`ScanImage`_
-`MROI`_
-
-Copyright (C) 2024 Elizabeth. R. Miller Brain Observatory | The Rockefeller University. All rights reserved.
+Copyright\ |copy| 2024 Elizabeth. R. Miller Brain Observatory | The Rockefeller University. All rights reserved.
 
 .. _CaImAn: https://github.com/flatironinstitute/CaImAn-MATLAB/
 .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
@@ -371,3 +369,5 @@ Copyright (C) 2024 Elizabeth. R. Miller Brain Observatory | The Rockefeller Univ
 .. _startup: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html
 .. _mroi_function: https://docs.scanimage.org/Appendix/ScanImage%2BUtility%2BFunctions.html#generate-multi-roi-data-from-tiff
 .. _BigTiffSpec: _https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification
+
+.. |copy|   unicode:: U+000A9 .. COPYRIGHT SIGN
