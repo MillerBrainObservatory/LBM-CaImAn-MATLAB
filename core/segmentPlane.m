@@ -29,7 +29,7 @@
 % pixelResolution: size of each pixel in microns (1,1) (um)
 % 'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')
 
-% Outputs:
+% Outputs: 
 % T_keep: neuronal time series (Km,T) (single)
 % Ac_keep: neuronal footprints (2*tau+1,2*tau+1,Km) (single)
 % C_keep: denoised time series (Km,T) (single)
