@@ -27,7 +27,6 @@ There are 4 steps corresponding to 4 core functions (more details in `Usage`_):
 4. Z Offset Correction.
     - segmentPlane
 
-
 .. _algorithms:
 
 Algorithms
@@ -83,9 +82,9 @@ WSL2 is helpful for access to unix tools, in such cases you should keep the repo
 
    $ cd /mnt/c/Users/<Username>/<project-install-path>
 
-This pipeline has been tested on WSL2, Ubuntu 22.04. Though any debian-based distribution should work.
+This pipeline has been not been tested with MATLAB inside a WSL environment.
 
-For unix environments:
+In Linux, Mac, WSL or mysys, clone with the pre-installed git client:
 
 .. code-block:: bash
 
@@ -97,22 +96,63 @@ For unix environments:
 .. _usage:
 
 Usage
------
+=====
 
 If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order
 of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user.
 
+| Example for all frames in 1 files: sessionX_00001.tiff
+| Example for all frames in 2 files: sessionX_00001_00001.tiff - sessionX_00001_00002.tiff
+| Example for all frames in 10 files: sessionX_00001.tiff - sessionX_00001_00010.tiff
+
 - Each session (series of .tiff files) should be in same directory.
 - No other .tiff files should be in this directory. If this happens, an error will throw.
 
-.. important:: For detailed documentation in your MATLAB editor, use help in the command window
 
-   >> help FunctionName
+**Inline Help from MATLAB Editor:**
+
+| Run 'help <function>' in the command window for a detailed overview on function parameters, outputs and examples.
+
+.. code-block:: MATLAB
+
    >> help convertScanImageTiffToVolume
+     convertScanImageTiffToVolume Convert ScanImage .tif files into a 4D volume.
 
-   .. code-block:: MATLAB
+      Convert raw `ScanImage`_ multi-roi .tif files from a single session
+      into a single 4D volume (x, y, z, t). It's designed to process files for the
+      ScanImage Version: 2016 software.
 
-        >> TODO: render the matlab output, link to wiki
+      Parameters
+      ----------
+      filePath : char
+          The directory containing the raw .tif files. Only raw .tif files from one
+          session should be in the directory.
+      saveDirPath : char, optional
+          The directory where processed files will be saved. It is created if it does
+          not exist. Defaults to the filePath if not provided.
+      diagnosticFlag : double, logical, optional
+          If set to 1, the function displays the files in the command window and does
+          not continue processing. Defaults to 0.
+
+      Notes
+      -----
+      The function adds necessary paths for ScanImage utilities and processes each .tif
+      file found in the specified directory. It checks if the directory exists, handles
+      multiple or single file scenarios, and can optionally report the directory's contents
+      based on the diagnosticFlag.
+
+      Each file processed is logged, assembled into a 4D volume, and saved in a specified
+      directory as a .mat file with accompanying metadata. The function also manages errors
+      by cleaning up and providing detailed error messages if something goes wrong during
+      processing.
+
+      Examples
+      --------
+      convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 0);
+      convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 1); % Diagnostic mode
+
+      See also fileparts, addpath, genpath, isfolder, dir, fullfile, error, regexp, savefast
+
 
 .. _extraction:
 
