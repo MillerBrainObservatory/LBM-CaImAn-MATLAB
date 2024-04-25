@@ -27,14 +27,6 @@ There are 4 steps corresponding to 4 core functions (more details in `Usage`_:
 4. Z Offset Correction.
     - segmentPlane
 
-.. _extraction:
-
-Data Extraction
----------------
-
-The output of an ScanImage MROI acquisition is a `tiff` (or series of tiffs, see caveat_)
-with metadata attached to the `artist` tag.
-In the resulting `tiff`, each ROI’s image is stacked one on top of the other vertically.
 
 .. _algorithms:
 
@@ -118,14 +110,20 @@ of an suffix appended to the filename: `_000N`, where n=number of files chosen b
    >> help FunctionName
    >> help convertScanImageTiffToVolume
 
-   .. code-block::
+   .. code-block:: MATLAB
 
-        TODO: render the matlab output, link to wiki
+        >> TODO: render the matlab output, link to wiki
 
+.. _extraction:
+
+The output of an ScanImage MROI acquisition is a `tiff` (or series of tiffs) with metadata attached to the `artist` tag.
+In the resulting `tiff`, each ROI’s image is stacked one on top of the other vertically.
 
 1. Pre-processing:
 
-Convert raw ScanImage .tif files into a 4D format for further processing
+Convert raw ScanImage .tif files into a 4D format for further processing. This will produce
+a `.mat` file equally sized ( a tad smaller due to the metadata attached to every frame being removed ) to your
+raw input data.
 
 .. code-block:: MATLAB
 
@@ -153,6 +151,9 @@ Segment the motion-corrected data and extract neuronal signals
     segmentPlane(path, 0, 1, 10, 24);  # Segment data from planes 1 to 10 using 24 cores
 
 4. Calibration and Alignment:
+
+    You will need to be in a GUI environment for this step. Calculate offset will show you two
+    images, click the feature that matches in both images.
 
 .. code-block:: MATLAB
 
