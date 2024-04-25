@@ -344,6 +344,10 @@ Segment the motion-corrected data and extract neuronal signals.
 
 Segmentation has the largest computational and time requirements.
 
+**Output**
+
+The output of :code:`segmentPlane` is a series of .mat files named caiman_output_plane_N.mat, where N=number of planes.
+
 Z Calibration and Alignment
 ---------------------------
 
