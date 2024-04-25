@@ -64,7 +64,7 @@ Installation
 Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is
 similar independent of OS.
 
-.. note::
+.. note:: Windows vs WSL
 
     If you have MATLAB installed on Windows, you won't be able to run commands from within WSL (i.e. //wsl.localhost/)
     due to the separate filesystems. Pay attention to which environment you install.
@@ -113,9 +113,7 @@ of an suffix appended to the filename: `_000N`, where n=number of files chosen b
 - Each session (series of .tiff files) should be in same directory.
 - No other .tiff files should be in this directory. If this happens, an error will throw.
 
-.. important::
-
-   For detailed documentation in your MATLAB editor, use:
+.. important:: For detailed documentation in your MATLAB editor, use help in the command window
 
    >> help FunctionName
    >> help convertScanImageTiffToVolume
@@ -147,7 +145,7 @@ Perform both piecewise-rigid motion correction using `NormCORRe`_ to stabilize t
 
 3. Segmentation and Deconvolution:
 
-Segment the motion-corrected data and extract neuronal signals::
+Segment the motion-corrected data and extract neuronal signals
 
 .. code-block:: MATLAB
 
