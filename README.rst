@@ -291,6 +291,12 @@ Segmentation and Deconvolution
 
 Segment the motion-corrected data and extract neuronal signals.
 
+As of now, this function makes the following assumptions:
+
+- 2nd order flourescence dynamics
+
+- Imaging in mouse cortex (9.2e4 neurons/mm^3)
+
 .. code-block:: MATLAB
 
    >> help segmentPlane
@@ -347,20 +353,39 @@ Segmentation has the largest computational and time requirements.
 
 The output of :code:`segmentPlane` is a series of .mat files named caiman_output_plane_N.mat, where N=number of planes.
 
+.. code-block:: MATLAB
+
+    % TODO: Allow these to be parameters to segmentPlane()
+    merge_thresh = 0.8;
+    min_SNR = 1.4;
+    space_thresh = 0.2; % threhsold for spatial comps
+    time_thresh = 0.0;
+    sz = 0.1; % IF FOOTPRINTS ARE TOO SMALL, CONSIDER sz = 0.1
+    mx = ceil(pi.*(1.33.*tau).^2);
+    mn = floor(pi.*(tau.*0.5).^2); % SHRINK IF FOOTPRINTS ARE TOO SMALL
+    p = 2; % order of dynamics
+    sizY = size(data);
+    patch_size = round(650/pixel_resolution).*[1,1];
+    overlap = [1,1].*ceil(50./pixel_resolution);
+    % number of components based on assumption of 9.2e4 neurons/mm^3
+    K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^M2);
+
 Z Calibration and Alignment
 ---------------------------
 
-before proceeding:
+Before proceeding:
 
-    You will need to be in a GUI environment for this step. Calculate offset will show you two
-    images, click the feature that matches in both images.
+- You will need to be in a GUI environment for this step. Calculate offset will show you two images, click the feature that matches in both images.
 
-    You need 'pollen_calibration_Z_vs_N.fig' to reference for calibration.
+- You will need the following calibration files:
+    - `pollen_calibration_Z_vs_N.fig`
+    - `pllen_calibration_x_y_offsets.fig`
 
+Place these files in the same directory as your `caiman_output_plane_N` files.
 
 .. code-block:: MATLAB
 
-   calculate_offset('C:\\Data\\calibration\\');  # Path to calibration data
+   calculate_offset('C:\\Data\\calibration\\');  % path to caiman_output files
    compare_planes('C:\\Data\\session1\\aligned\\');  # Path to data for final alignment
 
 Copyright\ |copy| 2024 Elizabeth. R. Miller Brain Observatory | The Rockefeller University. All rights reserved.
