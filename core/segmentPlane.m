@@ -1,52 +1,49 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SEGMENTPLANE Segment imaging data using CaImAn for motion-corrected data.
 %
-% segmentPlane.m
+% This function applies the CaImAn algorithm to segment neurons from
+% motion-corrected, pre-processed and ROI re-assembled MAxiMuM data.
+% The processing is conducted for specified planes, and the results
+% are saved to disk.
 %
-% Note: All inputs should be character strings.
+% Parameters
+% ----------
+% path : char
+%     The path to the local folder containing the motion-corrected data.
+% diagnosticFlag : char
+%     When set to '1', the function reports all .mat files in the directory
+%     specified by 'path'. Otherwise, it processes files for neuron segmentation.
+% startPlane : char
+%     The starting plane index for processing. A non-numeric input or '0' sets
+%     it to default (1).
+% endPlane : char
+%     The ending plane index for processing. A non-numeric input or '0' sets
+%     it to default (maximum available planes).
+% numCores : char
+%     The number of cores to use for parallel processing. A non-numeric input
+%     or '0' sets it to the default value (12).
 %
-% Use the 'path' input argument to point to a local folder with motion-corrected,
-% pre-processed and ROI re-assembled MAxiMuM data.
+% Outputs
+% -------
+% Outputs are saved to disk, including:
+% - T_keep: neuronal time series [Km, T] (single)
+% - Ac_keep: neuronal footprints [2*tau+1, 2*tau+1, Km] (single)
+% - C_keep: denoised time series [Km, T] (single)
+% - Km: number of neurons found (single)
+% - Cn: correlation image [x, y] (single)
+% - b: background spatial components [x*y, 3] (single)
+% - f: background temporal components [3, T] (single)
+% - acx: centroid in x direction for each neuron [1, Km] (single)
+% - acy: centroid in y direction for each neuron [1, Km] (single)
+% - acm: sum of component pixels for each neuron [1, Km] (single)
 %
-% The 'diagnosticFlag' argument, when set to '1', will report all .mat files in
-% the directory specified by 'path'.
+% Notes
+% -----
+% - The function handles large datasets by processing each plane serially.
+% - The segmentation settings are based on the assumption of 9.2e4 neurons/mm^3
+%   density in the imaged volume.
 %
-% The 'startPlane' and 'endPlane' arguments allow the user to specify the
-% range of consecutive planes for the code to process instead of the
-% default (all .mat files in directory). Non-numeric arguments or entering
-% '0' will select default option.
-%
-% The 'numCores' argument will override the default number of cores the
-% code accesses in the parallel pool. If the number is set to '0' or a
-% non-numeric value, the code defaults to a pool of 12.
-%
-% The code processes each plane serially with CaImAn and saves data to disk.
-%
-% Required fields for each file to be processed:
-% Y: single plane recording data (x,y,T) (single)
-% Ym: mean projection image of Y (x,y) (single)
-% sizY: array with size of dimension of Y (1,3)
-% volumeRate: volume rate of the recording (1,1) (Hz)
-% pixelResolution: size of each pixel in microns (1,1) (um)
-% 'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')
-
-% Outputs: 
-% T_keep: neuronal time series (Km,T) (single)
-% Ac_keep: neuronal footprints (2*tau+1,2*tau+1,Km) (single)
-% C_keep: denoised time series (Km,T) (single)
-% Km: number of neurons found (1,1)
-% Cn: correlation image (x,y) (single)
-% b: background spatial components (x*y,3) (single)
-% f: background temporal components (3,T) (single)
-% acx: centroid in x direction for each neuron (1,Km) (single)
-% acy: centroid in y direction for each neuron (1,Km) (single)
-% acm: sum of component pixels for each neuron (1,Km) (single)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% See also ADDPATH, FULLFILE, DIR, LOAD, SAVEFAST
 function segmentPlane(path,diagnosticFlag,startPlane,endPlane,numCores)
-
-%% Load image stack
-
 fileSep = filesep(); % clean up input 'path'
 if ~strcmp(path(end),fileSep)
     path = [path fileSep];
@@ -54,7 +51,6 @@ end
 
 if strcmp(diagnosticFlag,'1') % if the diagnostic flag is set to 1, spit out contents of directory specified by 'path'
     dir([path,'*.mat'])
-
 else
     files = dir([path, '*.mat']); % find all .mat files in the data directory
     numFiles = size(files,1);
@@ -106,7 +102,6 @@ else
     end
 
     numFiles = endPlane-startPlane+1;
-
     for abc = startPlane:endPlane
         try
             disp(['Beginning calculations for plane ' num2str(abc) ' of ' num2str(numFiles) '...'])
@@ -146,8 +141,8 @@ else
             %% CaImAn segmentation
 
             % give access to CaImAn files
-            addpath(genpath(fullfile('CaImAn-MATLAB-master','CaImAn-MATLAB-master')))
-            addpath(genpath(fullfile('motion_correction/')))
+            [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
+            addpath(genpath(fullfile(currpath, '../packages/CaImAn_Utilities/CaImAn-MATLAB-master/CaImAn-MATLAB-master/')));
 
             [d1,d2,T] = size(data);
             d = d1*d2; % total number of samples
@@ -162,6 +157,7 @@ else
             end
 
             % CaImAn settings
+            % TODO: Parameterize
             merge_thresh = 0.8; % threshold for merging
             min_SNR = 1.4; % liberal threshold, can tighten up in additional post-processing
             space_thresh = 0.2; % threhsold for selection of neurons by space
@@ -285,54 +281,56 @@ else
 
             clearvars -except abc numFiles files path save_path fid filestem numCores startPlane endPlane poolobj
 
-        catch ME
-            date = datetime(now,'ConvertFrom','datenum');
-            errorMessage = sprintf('%s Error in function %s() at line %d. Error Message: %s', ...
-            date,ME.stack(1).name, ME.stack(1).line, ME.message);
-            fprintf(1, '%s\n', errorMessage);
-            fprintf(fid,errorMessage,date,ME.stack(1).name, ME.stack(1).line, ME.message);
-
-            disp('Shutting down parallel pool to eliminate error propagation.')
-            poolobj = gcp('nocreate');
-            delete(poolobj)
-
-            clearvars -except abc numFiles files path save_path fid filestem numCores endPlane startPlane poolobj
-
+            catch ME
+                date = datetime(now,'ConvertFrom','datenum');
+                errorMessage = sprintf('%s Error in function %s() at line %d. Error Message: %s', ...
+                date,ME.stack(1).name, ME.stack(1).line, ME.message);
+                fprintf(1, '%s\n', errorMessage);
+                fprintf(fid,errorMessage,date,ME.stack(1).name, ME.stack(1).line, ME.message);
+    
+                disp('Shutting down parallel pool to eliminate error propagation.')
+                poolobj = gcp('nocreate');
+                delete(poolobj)
+    
+                clearvars -except abc numFiles files path save_path fid filestem numCores endPlane startPlane poolobj
+    
+            end
         end
+    
+        date = datetime(now,'ConvertFrom','datenum');
+        formatSpec = '%s Routine complete.\n';
+        fprintf(fid,formatSpec,date,abc);
+        fclose(fid);
     end
+end
 
-    date = datetime(now,'ConvertFrom','datenum');
-    formatSpec = '%s Routine complete.\n';
-    fprintf(fid,formatSpec,date,abc);
-    fclose(fid);
-
-    function [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2)
-        %% Convert the sparse matrix A_keep to a full 3D matrix that can be saved to hdf5
+function [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2)
+    %% Convert the sparse matrix A_keep to a full 3D matrix that can be saved to hdf5
     tau = tau(1);
     x = 1:d2;
     y = 1:d1;
     [X,Y] = meshgrid(x,y);
     Ac_keep = zeros(4*tau+1,4*tau+1,size(A_keep,2),'single');
-
+    
     acx = zeros(1,size(A_keep,2));
     acy = acx;
     acm = acx;
-
+    
     parfor ijk = 1:size(A_keep,2)
-
+    
         AOI = reshape(single(full(A_keep(:,ijk))),d1,d2);
         cx = round(trapz(trapz(X.*AOI))./trapz(trapz(AOI)));
         cy = round(trapz(trapz(Y.*AOI))./trapz(trapz(AOI)));
-
+    
         acx(ijk) = cx;
         acy(ijk) = cy;
         acm(ijk) = sum(AOI(:));
-
+    
         sx = max([cx-2*tau 1]); % handle cases where neuron is closer than 3*tau pixels to edge of FOV
         sy = max([cy-2*tau 1]);
         ex = min([cx+2*tau d2]);
         ey = min([cy+2*tau d1]);
-
+    
         AOIc = nan(4*tau+1,4*tau+1);
         AOIc(1:(ey-sy+1),1:(ex-sx+1)) = AOI(sy:ey,sx:ex);
         Ac_keep(:,:,ijk) = single(AOIc);

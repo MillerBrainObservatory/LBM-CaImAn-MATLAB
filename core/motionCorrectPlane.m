@@ -1,4 +1,4 @@
-function motionCorrectPlane(filePath, fileNameRoot, numCores, startPlane, endPlane)
+function motionCorrectPlane(filePath, numCores, startPlane, endPlane)
 % MOTIONCORRECTPLANE Perform rigid and non-rigid motion correction on imaging data.
 %
 % This function processes imaging data by sequentially loading individual
@@ -10,9 +10,6 @@ function motionCorrectPlane(filePath, fileNameRoot, numCores, startPlane, endPla
 % ----------
 % filePath : char
 %     Path to the directory containing the raw .tif files.
-% fileNameRoot : char
-%     Base name for files in the directory. This code appends '_00001.tif' to
-%     this root name, so this suffix should be removed from the root.
 % numCores : double, integer, positive
 %     Number of cores to use for computation. The value is limited to a maximum
 %     of 24 cores. If more than 24, it defaults to 23.
@@ -39,7 +36,6 @@ function motionCorrectPlane(filePath, fileNameRoot, numCores, startPlane, endPla
 % See also ADDPATH, GCP, DIR, ERROR, FULLFILE, FOPEN, REGEXP, CONTAINS, MATFILE, SAVEFAST
 arguments
     filePath (1,:) char                    % Path to the directory with input files.
-    fileNameRoot (1,:) char                % Base name for input files.
     numCores (1,1) double {mustBeInteger, mustBePositive, mustBeLessThanOrEqual(numCores,24)} = 1
     startPlane (1,1) double {mustBeInteger, mustBePositive} = 1
     endPlane (1,1) double {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(endPlane,startPlane)} = 1
@@ -91,7 +87,7 @@ end
 
     % Filter out motion correction output files containing "plane" in the filename
     fileNames = {files.name};
-    relevantFiles = contains(fileNames, fileNameRoot) & ~contains(fileNames, 'plane');
+    relevantFiles = ~contains(fileNames, 'plane');
     relevantFileNames = fileNames(relevantFiles);
     sprintf('Number of files to process: %s \n', num2str(length(relevantFileNames)))
 
