@@ -44,6 +44,11 @@
 %
 % See also ADDPATH, FULLFILE, DIR, LOAD, SAVEFAST
 function segmentPlane(path,diagnosticFlag,startPlane,endPlane,numCores)
+
+% give access to CaImAn files
+[currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
+addpath(genpath(fullfile(currpath, '../packages/CaImAn_Utilities/CaImAn-MATLAB-master/CaImAn-MATLAB-master/')));
+
 fileSep = filesep(); % clean up input 'path'
 if ~strcmp(path(end),fileSep)
     path = [path fileSep];
@@ -53,7 +58,12 @@ if strcmp(diagnosticFlag,'1') % if the diagnostic flag is set to 1, spit out con
     dir([path,'*.mat'])
 else
     files = dir([path, '*.mat']); % find all .mat files in the data directory
+
     numFiles = size(files,1);
+
+    if numFiles < 1
+        error('no valid files in %s', path)
+    end
 
     save_path = fullfile([path, 'output']); % create output directory
     if ~logical(exist(save_path,'dir'))
@@ -74,12 +84,6 @@ else
     filestem = files(1).name; % often there are other .mat files in the directory, we assume the 1st file is processed MAxiMuM data and base the template for the names of all files off it
     inds = strfind(filestem,'_');
     filestem = filestem(1:inds(end));
-
-    if size(files,1)>16 % determine if it's a 15 or 30 plane MAxiMuM recording
-        numFiles = 30;
-    else
-        numFiles = 15;
-    end
 
     % use defaults or determine range of planes to process based on input arguments
     if str2double(startPlane) == 0 || size(str2double(startPlane),1) == 0
@@ -139,11 +143,6 @@ else
             end
 
             %% CaImAn segmentation
-
-            % give access to CaImAn files
-            [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
-            addpath(genpath(fullfile(currpath, '../packages/CaImAn_Utilities/CaImAn-MATLAB-master/CaImAn-MATLAB-master/')));
-
             [d1,d2,T] = size(data);
             d = d1*d2; % total number of samples
 

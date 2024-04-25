@@ -12,7 +12,7 @@ end
 
 %% 1) Pre-Processing
 % should only contain .tif files from a single session
-datapath = 'C:\Users\RBO\Documents\MATLAB\benchmarks\high_resolution\';
-
-convertScanImageTiffToVolume(datapath);
-motionCorrectPlane(datapath, 23, 1, 3);
+datapath = 'C:\Users\RBO\Documents\MATLAB\benchmarks\high_res\';
+% convertScanImageTiffToVolume(datapath);
+% motionCorrectPlane(datapath, 23, 1, 3);
+segmentPlane(datapath, '0', '1', '1', '0')
