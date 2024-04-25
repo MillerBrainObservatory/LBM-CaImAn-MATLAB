@@ -3,9 +3,6 @@
 Light Beads Microscopy Pipeline
 ===============================
 
-.. image:: docs/_static/overlays.png
-   :width: 40pt
-
 A pipeline for processing light beads microscopy (LBM) datasets.
 
 LBM is a *scalable*, *spatiotemporally optimal* aquisition approach limited only by flourescence lifetime.
@@ -353,13 +350,18 @@ The output of :code:`segmentPlane` is a series of .mat files named caiman_output
 Z Calibration and Alignment
 ---------------------------
 
+before proceeding:
+
     You will need to be in a GUI environment for this step. Calculate offset will show you two
     images, click the feature that matches in both images.
+
+    You need 'pollen_calibration_Z_vs_N.fig' to reference for calibration.
+
 
 .. code-block:: MATLAB
 
    calculate_offset('C:\\Data\\calibration\\');  # Path to calibration data
-   compare_planes_new('C:\\Data\\session1\\aligned\\');  # Path to data for final alignment
+   compare_planes('C:\\Data\\session1\\aligned\\');  # Path to data for final alignment
 
 Copyright\ |copy| 2024 Elizabeth. R. Miller Brain Observatory | The Rockefeller University. All rights reserved.
 
