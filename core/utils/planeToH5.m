@@ -1,4 +1,4 @@
-function writePlaneH5(frames,folder,filename,metadata,nvargs)
+function planeToH5(frames,folder,filename,metadata,nvargs)
 %%
 arguments
 	frames		{mustBeA(frames,"uint16")}
