@@ -52,6 +52,7 @@ Requirements
 ------------
 
 - MATLAB (Tested on 2023a, 2023b, 2024b)
+  - Using a version pre-2017a may yield innaccurate registration due to `single-precision accuracy <https://github.com/flatironinstitute/NoRMCorre/wiki/Known-Issues>`_.
 - Toolboxes:
     - Parallel Computing Toolbox
     - Statistics and Machine Learning Toolbox
@@ -86,8 +87,18 @@ To find your install location:
         ans =
             'C:\Program Files\MATLAB\R2023b'
 
-The location of the installation is often desirably placed in `~/Documents/MATLAB/`, as this is on the MATLAB path.
-If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI or:
+Generally, MATLAB code should be stored in your `userpath`:
+
+.. code-block:: MATLAB
+
+   >> userpath
+
+   ans =
+
+       'C:\Users\RBO\Documents\MATLAB'
+
+
+Otherwise, you will need to navigate to that directory within the matlab GUI or add the path to this repository:
 
 .. code-block:: MATLAB
 
@@ -97,21 +108,20 @@ Windows/WSL2
 ------------
 
 If you have MATLAB installed on Windows, you won't be able to run commands from within WSL (i.e. //wsl.localhost/)
-due to the separate filesystems. Pay attention to which environment you install (see `this`_ discussion).
+due to the separate filesystems. Pay attention to where your MATLAB install is relative to your `C://` drive. (also see `this`_ discussion).
 
-The easiest installation method is one of the following:
+The recommended Windows installation method is one of the following:
 
-- install with git is via `mysys <https://gitforwindows.org/>`_
+- install with git via `mysys <https://gitforwindows.org/>`_
 
 - download the code from code/Download.zip button on github and unzip to a directory of your choosing **on the windows C:// path** and access via:
-
 
 .. code-block:: bash
 
    $ cd /mnt/c/Users/<Username>/<project-install-path>
 
 
-In Linux, Mac, WSL or mysys, clone with the pre-installed git client:
+In Linux, Mac, WSL or mysys, clone this repository with the pre-installed git client:
 
 .. code-block:: bash
 
@@ -124,6 +134,8 @@ In Linux, Mac, WSL or mysys, clone with the pre-installed git client:
 
 Usage
 =====
+
+.. _preprocessing:
 
 Pre-processing
 --------------
@@ -220,7 +232,9 @@ See `notebooks/Strip_Exploration` for a walkthrough on how ScanImage trims pixel
 Motion-correction
 -----------------
 
-Perform both piecewise-rigid motion correction using `NormCORRe`_ to stabilize the imaging data.
+Perform both piecewise-rigid motion correction using `NormCORRe`_ to stabilize the imaging data. Each plane is motion corrected sequentially, so
+only a single plane is ever loaded into memory due to large LBM filesizes (>35GB). A template of 150 frames is used to initialize a "reference image". This image is
+your "ground truth" per-se, it is the image you want to most accurately represent the movement in your video.
 
 For input, use the same directory as `savePath` parameter in `convertScanImageTiffToVolume`_.
 
@@ -263,6 +277,8 @@ For input, use the same directory as `savePath` parameter in `convertScanImageTi
 
       See also addpath, gcp, dir, error, fullfile, fopen, regexp, contains, matfile, savefast
 
+Every
+
 This function uses NoRMCorre for piecewise-rigid motion correction resulting in shifts for each patch. The output is a 2D column vector [x, y]
 with shifts that allow you to reconstruct the motion-corrected movie with `core.utils.translateFrames`.
 
@@ -285,6 +301,8 @@ with shifts that allow you to reconstruct the motion-corrected movie with `core.
         translatedFrames - A 3D array of translated image frames, same size and type as Y.
 
 See `notebooks/MC_Exploration` for a walkthrough on analyzing motion-corrected videos.
+
+Motion correction metrics are saved to your savepath.
 
 Segmentation and Deconvolution
 ------------------------------
