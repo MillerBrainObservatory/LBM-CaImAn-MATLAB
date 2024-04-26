@@ -1,5 +1,58 @@
 function [offsets] = calculateZOffset(datapath, metadata, startPlane, endPlane, numFeatures)
-    
+    % CALCULATEZOFFSET Calculates Z-axis offsets between consecutive image planes by cross-correlation.
+    %
+    % This function loads image data from specified planes, identifies features
+    % in each plane, and calculates the offset in pixels between these features
+    % across consecutive planes. The function maximizes cross-correlation on regions
+    % around identified features to determine the best match and thus the offset.
+    %
+    % Parameters
+    % ----------
+    % datapath : string
+    %     Path to the directory containing the image data and calibration files.
+    %     The function expects to find 'pollen_sample_xy_calibration.mat' in this directory along with each caiman_output_plane_N.
+    %
+    % metadata : struct
+    %     Structure containing metadata for the image data. Expected to have at
+    %     least the 'pixel_resolution' field which is used to scale distances.
+    %
+    % startPlane : int
+    %     The starting plane index from which to begin processing.
+    %
+    % endPlane : int
+    %     The ending plane index at which to stop processing. The function
+    %     calculates offsets from startPlane to endPlane, inclusive.
+    %
+    % numFeatures : int
+    %     The number of features to identify and use in each plane for
+    %     calculating offsets.
+    %
+    % Returns
+    % -------
+    % offsets : Nx2 array
+    %     An array of offsets between consecutive planes, where N is the number
+    %     of planes processed. Each row corresponds to a plane, and the two columns
+    %     represent the calculated offset in pixels along the x and y directions,
+    %     respectively.
+    %
+    % Notes
+    % -----
+    % - This function requires calibration data in input datapath:
+    %   - pollen_sample_xy_calibration.mat
+    % - The function uses MATLAB's `ginput` function for manual feature selection
+    %   on the images. It expects the user to manually select the corresponding
+    %   points on each plane.
+    % - The function assumes that the consecutive images will have some overlap
+    %   and that features will be manually identifiable and trackable across planes.
+    %
+    % Example
+    % -------
+    % offsets = calculateZOffset('C:/data/images/', metadata, 1, 10, 5);
+    %
+    % See also
+    % --------
+    % load, max, ind2sub, xcorr2, ginput, nanmean
+
     load([datapath 'pollen_sample_xy_calibration.mat'])
 
     pixel_resolution = metadata.pixel_resolution;
@@ -9,8 +62,8 @@ function [offsets] = calculateZOffset(datapath, metadata, startPlane, endPlane, 
     
     ddx = diff(dy);
     ddy = diff(dx);
-    ds = 10;
-    nsize = ceil(ds/data.pixel_resolution);
+    scale_fact = 10;
+    nsize = ceil(scale_fact/pixel_resolution);
     
     offsets = zeros(data.num_planes, 2);
     
@@ -38,14 +91,14 @@ function [offsets] = calculateZOffset(datapath, metadata, startPlane, endPlane, 
                 h1 = figure;
                 set(h1,'position',[100 400 560 420])
                 imagesc(p1); axis image
-                xlim([xi-ds*nsize xi+ds*nsize])
-                ylim([yi-ds*nsize yi+ds*nsize])
+                xlim([xi-scale_fact*nsize xi+scale_fact*nsize])
+                ylim([yi-scale_fact*nsize yi+scale_fact*nsize])
     
                 h2 = figure;
                 set(h2,'position',[700 400 560 420])
                 imagesc(p2); axis image
-                xlim([xi-ds*nsize+ddx(curr_plane) xi+ds*nsize+ddx(curr_plane)])
-                ylim([yi-ds*nsize+ddy(curr_plane) yi+ds*nsize+ddy(curr_plane)])
+                xlim([xi-scale_fact*nsize+ddx(curr_plane) xi+scale_fact*nsize+ddx(curr_plane)])
+                ylim([yi-scale_fact*nsize+ddy(curr_plane) yi+scale_fact*nsize+ddy(curr_plane)])
     
                 figure(h1)
                 [x1,y1] = ginput(1);
@@ -57,7 +110,7 @@ function [offsets] = calculateZOffset(datapath, metadata, startPlane, endPlane, 
                 figure(h2)
                 [x2,y2] = ginput(1);
     
-                if x2 > xi+ds*nsize+ddx(curr_plane) || x2 < xi-ds*nsize+ddx(curr_plane) || y2 >  yi+ds*nsize+ddy(curr_plane) || y2 < yi-ds*nsize+ddy(curr_plane)
+                if x2 > xi+scale_fact*nsize+ddx(curr_plane) || x2 < xi-scale_fact*nsize+ddx(curr_plane) || y2 >  yi+scale_fact*nsize+ddy(curr_plane) || y2 < yi-scale_fact*nsize+ddy(curr_plane)
     
                     disp('Current point ignored.')
     
@@ -94,7 +147,6 @@ function [offsets] = calculateZOffset(datapath, metadata, startPlane, endPlane, 
                 disp('Current mapping failed.')
             end
         end
-    
         offsets(curr_plane+1,:) = [round(nanmean(giy)) round(nanmean(gix))];
     end
     

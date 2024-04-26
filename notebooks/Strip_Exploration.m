@@ -1,58 +1,64 @@
-%% Load Data 
+%% Strip Exploration (ScanImage Tiff Extraction)
+clear; clc;
+% % give access core/scanimage utilities\
+[currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
+addpath(genpath(fullfile(currpath, '../core/')));
+addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/SI2016bR1_2017-09-28-140040_defde478ed/')));
 
-clc
-clear
-addpath(genpath(fullfile("Pre_Processing_Executable/ScanImage_Utilities/SI2016bR1_2017-09-28-140040_defde478ed/")))
-filename = 'C:\Users\RBO\Documents\MATLAB\benchmarks\high_resolution\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif';
-[roiData2, roiGroup2, header2, ~] = scanimage.util.getMroiDataFromTiff(filename); 
+filename = fullfile('C:\Users\RBO\Documents\MATLAB\benchmarks\high_resolution\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif');
+matfilename = fullfile('D:\outputs\high_speed\MH70_0p9mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.mat');
+savepath = 'C:\Users\RBO\Documents\MATLAB\autotune\results\';
 
-%% Load Data, again 
+hTiff = Tiff(filename);
+[header,~] = scanimage.util.private.getHeaderData(hTiff);
+data = matfile(matfilename);
+whos(data)
+volsize = data.fullVolumeSize;
+data = squeeze(int16(data.vol(:,:,21,:)));
 
-[header, aout] = scanimage.util.opentif(filename);
+%%
+clc;
+plane = 21;
+
+% Define the base path and file naming convention
+basePath = 'C:\Users\RBO\Documents\MATLAB\autotune\results\';
+baseFileName = '%d_Frame_%d_plane.tiff';
+
+tagstruct = struct();
+tagstruct.BitsPerSample = 16;
+tagstruct.Photometric = Tiff.Photometric.MinIsBlack;
+tagstruct.SamplesPerPixel = 1;    
+tagstruct.SampleFormat = Tiff.SampleFormat.Int;
+
+tagstruct.ImageLength = volsize(1);
+tagstruct.ImageWidth = volsize(2);
+tagstruct.PlanarConfiguration = Tiff.PlanarConfiguration.Chunky;
+tagstruct.Software = 'MATLAB';
+
+for frame = 1:volsize(4)
+   
+    fileName = sprintf(baseFileName, frame, plane);
+    fullPath = fullfile(basePath, fileName);
+
+    t = Tiff(fullPath, 'w');
+
+    tagstruct.ImageLength = volsize(1);
+    tagstruct.ImageWidth = volsize(2);
+    tagstruct.Photometric = Tiff.Photometric.MinIsBlack;
+    tagstruct.BitsPerSample = 16;
+    tagstruct.SamplesPerPixel = 1;
+    tagstruct.RowsPerStrip = volsize(1); %effects lazy loading
+    tagstruct.PlanarConfiguration = Tiff.PlanarConfiguration.Chunky;
+    tagstruct.SampleFormat = Tiff.SampleFormat.Int;
+
+    t.setTag(tagstruct);
+    t.write(data(:,:,frame));
+    t.close();
+  
+end
 
 %% 
-clc
-clearvars -except aout filename
-hTiff = Tiff(filename);
-roiStr = hTiff.getTag('Artist'); % where scanimage decided to store image data
-roiStr(roiStr == 0) = []; % remove null termination
-mdata = most.json.loadjson(roiStr);
-mdata = mdata.RoiGroups.imagingRoiGroup.rois;
-num_rois = length(mdata);
-mdata = mdata{:};
-scanfields = mdata.scanfields;
 
-center_xy = scanfields.centerXY;
-size_xy = scanfields.sizeXY;
-num_pixel_xy = scanfields.pixelResolutionXY;
-
-clear mdata;
-
-[header,~] = scanimage.util.private.getHeaderData(hTiff);
-image_length = hTiff.getTag('ImageLength'); %% Really the only value we need
-image_width = hTiff.getTag('ImageWidth'); 
-
-num_frames = header.SI.hStackManager.framesPerSlice;
-num_planes = length(header.SI.hChannels.channelSave);
-
-assert(num_frames == size(aout, 4)); % sanity check
-assert(num_planes == size(aout, 3)); % sanity check
-
-lines_per_frame = header.SI.hRoiManager.linesPerFrame;
-pixels_per_line = header .SI.hRoiManager.pixelsPerLine;
-num_lines_between_scanfields = round(header.SI.hScan2D.flytoTimePerScanfield/header.SI.hRoiManager.linePeriod);
-
-frame_rate = header.SI.hRoiManager.scanVolumeRate;
-objective_resolution = header.SI.objectiveResolution;
-
-fov = round(objective_resolution.*size_xy);
-pixel_resolution = mean(fov./num_pixel_xy);
-
-img_size_y = num_pixel_xy(2) - ((num_pixel_xy(2)*0.03)-1);
-img_size_x = (132)*num_rois; %% to match the slice of stripTemp(val:end, 7:138 ...
-strip_width_slice = (7:138); % width to slice each strip
-
-clear mdata roiStr
 
 %% new tiff extraction 
 
@@ -76,24 +82,6 @@ for plane = 1:2
 		    ];
 	    plane_temp(:, frame_col_idx(1):frame_col_idx(2), :) = strip_temp;
     end
-end
-
-%% Original 
-[roiData, roiGroup, header, ~] = scanimage.util.getMroiDataFromTiff(filename); % load in data throuhg scanimage utility
-imageData = zeros(dim1, dim2, numChannels, num_frames, 'int16');
-for channel = 1:numChannels
-    frameTemp = zeros(dim1, dim2, num_frames, 'int16');
-    for roi_idx = 1:num_rois
-        stripTemp = zeros(1000,144,num_frames, 'int16');
-        stripTemp = cell2mat(permute(cellfun(@(x) x{1}, roiData{1, roi_idx}.imageData{1, channel}, 'UniformOutput', false), [1, 3, 2]));
-        corr = returnScanOffset2(stripTemp,1); % find offset correction
-        stripTemp = fixScanPhase(stripTemp,corr,1); % fix scan phase
-        val = round(size(stripTemp,1)*0.03); % trim excess
-        stripTemp = stripTemp(val:end,strip_width_slice,:,:);
-        frameTemp(:, (roi_idx-1)*length(strip_width_slice)+1:roi_idx*length(strip_width_slice), :) = stripTemp;
-    end
-    imageData(:, :, channel, :) = frameTemp;
-    % h5write(filename, dataset_name, stripTemp, [1 1 1 channel], size(stripTemp);
 end
 
 

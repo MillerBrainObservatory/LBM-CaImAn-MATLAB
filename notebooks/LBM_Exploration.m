@@ -8,7 +8,31 @@
 % for image [hxw], the standard tiff imagelength and imagewidth values are used
 % to get the distance between rois/scanfields:
 %       - flytotimeperscanfield / hroiManager.lineperiod
-addpath(genpath(fullfile("Pre_Processing_Executable/ScanImage_Utilities/SI2016bR1_2017-09-28-140040_defde478ed/")));
+
+import ScanImageTiffReader.ScanImageTiffReader;
+
+[currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
+addpath(genpath(fullfile(currpath, '../core/')));
+addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/SI2016bR1_2017-09-28-140040_defde478ed/')));
+
+filename = 'C:\Users\RBO\Documents\MATLAB\benchmarks\high_resolution\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif';
+
+reader=ScanImageTiffReader(filename);
+vol=reader.data();
+%%
+vol2 = reshape(vol, [145 2478 30 1730]);
+vol2 = permute(vol2, [2 1 3 4]);
+slice = vol2(:, :, 21, 2:202);
+%%
+clear all
+data = matfile("C:\\Users\RBO\Documents\MATLAB\benchmarks\high_resolution\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.mat");
+
+
+%%
+metadata = get_metadata(filename);
+
+% imshow(vol(:,:,floor(size(vol,3)/2)),[]);
+
 % this is 2016, the version uploaded to the public lbm repository
 
 %% extract data for the 4 datasets before any scanimage manipulations
@@ -39,11 +63,6 @@ for i = 1:length(filepaths)
         otherwise
             lbm_data{i}.name = "unknown";
     end
-end
-
-%% Display Metadata
-for i=1:length(lbm_data)
-    disp_metadata(lbm_data{i});
 end
 
 %% Interactive Widget
@@ -92,8 +111,7 @@ for nd = 1:2
          yline(dataset.numLinesBetweenScanfields, '--');
     end
     set(gca,'xtick',[1, size(roi_data, 2)])
-    % formatSpec = sprintf('Plane: %s\n Frame: %s\n', num2str(plane), num2str(frame));
-    % sgtitle(formatSpec);
+
     nexttile;
     bw1 = edge(roi_data,'sobel');
     imagesc(bw1); axis image; title('sobel filter'); colormap('gray');
@@ -189,26 +207,6 @@ function exploreImageFrames(dataset)
     end
 end
 
-function disp_metadata(info)
-    fprintf('Dataset: %s\n', info.name);
-    fprintf('Fly-back Time(s): %s\n', info.flybacktime);
-    fprintf('Fly-to Time (s): %s\n', info.flytotime);
-    fprintf('\n');
-    fprintf('Frame Rate: %.2f Hz\n', info.frame_rate);
-    fprintf('Objective Resolution (um/deg): %.1f\n', info.objective_resolution);
-    fprintf('Lateral Sampling (um/px): %.1f\n', info.lateral_sampling);
-    fprintf('\n');
-    fprintf('Number of Planes: %d\n', info.numPlanes);
-    fprintf('Number of Frames per File: %d\n', info.num_frames_file);
-    fprintf('Number of Frames per Dataset: %d\n', info.numFrames);
-    fprintf('Number of Images/Tiff Pages: %d\n', info.numImages);
-    fprintf('\n');
-    fprintf('Size in X (deg): %.3f\n', info.sizeXY(1));
-    fprintf('Size in Y (deg): %.3f\n', info.sizeXY(2));
-    fprintf('FOV: %d\n', info.FOV);
-    fprintf('Number of Lines Between ROIs: %d\n', info.numLinesBetweenScanfields);
-    fprintf("============================\n");
-end
 
 function [data] = extract_data(filepath)
     data = struct;
