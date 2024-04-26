@@ -5,9 +5,9 @@ addpath(genpath(fullfile(fpath, 'core/')));
 
 result = validateRequirements();
 if ischar(result)
-    error(result);  % Stop execution and display error if not all toolboxes are installed
+    error(result); 
 else
-    disp('Proceeding with execution...');  % Continue with your script if all toolboxes are installed
+    disp('Proceeding with execution...');
 end
 
 %% 1) Pre-Processing
