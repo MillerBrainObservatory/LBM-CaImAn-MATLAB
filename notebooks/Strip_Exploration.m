@@ -1,5 +1,6 @@
 %% Strip Exploration (ScanImage Tiff Extraction)
 clear; clc;
+
 % % give access core/scanimage utilities\
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
 addpath(genpath(fullfile(currpath, '../core/')));

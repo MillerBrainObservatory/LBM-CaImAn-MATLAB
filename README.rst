@@ -35,7 +35,7 @@ There are 4 steps corresponding to 4 core functions (more details in `Usage`_):
     - segmentPlane
 
 4. Z Offset Correction.
-    - segmentPlane
+    - collatePlane
 
 .. _algorithms:
 
@@ -149,6 +149,8 @@ The raw output of an ScanImage MROI acquisition is a `tiff` (or series of tiffs)
 - plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.
 
 - Frames may be split across multiple files if this option is specified the ScanImage configuration.
+
+- Dimensions: [MxNxZxF], Image size MxN for z planes, F frames,. Default type is uint16.
 
 If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user:
 
@@ -277,8 +279,6 @@ For input, use the same directory as `savePath` parameter in `convertScanImageTi
 
       See also addpath, gcp, dir, error, fullfile, fopen, regexp, contains, matfile, savefast
 
-Every
-
 This function uses NoRMCorre for piecewise-rigid motion correction resulting in shifts for each patch. The output is a 2D column vector [x, y]
 with shifts that allow you to reconstruct the motion-corrected movie with `core.utils.translateFrames`.
 
@@ -405,18 +405,18 @@ Place these files in the same directory as your `caiman_output_plane_N` files.
 
 	>> help collatePlanes
   collatePlanes Analyzes and processes imaging data by extracting and correcting features across multiple planes.
- 
+
   This function analyzes imaging data from a specified directory, applying
   various thresholds and corrections based on metadata. It processes neuron
   activity data, handles z-plane corrections, and outputs figures representing
   neuron distributions along with collated data files.
- 
+
   The function expects the directory to contain 'caiman_output_plane_*.mat' files
   with variables related to neuronal activity, and uses provided metadata for
   processing parameters. It adjusts parameters dynamically based on the content
   of metadata and filters, merges data across imaging planes, and performs
   z-plane and field curvature corrections.
- 
+
   Parameters
   ----------
   dataPath : string
@@ -429,29 +429,29 @@ Place these files in the same directory as your `caiman_output_plane_N` files.
   startDepth : double
       The starting depth (z0) from which processing should begin; if not
       provided, a dialog will prompt for input.
- 
+
   Returns
   -------
   None
- 
+
   Outputs
   -------
   - .fig files showing neuron distributions in z and radial directions.
   - A .mat file with collated and processed imaging data.
- 
+
   Notes
   -----
   - Expects 'three_neuron_mean_offsets.mat' and 'pollen_calibration_Z_vs_N.fig'
     within the dataPath for processing.
   - The function uses parallel processing for some calculations to improve
     performance.
- 
+
   Examples
   --------
   collatePlanes('C:/data/images/', '', struct('r_thr':0.4, 'pixel_resolution':2, 'min_snr':1.5, 'frame_rate':9.61, 'fovx':1200, 'fovy':1164), 100);
     This example processes data from 'C:/data/images/', starting at a depth of 100 microns,
     with specified metadata parameters.
- 
+
   See also load, inputdlg, struct, fullfile, exist
 
 
