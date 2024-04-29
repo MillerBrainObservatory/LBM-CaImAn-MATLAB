@@ -1,3 +1,4 @@
+function segmentPlane(path,diagnosticFlag,startPlane,endPlane,numCores)
 % SEGMENTPLANE Segment imaging data using CaImAn for motion-corrected data.
 %
 % This function applies the CaImAn algorithm to segment neurons from
@@ -43,7 +44,7 @@
 %   density in the imaged volume.
 %
 % See also ADDPATH, FULLFILE, DIR, LOAD, SAVEFAST
-function segmentPlane(path,diagnosticFlag,startPlane,endPlane,numCores)
+
 
 % give access to CaImAn files
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
@@ -119,9 +120,16 @@ else
 
             % load data
             d = load(fullfile(path, [file '.mat']));
-            data = d.Y;
-            pixel_resolution = d.pixelResolution;
-            volume_rate = d.volumeRate;
+            shifts = d.shifts;
+            metadata = d.metadata;
+            
+            d1 = metadata.full_image_width;
+            d2 = metadata.full_image_height;
+
+            data = translateFrames(Y, shifts);
+
+            pixel_resolution = metadata.pixel_resolution;
+            volume_rate = metadata.frame_rate;
 
             t0 = toc;
             disp(['Data loaded in. This process takes ' num2str(t0./60) ' minutes.'])
