@@ -1,4 +1,4 @@
-function convertScanImageTiffToVolume(filePath, saveDirPath, diagnosticFlag)
+function convertScanImageTiffToVolume(filePath, saveDirPath, datasetName, diagnosticFlag)
 %CONVERTSCANIMAGETIFFTOVOLUME Convert ScanImage .tif files into a 4D volume.
 %
 % Convert raw `ScanImage`_ multi-roi .tif files from a single session
@@ -40,23 +40,25 @@ function convertScanImageTiffToVolume(filePath, saveDirPath, diagnosticFlag)
 arguments
     filePath (1,:) char  % The directory containing the raw .tif files
     saveDirPath (1,:) char  = filePath   % The directory where processed files will be saved, created if id doesn't exist. Defaults to the filePath.
+    datasetName (1,:) char = ''
     diagnosticFlag (1,1) double {mustBeNumericOrLogical} = 0 % If 1, display the files in the command window and stop the process.
 end
 
-% ScanImage path
+%% ScanImage path
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
-addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/SI2016bR1_2017-09-28-140040_defde478ed/')));
-
+% addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/SI2016bR1_2017-09-28-140040_defde478ed/')));
+addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/ScanImage/')));
 if ~exist('diagnosticFlag', 'var')
     diagnosticFlag = 0;
 end
 
 filePath = fullfile(filePath);
 if ~isfolder(filePath)
-    error("Filepath %u does not exist", filePath);
+    error("Filepath %s does not exist", filePath);
 end
 
 if not(isfolder(saveDirPath))
+    fprintf('Given savepath %s does not exist. Creating this directory...\n', saveDirPath);
     mkdir(saveDirPath)
 end
 
@@ -74,14 +76,16 @@ else
         multiFile = length(files) > 1;
 
         % fileNames = files.name;
-        % filteredFileNames = fileNames(~contains(lower(fileNames), 'plane'));
+        tic;
         filesToProcess = {}; % keep track of processed files
         for i = 1:length(files)
             currentFileName = files(i).name;
+            % TODO: Use metadata num_files instead of relying on filename
+
             % match _0000N.tif, where N = #files, at the end of the filename
             if multiFile && regexp(currentFileName, '.*_\d{5}\.tif$')
                 filesToProcess{end+1} = currentFileName;
-                sprintf('Adding %s ...', currentFileName)
+                fprintf('Adding %s ...', currentFileName);
             elseif ~multiFile
                 sprintf('Only file to process: %s ', currentFileName)
                 filesToProcess{end+1} = currentFileName;
@@ -89,6 +93,7 @@ else
             else
                 sprintf('Ignoring file %s ', currentFileName)
             end
+            toc
         end
 
         if isempty(filesToProcess)
@@ -102,38 +107,34 @@ else
         logFullPath = fullfile(filePath, logFileName);
         fid = fopen(logFullPath, 'w');
 
+        basepath = sprintf("/%s", datasetName);
+        
         %%  (I) Assemble ROI's from ScanImage
         %%% Loop through raw .tif files and reassemble planes/frames.
         numFiles = length(filesToProcess);
         for ijk = 1:numFiles
+            
             disp(['Loading file ' num2str(ijk) ' of ' num2str(numFiles) '...'])
+            
             date = datetime(now,'ConvertFrom','datenum');
             formatSpec = '%s Beginning file %u...\n';
             fprintf(fid,formatSpec,date,ijk);
 
             % Use the currentFileName from filesToProcess
+            grouppath = sprintf("%s/file_%s", basepath, num2str(ijk));
             currentFileName = filesToProcess{ijk};
-            [vol, metadata] = assembleCorrectedROITiff(fullfile(filePath, currentFileName));
+            current_fullfile = fullfile(filePath, currentFileName);
+
+            if ijk == 1
+                % metadata that will be the same for each file
+                metadata = get_metadata(current_fullfile);
+                metadata.f0 = current_fullfile;
+                metadata.savepath = fullfile(filePath, 'preprocess');
+            end
+            [metadata] = assembleCorrectedROITiff(current_fullfile, metadata, 'group_path', grouppath);
 
             tt = toc/3600;
             disp(['Volume loaded and processed. Elapsed time: ' num2str(tt) ' hours. Saving volume to temp...'])
-
-            %% Save volume as .mat/hdf5 with accompanying metadata
-            matfilename = fullfile(saveDirPath, [currentFileName(1:end-4) '.mat']);
-
-            order = [1 5:10 2 11:17 3 18:23 4 24:30];
-            order = fliplr(order);
-
-            vol = vol(:,:,order,:);
-            metadata.volume_size = size(vol);
-            metadata.filename = matfilename;
-            savefast(matfilename,'vol','metadata');
-
-            tt = toc/3600;
-            disp(['Volume loaded, processed, and saved to disk. Elapsed time: ' num2str(tt) ' hours. Processing next volume...'])
-
-            clear vol
-            pause(0.5)
         end
     catch ME
         % delete the logfile before erroring out
@@ -147,6 +148,4 @@ else
         end
         rethrow(ME)
     end
-
-
 end

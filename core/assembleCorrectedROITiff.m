@@ -1,42 +1,69 @@
-function [imageData,metadata] = assembleCorrectedROITiff(varargin) 
-    [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
-    addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/SI2016bR1_2017-09-28-140040_defde478ed/')));
-    addpath(genpath("utils"));
-    if nargin == 1
-        filename = varargin{1};
-        if ~isfile(filename)
-            [f, p] = uigetfile({'*.tif;*.tiff'},'Select Image File');
-            if f == 0
-                most.idioms.warn('Invalid arguments'); 
-                return;
-            end
-            filename = fullfile(p,f); 
-        end
-        % tic
-        % [header, aout] = scanimage.util.opentif(filename);
-        % toc
-        [roiData, roiGroup, header, ~] = scanimage.util.getMroiDataFromTiff(filename);
-    else
-        disp('No filename provided');
-	    return;
+function [metadata] = assembleCorrectedROITiff(filename, metadata, nvargs) 
+    arguments
+        filename
+        metadata (1,1) struct % Metadata values
+        nvargs.dataset (1,1) string = "/Y"
+        nvargs.group_path (1,1) string = "/data"
+        nvargs.fileMode (1,1) string = "separate"
+        nvargs.chunksize (1,:) = []
+        nvargs.compression (1,1) double = 0
     end
 
-    metadata = get_metadata(filename);
-    val = round(metadata.num_pixel_xy(2)*0.03);
+    [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
+    addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/ScanImage/')));
+    addpath(genpath("utils"));
 
-    imageData = zeros(metadata.img_size_y, metadata.img_size_x, metadata.num_planes, metadata.num_frames, 'int16');
-    for plane = 1:metadata.num_planes
-        frameTemp = zeros(metadata.img_size_y, metadata.img_size_x, metadata.num_frames, 'int16');
+    hTif = scanimage.util.ScanImageTiffReader(filename);
+    Aout = hTif.data();
+    Aout = most.memfunctions.inPlaceTranspose(Aout); % the ScanImageTiffReader reads data in row major order
+
+    % deinterleave zT
+    Aout = reshape(Aout,[size(Aout,1) size(Aout,2) metadata.num_planes, metadata.num_frames_file]);
+    
+    raw_roi_width = metadata.num_pixel_xy(1);
+    raw_roi_height = metadata.num_pixel_xy(2);
+
+    trim_roi_width_start = 6;
+    trim_roi_width_end = raw_roi_width - 6;
+
+    new_roi_width_range = trim_roi_width_start:trim_roi_width_end;
+    new_roi_width = size(new_roi_width_range, 2);
+
+    trim_roi_height_start = round(raw_roi_height*0.03);
+    trim_roi_height_end = raw_roi_height;
+
+    new_roi_height_range = trim_roi_height_start:trim_roi_height_end; % controls the width on each side of the concatenated strips
+    
+    full_image_height = raw_roi_height - (trim_roi_height_start-1);
+    full_image_width = new_roi_width*metadata.num_rois;
+
+    % imageData = zeros(metadata.img_size_y, metadata.img_size_x, metadata.num_planes, metadata.num_frames_per_file, 'int16');
+    for plane_idx = 1:metadata.num_planes
+        frameTemp = zeros(full_image_height, full_image_width, metadata.num_frames_file, 'uint16');
+        cnt=1;
         for roi_idx = 1:metadata.num_rois
-            stripTemp = cell2mat(permute(cellfun(@(x) x{1}, roiData{1, roi_idx}.imageData{1, plane}, 'UniformOutput', false), [1, 3, 2]));
-            corr = returnScanOffset2(stripTemp,1); % find offset correction
-            stripTemp = fixScanPhase(stripTemp,corr,1); % fix scan phase
-            stripTemp = stripTemp(val:end,metadata.strip_width_slice,:,:);
-            frameTemp(:, (roi_idx-1)*length(metadata.strip_width_slice)+1:roi_idx*length(metadata.strip_width_slice), :) = stripTemp;
+            if cnt == 1 
+                % The first one will be at the very top
+                offset_y = 0;
+                offset_x = 0;
+            else
+                % For the rest of the rois, there will be a recurring numLinesBetweenScanfields spacing
+                offset_y = offset_y + raw_roi_height + metadata.num_lines_between_scanfields; 
+                offset_x = offset_x + new_roi_width;
+            end
+            for frame_idx = 1:metadata.num_frames_file
+                frameTemp(:, offset_x+new_roi_width_range, frame_idx) = Aout(offset_y+new_roi_height_range, new_roi_width_range, plane_idx, frame_idx);
+            end
+            cnt=cnt+1;
         end
-        % Add to preallocated array
-        % ..or, save straight to H5
-        imageData(:, :, plane, :) = frameTemp;
+        metadata.corr = returnScanOffset(frameTemp, 1);
+        % frameTemp = fixScanPhase(frameTemp, corr, 1);
+
+        filesavepath = sprintf("%s.h5", metadata.base_filename);
+        datasavepath = sprintf("%s/plane_%d", nvargs.group_path, plane_idx);
+        finalPath = fullfile(metadata.savepath, filesavepath);
+        
+        writeDataToH5(frameTemp(), finalPath, datasavepath, nvargs, metadata);
     end
 end
 
@@ -46,9 +73,9 @@ function dataOut = fixScanPhase(dataIn,offset,dim)
     % occur between each successive line.
 
     [sy,sx,sc,sz] = size(dataIn);
-    dataOut = zeros(sy,sx,sc,sz);
+    dataOut = zeros(sy,sx,sc,sz, 'uint16');
 
-    if dim == 1 % time series
+    if dim == 1
         if offset>0
             dataOut(1:2:sy,1:sx,:,:) = dataIn(1:2:sy,:,:,:);
             dataOut(2:2:sy,1+offset:(offset+sx),:) = dataIn(2:2:sy,:,:);
@@ -61,7 +88,7 @@ function dataOut = fixScanPhase(dataIn,offset,dim)
             dataOut(:,1+floor(offset/2):sx+floor(offset/2),:,:) = dataIn;
         end
 
-    elseif dim == 2 % volume
+    elseif dim == 2
 
         if offset>0
             dataOut(1:sy,1:2:sx,:,:) = dataIn(:,1:2:sx,:,:);
@@ -96,7 +123,7 @@ function correction = returnScanOffset(Iin,dim)
             Iv1 = Iv1(1:min([size(Iv1,1) size(Iv2,1)]),:);
             Iv2 = Iv2(1:min([size(Iv1,1) size(Iv2,1)]),:);
 
-            buffers = zeros(size(Iv1,1),n);
+            buffers = zeros(size(Iv1,1),n,  'uint16');
 
             Iv1 = cat(2,buffers,Iv1,buffers);
             Iv2 = cat(2,buffers,Iv2,buffers);
@@ -111,7 +138,7 @@ function correction = returnScanOffset(Iin,dim)
             Iv1 = Iv1(:,1:min([size(Iv1,2) size(Iv2,2)]));
             Iv2 = Iv2(:,1:min([size(Iv1,2) size(Iv2,2)]),:);
 
-            buffers = zeros(n,size(Iv1,2));
+            buffers = zeros(n,size(Iv1,2), 'uint16');
 
             Iv1 = cat(1,buffers,Iv1,buffers);
             Iv2 = cat(1,buffers,Iv2,buffers);

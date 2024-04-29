@@ -16,6 +16,8 @@ data = matfile(matfilename);
 whos(data)
 volsize = data.fullVolumeSize;
 data = squeeze(int16(data.vol(:,:,21,:)));
+%% 
+
 
 %%
 clc;

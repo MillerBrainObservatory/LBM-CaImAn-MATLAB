@@ -1,4 +1,4 @@
-function motionCorrectPlane(filePath, numCores, startPlane, endPlane)
+function motionCorrectPlane(filePath, metadata, numCores, startPlane, endPlane)
 % MOTIONCORRECTPLANE Perform rigid and non-rigid motion correction on imaging data.
 %
 % This function processes imaging data by sequentially loading individual
@@ -36,12 +36,15 @@ function motionCorrectPlane(filePath, numCores, startPlane, endPlane)
 % See also ADDPATH, GCP, DIR, ERROR, FULLFILE, FOPEN, REGEXP, CONTAINS, MATFILE, SAVEFAST
 arguments
     filePath (1,:) char                    % Path to the directory with input files.
+    metadata (1,1) struct % Metadata values
     numCores (1,1) double {mustBeInteger, mustBePositive, mustBeLessThanOrEqual(numCores,24)} = 1
     startPlane (1,1) double {mustBeInteger, mustBePositive} = 1
     endPlane (1,1) double {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(endPlane,startPlane)} = 1
 end
-    addpath(genpath(fullfile("utils/")));
-    addpath(genpath(fullfile('motion_correction/')));
+
+    [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
+    addpath(genpath(fullfile(currpath, '../packages/CaImAn_Utilities/motion_correction/')));
+    addpath(genpath(fullfile(currpath, "utils")));
 
     tic;
     clck = clock; % Generate a timestamp for the log file name.
@@ -59,88 +62,43 @@ end
     numCores = max(numCores, 23);
     fprintf(fid, '%s Beginning processing routine...\n', datetime);
 
-    files = dir(fullfile(filePath, '*.mat'));
+    files = dir(fullfile(filePath, '*.h5'));
     if isempty(files)
-        error('No suitable tiff files found in: \n  %s', filePath);
+        error('No suitable h5 files found in: \n  %s', filePath);
     end
 
-    multiFile = length(files) > 1;
-    filesToProcess = {}; % keep track of processed files
-    for i = 1:length(files)
-        currentFileName = files(i).name;
-        % match _0000N.tif, where N = #files, at the end of the filename
-        if multiFile && ~isempty(regexp(currentFileName, '.*_\d{5}\.mat$', 'once'))
-            filesToProcess{end+1} = currentFileName;
-            sprintf('Adding %s ...', currentFileName)
-        elseif ~multiFile
-            sprintf('Only file to process: %s ', currentFileName)
-            filesToProcess{end+1} = currentFileName;
-            break;
-        else
-            sprintf('Ignoring file %s ', currentFileName)
-        end
-    end
-
-     if isempty(filesToProcess)
-        error('No suitable files found for processing in: \n  %s', filePath);
-     end
-
-    % Filter out motion correction output files containing "plane" in the filename
-    fileNames = {files.name};
-    relevantFiles = ~contains(fileNames, 'plane');
-    relevantFileNames = fileNames(relevantFiles);
-    sprintf('Number of files to process: %s \n', num2str(length(relevantFileNames)))
-
-    for fname=1:length(relevantFiles)
-        disp(fname)
-    end
-
-    % Check if at least one relevant file is found
-    if isempty(relevantFileNames)
-        error('No relevant files found in filePath: %d \n', filePath);
-    end
-
-    numFiles = length(relevantFileNames);
-
-    % Pull metadata file
-    metadata_matfile = matfile(fullfile(filePath, relevantFileNames{1}), 'Writable',true);
-    metadata = metadata_matfile.metadata;
-
+    num_files = metadata.num_files;
     pixel_resolution = metadata.pixel_resolution;
-    sizY = metadata.volume_size;
-    d1Planes = metadata.volume_size(3);
-    d1file = metadata.volume_size(1);
-    d2file = metadata.volume_size(2);
-    Tfile = metadata.volume_size(4);
-    totalT = Tfile*length(relevantFileNames);
+    num_planes = metadata.num_planes;
+    num_frames_file = metadata.num_frames_file;
+    num_frames_total = metadata.num_frames_total;
 
-    if ~(d1Planes >= endPlane)
-        error("Not enough planes to process given user supplied argument: %d as endPlane when only %d planes exist in this dataset.", endPlane, d1Planes);
+    if ~(num_planes >= endPlane)
+        error("Not enough planes to process given user supplied argument: %d as endPlane when only %d planes exist in this dataset.", endPlane, num_planes);
     end
+    % files = dir([filePath '/*.h5']).name
 
-    % To use H5:
-    % fileInfo = h5info(fullfile(filePath, relevantFileNames{1}), '/data');
-    % d1 = fileInfo.Dataspace.Size(1);
-    % d2 = fileInfo.Dataspace.Size(2);
-    % num_planes = fileInfo.Dataspace.Size(3);
-    % T = fileInfo.Dataspace.Size(4); % Number of time points per file
+    edst = sprintf('%s.h5', metadata.base_filename);
+    filesave = fullfile(filePath,edst);
+    info = h5info(filesave);
 
     % preallocate based on the total number of time points across all files
     % For each file, grab all data for this plane.
     for plane_idx = startPlane:endPlane
-        sprintf('Loading plane %s', num2str(plane_idx))
-        Y = zeros(sizY(1), sizY(2), totalT, 'single');
-        for file_idx = 1:numel(relevantFileNames)
-            currentFileName = relevantFileNames{file_idx};
-            data = matfile(fullfile(filePath, currentFileName), "Writable",true);
-            Y(:,:,(file_idx-1)*Tfile+1:file_idx*Tfile) = single(reshape(data.vol(:,:,plane_idx,:),d1file,d2file,Tfile));
+        fprintf('Loading plane %s\n', num2str(plane_idx));
+        ds = info.Groups.Groups.Datasets;
+        dspace = ds.Dataspace;
+        image_size = dspace.Size(1:2);
+
+        Y = zeros([image_size num_frames_total], 'single');
+        for file_idx = 1:numel(num_files)
+            file_group = sprintf("/%s/file_%d/plane_%d", metadata.dataset_name, file_idx, plane_idx);
+            Y(:,:,(file_idx-1)*num_frames_file+1:file_idx*num_frames_file) = im2single(h5read(filesave, file_group));
         end
 
-        sizY = size(Y);
-        d1 = sizY(1);
-        d2 = sizY(2);
-        T = sizY(3);
-
+        volume_size = size(Y);
+        d1 = volume_size(1);
+        d2 = volume_size(2);
         Y = Y-min(Y(:));
 
         fprintf(fid, '%s Beginning processing for plane %s with %s matlab workers.', datetime, plane_idx);
@@ -176,8 +134,8 @@ end
         % Non-rigid motion correction using the good tamplate from the rigid
         % correction.
           options_nonrigid = NoRMCorreSetParms(...
-            'd1',d1file,...
-            'd2',d2file,...
+            'd1',d1,...
+            'd2',d2,...
             'bin_width',24,...
             'max_shift', max_shift,...
             'us_fac',20,...
