@@ -9,10 +9,10 @@ function motionCorrectPlane(filePath, metadata, numCores, startPlane, endPlane)
 % Parameters
 % ----------
 % filePath : char
-%     Path to the directory containing the raw .tif files.
+%     Path to the directory containing the files extracted via convertScanImageTiffToVolume.
 % numCores : double, integer, positive
 %     Number of cores to use for computation. The value is limited to a maximum
-%     of 24 cores. If more than 24, it defaults to 23.
+%     of 24 cores.
 % startPlane : double, integer, positive
 %     The starting plane index for processing.
 % endPlane : double, integer, positive
@@ -29,8 +29,8 @@ function motionCorrectPlane(filePath, metadata, numCores, startPlane, endPlane)
 %
 % Notes
 % -----
-% - Only .mat files containing processed volumes should be in the filePath.
-% - Any .mat files with "plane" in the filename will be skipped to avoid
+% - Only .h5 files containing processed volumes should be in the filePath.
+% - Any .h5 files with "plane" in the filename will be skipped to avoid
 %   re-processing a previously motion-corrected plane.
 %
 % See also ADDPATH, GCP, DIR, ERROR, FULLFILE, FOPEN, REGEXP, CONTAINS, MATFILE, SAVEFAST
@@ -41,7 +41,6 @@ arguments
     startPlane (1,1) double {mustBeInteger, mustBePositive} = 1
     endPlane (1,1) double {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(endPlane,startPlane)} = 1
 end
-
     [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
     addpath(genpath(fullfile(currpath, '../packages/CaImAn_Utilities/motion_correction/')));
     addpath(genpath(fullfile(currpath, "utils")));

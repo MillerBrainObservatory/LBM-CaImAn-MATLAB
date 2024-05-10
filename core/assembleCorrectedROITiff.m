@@ -7,6 +7,7 @@ function [metadata] = assembleCorrectedROITiff(filename, metadata, nvargs)
         nvargs.fileMode (1,1) string = "separate"
         nvargs.chunksize (1,:) = []
         nvargs.compression (1,1) double = 0
+        nvargs.overwrite (1,1) logical = 1
     end
 
     [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
@@ -37,7 +38,6 @@ function [metadata] = assembleCorrectedROITiff(filename, metadata, nvargs)
     full_image_height = raw_roi_height - (trim_roi_height_start-1);
     full_image_width = new_roi_width*metadata.num_rois;
 
-    % imageData = zeros(metadata.img_size_y, metadata.img_size_x, metadata.num_planes, metadata.num_frames_per_file, 'int16');
     for plane_idx = 1:metadata.num_planes
         frameTemp = zeros(full_image_height, full_image_width, metadata.num_frames_file, 'uint16');
         cnt=1;
@@ -63,7 +63,7 @@ function [metadata] = assembleCorrectedROITiff(filename, metadata, nvargs)
         datasavepath = sprintf("%s/plane_%d", nvargs.group_path, plane_idx);
         finalPath = fullfile(metadata.savepath, filesavepath);
         
-        writeDataToH5(frameTemp(), finalPath, datasavepath, nvargs, metadata);
+        writeDataToH5(frameTemp, metadata, finalPath, datasavepath, nvargs);
     end
 end
 
