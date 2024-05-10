@@ -121,7 +121,7 @@ else
             fprintf(fid,formatSpec,date,ijk);
 
             % Use the currentFileName from filesToProcess
-            grouppath = sprintf("%s/file_%s", basepath, num2str(ijk));
+            grouppath = sprintf("/file_%s", num2str(ijk));
             currentFileName = filesToProcess{ijk};
             current_fullfile = fullfile(filePath, currentFileName);
 
@@ -129,7 +129,10 @@ else
                 % metadata that will be the same for each file
                 metadata = get_metadata(current_fullfile);
                 metadata.f0 = current_fullfile;
-                metadata.savepath = fullfile(filePath, 'preprocess');
+                metadata.savepath = fullfile(filePath, 'extracted');
+                if ~isfolder(metadata.savepath)
+                    mkdir(metadata.savepath)
+                end
             end
             [metadata] = assembleCorrectedROITiff(current_fullfile, metadata, 'group_path', grouppath);
 

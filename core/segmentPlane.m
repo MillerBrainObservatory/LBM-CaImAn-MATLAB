@@ -1,4 +1,4 @@
-function segmentPlane(path,diagnosticFlag,startPlane,endPlane,numCores)
+function segmentPlane(path,metadata,diagnosticFlag,startPlane,endPlane,numCores)
 % SEGMENTPLANE Segment imaging data using CaImAn for motion-corrected data.
 %
 % This function applies the CaImAn algorithm to segment neurons from
@@ -10,6 +10,9 @@ function segmentPlane(path,diagnosticFlag,startPlane,endPlane,numCores)
 % ----------
 % path : char
 %     The path to the local folder containing the motion-corrected data.
+% metadata: struct
+%     Struct of ScanImage metadata containing image width, height, and
+%     scanfield information relating to each ROI.
 % diagnosticFlag : char
 %     When set to '1', the function reports all .mat files in the directory
 %     specified by 'path'. Otherwise, it processes files for neuron segmentation.
@@ -44,7 +47,6 @@ function segmentPlane(path,diagnosticFlag,startPlane,endPlane,numCores)
 %   density in the imaged volume.
 %
 % See also ADDPATH, FULLFILE, DIR, LOAD, SAVEFAST
-
 
 % give access to CaImAn files
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
@@ -120,13 +122,14 @@ else
 
             % load data
             d = load(fullfile(path, [file '.mat']));
-            shifts = d.shifts;
-            metadata = d.metadata;
+            % shifts = d.shifts;
+            % metadata = d.metadata;
             
             d1 = metadata.full_image_width;
             d2 = metadata.full_image_height;
 
-            data = translateFrames(Y, shifts);
+            % data = translateFrames(Y, shifts);
+            data = d.Y;
 
             pixel_resolution = metadata.pixel_resolution;
             volume_rate = metadata.frame_rate;
