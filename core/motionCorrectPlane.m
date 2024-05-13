@@ -66,7 +66,32 @@ end
         error('No suitable h5 files found in: \n  %s', filePath);
     end
 
-    num_files = metadata.num_files;
+    h5files = dir([filePath '*.h5']);
+    metainfo = h5files(1);
+    h5path = fullfile(metainfo.folder, metainfo.name);
+
+    figpath = fullfile(filePath, 'figures/');
+    mkdir(figpath);
+
+    h5data = readH5Metadata(h5path);
+    groups = h5data.Groups;
+    num_files = length(groups);    
+    for file_idx=1:num_files        
+        file_info = groups(file_idx);
+        planes = file_info.Datasets;
+        for j=1:length(planes)
+            loc_plane = sprintf("/plane_%d", j);
+            full_path = sprintf("%s%s", file_info.Name, loc_plane);
+            datasetInfo = h5info(h5path, full_path);
+            metadata = struct();
+            for k = 1:length(datasetInfo.Attributes)
+                attrName = datasetInfo.Attributes(k).Name;
+                attrValue = h5readatt(h5path, full_path, attrName);
+                metadata.(matlab.lang.makeValidName(attrName)) = attrValue;
+            end
+        end
+    end
+
     pixel_resolution = metadata.pixel_resolution;
     num_planes = metadata.num_planes;
     num_frames_file = metadata.num_frames_file;
@@ -75,24 +100,24 @@ end
     if ~(num_planes >= endPlane)
         error("Not enough planes to process given user supplied argument: %d as endPlane when only %d planes exist in this dataset.", endPlane, num_planes);
     end
-    % files = dir([filePath '/*.h5']).name
-
-    edst = sprintf('%s.h5', metadata.base_filename);
-    filesave = fullfile(filePath,edst);
-    info = h5info(filesave);
 
     % preallocate based on the total number of time points across all files
     % For each file, grab all data for this plane.
     for plane_idx = startPlane:endPlane
-        fprintf('Loading plane %s\n', num2str(plane_idx));
-        ds = info.Groups.Groups.Datasets;
-        dspace = ds.Dataspace;
-        image_size = dspace.Size(1:2);
 
-        Y = zeros([image_size num_frames_total], 'single');
-        for file_idx = 1:numel(num_files)
-            file_group = sprintf("/%s/file_%d/plane_%d", metadata.dataset_name, file_idx, plane_idx);
-            Y(:,:,(file_idx-1)*num_frames_file+1:file_idx*num_frames_file) = im2single(h5read(filesave, file_group));
+        fprintf('Loading plane %s\n', num2str(plane_idx));
+        Y = zeros([metadata.image_size(1) metadata.image_size(2) num_frames_total], 'single');
+
+        for file_idx = 1:num_files
+            file_group = sprintf("/file_%d/plane_%d", file_idx, plane_idx);
+            save_name = sprintf("file_%d_plane_%d", file_idx, plane_idx);
+
+            Y(:,:,(file_idx-1)*num_frames_file+1:file_idx*num_frames_file) = im2single(h5read(h5path, file_group));
+            this_frame_slice = (file_idx-1)*num_frames_file+1:file_idx*num_frames_file;
+            disp([this_frame_slice(1) this_frame_slice(end)]);
+            p_img = imagesc(Y(:,:, this_frame_slice(2))); axis image;
+
+            saveas(gcf, fullfile(figpath, strcat(save_name, '.png')));
         end
 
         volume_size = size(Y);
