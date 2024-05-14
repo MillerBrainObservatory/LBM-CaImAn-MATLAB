@@ -36,6 +36,7 @@ function motionCorrectPlane(filePath, savePath, numCores, startPlane, endPlane)
 % See also ADDPATH, GCP, DIR, ERROR, FULLFILE, FOPEN, REGEXP, CONTAINS, MATFILE, SAVEFAST
 arguments
     filePath (1,:) char                    % Path to the directory with input files.
+    savePath (1,:) char                    % Path to the directory to save outputs.
     numCores (1,1) double {mustBeInteger, mustBePositive, mustBeLessThanOrEqual(numCores,24)} = 1
     startPlane (1,1) double {mustBeInteger, mustBePositive} = 1
     endPlane (1,1) double {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(endPlane,startPlane)} = 1
@@ -167,23 +168,24 @@ end
         % [shifts, ~, ~] = rigid_mcorr(Y,'template', template_good, 'max_shift', max_shift, 'subtract_median', false, 'upsampling', 20);
         % outputFile = [filePath 'mc_vectors_plane_' num2str(plane_idx) '.mat'];
 
-        savefast(savePath, 'metadata', 'shifts', 'M2', 'shifts2');
+        [cM2,~,~] = motion_metrics(M2,10);
+
+        savefast(savePath, 'metadata', 'M2', 'shifts2');
 
         disp('Data saved, beginning next plane...')
         date = datetime(now,'ConvertFrom','datenum');
         formatSpec = '%s Motion Correction Complete. Beginning next plane...\n';
         fprintf(fid,formatSpec,date);
 
-        clear M1 cM1 cM2 cY cMT template_good shifts* M2
-
-        % disp('Calculating motion correction metrics...')
+        clear M1 c* template_good shifts* M2
+        disp('Calculating motion correction metrics...')
 
         % apply vectors to movie
         % mov_from_vec = translateFrames(Y, t_shifts);
 
-        [cY,~,~] = motion_metrics(Y,10);
-        [cM1,~,~] = motion_metrics(M1,10);
-        % [cM2,~,~] = motion_metrics(M2,10);
+        % [cY,~,~] = motion_metrics(Y,10);
+        % [cM1,~,~] = motion_metrics(M1,10);
+          
         % [cMT,~,~] = motion_metrics(mov_from_vec,10);
     end
 
