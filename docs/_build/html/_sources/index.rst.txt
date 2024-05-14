@@ -3,32 +3,22 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. currentmodule:: .
+.. _contents:
 
-Functions
-=========
-
-Core LBM functionality.
-
-.. autofunction:: motionCorrectPlane
-
-.. autofunction:: convertScanImageTiffToVolume
-
-.. autofunction:: segmentPlane
-
-.. autofunction:: utils.validateRequirements
-
-.. autofunction:: utils.writePlaneh5
-
-.. autofunction:: utils.validate_components
-
-.. autofunction:: utils.translateFrames
+LBM Contents!
+=============
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 3
+    :caption: Contents:
 
-   guide
+    guide
+    install
+    pre_processing
+    segmentation
+    offset_correction
+    api/index
+
 
 Indices and tables
 ==================

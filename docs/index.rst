@@ -3,21 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. _overview:
+.. _contents:
 
-CaImAn_Matlab Documentation
-===========================
-
-* :ref:`modindex`
-* :ref:`search`
-* :ref:`genindex`
+LBM Contents!
+=============
 
 .. toctree::
     :maxdepth: 3
-    :caption: Pipeline:
+    :caption: Contents:
 
     guide
-    pre-processing
+    install
+    pre_processing
+    segmentation
+    offset_correction
     api/index
 
 
