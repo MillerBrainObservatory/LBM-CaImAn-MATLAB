@@ -22,10 +22,6 @@ else
     end
 end
 
-% Write the data to the specified dataset within the group
-
-
-% Write metadata attributes to the dataset
 fields = string(fieldnames(metadata));
 for f = fields'
     h5writeatt(filePath, datasetPath, f, metadata.(f));

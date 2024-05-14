@@ -101,9 +101,8 @@ else
         endPlane = str2double(endPlane);
     end
 
-    % use default (12) cores or specify based on input argument
     if str2double(numCores) == 0 || size(str2double(numCores),1) == 0
-        numCores = 12;
+        numCores = 24;
     else
         numCores = str2double(numCores);
     end

@@ -42,7 +42,7 @@
 <p>Core LBM functionality.</p>
 <dl class="mat function">
 <dt class="sig sig-object mat" id="motionCorrectPlane">
-<span class="sig-name descname"><span class="pre">motionCorrectPlane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filePath</span></em>, <em class="sig-param"><span class="pre">numCores</span></em>, <em class="sig-param"><span class="pre">startPlane</span></em>, <em class="sig-param"><span class="pre">endPlane</span></em><span class="sig-paren">)</span><a class="headerlink" href="#motionCorrectPlane" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">motionCorrectPlane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filePath</span></em>, <em class="sig-param"><span class="pre">metadata</span></em>, <em class="sig-param"><span class="pre">numCores</span></em>, <em class="sig-param"><span class="pre">startPlane</span></em>, <em class="sig-param"><span class="pre">endPlane</span></em><span class="sig-paren">)</span><a class="headerlink" href="#motionCorrectPlane" title="Permalink to this definition">¶</a></dt>
 <dd><p>MOTIONCORRECTPLANE Perform rigid and non-rigid motion correction on imaging data.</p>
 <p>This function processes imaging data by sequentially loading individual
 processed planes, applying rigid motion correction to generate a template,
@@ -51,10 +51,10 @@ is saved separately with relevant shifts and metadata.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>filePath</strong><span class="classifier">char</span></dt><dd><p>Path to the directory containing the raw .tif files.</p>
+<dt><strong>filePath</strong><span class="classifier">char</span></dt><dd><p>Path to the directory containing the files extracted via convertScanImageTiffToVolume.</p>
 </dd>
 <dt><strong>numCores</strong><span class="classifier">double, integer, positive</span></dt><dd><p>Number of cores to use for computation. The value is limited to a maximum
-of 24 cores. If more than 24, it defaults to 23.</p>
+of 24 cores.</p>
 </dd>
 <dt><strong>startPlane</strong><span class="classifier">double, integer, positive</span></dt><dd><p>The starting plane index for processing.</p>
 </dd>
@@ -75,8 +75,8 @@ startPlane.</p>
 </dl>
 <p class="rubric">Notes</p>
 <ul class="simple">
-<li><p>Only .mat files containing processed volumes should be in the filePath.</p></li>
-<li><p>Any .mat files with “plane” in the filename will be skipped to avoid
+<li><p>Only .h5 files containing processed volumes should be in the filePath.</p></li>
+<li><p>Any .h5 files with “plane” in the filename will be skipped to avoid
 re-processing a previously motion-corrected plane.</p></li>
 </ul>
 <p>See also <code class="docutils literal notranslate"><span class="pre">ADDPATH</span></code>, <code class="docutils literal notranslate"><span class="pre">GCP</span></code>, <code class="docutils literal notranslate"><span class="pre">DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">ERROR</span></code>, <code class="docutils literal notranslate"><span class="pre">FULLFILE</span></code>, <code class="docutils literal notranslate"><span class="pre">FOPEN</span></code>, <code class="docutils literal notranslate"><span class="pre">REGEXP</span></code>, <code class="docutils literal notranslate"><span class="pre">CONTAINS</span></code>, <code class="docutils literal notranslate"><span class="pre">MATFILE</span></code>, <code class="docutils literal notranslate"><span class="pre">SAVEFAST</span></code></p>
@@ -84,7 +84,7 @@ re-processing a previously motion-corrected plane.</p></li>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="convertScanImageTiffToVolume">
-<span class="sig-name descname"><span class="pre">convertScanImageTiffToVolume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filePath</span></em>, <em class="sig-param"><span class="pre">saveDirPath</span></em>, <em class="sig-param"><span class="pre">diagnosticFlag</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convertScanImageTiffToVolume" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">convertScanImageTiffToVolume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filePath</span></em>, <em class="sig-param"><span class="pre">saveDirPath</span></em>, <em class="sig-param"><span class="pre">diagnosticFlag</span></em>, <em class="sig-param"><span class="pre">nvargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convertScanImageTiffToVolume" title="Permalink to this definition">¶</a></dt>
 <dd><p>CONVERTSCANIMAGETIFFTOVOLUME Convert ScanImage .tif files into a 4D volume.</p>
 <p>Convert raw <a class="reference external" href="https://www.mbfbioscience.com/products/scanimage/">ScanImage</a> multi-roi .tif files from a single session
 into a single 4D volume (x, y, z, t). It’s designed to process files for the
@@ -100,6 +100,8 @@ not exist. Defaults to the filePath if not provided.</p>
 </dd>
 <dt><strong>diagnosticFlag</strong><span class="classifier">double, logical, optional</span></dt><dd><p>If set to 1, the function displays the files in the command window and does
 not continue processing. Defaults to 0.</p>
+</dd>
+<dt><strong>nvargs</strong><span class="classifier">struct, optional</span></dt><dd><p>Options to pass to motion correction.</p>
 </dd>
 </dl>
 </dd>
@@ -121,8 +123,42 @@ convertScanImageTiffToVolume(‘C:/data/session1/’, ‘C:/processed/’, 1); %
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="segmentPlane">
-<span class="sig-name descname"><span class="pre">segmentPlane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">path</span></em>, <em class="sig-param"><span class="pre">diagnosticFlag</span></em>, <em class="sig-param"><span class="pre">startPlane</span></em>, <em class="sig-param"><span class="pre">endPlane</span></em>, <em class="sig-param"><span class="pre">numCores</span></em><span class="sig-paren">)</span><a class="headerlink" href="#segmentPlane" title="Permalink to this definition">¶</a></dt>
-<dd><p>give access to CaImAn files</p>
+<span class="sig-name descname"><span class="pre">segmentPlane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">path</span></em>, <em class="sig-param"><span class="pre">metadata</span></em>, <em class="sig-param"><span class="pre">diagnosticFlag</span></em>, <em class="sig-param"><span class="pre">startPlane</span></em>, <em class="sig-param"><span class="pre">endPlane</span></em>, <em class="sig-param"><span class="pre">numCores</span></em><span class="sig-paren">)</span><a class="headerlink" href="#segmentPlane" title="Permalink to this definition">¶</a></dt>
+<dd><p>SEGMENTPLANE Segment imaging data using CaImAn for motion-corrected data.</p>
+<p>This function applies the CaImAn algorithm to segment neurons from
+motion-corrected, pre-processed and ROI re-assembled MAxiMuM data.
+The processing is conducted for specified planes, and the results
+are saved to disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>path</strong><span class="classifier">char</span></dt><dd><p>The path to the local folder containing the motion-corrected data.</p>
+</dd>
+<dt><strong>metadata: struct</strong></dt><dd><p>Struct of ScanImage metadata containing image width, height, and
+scanfield information relating to each ROI.</p>
+</dd>
+<dt><strong>diagnosticFlag</strong><span class="classifier">char</span></dt><dd><p>When set to ‘1’, the function reports all .mat files in the directory
+specified by ‘path’. Otherwise, it processes files for neuron segmentation.</p>
+</dd>
+<dt><strong>startPlane</strong><span class="classifier">char</span></dt><dd><p>The starting plane index for processing. A non-numeric input or ‘0’ sets
+it to default (1).</p>
+</dd>
+<dt><strong>endPlane</strong><span class="classifier">char</span></dt><dd><p>The ending plane index for processing. A non-numeric input or ‘0’ sets
+it to default (maximum available planes).</p>
+</dd>
+<dt><strong>numCores</strong><span class="classifier">char</span></dt><dd><p>The number of cores to use for parallel processing. A non-numeric input
+or ‘0’ sets it to the default value (12).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The function handles large datasets by processing each plane serially.</p></li>
+<li><p>The segmentation settings are based on the assumption of 9.2e4 neurons/mm^3
+density in the imaged volume.</p></li>
+</ul>
+<p>See also <code class="docutils literal notranslate"><span class="pre">ADDPATH</span></code>, <code class="docutils literal notranslate"><span class="pre">FULLFILE</span></code>, <code class="docutils literal notranslate"><span class="pre">DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">LOAD</span></code>, <code class="docutils literal notranslate"><span class="pre">SAVEFAST</span></code></p>
 </dd></dl>
 
 <dl class="mat function">

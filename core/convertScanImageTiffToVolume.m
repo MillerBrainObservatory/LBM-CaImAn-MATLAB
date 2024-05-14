@@ -1,4 +1,4 @@
-function convertScanImageTiffToVolume(filePath, saveDirPath, datasetName, diagnosticFlag)
+function convertScanImageTiffToVolume(filePath, saveDirPath, diagnosticFlag, nvargs)
 %CONVERTSCANIMAGETIFFTOVOLUME Convert ScanImage .tif files into a 4D volume.
 %
 % Convert raw `ScanImage`_ multi-roi .tif files from a single session
@@ -16,6 +16,8 @@ function convertScanImageTiffToVolume(filePath, saveDirPath, datasetName, diagno
 % diagnosticFlag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
+% nvargs : struct, optional
+%    Options to pass to motion correction.
 %
 % Notes
 % -----
@@ -40,8 +42,9 @@ function convertScanImageTiffToVolume(filePath, saveDirPath, datasetName, diagno
 arguments
     filePath (1,:) char  % The directory containing the raw .tif files
     saveDirPath (1,:) char  = filePath   % The directory where processed files will be saved, created if id doesn't exist. Defaults to the filePath.
-    datasetName (1,:) char = ''
     diagnosticFlag (1,1) double {mustBeNumericOrLogical} = 0 % If 1, display the files in the command window and stop the process.
+    nvargs.fix_scan_phase logical = 1 % Correct bi-directional scanning (can be done in a separate step
+    nvargs.overwrite logical = 1 % Example
 end
 
 %% ScanImage path
@@ -106,8 +109,6 @@ else
         logFileName = sprintf('matlab_log_%d_%02d_%02d_%02d_%02d.txt', clck(1), clck(2), clck(3), clck(4), clck(5));
         logFullPath = fullfile(filePath, logFileName);
         fid = fopen(logFullPath, 'w');
-
-        basepath = sprintf("/%s", datasetName);
         
         %%  (I) Assemble ROI's from ScanImage
         %%% Loop through raw .tif files and reassemble planes/frames.
@@ -128,13 +129,9 @@ else
             if ijk == 1
                 % metadata that will be the same for each file
                 metadata = get_metadata(current_fullfile);
-                metadata.f0 = current_fullfile;
-                metadata.savepath = fullfile(filePath, 'extracted');
-                if ~isfolder(metadata.savepath)
-                    mkdir(metadata.savepath)
-                end
+                metadata.savepath = saveDirPath;
             end
-            [metadata] = assembleCorrectedROITiff(current_fullfile, metadata, 'group_path', grouppath);
+            [metadata] = assembleCorrectedROITiff(current_fullfile, metadata, 'group_path', grouppath, 'fix_scan_phase', nvargs.fix_scan_phase);
 
             tt = toc/3600;
             disp(['Volume loaded and processed. Elapsed time: ' num2str(tt) ' hours. Saving volume to temp...'])

@@ -3,32 +3,52 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. currentmodule:: .
 
-Functions
-=========
+CaImAn_Matlab documentation
+===========================
 
-Core LBM functionality.
+* :ref:`modindex`
+* :ref:`search`
+* :ref:`genindex`
 
-.. autofunction:: motionCorrectPlane
+.. toctree::
+:maxdepth: 3
+:caption: Basics:
+
+    installation
+    inputs
+
+.. .. toctree::
+.. :maxdepth: 3
+.. :caption: How it works:
+
+..     registration
+..     celldetection
+..     roiextraction
+..     deconvolution
+
+.. toctree::
+    :maxdepth: 3
+    :caption: API:
+
+.. currentmodule:: core
 
 .. autofunction:: convertScanImageTiffToVolume
 
+.. autofunction:: motionCorrectPlane
+
 .. autofunction:: segmentPlane
 
-.. autofunction:: utils.validateRequirements
+.. currentmodule:: utils
 
-.. autofunction:: utils.writePlaneh5
+.. autofunction:: validateRequirements
 
-.. autofunction:: utils.validate_components
+.. autofunction:: writePlaneh5
 
-.. autofunction:: utils.translateFrames
+.. autofunction:: validate_components
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+.. autofunction:: translateFrames
 
-   guide
 
 Indices and tables
 ==================

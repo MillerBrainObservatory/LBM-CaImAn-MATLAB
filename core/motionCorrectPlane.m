@@ -1,4 +1,4 @@
-function motionCorrectPlane(filePath, metadata, numCores, startPlane, endPlane)
+function motionCorrectPlane(filePath, savePath, numCores, startPlane, endPlane)
 % MOTIONCORRECTPLANE Perform rigid and non-rigid motion correction on imaging data.
 %
 % This function processes imaging data by sequentially loading individual
@@ -10,6 +10,8 @@ function motionCorrectPlane(filePath, metadata, numCores, startPlane, endPlane)
 % ----------
 % filePath : char
 %     Path to the directory containing the files extracted via convertScanImageTiffToVolume.
+% savePath : char
+%     Path to the directory to save the motion vectors.
 % numCores : double, integer, positive
 %     Number of cores to use for computation. The value is limited to a maximum
 %     of 24 cores.
@@ -24,8 +26,6 @@ function motionCorrectPlane(filePath, metadata, numCores, startPlane, endPlane)
 % Each motion-corrected plane is saved as a .mat file containing the following:
 % shifts : array
 %     2D motion vectors as single precision.
-% metadata : struct
-%     Struct containing all relevant metadata for the session.
 %
 % Notes
 % -----
@@ -36,7 +36,6 @@ function motionCorrectPlane(filePath, metadata, numCores, startPlane, endPlane)
 % See also ADDPATH, GCP, DIR, ERROR, FULLFILE, FOPEN, REGEXP, CONTAINS, MATFILE, SAVEFAST
 arguments
     filePath (1,:) char                    % Path to the directory with input files.
-    metadata (1,1) struct % Metadata values
     numCores (1,1) double {mustBeInteger, mustBePositive, mustBeLessThanOrEqual(numCores,24)} = 1
     startPlane (1,1) double {mustBeInteger, mustBePositive} = 1
     endPlane (1,1) double {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(endPlane,startPlane)} = 1
@@ -113,11 +112,6 @@ end
             save_name = sprintf("file_%d_plane_%d", file_idx, plane_idx);
 
             Y(:,:,(file_idx-1)*num_frames_file+1:file_idx*num_frames_file) = im2single(h5read(h5path, file_group));
-            this_frame_slice = (file_idx-1)*num_frames_file+1:file_idx*num_frames_file;
-            disp([this_frame_slice(1) this_frame_slice(end)]);
-            p_img = imagesc(Y(:,:, this_frame_slice(2))); axis image;
-
-            saveas(gcf, fullfile(figpath, strcat(save_name, '.png')));
         end
 
         volume_size = size(Y);
@@ -126,7 +120,6 @@ end
         Y = Y-min(Y(:));
 
         fprintf(fid, '%s Beginning processing for plane %s with %s matlab workers.', datetime, plane_idx);
-
         if size(gcp("nocreate"),1)==0
             parpool(numCores);
         end
@@ -168,29 +161,29 @@ end
             );
 
         % DFT subpixel registration - results used in CNMF
-        % [M2,shifts2,~,~] = normcorre_batch(Y,options_nonrigid,template_good);
+        [M2,shifts2,~,~] = normcorre_batch(Y,options_nonrigid,template_good);
 
-        % Returns a [2xnum_frames] vector of shifts in x and y
-        [shifts, ~, ~] = rigid_mcorr(Y,'template', template_good, 'max_shift', max_shift, 'subtract_median', false, 'upsampling', 20);
-        outputFile = [filePath 'mc_vectors_plane_' num2str(plane_idx) '.mat'];
+        % % Returns a [2xnum_frames] vector of shifts in x and y
+        % [shifts, ~, ~] = rigid_mcorr(Y,'template', template_good, 'max_shift', max_shift, 'subtract_median', false, 'upsampling', 20);
+        % outputFile = [filePath 'mc_vectors_plane_' num2str(plane_idx) '.mat'];
 
-        savefast(outputFile, 'metadata', 'shifts');
+        savefast(savePath, 'metadata', 'shifts', 'M2', 'shifts2');
 
         disp('Data saved, beginning next plane...')
         date = datetime(now,'ConvertFrom','datenum');
         formatSpec = '%s Motion Correction Complete. Beginning next plane...\n';
         fprintf(fid,formatSpec,date);
 
-        clear M1 cM1 cM2 cY cMT template_good shifts* %M2
+        clear M1 cM1 cM2 cY cMT template_good shifts* M2
 
         % disp('Calculating motion correction metrics...')
 
         % apply vectors to movie
         % mov_from_vec = translateFrames(Y, t_shifts);
 
-        % [cY,~,~] = motion_metrics(Y,10);
-        % [cM1,~,~] = motion_metrics(M1,10);
-        % % [cM2,~,~] = motion_metrics(M2,10);
+        [cY,~,~] = motion_metrics(Y,10);
+        [cM1,~,~] = motion_metrics(M1,10);
+        % [cM2,~,~] = motion_metrics(M2,10);
         % [cMT,~,~] = motion_metrics(mov_from_vec,10);
     end
 

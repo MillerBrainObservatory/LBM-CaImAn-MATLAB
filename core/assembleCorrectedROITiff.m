@@ -7,7 +7,8 @@ function [metadata] = assembleCorrectedROITiff(filename, metadata, nvargs)
         nvargs.fileMode (1,1) string = "separate"
         nvargs.chunksize (1,:) = []
         nvargs.compression (1,1) double = 0
-        nvargs.overwrite (1,1) logical = 1
+        nvargs.overwrite (1,1) logical = true
+        nvargs.fix_scan_phase (1,1) logical = true
     end
 
     [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
@@ -35,11 +36,18 @@ function [metadata] = assembleCorrectedROITiff(filename, metadata, nvargs)
 
     new_roi_height_range = trim_roi_height_start:trim_roi_height_end; % controls the width on each side of the concatenated strips
     
+    if nvargs.fix_scan_phase
+        trimmed_height = trim_roi_height_end - (trim_roi_height_start - 1);
+        trimmed_width = new_roi_width * metadata.num_rois;
+        arr_dtype = 'single';
+        trimmed_array = zeros(trimmed_width, trimmed_height, metadata.num_frames_file, arr_dtype);
+    else
+        arr_dtype='uint16';
+    end
     full_image_height = raw_roi_height - (trim_roi_height_start-1);
     full_image_width = new_roi_width*metadata.num_rois;
-
     for plane_idx = 1:metadata.num_planes
-        frameTemp = zeros(full_image_height, full_image_width, metadata.num_frames_file, 'uint16');
+        frameTemp = zeros(full_image_height, full_image_width, metadata.num_frames_file, arr_dtype);
         cnt=1;
         for roi_idx = 1:metadata.num_rois
             if cnt == 1 
@@ -52,12 +60,20 @@ function [metadata] = assembleCorrectedROITiff(filename, metadata, nvargs)
                 offset_x = offset_x + new_roi_width;
             end
             for frame_idx = 1:metadata.num_frames_file
-                frameTemp(:, offset_x+new_roi_width_range, frame_idx) = Aout(offset_y+new_roi_height_range, new_roi_width_range, plane_idx, frame_idx);
+                frameTemp(:, offset_x+(1:length(new_roi_width_range)), frame_idx) = Aout(offset_y+new_roi_height_range, new_roi_width_range, plane_idx, frame_idx);
             end
             cnt=cnt+1;
         end
-        metadata.corr = returnScanOffset(frameTemp, 1);
-        % frameTemp = fixScanPhase(frameTemp, corr, 1);
+
+        metadata.corr = returnScanOffset(frameTemp, 1, arr_dtype);
+        metadata.image_size = size(frameTemp);
+        if metadata.corr ~= 0 && nvargs.fix_scan_phase
+            trimmed_array = fixScanPhase(frameTemp, ...
+                metadata.corr, ...
+                1, ...
+                arr_dtype ...
+            );
+        end
 
         filesavepath = sprintf("%s.h5", metadata.base_filename);
         datasavepath = sprintf("%s/plane_%d", nvargs.group_path, plane_idx);
@@ -67,13 +83,13 @@ function [metadata] = assembleCorrectedROITiff(filename, metadata, nvargs)
     end
 end
 
-function dataOut = fixScanPhase(dataIn,offset,dim)
+function dataOut = fixScanPhase(dataIn,offset,dim, dtype)
     % Find the lateral shift that maximizes the correlation between
     % alternating lines for the resonant galvo. Correct for phase-offsets
     % occur between each successive line.
 
     [sy,sx,sc,sz] = size(dataIn);
-    dataOut = zeros(sy,sx,sc,sz, 'uint16');
+    dataOut = zeros(sy,sx,sc,sz, dtype);
 
     if dim == 1
         if offset>0
@@ -105,7 +121,7 @@ function dataOut = fixScanPhase(dataIn,offset,dim)
     end
 end
 
-function correction = returnScanOffset(Iin,dim)
+function correction = returnScanOffset(Iin,dim,dtype)
 
     if numel(size(Iin)) == 3
         Iin = mean(Iin,3);
@@ -123,7 +139,7 @@ function correction = returnScanOffset(Iin,dim)
             Iv1 = Iv1(1:min([size(Iv1,1) size(Iv2,1)]),:);
             Iv2 = Iv2(1:min([size(Iv1,1) size(Iv2,1)]),:);
 
-            buffers = zeros(size(Iv1,1),n,  'uint16');
+            buffers = zeros(size(Iv1,1),n, dtype);
 
             Iv1 = cat(2,buffers,Iv1,buffers);
             Iv2 = cat(2,buffers,Iv2,buffers);
@@ -138,7 +154,7 @@ function correction = returnScanOffset(Iin,dim)
             Iv1 = Iv1(:,1:min([size(Iv1,2) size(Iv2,2)]));
             Iv2 = Iv2(:,1:min([size(Iv1,2) size(Iv2,2)]),:);
 
-            buffers = zeros(n,size(Iv1,2), 'uint16');
+            buffers = zeros(n,size(Iv1,2), dtype);
 
             Iv1 = cat(1,buffers,Iv1,buffers);
             Iv2 = cat(1,buffers,Iv2,buffers);

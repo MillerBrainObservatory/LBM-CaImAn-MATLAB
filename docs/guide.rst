@@ -8,7 +8,7 @@ A pipeline for processing light beads microscopy (LBM) datasets.
 LBM is a *scalable*, *spatiotemporally optimal* aquisition approach limited only by flourescence lifetime.
 For background, theory and design of LBM technology, see the reference `publication`_.
 
-Currently, this pipeline is optimized to extract data aquired through the `ScanImage`_ software package.
+Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files.
 
 Steps
 _____
