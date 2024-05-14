@@ -26,8 +26,11 @@ function segmentPlane(path,metadata,diagnosticFlag,startPlane,endPlane,numCores)
 %     The number of cores to use for parallel processing. A non-numeric input
 %     or '0' sets it to the default value (12).
 %
-% Outputs
+% Returns
 % -------
+% None
+%
+%
 % Outputs are saved to disk, including:
 % - T_keep: neuronal time series [Km, T] (single)
 % - Ac_keep: neuronal footprints [2*tau+1, 2*tau+1, Km] (single)
@@ -79,6 +82,7 @@ else
     disp(['Processing ' num2str(numFiles) ' files found in directory ' path '...'])
 
     poolobj = gcp('nocreate'); % if a parallel pool is running, kill it and restart it to make sure parameters are correct
+
     if ~isempty(poolobj)
         disp('Removing existing parallel pool.')
         delete(poolobj)
@@ -123,7 +127,7 @@ else
             d = load(fullfile(path, [file '.mat']));
             % shifts = d.shifts;
             % metadata = d.metadata;
-            
+
             d1 = metadata.full_image_width;
             d2 = metadata.full_image_height;
 
@@ -296,16 +300,16 @@ else
                 date,ME.stack(1).name, ME.stack(1).line, ME.message);
                 fprintf(1, '%s\n', errorMessage);
                 fprintf(fid,errorMessage,date,ME.stack(1).name, ME.stack(1).line, ME.message);
-    
+
                 disp('Shutting down parallel pool to eliminate error propagation.')
                 poolobj = gcp('nocreate');
                 delete(poolobj)
-    
+
                 clearvars -except abc numFiles files path save_path fid filestem numCores endPlane startPlane poolobj
-    
+
             end
         end
-    
+
         date = datetime(now,'ConvertFrom','datenum');
         formatSpec = '%s Routine complete.\n';
         fprintf(fid,formatSpec,date,abc);
@@ -320,26 +324,26 @@ function [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2)
     y = 1:d1;
     [X,Y] = meshgrid(x,y);
     Ac_keep = zeros(4*tau+1,4*tau+1,size(A_keep,2),'single');
-    
+
     acx = zeros(1,size(A_keep,2));
     acy = acx;
     acm = acx;
-    
+
     parfor ijk = 1:size(A_keep,2)
-    
+
         AOI = reshape(single(full(A_keep(:,ijk))),d1,d2);
         cx = round(trapz(trapz(X.*AOI))./trapz(trapz(AOI)));
         cy = round(trapz(trapz(Y.*AOI))./trapz(trapz(AOI)));
-    
+
         acx(ijk) = cx;
         acy(ijk) = cy;
         acm(ijk) = sum(AOI(:));
-    
+
         sx = max([cx-2*tau 1]); % handle cases where neuron is closer than 3*tau pixels to edge of FOV
         sy = max([cy-2*tau 1]);
         ex = min([cx+2*tau d2]);
         ey = min([cy+2*tau d1]);
-    
+
         AOIc = nan(4*tau+1,4*tau+1);
         AOIc(1:(ey-sy+1),1:(ex-sx+1)) = AOI(sy:ey,sx:ex);
         Ac_keep(:,:,ijk) = single(AOIc);
