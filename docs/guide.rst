@@ -27,7 +27,6 @@ There are 4 steps corresponding to 4 core functions (more details in `Usage`_:
 4. Z Offset Correction.
     - segmentPlane
 
-.. _extraction:
 
 Data Extraction
 ---------------
@@ -119,11 +118,6 @@ of an suffix appended to the filename: `_000N`, where n=number of files chosen b
 
    >> help FunctionName
    >> help convertScanImageTiffToVolume
-
-   .. code-block::
-
-        TODO: render the matlab output, link to wiki
-
 
 1. Pre-processing:
 
