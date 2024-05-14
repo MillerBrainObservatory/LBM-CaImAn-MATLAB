@@ -17,9 +17,7 @@ of an suffix appended to the filename: `_000N`, where n=number of files chosen b
     All output .tiff files for a single imaging session should be placed in the same directory.
     No other .tiff files should be in this directory. If this happens, an error will throw.
 
-
 There are 2 primary functions for pre-processing,
-- :ref:
 
 .. note::
 
@@ -110,5 +108,19 @@ Motion correction can simply take the extract_path as the first input parameter 
 
     mcpath = 'C:\Users\RBO\Documents\data\bi_hemisphere\registration';
     motionCorrectPlane(extract_path, 23, 1, 3);
->>>>>>> 8525d04210bfd98c0baf181202d6df72ce66c118
 
+3. Segmentation and Deconvolution:
+
+Segment the motion-corrected data and extract neuronal signals::
+
+.. code-block:: MATLAB
+
+    path = 'C:\\Users\\LBM_User\\Data\\Session1\\motion_corrected\\';
+    segmentPlane(path, 0, 1, 10, 24);  # Segment data from planes 1 to 10 using 24 cores
+
+4. Calibration and Alignment:
+
+.. code-block:: MATLAB
+
+   calculate_offset('C:\\Data\\calibration\\');  # Path to calibration data
+   compare_planes_new('C:\\Data\\session1\\aligned\\');  # Path to data for final alignment

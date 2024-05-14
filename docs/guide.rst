@@ -10,8 +10,27 @@ For background, theory and design of LBM technology, see the reference `publicat
 
 Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files.
 
+.. _requirements:
+
+Requirements
+------------
+
+- MATLAB (Tested on 2023a, 2023b, 2024b)
+- Toolboxes:
+    - Parallel Computing Toolbox
+    - Statistics and Machine Learning Toolbox
+    - Image Processing Toolbox
+
+Algorithms
+----------
+
+- `CNMF`_ segmentation and neuronal source extraction.
+- `NoRMCorre`_ piecewise rigid motion correction.
+- `constrained-foopsi`_ constrained deconvolution spike inference.
+
+
 Steps
-_____
+-----
 
 There are 4 steps corresponding to 4 core functions (more details in `Usage`_:
 
@@ -37,69 +56,7 @@ In the resulting `tiff`, each ROI’s image is stacked one on top of the other v
 
 .. _algorithms:
 
-Algorithms
-----------
 
-- `CNMF`_ segmentation and neuronal source extraction.
-- `NoRMCorre`_ piecewise rigid motion correction.
-- `constrained-foopsi`_ constrained deconvolution spike inference.
-
-.. _requirements:
-
-Requirements
-------------
-
-- MATLAB (Tested on 2023a, 2023b, 2024b)
-- Toolboxes:
-    - Parallel Computing Toolbox
-    - Statistics and Machine Learning Toolbox
-    - Image Processing Toolbox
-
-.. _installation:
-
-Installation
-============
-
-Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is
-similar independent of OS.
-
-.. note::
-
-    If you have MATLAB installed on Windows, you won't be able to run commands from within WSL (i.e. //wsl.localhost/)
-    due to the separate filesystems. Pay attention to which environment you install.
-
-Windows
--------
-
-The easiest method to download this repository with git is via `mysys <https://gitforwindows.org/>`_
-Or just download the code from code/Download.zip above and unzip to a directory of your choosing.
-
-Unix (Linux/Mac)
-----------------
-
-The location of the installation is often in `~/Documents/MATLAB/`.
-If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI.
-
-WSL2 (Windows Subsystem for Linux)
-----------------------------------
-
-If you have MATLAB installed on Windows and wish to use this repository from a WSL instance, see `this`_ discussion.
-WSL2 is helpful for access to unix tools, in such cases you should keep the repository on the Windows `C:// drive`, and access via:
-
-.. code-block:: bash
-
-   $ cd /mnt/c/Users/<Username>/<project-install-path>
-
-This pipeline has been tested on WSL2, Ubuntu 22.04. Though any debian-based distribution should work.
-
-For unix environments:
-
-.. code-block:: bash
-
-    $ cd ~/Documents/MATLAB
-    $ git clone https://github.com/ru-rbo/caiman_matlab.git
-    $ cd caiman_matlab
-    $ matlab
 
 .. _usage:
 
@@ -119,41 +76,6 @@ of an suffix appended to the filename: `_000N`, where n=number of files chosen b
    >> help FunctionName
    >> help convertScanImageTiffToVolume
 
-1. Pre-processing:
-
-Convert raw ScanImage .tif files into a 4D format for further processing
-
-.. code-block:: MATLAB
-
-    datapath = 'C:\\Users\\LBM_User\\Data\\Session1\\';  # Directory containing raw .tif files
-    savepath = 'C:\\Users\\LBM_User\\Data\\Session1\\extracted_volumes\\';  # Output directory for 4D volumes
-    convertScanImageTiffToVolume(datapath, savepath, 0);
-
-2. Motion Correction:
-
-Perform both piecewise-rigid motion correction using `NormCORRe`_ to stabilize the imaging data
-
-.. code-block:: MATLAB
-
-    filePath = 'C:\\Data\\';  # Path to the directory containing .mat files for processing
-    fileNameRoot = 'session1_';  # Base filename to match for processing
-    motionCorrectPlane(filePath, fileNameRoot, 24, 1, 10);  # Process from plane 1 to 10 using 24 cores
-
-3. Segmentation and Deconvolution:
-
-Segment the motion-corrected data and extract neuronal signals::
-
-.. code-block:: MATLAB
-
-    path = 'C:\\Users\\LBM_User\\Data\\Session1\\motion_corrected\\';
-    segmentPlane(path, 0, 1, 10, 24);  # Segment data from planes 1 to 10 using 24 cores
-
-4. Calibration and Alignment:
-
-.. code-block:: MATLAB
-
-   calculate_offset('C:\\Data\\calibration\\');  # Path to calibration data
-   compare_planes_new('C:\\Data\\session1\\aligned\\');  # Path to data for final alignment
 
 
 Additional Resources
@@ -165,8 +87,6 @@ Additional Resources
 `DataSheet`_
 `MBO`_
 `Slides`_
-
-Copyright (C) 2024 Elizabeth. R. Miller Brain Observatory | The Rockefeller University. All rights reserved.
 
 .. _CaImAn: https://github.com/flatironinstitute/CaImAn-MATLAB/
 .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
@@ -180,3 +100,5 @@ Copyright (C) 2024 Elizabeth. R. Miller Brain Observatory | The Rockefeller Univ
 .. _startup: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html
 .. _mroi_function: https://docs.scanimage.org/Appendix/ScanImage%2BUtility%2BFunctions.html#generate-multi-roi-data-from-tiff
 .. _BigTiffSpec: _https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification
+
+Copyright (C) 2024 Elizabeth. R. Miller Brain Observatory | The Rockefeller University. All rights reserved.

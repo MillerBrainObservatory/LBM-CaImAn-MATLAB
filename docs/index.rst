@@ -3,8 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. _overview:
 
-CaImAn_Matlab documentation
+CaImAn_Matlab Documentation
 ===========================
 
 * :ref:`modindex`
@@ -12,42 +13,12 @@ CaImAn_Matlab documentation
 * :ref:`genindex`
 
 .. toctree::
-:maxdepth: 3
-:caption: Basics:
-
-    installation
-    inputs
-
-.. .. toctree::
-.. :maxdepth: 3
-.. :caption: How it works:
-
-..     registration
-..     celldetection
-..     roiextraction
-..     deconvolution
-
-.. toctree::
     :maxdepth: 3
-    :caption: API:
+    :caption: Pipeline:
 
-.. currentmodule:: core
-
-.. autofunction:: convertScanImageTiffToVolume
-
-.. autofunction:: motionCorrectPlane
-
-.. autofunction:: segmentPlane
-
-.. currentmodule:: utils
-
-.. autofunction:: validateRequirements
-
-.. autofunction:: writePlaneh5
-
-.. autofunction:: validate_components
-
-.. autofunction:: translateFrames
+    guide
+    pre-processing
+    api/index
 
 
 Indices and tables
