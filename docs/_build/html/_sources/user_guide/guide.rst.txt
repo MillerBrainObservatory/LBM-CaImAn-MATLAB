@@ -22,16 +22,17 @@ Requirements
 
 Algorithms
 ----------
+The following algorithms perform the main computations and are included by default in the pipeline:
 
 - `CNMF`_ segmentation and neuronal source extraction.
 - `NoRMCorre`_ piecewise rigid motion correction.
 - `constrained-foopsi`_ constrained deconvolution spike inference.
 
 
-Steps
------
+Quickstart
+----------
 
-There are 4 steps corresponding to 4 core functions:
+There are 4 steps that require user input:
 
 1. Convert ScanImage .Tiff to 4D [x, y, z, t] array.
     - convertScanImageTiffToVolume
@@ -40,7 +41,8 @@ There are 4 steps corresponding to 4 core functions:
 3. Plane-by-plane 2D neuronal segmentation and deconvolution.
     - segmentPlane
 4. Z Offset Correction.
-    - segmentPlane
+    - calculateZOffset
+    - compare_planes
 
 .. _tips_and_tricks:
 
@@ -52,7 +54,6 @@ of an suffix appended to the filename: `_000N`, where n=number of files chosen b
 
 - Each session (series of .tiff files) should be in same directory.
 - No other .tiff files should be in this directory. If this happens, an error will throw.
-
 
 *For detailed documentation in your MATLAB editor, use:*
 

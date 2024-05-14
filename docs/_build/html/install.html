@@ -41,8 +41,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'install';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Pre-Processing" href="pre_processing.html" />
-    <link rel="prev" title="Overview" href="guide.html" />
+    <link rel="next" title="Semantics" href="semantics.html" />
+    <link rel="prev" title="LBM Documentation" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -135,13 +135,6 @@
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="guide.html">
-                        Overview
-                      </a>
-                    </li>
-                
-
                     <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="#">
                         Installation
@@ -150,24 +143,31 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="pre_processing.html">
-                        Pre-Processing
+                      <a class="nav-link nav-internal" href="semantics.html">
+                        Semantics
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="segmentation.html">
-                        Segmentation
+                      <a class="nav-link nav-internal" href="user_guide/index.html">
+                        User Guide
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="offset_correction.html">
-                        Z-Offset Correction
+                      <a class="nav-link nav-internal" href="api/index.html">
+                        API
                       </a>
                     </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://mbo.rockefeller.edu">
+                    MBO
+                  </a>
+                </li>
                 
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
@@ -175,11 +175,11 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="api/index.html">
-                        API
-                      </a>
-                    </li>
+                <li class="nav-item">
+                  <a class="nav-link dropdown-item nav-external" href="https://github.com/ru-rbo/rbo-lbm">
+                    PyBeads
+                  </a>
+                </li>
                 
                 </ul>
             </li>
@@ -266,13 +266,6 @@ document.write(`
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="guide.html">
-                        Overview
-                      </a>
-                    </li>
-                
-
                     <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="#">
                         Installation
@@ -281,24 +274,31 @@ document.write(`
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="pre_processing.html">
-                        Pre-Processing
+                      <a class="nav-link nav-internal" href="semantics.html">
+                        Semantics
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="segmentation.html">
-                        Segmentation
+                      <a class="nav-link nav-internal" href="user_guide/index.html">
+                        User Guide
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="offset_correction.html">
-                        Z-Offset Correction
+                      <a class="nav-link nav-internal" href="api/index.html">
+                        API
                       </a>
                     </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://mbo.rockefeller.edu">
+                    MBO
+                  </a>
+                </li>
                 
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
@@ -306,11 +306,11 @@ document.write(`
                 </button>
                 <ul id="pst-nav-more-links-2" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="api/index.html">
-                        API
-                      </a>
-                    </li>
+                <li class="nav-item">
+                  <a class="nav-link dropdown-item nav-external" href="https://github.com/ru-rbo/rbo-lbm">
+                    PyBeads
+                  </a>
+                </li>
                 
                 </ul>
             </li>
@@ -409,11 +409,8 @@ document.write(`
 </pre></div>
 </div>
 <p>Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you have MATLAB installed on Windows, you won’t be able to run commands from within WSL (i.e. //wsl.localhost/)
-due to the separate filesystems. Pay attention to which environment you install.</p>
-</div>
+<a class="reference internal image-reference" href="_images/matlab_path_explorer.png"><img alt="_images/matlab_path_explorer.png" src="_images/matlab_path_explorer.png" style="width: 200px;" />
+</a>
 </section>
 <section id="by-operating-system">
 <h2>By Operating System<a class="headerlink" href="#by-operating-system" title="Link to this heading">#</a></h2>
@@ -421,6 +418,11 @@ due to the separate filesystems. Pay attention to which environment you install.
 <span id="id2"></span><h3>Windows<a class="headerlink" href="#windows" title="Link to this heading">#</a></h3>
 <p>The easiest method to download this repository with git is via <a class="reference external" href="https://gitforwindows.org/">mysys</a>
 Or just download the code from code/Download.zip above and unzip to a directory of your choosing.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you have MATLAB installed on Windows, you won’t be able to run commands from within WSL (i.e. //wsl.localhost/)
+due to the separate filesystems. Pay attention to which environment you install.</p>
+</div>
 </section>
 <section id="wsl2-windows-subsystem-for-linux">
 <span id="wsl"></span><h3>WSL2 (Windows Subsystem for Linux)<a class="headerlink" href="#wsl2-windows-subsystem-for-linux" title="Link to this heading">#</a></h3>
@@ -442,24 +444,24 @@ $<span class="w"> </span>matlab
 </pre></div>
 </div>
 </section>
-<section id="unix-linux-mac">
-<h3>Unix (Linux/Mac)<a class="headerlink" href="#unix-linux-mac" title="Link to this heading">#</a></h3>
+</section>
+<section id="find-matlab-install-location">
+<h2>Find MATLAB Install Location:<a class="headerlink" href="#find-matlab-install-location" title="Link to this heading">#</a></h2>
 <p>The location of the installation is often in <cite>~/Documents/MATLAB/</cite>.
 If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI.</p>
-<p>Modern versions of MATLAB (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.</p>
-</section>
-<section id="matlab-install-location">
-<h3><strong>MATLAB Install Location</strong>:<a class="headerlink" href="#matlab-install-location" title="Link to this heading">#</a></h3>
-<p>By default, MATLAB is installed in the following locations:
-Windows (64-bit):
-- C:Program FilesMATLABR20XXx (64-bit MATLAB)
-- C:Program Files (x86)MATLABR20XXx (32-bit MATLAB)
-Windows (32-bit):
-- C:Program FilesMATLABR20XXx
-Linux:
-- /usr/local/MATLAB/R20XXx
-Mac:
-- /Applications/MATLAB_R20XXx.app</p>
+<p>Modern versions of MATLAB (2017+) solve most Linux/Windows filesystem conflicts.</p>
+<p>Generally, the main difference in matlab installations on unix vs windows systems is nothing more than the install path:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Windows</span> <span class="p">(</span><span class="mi">64</span><span class="o">-</span><span class="n">bit</span><span class="p">):</span>
+<span class="o">-</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Program</span> <span class="n">Files</span>\<span class="n">MATLAB</span>\<span class="n">R20XXx</span> <span class="p">(</span><span class="mi">64</span><span class="o">-</span><span class="n">bit</span> <span class="n">MATLAB</span><span class="p">)</span>
+<span class="o">-</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Program</span> <span class="n">Files</span> <span class="p">(</span><span class="n">x86</span><span class="p">)</span>\<span class="n">MATLAB</span>\<span class="n">R20XXx</span> <span class="p">(</span><span class="mi">32</span><span class="o">-</span><span class="n">bit</span> <span class="n">MATLAB</span><span class="p">)</span>
+<span class="n">Windows</span> <span class="p">(</span><span class="mi">32</span><span class="o">-</span><span class="n">bit</span><span class="p">):</span>
+<span class="o">-</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Program</span> <span class="n">Files</span>\<span class="n">MATLAB</span>\<span class="n">R20XXx</span>
+<span class="n">Linux</span><span class="p">:</span>
+<span class="o">-</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">MATLAB</span><span class="o">/</span><span class="n">R20XXx</span>
+<span class="n">Mac</span><span class="p">:</span>
+<span class="o">-</span> <span class="o">/</span><span class="n">Applications</span><span class="o">/</span><span class="n">MATLAB_R20XXx</span><span class="o">.</span><span class="n">app</span>
+</pre></div>
+</div>
 <p>To find your install location:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">matlabroot</span>
 <span class="w">    </span><span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
@@ -478,7 +480,6 @@ Mac:
 </div>
 </section>
 </section>
-</section>
 
 
                 </article>
@@ -491,20 +492,20 @@ Mac:
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="guide.html"
+       href="index.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Overview</p>
+        <p class="prev-next-title">LBM Documentation</p>
       </div>
     </a>
     <a class="right-next"
-       href="pre_processing.html"
+       href="semantics.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Pre-Processing</p>
+        <p class="prev-next-title">Semantics</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -531,10 +532,9 @@ Mac:
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#windows">Windows</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#wsl2-windows-subsystem-for-linux">WSL2 (Windows Subsystem for Linux)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#for-unix-linux-macos">For unix (Linux/MacOS):</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unix-linux-mac">Unix (Linux/Mac)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#matlab-install-location"><strong>MATLAB Install Location</strong>:</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#find-matlab-install-location">Find MATLAB Install Location:</a></li>
 </ul>
   </nav></div>
 
