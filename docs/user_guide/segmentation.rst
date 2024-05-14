@@ -64,7 +64,7 @@ Segmentation has the largest computational and time requirements.
 
 **Output**
 
-The output of :ref:`api/segmentPlane` is a series of .mat files named caiman_output_plane_N.mat, where N=number of planes.
+The output of _`segmentPlane` is a series of .mat files named caiman_output_plane_N.mat, where N=number of planes.
 
 .. code-block:: MATLAB
 

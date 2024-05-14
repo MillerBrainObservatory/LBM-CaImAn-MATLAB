@@ -3,22 +3,30 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. _contents:
+#################
+LBM Documentation
+#################
 
-LBM Contents!
-=============
+Information about using, configuration, and customizing this theme.
 
 .. toctree::
-    :maxdepth: 3
-    :caption: Contents:
+    :maxdepth: 2
+    :caption: Get started:
 
-    guide
     install
-    pre_processing
-    segmentation
-    offset_correction
-    api/index
+    semantics
 
+.. toctree::
+    :maxdepth: 2
+    :caption: User Guide
+
+    user_guide/index
+
+.. toctree::
+    :maxdepth: 2
+    :caption: API:
+
+    api/index
 
 Indices and tables
 ==================

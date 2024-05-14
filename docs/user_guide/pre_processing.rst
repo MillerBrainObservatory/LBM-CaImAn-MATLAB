@@ -50,7 +50,7 @@ used for the demo.
 
     .. where N = the number of [X, Y, Z] time-series (planes)
 
-Following the recommendation described in :ref:`recommended_install` all necessary functions should already be on your
+Following the recommendation described in :ref:`recommended-install` all necessary functions should already be on your
 MATLAB path. If an error is encountered, such as:
 
 .. code-block:: MATLAB

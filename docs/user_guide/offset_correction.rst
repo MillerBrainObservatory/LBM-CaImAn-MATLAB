@@ -1,13 +1,14 @@
 .. _offset_correction:
 
-Z-Offset Correction
-===================
+Axial-Offset Correction
+=======================
 
 Before proceeding:
 
 - You will need to be in a GUI environment for this step. Calculate offset will show you two images, click the feature that matches in both images.
 
 - You will need the following calibration files:
+
     - `pollen_calibration_Z_vs_N.fig`
     - `pllen_calibration_x_y_offsets.fig`
 

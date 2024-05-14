@@ -1,12 +1,13 @@
 .. _installation:
 
+############
 Installation
-============
+############
 
 .. _recommended-install:
 
 Recommendation
---------------
+==============
 
 The most reliable installation method is to clone/download the repository and add the path to a `startup.m`_ file located in `~/Documents/MATLAB/startup.m`.
 
@@ -18,26 +19,29 @@ The most reliable installation method is to clone/download the repository and ad
 
 Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.
 
+.. image:: ./_static/_images/matlab_path_explorer.png
+   :width: 200
+
+By Operating System
+===================
+
+.. _windows:
+
+Windows
+-------
+
+The easiest method to download this repository with git is via `mysys <https://gitforwindows.org/>`_
+Or just download the code from code/Download.zip above and unzip to a directory of your choosing.
+
 .. note::
 
     If you have MATLAB installed on Windows, you won't be able to run commands from within WSL (i.e. //wsl.localhost/)
     due to the separate filesystems. Pay attention to which environment you install.
 
-By Operating System
--------------------
-
-.. _windows:
-
-Windows
-+++++++
-
-The easiest method to download this repository with git is via `mysys <https://gitforwindows.org/>`_
-Or just download the code from code/Download.zip above and unzip to a directory of your choosing.
-
 .. _wsl:
 
 WSL2 (Windows Subsystem for Linux)
-++++++++++++++++++++++++++++++++++
+----------------------------------
 
 Windows subsystem for Linux (WSL/WSL2) is a local environment on your windows machine that is capable of running linux commands using a separate filesystem. As of 2024, Mathworks does not officially support and is not planning support for MATLAB on WSL or WSL2.
 If you have MATLAB installed on Windows and wish to use this repository from a WSL instance, see `this discussion on how to accomplish this <https://ww2.mathworks.cn/matlabcentral/answers/1597219-can-microsoft-s-wslg-windows-subsystem-for-linux-gui-support-running-matlab>`_.
@@ -51,8 +55,9 @@ This pipeline has been tested on WSL2, Ubuntu 22.04. Though any debian-based dis
 
 .. _unix:
 
+
 For unix (Linux/MacOS):
-+++++++++++++++++++++++
+-----------------------
 
 In Linux, Mac, WSL or mysys, clone this repository with the pre-installed git client:
 
@@ -63,27 +68,26 @@ In Linux, Mac, WSL or mysys, clone this repository with the pre-installed git cl
     $ cd caiman_matlab
     $ matlab
 
-Unix (Linux/Mac)
-++++++++++++++++
+
+Find MATLAB Install Location:
+=============================
 
 The location of the installation is often in `~/Documents/MATLAB/`.
 If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI.
 
-Modern versions of MATLAB (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.
+Modern versions of MATLAB (2017+) solve most Linux/Windows filesystem conflicts.
 
-**MATLAB Install Location**:
-++++++++++++++++++++++++++++
+Generally, the main difference in matlab installations on unix vs windows systems is nothing more than the install path::
 
-By default, MATLAB is installed in the following locations:
-Windows (64-bit):
-- C:\Program Files\MATLAB\R20XXx (64-bit MATLAB)
-- C:\Program Files (x86)\MATLAB\R20XXx (32-bit MATLAB)
-Windows (32-bit):
-- C:\Program Files\MATLAB\R20XXx
-Linux:
-- /usr/local/MATLAB/R20XXx
-Mac:
-- /Applications/MATLAB_R20XXx.app
+    Windows (64-bit):
+    - C:\Program Files\MATLAB\R20XXx (64-bit MATLAB)
+    - C:\Program Files (x86)\MATLAB\R20XXx (32-bit MATLAB)
+    Windows (32-bit):
+    - C:\Program Files\MATLAB\R20XXx
+    Linux:
+    - /usr/local/MATLAB/R20XXx
+    Mac:
+    - /Applications/MATLAB_R20XXx.app
 
 To find your install location:
 
@@ -100,7 +104,6 @@ Generally, MATLAB code should be stored in your `userpath`:
    >> userpath
    ans =
        'C:\Users\RBO\Documents\MATLAB'
-
 
 Otherwise, you will need to navigate to that directory within the matlab GUI or add the path to this repository:
 

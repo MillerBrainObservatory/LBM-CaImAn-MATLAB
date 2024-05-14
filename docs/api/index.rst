@@ -1,12 +1,14 @@
 .. _api:
 
+###
 API
-===
+###
+
+Documentation for each function from docstrings.
 
 .. toctree::
-    :glob:
-    :maxdepth: 3
-    :caption: Functions:
+    :maxdepth: 2
+    :caption: Core Functions:
 
     core
     utils
