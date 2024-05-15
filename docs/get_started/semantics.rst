@@ -1,6 +1,5 @@
 .. _semantics:
 
-#########
 Semantics
 #########
 

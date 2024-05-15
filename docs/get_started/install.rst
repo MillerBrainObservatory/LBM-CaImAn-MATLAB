@@ -1,8 +1,8 @@
 .. _installation:
 
-############
+============
 Installation
-############
+============
 
 .. _recommended-install:
 
@@ -21,8 +21,8 @@ The most reliable installation method is to clone/download the repository and ad
 
 Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.
 
-.. image:: ./_static/_images/matlab_path_explorer.png
-   :width: 200
+.. image:: ../_static/_images/matlab_path_explorer.png
+   :width: 1080
 
 By Operating System
 ===================

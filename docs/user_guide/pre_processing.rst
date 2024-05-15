@@ -4,11 +4,27 @@
 Pre-Processing
 ##############
 
-Pre-processing LBM datasets consists of 3 main processes:
+Before beginning pre-processing, follow setup steps in :ref:`getting_started` to make sure the pipeline and dependencies are installed properly.
 
-- 1 ) Reshaping vertically concatenated strips into horizontally concatenated strips and aligning adjacent strips.
-- 2 ) Bi-Directional Scan Phase Correction
-- 3 ) Peicewise motion-correction
+See :ref:`troubleshooting` for common issues.
+
+Steps
+-----
+
+Pre-processing LBM datasets consists of 2 main processing steps:
+
+- 1 ) Reshaping vertically concatenated strips into horizontally concatenated strips
+- 2 ) Peicewise motion-correction
+
+The raw output of an ScanImage MROI acquisition is a `tiff` (or series of tiffs).
+Each ROI’s image is stacked one on top of the other vertically, as seen in A:
+
+.. image:: ../_static/_images/abc_strip.png
+   :width: 1080
+
+Each plane is written before moving onto the next frame, e.g.:
+
+- plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.
 
 If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order
 of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user.
@@ -17,80 +33,6 @@ of an suffix appended to the filename: `_000N`, where n=number of files chosen b
 
     All output .tiff files for a single imaging session should be placed in the same directory.
     No other .tiff files should be in this directory. If this happens, an error will throw.
-
-There are 2 primary functions for pre-processing,
-
-.. note::
-
-   For detailed documentation in your MATLAB editor, use:
-
-   >> help FunctionName
-   >> help convertScanImageTiffToVolume
-
-.. _directory structure:
-
-Directory Structure
-===================
-
-The following is an example of the directory hierarchy
-used for the demo.
-
-.. code-block:: text
-
-    Parent
-    ├── raw
-    │   └── basename_00001_0001.tiff
-    │   └── basename_00001_0002.tiff
-    │   └── basename_00001_00NN.tiff
-    ├── extraction
-    │   └── basename.h5
-    ├── registration
-    │   └── shift_vectors_plane_N.h5
-    └── segmentation
-        └── caiman_output_plane_.h5
-
-    .. where N = the number of [X, Y, Z] time-series (planes)
-
-Following the recommendation described in :ref:`recommended-install` all necessary functions should already be on your
-MATLAB path. If an error is encountered, such as:
-
-.. code-block:: MATLAB
-
-    Undefined function 'convertScanImageTiffToVolume' for input arguments of type 'char'.
-
-
-This means the input is not on your MATLAB path. Add this to the top of the script you are running:
-
- .. code-block:: MATLAB
-
-    [fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
-    addpath(genpath(fullfile(fpath, 'core/')));
-
-You can make sure all of the requirements for the package are in the path with the following:
-
- .. code-block:: MATLAB
-
-    result = validateRequirements(); % make sure we have dependencies in accessible places
-    if ischar(result)
-        error(result);
-    else
-        disp('Proceeding with execution...');
-    end
-
-First, we set up our inputs/outputs.
-
-The raw output of an ScanImage MROI acquisition is a `tiff` (or series of tiffs) with metadata attached to the `artist` tag where:
-
-- Each ROI’s image is stacked one on top of the other vertically, as seen in A:
-
-.. image:: ../_static/_images/abc_strip.png
-   :width: 200
-
-- Each plane is written before moving onto the next frame, e.g.:
-
-    - plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.
-
-- Frames may be split across multiple files if this option is specified the ScanImage configuration.
 
 You can chain the output of one function to the input of another. Note the path names match :ref:`Directory Structure`.
 
@@ -103,19 +45,16 @@ You can chain the output of one function to the input of another. Note the path 
 
 .. code-block:: MATLAB
 
-    convertScanImageTiffToVolume(raw_path, extract_path, 0, 'fix_scan_phase', false);
+    convertScanImageTiffToVolume(raw_path, extract_path, 0, 'fix_scan_phase', true);
 
-`fix_scan_phase` = true leads to Bi-Directional scan-phase correlations.
+Setting `fix_scan_phase=true` attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
 
-.. image:: ../_static/_images/corr_ncorr_phase_example.png
-   :width: 200
+.. image:: ../_static/_images/corr_nocorr_phase_example.png
+   :width: 1080
 
 Our data are now saved as a single hdf5 file separated by file and by plane. This storage format
 makes it easy to motion correct each time-series individually. We will be processing small patches of the total image,
 roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.
-
-The key parameter "fix_scan_phase" will use Bi-Directional phase correlations to determine the lateral shift
-between each line (row) of each ROI.
 
 If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user:
 
@@ -135,7 +74,6 @@ Multi File (>=10):
 Be careful to make sure that:
 
 - Each session (series of .tiff files) should be in same directory.
-
 - No other .tiff files should be in this directory. If this happens, an error will throw.
 
 De-interleaving planes/frames is done via _`convertScanImageTiffToVolume`
