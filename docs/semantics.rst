@@ -1,0 +1,26 @@
+.. _semantics:
+
+#########
+Semantics
+#########
+
+Throughout the pipeline, image-processing terms will be used such as::
+
+    ROI STRIP FRAME IMAGE PLANE VOLUME TIME-SERIES Z-STACK T-STACK
+
+This section aims to define these terms with respect to the LBM Data Processing Pipeline.
+
+.. list-table:: LBM Semantics
+   :header-rows: 1
+
+   * - Dimension
+     - Description
+   * - [X, Y]
+     - Image / Plane / Frame (short for "picture frame")
+   * - [X, Y, Z]
+     - Volume, 3D-Stack, Z-Stack
+   * - [X, Y, Z, T]
+     - Volumetric Timeseries
+   * - [X, Y, T]
+     - Time-Series of a 2D Plane
+

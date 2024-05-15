@@ -30,7 +30,12 @@ function segmentPlane(path, savepath, metadata,diagnosticFlag,startPlane,endPlan
 %
 % Returns
 % -------
-% Outputs are saved to disk, including:
+% None
+%
+%
+% Notes
+% -----
+% - Outputs are saved to disk, including:
 % - T_keep: neuronal time series [Km, T] (single)
 % - Ac_keep: neuronal footprints [2*tau+1, 2*tau+1, Km] (single)
 % - C_keep: denoised time series [Km, T] (single)
@@ -41,9 +46,6 @@ function segmentPlane(path, savepath, metadata,diagnosticFlag,startPlane,endPlan
 % - acx: centroid in x direction for each neuron [1, Km] (single)
 % - acy: centroid in y direction for each neuron [1, Km] (single)
 % - acm: sum of component pixels for each neuron [1, Km] (single)
-%
-% Notes
-% -----
 % - The function handles large datasets by processing each plane serially.
 % - The segmentation settings are based on the assumption of 9.2e4 neurons/mm^3
 %   density in the imaged volume.
@@ -81,6 +83,7 @@ else
     disp(['Processing ' num2str(numFiles) ' files found in directory ' path '...'])
 
     poolobj = gcp('nocreate'); % if a parallel pool is running, kill it and restart it to make sure parameters are correct
+
     if ~isempty(poolobj)
         disp('Removing existing parallel pool.')
         delete(poolobj)
@@ -124,7 +127,6 @@ else
 
             % load data
             d = load(fullfile(path, [file '.mat']));
-            
             d1 = metadata.full_image_width;
             d2 = metadata.full_image_height;
 
@@ -297,14 +299,14 @@ else
                 date,ME.stack(1).name, ME.stack(1).line, ME.message);
                 fprintf(1, '%s\n', errorMessage);
                 fprintf(fid,errorMessage,date,ME.stack(1).name, ME.stack(1).line, ME.message);
-    
+
                 disp('Shutting down parallel pool to eliminate error propagation.')
                 poolobj = gcp('nocreate');
                 delete(poolobj)
                 clearvars -except abc numFiles files path savepath fid filestem numCores startPlane endPlane poolobj metadata tmpDir
             end
         end
-    
+
         date = datetime(now,'ConvertFrom','datenum');
         formatSpec = '%s Routine complete.\n';
         fprintf(fid,formatSpec,date,abc);
@@ -319,26 +321,26 @@ function [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2)
     y = 1:d1;
     [X,Y] = meshgrid(x,y);
     Ac_keep = zeros(4*tau+1,4*tau+1,size(A_keep,2),'single');
-    
+
     acx = zeros(1,size(A_keep,2));
     acy = acx;
     acm = acx;
-    
+
     parfor ijk = 1:size(A_keep,2)
-    
+
         AOI = reshape(single(full(A_keep(:,ijk))),d1,d2);
         cx = round(trapz(trapz(X.*AOI))./trapz(trapz(AOI)));
         cy = round(trapz(trapz(Y.*AOI))./trapz(trapz(AOI)));
-    
+
         acx(ijk) = cx;
         acy(ijk) = cy;
         acm(ijk) = sum(AOI(:));
-    
+
         sx = max([cx-2*tau 1]); % handle cases where neuron is closer than 3*tau pixels to edge of FOV
         sy = max([cy-2*tau 1]);
         ex = min([cx+2*tau d2]);
         ey = min([cy+2*tau d1]);
-    
+
         AOIc = nan(4*tau+1,4*tau+1);
         AOIc(1:(ey-sy+1),1:(ex-sx+1)) = AOI(sy:ey,sx:ex);
         Ac_keep(:,:,ijk) = single(AOIc);

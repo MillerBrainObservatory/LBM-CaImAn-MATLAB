@@ -4,7 +4,6 @@ import os
 os.path.abspath(os.path.join("..", "core/utils"))
 sys.path.insert(0, os.path.abspath(os.path.join("..", "core")))
 matlab_src_dir = os.path.abspath("../core/")
-# print(f'{x}')
 
 primary_domain = "mat"
 matlab_auto_link="basic"
@@ -20,13 +19,20 @@ source_suffix = {
         }
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'exclude/*']
 extensions = ["sphinx.ext.autodoc", "sphinxcontrib.matlab", "numpydoc", "sphinx.ext.intersphinx", "sphinx.ext.napoleon"]
 
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "packages", "exclude"]
-html_theme = "nature"
+html_theme = "pydata_sphinx_theme"
 html_short_title="LBM"
 html_static_path = ["_static"]
+
+# html_css_files = ['caiman_matlab.css']
 html_logo = "_static/favicon.ico"
 
+html_theme_options = {
+  "external_links": [
+      {"name": "MBO", "url": "https://mbo.rockefeller.edu"},
+      {"name": "PyBeads", "url": "https://github.com/ru-rbo/rbo-lbm"}
+  ]
+}

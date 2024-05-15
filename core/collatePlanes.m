@@ -29,13 +29,10 @@ function [] = collatePlanes(dataPath, data, metadata, startDepth)
 % -------
 % None
 %
-% Outputs
-% -------
-% - .fig files showing neuron distributions in z and radial directions.
-% - A .mat file with collated and processed imaging data.
 %
 % Notes
 % -----
+% - A .mat file with collated and processed imaging data.
 % - Expects 'three_neuron_mean_offsets.mat' and 'pollen_calibration_Z_vs_N.fig'
 %   within the dataPath for processing.
 % - The function uses parallel processing for some calculations to improve
@@ -62,19 +59,19 @@ FOVx = metadata.fovx;
 FOVy = metadata.fovy;
 
 min_snr = metadata.min_snr;
-         
+
 tau = ceil(7.5/pixel_resolution);
 
 merge_thr = 0.8;
 ovp_thr = 0.0;
 Kms = zeros(30,1);
-num_corr_no_ovp = 0; 
+num_corr_no_ovp = 0;
 num_ovlpd = 0;
 
 p = load([path 'caiman_output_plane_1.mat']); % Load stuff from first p
 rVals = p.rVals;
 
-Tinit = p.T_keep; 
+Tinit = p.T_keep;
 decay_time = 0.5;
 Nsamples = ceil(decay_time*frameRate);
 min_fitness = log(normcdf(-min_snr))*Nsamples;
@@ -96,7 +93,7 @@ if size(rVals)>0
     N(:,2) = p.acy(kp)';
     N(:,3) = p.acx(kp)';
     N(:,4) = 1;
-    
+
 else
     fff = p.f;
     bbb = p.b;
@@ -123,21 +120,21 @@ yo = cumsum(-offsets(:,1));
 yo = yo-min(yo);
 
 for ijk = 2:28
-    
+
     disp(['Beginning calculation for plane ' num2str(ijk)])
-    
+
     pm = load([path 'caiman_output_plane_' num2str(ijk) '.mat']);
-    
+
     Tinit = pm.T_keep;
     [fitness] = compute_event_exceptionality(Tinit,Nsamples,0);
-    
+
     clear Tinit
-    
+
     rValsm = pm.rVals;
 
     kpm = logical(rValsm>r_thr & fitness<min_fitness);
-    
-    Tm = pm.T_keep(kpm,:);    
+
+    Tm = pm.T_keep(kpm,:);
     Cm = pm.C_keep(kpm,:);
     Ym = pm.Ym;
     Am = pm.Ac_keep(:,:,kpm);
@@ -151,7 +148,7 @@ for ijk = 2:28
 
     Nm(:,2) = Nm(:,2) + cumsum(xo(ijk));
     Nm(:,3) = Nm(:,3) + cumsum(yo(ijk));
-    
+
     if size(T,1)>0 && size(Tm,1)>0
         RR = corr(T',Tm');
         MM = RR;
@@ -159,24 +156,24 @@ for ijk = 2:28
     else
         MM = 0;
     end
-    
+
     if sum(sum(MM))>0
-        
+
         inds = find(MM(:));
         [ys,xs] = ind2sub(size(MM),inds);
         mm = MM(MM>0);
         [mm,sinds] = sort(mm,'ascend');
         ys = ys(sinds);
         xs = xs(sinds);
-        
+
         Nk = numel(ys);
-        
+
         for xyz = 1:Nk
             k = ys(xyz);
             km = xs(xyz);
-            
+
             distance = sqrt(abs(N(k,2)-Nm(km,2)).^2 + abs(N(k,3)-Nm(km,3)).^2);
-            
+
             overlapped = distance<3*tau;
 
             if overlapped
@@ -184,24 +181,24 @@ for ijk = 2:28
                     indbuffer = sum(Kms(1:(ijk-2)));
                 else indbuffer = 0;
                 end
-                
+
                 T_all(indbuffer+k,:) = NaN(1,size(T_all,2));
                 C_all(indbuffer+k,:) = NaN(1,size(T_all,2));
                 N(indbuffer+k,:) = NaN(1,4);
-                
+
                 new_T = (T(k,:).*N(k,1) + Tm(km,:).*Nm(km,1))./(N(k,1) + Nm(km,1));
                 new_C = (C(k,:).*N(k,1) + Cm(km,:).*Nm(km,1))./(N(k,1) + Nm(km,1));
                 new_x = round((N(k,2)*N(k,1) + Nm(km,2)*Nm(km,1))./(N(k,1) + Nm(km,1)));
                 new_y = round((N(k,3)*N(k,1) + Nm(km,3)*Nm(km,1))./(N(k,1) + Nm(km,1)));
                 new_z = (N(k,4)*N(k,1) + Nm(km,4)*Nm(km,1))./(N(k,1) + Nm(km,1));
                 new_sum = N(k,1) + Nm(km,1);
-                
+
                 Tm(km,:) = new_T;
                 Cm(km,:) = new_C;
                 Nm(km,:) = [new_sum new_x new_y new_z];
-                
+
                 num_ovlpd = num_ovlpd+1;
-                
+
             else
                 num_corr_no_ovp = num_corr_no_ovp+1;
             end
@@ -232,19 +229,19 @@ disp('De-convolving raw traces...')
 parfor j = 1:size(T_all,1);
     spkmin = 0.5*GetSn(T_all(j,:));
     [cc, spk, opts_oasis] = deconvolveCa(T_all(j,:),'ar2','optimize_b',true,'method','thresholded',...
-        'optimize_pars',true,'maxIter',100,'smin',spkmin);    
+        'optimize_pars',true,'maxIter',100,'smin',spkmin);
     cb = opts_oasis.b;
-    
+
     C_all(j,:) = full(cc(:)' + cb);
-    
+
 end
 
-if sum(isnan(C_all(:)))>0 
+if sum(isnan(C_all(:)))>0
     inds = find(isnan(sum(C_all,2)));
     disp(['Replacing ' num2str(numel(inds)) ' traces where de-convolution failed...'])
-    
+
     for ijk = 1:numel(inds)
-       C_all(inds(ijk),:) = T_all(inds(ijk),:); 
+       C_all(inds(ijk),:) = T_all(inds(ijk),:);
     end
 end
 
