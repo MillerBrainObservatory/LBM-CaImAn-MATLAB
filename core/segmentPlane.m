@@ -1,4 +1,4 @@
-function segmentPlane(path,metadata,diagnosticFlag,startPlane,endPlane,numCores)
+function segmentPlane(path, savepath, metadata,diagnosticFlag,startPlane,endPlane,numCores)
 % SEGMENTPLANE Segment imaging data using CaImAn for motion-corrected data.
 %
 % This function applies the CaImAn algorithm to segment neurons from
@@ -9,7 +9,9 @@ function segmentPlane(path,metadata,diagnosticFlag,startPlane,endPlane,numCores)
 % Parameters
 % ----------
 % path : char
-%     The path to the local folder containing the motion-corrected data.
+%     The path to the folder containing the motion-corrected data.
+% savepath : char
+%     The path where the neuronal .
 % metadata: struct
 %     Struct of ScanImage metadata containing image width, height, and
 %     scanfield information relating to each ROI.
@@ -26,7 +28,7 @@ function segmentPlane(path,metadata,diagnosticFlag,startPlane,endPlane,numCores)
 %     The number of cores to use for parallel processing. A non-numeric input
 %     or '0' sets it to the default value (12).
 %
-% Outputs
+% Returns
 % -------
 % Outputs are saved to disk, including:
 % - T_keep: neuronal time series [Km, T] (single)
@@ -52,9 +54,14 @@ function segmentPlane(path,metadata,diagnosticFlag,startPlane,endPlane,numCores)
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
 addpath(genpath(fullfile(currpath, '../packages/CaImAn_Utilities/CaImAn-MATLAB-master/CaImAn-MATLAB-master/')));
 
-fileSep = filesep(); % clean up input 'path'
-if ~strcmp(path(end),fileSep)
-    path = [path fileSep];
+filePath = fullfile(path);
+if ~isfolder(filePath)
+    error("Filepath %s does not exist", filePath);
+end
+
+if not(isfolder(savepath))
+    fprintf('Given savepath %s does not exist. Creating this directory...\n', saveDirPath);
+    mkdir(savepath)
 end
 
 if strcmp(diagnosticFlag,'1') % if the diagnostic flag is set to 1, spit out contents of directory specified by 'path'
@@ -68,11 +75,6 @@ else
         error('no valid files in %s', path)
     end
 
-    save_path = fullfile([path, 'output']); % create output directory
-    if ~logical(exist(save_path,'dir'))
-        mkdir(save_path)
-    end
-
     clck = clock; % use current time and date to make a log file
     fid = fopen(fullfile(path,['matlab_log_' num2str(clck(1)) '_' num2str(clck(2)) '_' num2str(clck(3)) '_' num2str(clck(4)) '_' num2str(clck(5)) '.txt']),'w');
 
@@ -84,7 +86,7 @@ else
         delete(poolobj)
     end
 
-    filestem = files(1).name; % often there are other .mat files in the directory, we assume the 1st file is processed MAxiMuM data and base the template for the names of all files off it
+    filestem = files(1).name; %  we assume the 1st file is processed MAxiMuM data and base the template for the names of all files off it
     inds = strfind(filestem,'_');
     filestem = filestem(1:inds(end));
 
@@ -117,18 +119,17 @@ else
 
             tic
 
+
             file = [filestem num2str(abc)];
 
             % load data
             d = load(fullfile(path, [file '.mat']));
-            % shifts = d.shifts;
-            % metadata = d.metadata;
             
             d1 = metadata.full_image_width;
             d2 = metadata.full_image_height;
 
             % data = translateFrames(Y, shifts);
-            data = d.Y;
+            data = d.M2;
 
             pixel_resolution = metadata.pixel_resolution;
             volume_rate = metadata.frame_rate;
@@ -280,7 +281,7 @@ else
             f = single(f);
 
             % Save data
-            savefast(fullfile(save_path, ['caiman_output_plane_' num2str(abc) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')
+            savefast(fullfile(savepath, ['caiman_output_plane_' num2str(abc) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')
 
             t4 = toc;
             disp(['Segmentation complete and data saved. Total time elapsed for current iteration ' num2str(t4./60) ' minutes.'])
@@ -288,7 +289,7 @@ else
             formatSpec = '%s Data saved.\n';
             fprintf(fid,formatSpec,date,abc);
 
-            clearvars -except abc numFiles files path save_path fid filestem numCores startPlane endPlane poolobj
+            clearvars -except abc numFiles files path savepath fid filestem numCores startPlane endPlane poolobj metadata tmpDir
 
             catch ME
                 date = datetime(now,'ConvertFrom','datenum');
@@ -300,9 +301,7 @@ else
                 disp('Shutting down parallel pool to eliminate error propagation.')
                 poolobj = gcp('nocreate');
                 delete(poolobj)
-    
-                clearvars -except abc numFiles files path save_path fid filestem numCores endPlane startPlane poolobj
-    
+                clearvars -except abc numFiles files path savepath fid filestem numCores startPlane endPlane poolobj metadata tmpDir
             end
         end
     
