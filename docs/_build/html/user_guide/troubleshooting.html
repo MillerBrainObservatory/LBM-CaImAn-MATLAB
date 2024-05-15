@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Overview &#8212; caiman_matlab  documentation</title>
+    <title>Troubleshooting Common Problems &#8212; caiman_matlab  documentation</title>
   
   
   
@@ -38,11 +38,9 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/guide';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/troubleshooting';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Pre-Processing" href="pre_processing.html" />
-    <link rel="prev" title="User Guide" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -149,7 +147,7 @@
                     </li>
                 
 
-                    <li class="nav-item current active">
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="index.html">
                         User Guide
                       </a>
@@ -253,7 +251,9 @@ document.write(`
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -280,7 +280,7 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item current active">
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="index.html">
                         User Guide
                       </a>
@@ -340,23 +340,6 @@ document.write(`
     
   </div>
   
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">General</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre_processing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="troubleshoot.html">Troubleshooting</a></li>
-</ul>
-</div>
-</nav></div>
-    </div>
-  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
   </div>
@@ -389,10 +372,7 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page">Overview</li>
+    <li class="breadcrumb-item active" aria-current="page">Troubleshoot...</li>
   </ul>
 </nav>
 </div>
@@ -409,76 +389,72 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="overview">
-<span id="id1"></span><h1>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h1>
-<p>A pipeline for processing light beads microscopy (LBM) datasets.</p>
-<p>For background, theory and design of LBM technology, see the reference <a class="reference external" href="https://www.nature.com/articles/s41592-021-01239-8/">publication</a>.</p>
-<a class="reference internal image-reference" href="../_images/overlays.png"><img alt="../_images/overlays.png" src="../_images/overlays.png" style="width: 200px;" />
-</a>
-<p>Currently, inputs to this pipeline are limited to <a class="reference external" href="https://www.mbfbioscience.com/products/scanimage/">ScanImage</a> tiff files.</p>
-<section id="requirements">
-<span id="id2"></span><h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p>MATLAB (Tested on 2023a, 2023b, 2024b)</p></li>
-<li><dl class="simple">
-<dt>Toolboxes:</dt><dd><ul>
-<li><p>Parallel Computing Toolbox</p></li>
-<li><p>Statistics and Machine Learning Toolbox</p></li>
-<li><p>Image Processing Toolbox</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</section>
-<section id="algorithms">
-<h2>Algorithms<a class="headerlink" href="#algorithms" title="Link to this heading">#</a></h2>
-<p>The following algorithms perform the main computations and are included by default in the pipeline:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://github.com/simonsfoundation/NoRMCorre">CNMF</a> segmentation and neuronal source extraction.</p></li>
-<li><p><a class="reference external" href="https://github.com/flatironinstitute/NoRMCorre/">NoRMCorre</a> piecewise rigid motion correction.</p></li>
-<li><p><a class="reference external" href="https://github.com/epnev/constrained-foopsi/">constrained-foopsi</a> constrained deconvolution spike inference.</p></li>
-</ul>
-</section>
-<section id="quickstart">
-<h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading">#</a></h2>
-<p>There are 4 steps that require user input:</p>
-<ol class="arabic simple">
-<li><dl class="simple">
-<dt>Convert ScanImage .Tiff to 4D [x, y, z, t] array.</dt><dd><ul class="simple">
-<li><p>convertScanImageTiffToVolume</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Piecewise rigid motion correction.</dt><dd><ul class="simple">
-<li><p>motionCorrectPlane</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Plane-by-plane 2D neuronal segmentation and deconvolution.</dt><dd><ul class="simple">
-<li><p>segmentPlane</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Z Offset Correction.</dt><dd><ul class="simple">
-<li><p>calculateZOffset</p></li>
-<li><p>compare_planes</p></li>
-</ul>
-</dd>
-</dl>
+  <section id="troubleshooting-common-problems">
+<h1>Troubleshooting Common Problems<a class="headerlink" href="#troubleshooting-common-problems" title="Link to this heading">#</a></h1>
+<section id="matlab-path-issues">
+<h2>MATLAB Path Issues<a class="headerlink" href="#matlab-path-issues" title="Link to this heading">#</a></h2>
+<p><strong>Problem:</strong> The <cite>run_CNMF_patches</cite> function errors out.</p>
+<p><strong>Cause:</strong> The CaImAn parent folder containing <cite>run_CNMF_patches</cite> is not on the MATLAB path.</p>
+<p><strong>Solution:</strong>
+1. Check the MATLAB path configuration in the <cite>planarSegmentation</cite> script, around line 150:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">`matlab</span>
+<span class="pre">%</span> <span class="pre">give</span> <span class="pre">access</span> <span class="pre">to</span> <span class="pre">CaImAn</span> <span class="pre">files</span>
+<span class="pre">addpath(genpath(fullfile('CaImAn-MATLAB-master','CaImAn-MATLAB-master')))</span>
+<span class="pre">addpath(genpath(fullfile('motion_correction/')))</span>
+<span class="pre">`</span></code></p>
+<p>This code adds paths relative to the current directory, which may fail if the <cite>CaImAn-MATLAB-master</cite> folder is not in the same directory as your MATLAB interpreter.</p>
+</div></blockquote>
+<ol class="arabic" start="2">
+<li><p>Move the <cite>CaImAn-MATLAB-master</cite> folder to your userpath, typically <cite>~/Documents/MATLAB/</cite>. You can find this path by typing <cite>userpath</cite> in the MATLAB command window and placing the <cite>CaImAn</cite> folder there.</p></li>
+<li><p>Alternatively, you can modify the <cite>planarSegmentation</cite> script to use an absolute path:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`matlab</span>
+<span class="pre">%</span> <span class="pre">give</span> <span class="pre">access</span> <span class="pre">to</span> <span class="pre">CaImAn</span> <span class="pre">files</span>
+<span class="pre">[currpath,</span> <span class="pre">~,</span> <span class="pre">~]</span> <span class="pre">=</span> <span class="pre">fileparts(fullfile(mfilename('fullpath')));</span> <span class="pre">%</span> <span class="pre">grabs</span> <span class="pre">absolute</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">this</span> <span class="pre">script</span>
+<span class="pre">addpath(genpath(fullfile(currpath,</span> <span class="pre">'../CaImAn-MATLAB-master/CaImAn-MATLAB-master')));</span>
+<span class="pre">`</span></code></p>
 </li>
 </ol>
 </section>
-<section id="tips-and-tricks">
-<span id="id3"></span><h2>Tips and Tricks<a class="headerlink" href="#tips-and-tricks" title="Link to this heading">#</a></h2>
-<a class="reference internal image-reference" href="../_images/storage_rec.png"><img alt="../_images/storage_rec.png" src="../_images/storage_rec.png" style="width: 200px;" />
-</a>
+<section id="missing-compiled-binary-windows">
+<h2>Missing Compiled Binary (Windows)<a class="headerlink" href="#missing-compiled-binary-windows" title="Link to this heading">#</a></h2>
+<p><strong>Problem:</strong> The <cite>run_CNMF_patches</cite> function errors out on Windows.</p>
+<p><strong>Cause:</strong> Missing compiled binary for <cite>graph_conn_comp_mex.mexw64</cite>.</p>
+<p><strong>Solution:</strong>
+1. Compile the binary in MATLAB via the command window:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">`matlab</span>
+<span class="pre">&gt;&gt;</span> <span class="pre">mex</span> <span class="pre">.\CaImAn_Utilities\CaImAn-MATLAB-master\CaImAn-MATLAB-master\utilities\graph_conn_comp_mex.cpp</span>
+<span class="pre">Building</span> <span class="pre">with</span> <span class="pre">'MinGW64</span> <span class="pre">Compiler</span> <span class="pre">(C++)'.</span>
+<span class="pre">MEX</span> <span class="pre">completed</span> <span class="pre">successfully.</span>
+<span class="pre">`</span></code></p>
+</div></blockquote>
+</section>
+<section id="less-likely-issues">
+<h2>Less-Likely Issues<a class="headerlink" href="#less-likely-issues" title="Link to this heading">#</a></h2>
+<p><strong>Problem:</strong> The <cite>run_CNMF_patches</cite> function still fails after addressing the common issues.</p>
+<p><strong>Solution:</strong>
+1. Task Manager:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>End all MATLAB-related tasks.</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Check MATLAB License:
+- Run <cite>license checkout Distrib_Computing_Toolbox</cite>.
+- If <cite>Ans=1</cite>, the license is valid.</p></li>
+<li><p>Revert Local Profile:
+- Create a new profile in the cluster manager, set it as default, and delete ‘Processes’.</p></li>
+<li><p>Replace Local Cluster Storage:
+- Find <cite>prefdir</cite> using <cite>&gt;&gt; prefdir</cite> (e.g., <cite>C:Users%username%AppDataRoamingMathWorksMATLABR202x</cite>).
+- Delete the <cite>MATLABlocal_cluster_jobs</cite> directory one level up.</p></li>
+<li><p>Check for Potentially Conflicting Files:
+- Run <cite>which -all startup.m</cite>. If not found, it’s not the issue.
+- Run <cite>which -all pathdef.m</cite>. Ensure it’s located in <cite>C:Program FilesMATLABR2023btoolboxlocalpathdef.m</cite>.
+- Run <cite>which -all matlabrc.m</cite>. Ensure it’s located in <cite>C:Program FilesMATLABR2023btoolboxlocalmatlabrc.m</cite>.</p></li>
+</ol>
+<p>If these solutions do not resolve the issue, please reach out for further assistance or schedule a Zoom call for additional troubleshooting.</p>
 </section>
 </section>
 
@@ -492,24 +468,6 @@ document.write(`
                 <footer class="prev-next-footer">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="index.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">User Guide</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="pre_processing.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Pre-Processing</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
@@ -528,17 +486,16 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements">Requirements</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithms">Algorithms</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quickstart">Quickstart</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tips-and-tricks">Tips and Tricks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matlab-path-issues">MATLAB Path Issues</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#missing-compiled-binary-windows">Missing Compiled Binary (Windows)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#less-likely-issues">Less-Likely Issues</a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/user_guide/guide.rst.txt">
+    <a href="../_sources/user_guide/troubleshooting.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

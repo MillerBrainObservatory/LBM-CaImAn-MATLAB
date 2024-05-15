@@ -79,6 +79,19 @@ You can make sure all of the requirements for the package are in the path with t
 
 First, we set up our inputs/outputs.
 
+The raw output of an ScanImage MROI acquisition is a `tiff` (or series of tiffs) with metadata attached to the `artist` tag where:
+
+- Each ROI’s image is stacked one on top of the other vertically, as seen in A:
+
+.. image:: ../_static/_images/abc_strip.png
+   :width: 200
+
+- Each plane is written before moving onto the next frame, e.g.:
+
+    - plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.
+
+- Frames may be split across multiple files if this option is specified the ScanImage configuration.
+
 You can chain the output of one function to the input of another. Note the path names match :ref:`Directory Structure`.
 
 .. code-block:: MATLAB
@@ -103,6 +116,38 @@ roughly 20um in parallel, so attempting to process multiple time-series will dra
 
 The key parameter "fix_scan_phase" will use Bi-Directional phase correlations to determine the lateral shift
 between each line (row) of each ROI.
+
+If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user:
+
+Single File:
+- sessionX_00001.tiff
+
+Multi File (<10):
+- sessionX_00001_00001.tiff
+- sessionX_00001_00002.tiff
+
+Multi File (>=10):
+- sessionX_00001_00001.tiff
+- sessionX_00001_00002.tiff
+- ...
+- sessionX_00001_00010.tiff
+
+Be careful to make sure that:
+
+- Each session (series of .tiff files) should be in same directory.
+
+- No other .tiff files should be in this directory. If this happens, an error will throw.
+
+De-interleaving planes/frames is done via _`convertScanImageTiffToVolume`
+
+**Output**
+
+- After successfully running `convertScanImageTiffToVolume`, there will be a single `.h5` file containing extracted data.
+- Each `.mat` contains the following fields:
+    - Y: 4D (x,y,z,t) volume
+    - metadata: struct of metadata retrieved through `get_metadata`
+
+See `notebooks/Strip_Exploration` for a walkthrough on how ScanImage trims pixels and concatenates adjacent strips into a single image.
 
 2. Motion Correction:
 
@@ -130,7 +175,6 @@ between each line (row) of each ROI.
         translatedFrames - A 3D array of translated image frames, same size and type as Y.
 
 See `notebooks/MC_Exploration` for a walkthrough on analyzing motion-corrected videos.
-
 Motion correction metrics are saved to your savepath.
 
 .. code-block:: MATLAB
@@ -141,147 +185,9 @@ Motion correction metrics are saved to your savepath.
     mcpath = 'C:\Users\RBO\Documents\data\bi_hemisphere\registration';
     motionCorrectPlane(extract_path, 23, 1, 3);
 
-Pre-processing2
----------------
-
-The raw output of an ScanImage MROI acquisition is a `tiff` (or series of tiffs) with metadata attached to the `artist` tag where:
-
-- Each ROI’s image is stacked one on top of the other vertically, as seen in A:
-
-.. image:: ../_static/_images/abc_strip.png
-   :width: 200
-
-- Each plane is written before moving onto the next frame, e.g.:
-
-    - plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.
-
-- Frames may be split across multiple files if this option is specified the ScanImage configuration.
-
-
-If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user:
-
-Single File:
-- sessionX_00001.tiff
-
-Multi File (<10):
-- sessionX_00001_00001.tiff
-- sessionX_00001_00002.tiff
-
-Multi File (>=10):
-- sessionX_00001_00001.tiff
-- sessionX_00001_00002.tiff
-- ...
-- sessionX_00001_00010.tiff
-
-Be careful to make sure that:
-
-- Each session (series of .tiff files) should be in same directory.
-
-- No other .tiff files should be in this directory. If this happens, an error will throw.
-
-De-interleaving planes/frames is done via :code:`convertScanImageTiffToVolume`
-
-| Run 'help <function>' in the command window for a detailed overview on function parameters, outputs and examples.
-
-.. _convertScanImageTiffToVolume:
-
-.. code-block:: MATLAB
-
-   >> help convertScanImageTiffToVolume
-     convertScanImageTiffToVolume Convert ScanImage .tif files into a 4D volume.
-
-      Convert raw `ScanImage`_ multi-roi .tif files from a single session
-      into a single 4D volume (x, y, z, t). It's designed to process files for the
-      ScanImage Version: 2016 software.
-
-      Parameters
-      ----------
-      filePath : char
-          The directory containing the raw .tif files. Only raw .tif files from one
-          session should be in the directory.
-      saveDirPath : char, optional
-          The directory where processed files will be saved. It is created if it does
-          not exist. Defaults to the filePath if not provided.
-      diagnosticFlag : double, logical, optional
-          If set to 1, the function displays the files in the command window and does
-          not continue processing. Defaults to 0.
-
-      Notes
-      -----
-      The function adds necessary paths for ScanImage utilities and processes each .tif
-      file found in the specified directory. It checks if the directory exists, handles
-      multiple or single file scenarios, and can optionally report the directory's contents
-      based on the diagnosticFlag.
-
-      Each file processed is logged, assembled into a 4D volume, and saved in a specified
-      directory as a .mat file with accompanying metadata. The function also manages errors
-      by cleaning up and providing detailed error messages if something goes wrong during
-      processing.
-
-      Examples
-      --------
-      .. code-block:: MATLAB
-
-            % Path to data, path to save data, diagnostic flag
-            convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 0);
-            convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 1); % just display files
-
-      See also fileparts, addpath, genpath, isfolder, dir, fullfile, error, regexp, savefast
-
-**Output**
-
-- After successfully running `convertScanImageTiffToVolume`, there will be a series of `.mat` files matching the number of raw `.tiff` files.
-- Each `.mat` contains the following fields:
-    - Y: 4D (x,y,z,t) volume
-    - metadata: struct of metadata retrieved through `get_metadata`
-
-See `notebooks/Strip_Exploration` for a walkthrough on how ScanImage trims pixels and concatenates adjacent strips into a single image.
-
-
-Motion-correction2
-------------------
-
 Perform both piecewise-rigid motion correction using `NormCORRe`_ to stabilize the imaging data. Each plane is motion corrected sequentially, so
 only a single plane is ever loaded into memory due to large LBM filesizes (>35GB). A template of 150 frames is used to initialize a "reference image". This image is
 your "ground truth" per-se, it is the image you want to most accurately represent the movement in your video.
 
 For input, use the same directory as `savePath` parameter in `convertScanImageTiffToVolume`_.
 
-.. code-block:: MATLAB
-
-    >> help motionCorrectPlane
-      motionCorrectPlane Perform rigid and non-rigid motion correction on imaging data.
-
-      This function processes imaging data by sequentially loading individual
-      processed planes, applying rigid motion correction to generate a template,
-      followed by patched non-rigid motion correction. Each motion-corrected plane
-      is saved separately with relevant shifts and metadata.
-
-      Parameters
-      ----------
-      filePath : char
-          Path to the directory containing the raw .tif files.
-      numCores : double, integer, positive
-          Number of cores to use for computation. The value is limited to a maximum
-          of 24 cores. If more than 24, it defaults to 23.
-      startPlane : double, integer, positive
-          The starting plane index for processing.
-      endPlane : double, integer, positive
-          The ending plane index for processing. Must be greater than or equal to
-          startPlane.
-
-      Returns
-      -------
-      Each motion-corrected plane is saved as a .mat file containing the following:
-      shifts : array
-          2D motion vectors as single precision.
-      metadata : struct
-          Struct containing all relevant metadata for the session.
-
-      Notes
-      -----
-      - Only .mat files containing processed volumes should be in the filePath.
-      - Any .mat files with "plane" in the filename will be skipped to avoid
-        re-processing a previously motion-corrected plane.
-
-      See also addpath, gcp, dir, error, fullfile, fopen, regexp, contains, matfile, savefast

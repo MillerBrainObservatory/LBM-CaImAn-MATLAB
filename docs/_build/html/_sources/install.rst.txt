@@ -9,6 +9,8 @@ Installation
 Recommendation
 ==============
 
+The easiest way to download the source code is to visit the 'github repository `github repository <https://github.com/ru-rbo/caiman_matlab.git>`_.
+
 The most reliable installation method is to clone/download the repository and add the path to a `startup.m`_ file located in `~/Documents/MATLAB/startup.m`.
 
 .. code-block:: MATLAB
@@ -112,3 +114,5 @@ Otherwise, you will need to navigate to that directory within the matlab GUI or 
    >> addpath(genpath("path/to/caiman_matlab"))
 
 .. _startup.m: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html
+.. _GITHUB_: https://github.com/ru-rbo/rbo-lbm'_
+

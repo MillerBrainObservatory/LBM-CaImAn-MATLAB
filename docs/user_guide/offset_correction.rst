@@ -69,7 +69,7 @@ Place these files in the same directory as your `caiman_output_plane_N` files.
 
 The user will be prompted to select the same **feature** / **region-of-interest** / **neuron**:
 
-.. image:: ./_static/_images/compare_planes.png
+.. image:: ../_static/_images/compare_planes.png
    :width: 200
 
 
