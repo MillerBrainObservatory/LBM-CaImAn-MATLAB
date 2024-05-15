@@ -41,7 +41,7 @@ Resources
 Core Functionality
 ------------------
 
-There are 4 steps corresponding to 4 core functions (more details in `Usage`_):
+There are 4 steps corresponding to 4 core functions:
 
 1. Convert ScanImage .Tiff to 4D [x, y, z, t] array.
     - convertScanImageTiffToVolume
