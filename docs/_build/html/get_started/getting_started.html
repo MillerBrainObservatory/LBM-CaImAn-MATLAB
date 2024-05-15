@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Troubleshooting Common Problems &#8212; caiman_matlab  documentation</title>
+    <title>Getting Started &#8212; caiman_matlab  documentation</title>
   
   
   
@@ -38,11 +38,11 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/troubleshooting';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'get_started/getting_started';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="API" href="../api/index.html" />
-    <link rel="prev" title="Tips and Tricks" href="tips_tricks.html" />
+    <link rel="next" title="User Guide" href="../user_guide/index.html" />
+    <link rel="prev" title="Semantics" href="semantics.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -135,15 +135,15 @@
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../get_started/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
                         First Steps
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="index.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide/index.html">
                         User Guide
                       </a>
                     </li>
@@ -251,15 +251,15 @@ document.write(`
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../get_started/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
                         First Steps
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="index.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user_guide/index.html">
                         User Guide
                       </a>
                     </li>
@@ -315,13 +315,11 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">First Steps</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre_processing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tips_tricks.html">Tips and Tricks</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="semantics.html">Semantics</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Getting Started</a></li>
 </ul>
 </div>
 </nav></div>
@@ -360,9 +358,9 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">First Steps</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Troubleshoot...</li>
+    <li class="breadcrumb-item active" aria-current="page">Getting Started</li>
   </ul>
 </nav>
 </div>
@@ -379,66 +377,79 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="troubleshooting-common-problems">
-<span id="troubleshooting"></span><h1>Troubleshooting Common Problems<a class="headerlink" href="#troubleshooting-common-problems" title="Link to this heading">#</a></h1>
-<section id="matlab-path-issues">
-<h2>MATLAB Path Issues<a class="headerlink" href="#matlab-path-issues" title="Link to this heading">#</a></h2>
-<p><strong>Problem:</strong> The <cite>run_CNMF_patches</cite> function errors out.</p>
-<p><strong>Cause:</strong> The CaImAn parent folder containing <cite>run_CNMF_patches</cite> is not on the MATLAB path.</p>
-<p><strong>Solution:</strong>
-1. Check the MATLAB path configuration in the <cite>segmentPlane</cite> script, around line 150:</p>
-<blockquote>
-<div><p><code class="docutils literal notranslate"><span class="pre">`matlab</span>
-<span class="pre">%</span> <span class="pre">give</span> <span class="pre">access</span> <span class="pre">to</span> <span class="pre">CaImAn</span> <span class="pre">files</span>
-<span class="pre">addpath(genpath(fullfile('CaImAn-MATLAB-master','CaImAn-MATLAB-master')))</span>
-<span class="pre">addpath(genpath(fullfile('motion_correction/')))</span>
-<span class="pre">`</span></code></p>
-<p>This code adds paths relative to the current directory, which may fail if the <cite>CaImAn-MATLAB-master</cite> folder is not in the same directory as your MATLAB interpreter.</p>
-</div></blockquote>
-<ol class="arabic" start="2">
-<li><p>Move the <cite>CaImAn-MATLAB-master</cite> folder to your userpath, typically <cite>~/Documents/MATLAB/</cite>. You can find this path by typing <cite>userpath</cite> in the MATLAB command window and placing the <cite>CaImAn</cite> folder there.</p></li>
-<li><p>Alternatively, you can modify the <cite>planarSegmentation</cite> script to use an absolute path:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`matlab</span>
-<span class="pre">%</span> <span class="pre">give</span> <span class="pre">access</span> <span class="pre">to</span> <span class="pre">CaImAn</span> <span class="pre">files</span>
-<span class="pre">[currpath,</span> <span class="pre">~,</span> <span class="pre">~]</span> <span class="pre">=</span> <span class="pre">fileparts(fullfile(mfilename('fullpath')));</span> <span class="pre">%</span> <span class="pre">grabs</span> <span class="pre">absolute</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">this</span> <span class="pre">script</span>
-<span class="pre">addpath(genpath(fullfile(currpath,</span> <span class="pre">'../CaImAn-MATLAB-master/CaImAn-MATLAB-master')));</span>
-<span class="pre">`</span></code></p>
-</li>
-</ol>
+  <section id="getting-started">
+<span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h1>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">#</a></h2>
+<p>Before running your first dataset, you should ensure that all dependencies of the pipeline are satisfied.</p>
+<p>This pipeline requires the parallel pool, statistics and machine learning, and image processing toolboxes.</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="nb">ver</span>
+</pre></div>
+</div>
+<p>If the user choses to split frames across multiple <cite>.tiff</cite> files, there will be multiple tiff files in ascending order
+of an suffix appended to the filename: <cite>_000N</cite>, where n=number of files chosen by the user.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>All output .tiff files for a single imaging session should be placed in the same directory.
+No other .tiff files should be in this directory. If this happens, an error will throw.</p>
+</div>
+<p>There are 2 primary functions for pre-processing,</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For detailed documentation in your MATLAB editor, use:</p>
+<p>&gt;&gt; help FunctionName
+&gt;&gt; help convertScanImageTiffToVolume</p>
+</div>
 </section>
-<section id="missing-compiled-binary-windows">
-<h2>Missing Compiled Binary (Windows)<a class="headerlink" href="#missing-compiled-binary-windows" title="Link to this heading">#</a></h2>
-<p><strong>Problem:</strong> The <cite>run_CNMF_patches</cite> function errors out on Windows.</p>
-<p><strong>Cause:</strong> Missing compiled binary for <cite>graph_conn_comp_mex.mexw64</cite>.</p>
-<p><strong>Solution:</strong>
-1. Compile the binary in MATLAB via the command window:</p>
+<section id="directory-structure">
+<span id="id2"></span><h2>Directory Structure<a class="headerlink" href="#directory-structure" title="Link to this heading">#</a></h2>
+<p>The following is an example of the directory hierarchy
+used for the demo.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Parent
+├── raw
+│   └── basename_00001_0001.tiff
+│   └── basename_00001_0002.tiff
+│   └── basename_00001_00NN.tiff
+├── extraction
+│   └── basename.h5
+├── registration
+│   └── shift_vectors_plane_N.h5
+└── segmentation
+    └── caiman_output_plane_.h5
+</pre></div>
+</div>
+<p>where <cite>N</cite> = the number of <cite>[X, Y, T]</cite> planar time-series.</p>
+<p>Following the recommendation described in <a class="reference internal" href="install.html#recommended-install"><span class="std std-ref">Recommendation</span></a> all necessary functions should already be on your
+MATLAB path. If an error is encountered, such as:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">Undefined</span><span class="w"> </span><span class="s">function</span><span class="w"> </span><span class="s">&#39;convertScanImageTiffToVolume&#39;</span><span class="w"> </span><span class="s">for</span><span class="w"> </span><span class="s">input</span><span class="w"> </span><span class="s">arguments</span><span class="w"> </span><span class="s">of</span><span class="w"> </span><span class="s">type</span><span class="w"> </span><span class="s">&#39;char&#39;.</span>
+</pre></div>
+</div>
+<p>This means the input is not on your MATLAB path. Add this to the top of the script you are running:</p>
 <blockquote>
-<div><p><code class="docutils literal notranslate"><span class="pre">`matlab</span>
-<span class="pre">&gt;&gt;</span> <span class="pre">mex</span> <span class="pre">.\CaImAn_Utilities\CaImAn-MATLAB-master\CaImAn-MATLAB-master\utilities\graph_conn_comp_mex.cpp</span>
-<span class="pre">Building</span> <span class="pre">with</span> <span class="pre">'MinGW64</span> <span class="pre">Compiler</span> <span class="pre">(C++)'.</span>
-<span class="pre">MEX</span> <span class="pre">completed</span> <span class="pre">successfully.</span>
-<span class="pre">`</span></code></p>
+<div><div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">fpath</span><span class="p">,</span><span class="w"> </span><span class="n">fname</span><span class="p">,</span><span class="w"> </span><span class="o">~</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">fileparts</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="nb">mfilename</span><span class="p">(</span><span class="s">&#39;fullpath&#39;</span><span class="p">)));</span><span class="w"> </span><span class="c">% path to this script</span>
+<span class="nb">addpath</span><span class="p">(</span><span class="nb">genpath</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;core/&#39;</span><span class="p">)));</span>
+</pre></div>
+</div>
 </div></blockquote>
-</section>
-<section id="less-likely-issues">
-<h2>Less-Likely Issues<a class="headerlink" href="#less-likely-issues" title="Link to this heading">#</a></h2>
-<p><strong>Problem:</strong> The <cite>run_CNMF_patches</cite> function still fails after addressing the common issues.</p>
-<p><strong>Solution:</strong>
-1. Task Manager:
-- End all MATLAB-related tasks.
-2. Check MATLAB License:
-- Run <cite>license checkout Distrib_Computing_Toolbox</cite>.
-- If <cite>Ans=1</cite>, the license is valid.
-3. Revert Local Profile:
-- Create a new profile in the cluster manager, set it as default, and delete ‘Processes’.
-4. Replace Local Cluster Storage:
-- Find <cite>prefdir</cite> using <cite>&gt;&gt; prefdir</cite> (e.g., <cite>C:Users%username%AppDataRoamingMathWorksMATLABR202x</cite>).
-- Delete the <cite>MATLABlocal_cluster_jobs</cite> directory one level up.
-5. Check for Potentially Conflicting Files:
-- Run <cite>which -all startup.m</cite>. If not found, it’s not the issue.
-- Run <cite>which -all pathdef.m</cite>. Ensure it’s located in <cite>C:Program FilesMATLABR2023btoolboxlocalpathdef.m</cite>.
-- Run <cite>which -all matlabrc.m</cite>. Ensure it’s located in <cite>C:Program FilesMATLABR2023btoolboxlocalmatlabrc.m</cite>.</p>
-<p>If these solutions do not resolve the issue, please reach out for further assistance or schedule a Zoom call for additional troubleshooting.</p>
+<p>You can make sure all of the requirements for the package are in the path with the following:</p>
+<blockquote>
+<div><div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">validateRequirements</span><span class="p">();</span><span class="w"> </span><span class="c">% make sure we have dependencies in accessible places</span>
+<span class="k">if</span><span class="w"> </span><span class="nb">ischar</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
+<span class="k">else</span>
+<span class="w">    </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Proceeding with execution...&#39;</span><span class="p">);</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>First, we set up our inputs/outputs.</p>
+<p>You can chain the output of one function to the input of another. Note the path names match <a class="reference internal" href="#directory-structure"><span class="std std-ref">Directory Structure</span></a>.</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">parentpath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;C:\Users\RBO\Documents\data\bi_hemisphere\&#39;</span><span class="p">;</span>
+<span class="n">raw_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;raw\&#39;</span><span class="p">];</span>
+<span class="n">extract_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;extracted2\&#39;</span><span class="p">];</span>
+<span class="nb">mkdir</span><span class="p">(</span><span class="n">extract_path</span><span class="p">);</span><span class="w"> </span><span class="nb">mkdir</span><span class="p">(</span><span class="n">raw_path</span><span class="p">);</span>
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -453,20 +464,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="tips_tricks.html"
+       href="semantics.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Tips and Tricks</p>
+        <p class="prev-next-title">Semantics</p>
       </div>
     </a>
     <a class="right-next"
-       href="../api/index.html"
+       href="../user_guide/index.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">API</p>
+        <p class="prev-next-title">User Guide</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -488,16 +499,15 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matlab-path-issues">MATLAB Path Issues</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#missing-compiled-binary-windows">Missing Compiled Binary (Windows)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#less-likely-issues">Less-Likely Issues</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies">Dependencies</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#directory-structure">Directory Structure</a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/user_guide/troubleshooting.rst.txt">
+    <a href="../_sources/get_started/getting_started.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

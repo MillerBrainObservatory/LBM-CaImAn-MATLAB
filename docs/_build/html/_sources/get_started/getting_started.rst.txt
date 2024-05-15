@@ -1,10 +1,20 @@
+.. _getting_started:
+
 ###############
 Getting Started
 ###############
 
+Dependencies
+============
+
 Before running your first dataset, you should ensure that all dependencies of the pipeline are satisfied.
 
-Where do you want to keep the raw, extracted, registered data?
+This pipeline requires the parallel pool, statistics and machine learning, and image processing toolboxes.
+
+.. code-block:: MATLAB
+
+   ver
+
 
 If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order
 of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user.
@@ -23,7 +33,7 @@ There are 2 primary functions for pre-processing,
    >> help FunctionName
    >> help convertScanImageTiffToVolume
 
-.. _directory_structure_start:
+.. _directory structure:
 
 Directory Structure
 ===================
@@ -45,7 +55,7 @@ used for the demo.
     └── segmentation
         └── caiman_output_plane_.h5
 
-    .. where N = the number of [X, Y, Z] time-series (planes)
+where `N` = the number of `[X, Y, T]` planar time-series.
 
 Following the recommendation described in :ref:`recommended-install` all necessary functions should already be on your
 MATLAB path. If an error is encountered, such as:

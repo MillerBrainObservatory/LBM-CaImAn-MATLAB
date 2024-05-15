@@ -1,7 +1,16 @@
 
-| Run 'help <function>' in the command window for a detailed overview on function parameters, outputs and examples.
+.. _tips_and_tricks:
 
-.. _convertScanImageTiffToVolume:
+###############
+Tips and Tricks
+###############
+
+.. _help_functions:
+
+Learn about Functions
+---------------------
+
+| Run 'help <function>' in the command window for a detailed overview on function parameters, outputs and examples.
 
 .. code-block:: MATLAB
 
@@ -45,3 +54,5 @@
             convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 1); % just display files
 
       See also fileparts, addpath, genpath, isfolder, dir, fullfile, error, regexp, savefast
+
+

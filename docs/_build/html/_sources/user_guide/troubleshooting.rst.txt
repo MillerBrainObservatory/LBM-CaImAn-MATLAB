@@ -1,3 +1,4 @@
+.. _troubleshooting:
 
 Troubleshooting Common Problems
 ===============================
@@ -10,7 +11,7 @@ MATLAB Path Issues
 **Cause:** The CaImAn parent folder containing `run_CNMF_patches` is not on the MATLAB path.
 
 **Solution:**
-1. Check the MATLAB path configuration in the `planarSegmentation` script, around line 150:
+1. Check the MATLAB path configuration in the `segmentPlane` script, around line 150:
 
    ```matlab
    % give access to CaImAn files
@@ -51,20 +52,20 @@ Less-Likely Issues
 
 **Problem:** The `run_CNMF_patches` function still fails after addressing the common issues.
 
-**Solution:** 
+**Solution:**
 1. Task Manager:
-   - End all MATLAB-related tasks.
+- End all MATLAB-related tasks.
 2. Check MATLAB License:
-   - Run `license checkout Distrib_Computing_Toolbox`.
-   - If `Ans=1`, the license is valid.
+- Run `license checkout Distrib_Computing_Toolbox`.
+- If `Ans=1`, the license is valid.
 3. Revert Local Profile:
-   - Create a new profile in the cluster manager, set it as default, and delete 'Processes'.
+- Create a new profile in the cluster manager, set it as default, and delete 'Processes'.
 4. Replace Local Cluster Storage:
-   - Find `prefdir` using `>> prefdir` (e.g., `C:\Users\%username%\AppData\Roaming\MathWorks\MATLAB\R202x`).
-   - Delete the `MATLAB\local_cluster_jobs` directory one level up.
+- Find `prefdir` using `>> prefdir` (e.g., `C:\Users\%username%\AppData\Roaming\MathWorks\MATLAB\R202x`).
+- Delete the `MATLAB\local_cluster_jobs` directory one level up.
 5. Check for Potentially Conflicting Files:
-   - Run `which -all startup.m`. If not found, it's not the issue.
-   - Run `which -all pathdef.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\pathdef.m`.
-   - Run `which -all matlabrc.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\matlabrc.m`.
+- Run `which -all startup.m`. If not found, it's not the issue.
+- Run `which -all pathdef.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\pathdef.m`.
+- Run `which -all matlabrc.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\matlabrc.m`.
 
 If these solutions do not resolve the issue, please reach out for further assistance or schedule a Zoom call for additional troubleshooting.

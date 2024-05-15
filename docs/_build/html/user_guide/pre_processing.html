@@ -136,15 +136,8 @@
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../install.html">
-                        Installation
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../semantics.html">
-                        Semantics
+                      <a class="nav-link nav-internal" href="../get_started/index.html">
+                        First Steps
                       </a>
                     </li>
                 
@@ -169,21 +162,13 @@
                   </a>
                 </li>
                 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
+
                 <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://github.com/ru-rbo/rbo-lbm">
+                  <a class="nav-link nav-external" href="https://github.com/ru-rbo/rbo-lbm">
                     PyBeads
                   </a>
                 </li>
                 
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -267,15 +252,8 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../install.html">
-                        Installation
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../semantics.html">
-                        Semantics
+                      <a class="nav-link nav-internal" href="../get_started/index.html">
+                        First Steps
                       </a>
                     </li>
                 
@@ -300,21 +278,13 @@ document.write(`
                   </a>
                 </li>
                 
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
-                    More
-                </button>
-                <ul id="pst-nav-more-links-2" class="dropdown-menu">
-                    
+
                 <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://github.com/ru-rbo/rbo-lbm">
+                  <a class="nav-link nav-external" href="https://github.com/ru-rbo/rbo-lbm">
                     PyBeads
                   </a>
                 </li>
                 
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
         
@@ -345,12 +315,13 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Pipeline Steps:</span></p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Pre_processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="troubleshoot.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips_tricks.html">Tips and Tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
 </ul>
 </div>
 </nav></div>
@@ -410,11 +381,22 @@ document.write(`
                   
   <section id="pre-processing">
 <span id="id1"></span><h1>Pre-Processing<a class="headerlink" href="#pre-processing" title="Link to this heading">#</a></h1>
-<p>Pre-processing LBM datasets consists of 3 main processes:</p>
+<p>Before beginning pre-processing, follow setup steps in <a class="reference internal" href="../get_started/getting_started.html#getting-started"><span class="std std-ref">Getting Started</span></a> to make sure the pipeline and dependencies are installed properly.</p>
+<p>See <a class="reference internal" href="troubleshooting.html#troubleshooting"><span class="std std-ref">Troubleshooting Common Problems</span></a> for common issues.</p>
+<section id="steps">
+<h2>Steps<a class="headerlink" href="#steps" title="Link to this heading">#</a></h2>
+<p>Pre-processing LBM datasets consists of 2 main processing steps:</p>
 <ul class="simple">
-<li><p>1 ) Reshaping vertically concatenated strips into horizontally concatenated strips and aligning adjacent strips.</p></li>
-<li><p>2 ) Bi-Directional Scan Phase Correction</p></li>
-<li><p>3 ) Peicewise motion-correction</p></li>
+<li><p>1 ) Reshaping vertically concatenated strips into horizontally concatenated strips</p></li>
+<li><p>2 ) Peicewise motion-correction</p></li>
+</ul>
+<p>The raw output of an ScanImage MROI acquisition is a <cite>tiff</cite> (or series of tiffs).
+Each ROI’s image is stacked one on top of the other vertically, as seen in A:</p>
+<a class="reference internal image-reference" href="../_images/abc_strip.png"><img alt="../_images/abc_strip.png" src="../_images/abc_strip.png" style="width: 1080px;" />
+</a>
+<p>Each plane is written before moving onto the next frame, e.g.:</p>
+<ul class="simple">
+<li><p>plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.</p></li>
 </ul>
 <p>If the user choses to split frames across multiple <cite>.tiff</cite> files, there will be multiple tiff files in ascending order
 of an suffix appended to the filename: <cite>_000N</cite>, where n=number of files chosen by the user.</p>
@@ -423,74 +405,52 @@ of an suffix appended to the filename: <cite>_000N</cite>, where n=number of fil
 <p>All output .tiff files for a single imaging session should be placed in the same directory.
 No other .tiff files should be in this directory. If this happens, an error will throw.</p>
 </div>
-<p>There are 2 primary functions for pre-processing,</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>For detailed documentation in your MATLAB editor, use:</p>
-<p>&gt;&gt; help FunctionName
-&gt;&gt; help convertScanImageTiffToVolume</p>
-</div>
-<section id="directory-structure">
-<span id="id2"></span><h2>Directory Structure<a class="headerlink" href="#directory-structure" title="Link to this heading">#</a></h2>
-<p>The following is an example of the directory hierarchy
-used for the demo.</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Parent
-├── raw
-│   └── basename_00001_0001.tiff
-│   └── basename_00001_0002.tiff
-│   └── basename_00001_00NN.tiff
-├── extraction
-│   └── basename.h5
-├── registration
-│   └── shift_vectors_plane_N.h5
-└── segmentation
-    └── caiman_output_plane_.h5
-
-.. where N = the number of [X, Y, Z] time-series (planes)
-</pre></div>
-</div>
-<p>Following the recommendation described in <a class="reference internal" href="../install.html#recommended-install"><span class="std std-ref">Recommendation</span></a> all necessary functions should already be on your
-MATLAB path. If an error is encountered, such as:</p>
-<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">Undefined</span><span class="w"> </span><span class="s">function</span><span class="w"> </span><span class="s">&#39;convertScanImageTiffToVolume&#39;</span><span class="w"> </span><span class="s">for</span><span class="w"> </span><span class="s">input</span><span class="w"> </span><span class="s">arguments</span><span class="w"> </span><span class="s">of</span><span class="w"> </span><span class="s">type</span><span class="w"> </span><span class="s">&#39;char&#39;.</span>
-</pre></div>
-</div>
-<p>This means the input is not on your MATLAB path. Add this to the top of the script you are running:</p>
-<blockquote>
-<div><div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">fpath</span><span class="p">,</span><span class="w"> </span><span class="n">fname</span><span class="p">,</span><span class="w"> </span><span class="o">~</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">fileparts</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="nb">mfilename</span><span class="p">(</span><span class="s">&#39;fullpath&#39;</span><span class="p">)));</span><span class="w"> </span><span class="c">% path to this script</span>
-<span class="nb">addpath</span><span class="p">(</span><span class="nb">genpath</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;core/&#39;</span><span class="p">)));</span>
-</pre></div>
-</div>
-</div></blockquote>
-<p>You can make sure all of the requirements for the package are in the path with the following:</p>
-<blockquote>
-<div><div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">validateRequirements</span><span class="p">();</span><span class="w"> </span><span class="c">% make sure we have dependencies in accessible places</span>
-<span class="k">if</span><span class="w"> </span><span class="nb">ischar</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-<span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
-<span class="k">else</span>
-<span class="w">    </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Proceeding with execution...&#39;</span><span class="p">);</span>
-<span class="k">end</span>
-</pre></div>
-</div>
-</div></blockquote>
-<p>First, we set up our inputs/outputs.</p>
-<p>You can chain the output of one function to the input of another. Note the path names match <a class="reference internal" href="#directory-structure"><span class="std std-ref">Directory Structure</span></a>.</p>
+<p>You can chain the output of one function to the input of another. Note the path names match <a class="reference internal" href="../get_started/getting_started.html#directory-structure"><span class="std std-ref">Directory Structure</span></a>.</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">parentpath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;C:\Users\RBO\Documents\data\bi_hemisphere\&#39;</span><span class="p">;</span>
 <span class="n">raw_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;raw\&#39;</span><span class="p">];</span>
 <span class="n">extract_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;extracted2\&#39;</span><span class="p">];</span>
 <span class="nb">mkdir</span><span class="p">(</span><span class="n">extract_path</span><span class="p">);</span><span class="w"> </span><span class="nb">mkdir</span><span class="p">(</span><span class="n">raw_path</span><span class="p">);</span>
 </pre></div>
 </div>
-<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">convertScanImageTiffToVolume</span><span class="p">(</span><span class="n">raw_path</span><span class="p">,</span><span class="w"> </span><span class="n">extract_path</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;fix_scan_phase&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">convertScanImageTiffToVolume</span><span class="p">(</span><span class="n">raw_path</span><span class="p">,</span><span class="w"> </span><span class="n">extract_path</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;fix_scan_phase&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
 </pre></div>
 </div>
-<p><cite>fix_scan_phase</cite> = true leads to Bi-Directional scan-phase correlations.</p>
-<a class="reference internal image-reference" href="_static/_images/corr_ncorr_phase_example.png"><img alt="_static/_images/corr_ncorr_phase_example.png" src="_static/_images/corr_ncorr_phase_example.png" style="width: 200px;" />
+<p>Setting <cite>fix_scan_phase=true</cite> attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.</p>
+<a class="reference internal image-reference" href="../_images/corr_nocorr_phase_example.png"><img alt="../_images/corr_nocorr_phase_example.png" src="../_images/corr_nocorr_phase_example.png" style="width: 1080px;" />
 </a>
 <p>Our data are now saved as a single hdf5 file separated by file and by plane. This storage format
 makes it easy to motion correct each time-series individually. We will be processing small patches of the total image,
 roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.</p>
-<p>The key parameter “fix_scan_phase” will use Bi-Directional phase correlations to determine the lateral shift
-between each line (row) of each ROI.</p>
+<p>If the user choses to split frames across multiple <cite>.tiff</cite> files, there will be multiple tiff files in ascending order of an suffix appended to the filename: <cite>_000N</cite>, where n=number of files chosen by the user:</p>
+<p>Single File:
+- sessionX_00001.tiff</p>
+<p>Multi File (&lt;10):
+- sessionX_00001_00001.tiff
+- sessionX_00001_00002.tiff</p>
+<p>Multi File (&gt;=10):
+- sessionX_00001_00001.tiff
+- sessionX_00001_00002.tiff
+- …
+- sessionX_00001_00010.tiff</p>
+<p>Be careful to make sure that:</p>
+<ul class="simple">
+<li><p>Each session (series of .tiff files) should be in same directory.</p></li>
+<li><p>No other .tiff files should be in this directory. If this happens, an error will throw.</p></li>
+</ul>
+<p>De-interleaving planes/frames is done via <span class="target" id="convertscanimagetifftovolume">convertScanImageTiffToVolume</span></p>
+<p><strong>Output</strong></p>
+<ul class="simple">
+<li><p>After successfully running <cite>convertScanImageTiffToVolume</cite>, there will be a single <cite>.h5</cite> file containing extracted data.</p></li>
+<li><dl class="simple">
+<dt>Each <cite>.mat</cite> contains the following fields:</dt><dd><ul>
+<li><p>Y: 4D (x,y,z,t) volume</p></li>
+<li><p>metadata: struct of metadata retrieved through <cite>get_metadata</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>See <cite>notebooks/Strip_Exploration</cite> for a walkthrough on how ScanImage trims pixels and concatenates adjacent strips into a single image.</p>
 <ol class="arabic simple" start="2">
 <li><p>Motion Correction:</p></li>
 </ol>
@@ -517,8 +477,8 @@ between each line (row) of each ROI.</p>
 <span class="w">     </span><span class="n">translatedFrames</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">A</span><span class="w"> </span>3<span class="n">D</span><span class="w"> </span><span class="n">array</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">translated</span><span class="w"> </span><span class="nb">image</span><span class="w"> </span><span class="n">frames</span><span class="p">,</span><span class="w"> </span><span class="n">same</span><span class="w"> </span><span class="nb">size</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="nb">type</span><span class="w"> </span><span class="n">as</span><span class="w"> </span><span class="n">Y</span><span class="p">.</span>
 </pre></div>
 </div>
-<p>See <cite>notebooks/MC_Exploration</cite> for a walkthrough on analyzing motion-corrected videos.</p>
-<p>Motion correction metrics are saved to your savepath.</p>
+<p>See <cite>notebooks/MC_Exploration</cite> for a walkthrough on analyzing motion-corrected videos.
+Motion correction metrics are saved to your savepath.</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">mdata</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">get_metadata</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="n">metapath</span><span class="p">,</span><span class="w"> </span><span class="n">metaname</span><span class="p">));</span>
 <span class="n">mdata</span><span class="p">.</span><span class="n">base_filename</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001&quot;</span><span class="p">;</span>
 
@@ -526,100 +486,10 @@ between each line (row) of each ROI.</p>
 <span class="n">motionCorrectPlane</span><span class="p">(</span><span class="n">extract_path</span><span class="p">,</span><span class="w"> </span><span class="mi">23</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
-<section id="pre-processing2">
-<h3>Pre-processing2<a class="headerlink" href="#pre-processing2" title="Link to this heading">#</a></h3>
-<p>The raw output of an ScanImage MROI acquisition is a <cite>tiff</cite> (or series of tiffs) with metadata attached to the <cite>artist</cite> tag where:</p>
-<ul class="simple">
-<li><p>Each ROI’s image is stacked one on top of the other vertically, as seen in A:</p></li>
-</ul>
-<a class="reference internal image-reference" href="../_images/abc_strip.png"><img alt="../_images/abc_strip.png" src="../_images/abc_strip.png" style="width: 200px;" />
-</a>
-<ul>
-<li><p>Each plane is written before moving onto the next frame, e.g.:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.</p></li>
-</ul>
-</div></blockquote>
-</li>
-<li><p>Frames may be split across multiple files if this option is specified the ScanImage configuration.</p></li>
-</ul>
-<p>If the user choses to split frames across multiple <cite>.tiff</cite> files, there will be multiple tiff files in ascending order of an suffix appended to the filename: <cite>_000N</cite>, where n=number of files chosen by the user:</p>
-<p>Single File:
-- sessionX_00001.tiff</p>
-<p>Multi File (&lt;10):
-- sessionX_00001_00001.tiff
-- sessionX_00001_00002.tiff</p>
-<p>Multi File (&gt;=10):
-- sessionX_00001_00001.tiff
-- sessionX_00001_00002.tiff
-- …
-- sessionX_00001_00010.tiff</p>
-<p>Be careful to make sure that:</p>
-<ul class="simple">
-<li><p>Each session (series of .tiff files) should be in same directory.</p></li>
-<li><p>No other .tiff files should be in this directory. If this happens, an error will throw.</p></li>
-</ul>
-<p>De-interleaving planes/frames is done via <code class="code docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume</span></code></p>
-<p><strong>Output</strong></p>
-<ul class="simple">
-<li><p>After successfully running <cite>convertScanImageTiffToVolume</cite>, there will be a series of <cite>.mat</cite> files matching the number of raw <cite>.tiff</cite> files.</p></li>
-<li><dl class="simple">
-<dt>Each <cite>.mat</cite> contains the following fields:</dt><dd><ul>
-<li><p>Y: 4D (x,y,z,t) volume</p></li>
-<li><p>metadata: struct of metadata retrieved through <cite>get_metadata</cite></p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-<p>See <cite>notebooks/Strip_Exploration</cite> for a walkthrough on how ScanImage trims pixels and concatenates adjacent strips into a single image.</p>
-</section>
-<section id="motion-correction2">
-<h3>Motion-correction2<a class="headerlink" href="#motion-correction2" title="Link to this heading">#</a></h3>
 <p>Perform both piecewise-rigid motion correction using <a class="reference internal" href="#normcorre">NormCORRe</a> to stabilize the imaging data. Each plane is motion corrected sequentially, so
 only a single plane is ever loaded into memory due to large LBM filesizes (&gt;35GB). A template of 150 frames is used to initialize a “reference image”. This image is
 your “ground truth” per-se, it is the image you want to most accurately represent the movement in your video.</p>
-<p>For input, use the same directory as <cite>savePath</cite> parameter in <a href="#id3"><span class="problematic" id="id4">`convertScanImageTiffToVolume`_</span></a>.</p>
-<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="n">motionCorrectPlane</span>
-<span class="w">  </span><span class="n">motionCorrectPlane</span><span class="w"> </span><span class="n">Perform</span><span class="w"> </span><span class="n">rigid</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">non</span><span class="o">-</span><span class="n">rigid</span><span class="w"> </span><span class="n">motion</span><span class="w"> </span><span class="n">correction</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">imaging</span><span class="w"> </span><span class="n">data</span><span class="p">.</span>
-
-<span class="w">  </span><span class="n">This</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">processes</span><span class="w"> </span><span class="n">imaging</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="n">sequentially</span><span class="w"> </span><span class="n">loading</span><span class="w"> </span><span class="n">individual</span>
-<span class="w">  </span><span class="n">processed</span><span class="w"> </span><span class="n">planes</span><span class="p">,</span><span class="w"> </span><span class="n">applying</span><span class="w"> </span><span class="n">rigid</span><span class="w"> </span><span class="n">motion</span><span class="w"> </span><span class="n">correction</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">generate</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">template</span><span class="p">,</span>
-<span class="w">  </span><span class="n">followed</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="n">patched</span><span class="w"> </span><span class="n">non</span><span class="o">-</span><span class="n">rigid</span><span class="w"> </span><span class="n">motion</span><span class="w"> </span><span class="n">correction</span><span class="p">.</span><span class="w"> </span><span class="n">Each</span><span class="w"> </span><span class="n">motion</span><span class="o">-</span><span class="n">corrected</span><span class="w"> </span><span class="n">plane</span>
-<span class="w">  </span><span class="n">is</span><span class="w"> </span><span class="n">saved</span><span class="w"> </span><span class="n">separately</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">relevant</span><span class="w"> </span><span class="n">shifts</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span>
-
-<span class="w">  </span><span class="n">Parameters</span>
-<span class="w">  </span><span class="o">----------</span>
-<span class="w">  </span><span class="n">filePath</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">char</span>
-<span class="w">      </span><span class="n">Path</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">directory</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="p">.</span><span class="n">tif</span><span class="w"> </span><span class="n">files</span><span class="p">.</span>
-<span class="w">  </span><span class="n">numCores</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">double</span><span class="p">,</span><span class="w"> </span><span class="n">integer</span><span class="p">,</span><span class="w"> </span><span class="n">positive</span>
-<span class="w">      </span><span class="n">Number</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">cores</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">use</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">computation</span><span class="p">.</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">limited</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">maximum</span>
-<span class="w">      </span><span class="n">of</span><span class="w"> </span><span class="mi">24</span><span class="w"> </span><span class="n">cores</span><span class="p">.</span><span class="w"> </span><span class="n">If</span><span class="w"> </span><span class="nb">more</span><span class="w"> </span><span class="n">than</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="n">defaults</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="mf">23.</span>
-<span class="w">  </span><span class="n">startPlane</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">double</span><span class="p">,</span><span class="w"> </span><span class="n">integer</span><span class="p">,</span><span class="w"> </span><span class="n">positive</span>
-<span class="w">      </span><span class="n">The</span><span class="w"> </span><span class="n">starting</span><span class="w"> </span><span class="n">plane</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">processing</span><span class="p">.</span>
-<span class="w">  </span><span class="n">endPlane</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">double</span><span class="p">,</span><span class="w"> </span><span class="n">integer</span><span class="p">,</span><span class="w"> </span><span class="n">positive</span>
-<span class="w">      </span><span class="n">The</span><span class="w"> </span><span class="n">ending</span><span class="w"> </span><span class="n">plane</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">processing</span><span class="p">.</span><span class="w"> </span><span class="n">Must</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">greater</span><span class="w"> </span><span class="n">than</span><span class="w"> </span><span class="n">or</span><span class="w"> </span><span class="n">equal</span><span class="w"> </span><span class="n">to</span>
-<span class="w">      </span><span class="n">startPlane</span><span class="p">.</span>
-
-<span class="w">  </span><span class="n">Returns</span>
-<span class="w">  </span><span class="o">-------</span>
-<span class="w">  </span><span class="n">Each</span><span class="w"> </span><span class="n">motion</span><span class="o">-</span><span class="n">corrected</span><span class="w"> </span><span class="n">plane</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">saved</span><span class="w"> </span><span class="n">as</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="p">.</span><span class="n">mat</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">following</span><span class="p">:</span>
-<span class="w">  </span><span class="n">shifts</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">array</span>
-<span class="w">      </span>2<span class="n">D</span><span class="w"> </span><span class="n">motion</span><span class="w"> </span><span class="n">vectors</span><span class="w"> </span><span class="n">as</span><span class="w"> </span><span class="nb">single</span><span class="w"> </span><span class="n">precision</span><span class="p">.</span>
-<span class="w">  </span><span class="n">metadata</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">struct</span>
-<span class="w">      </span><span class="n">Struct</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="nb">all</span><span class="w"> </span><span class="n">relevant</span><span class="w"> </span><span class="n">metadata</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">session</span><span class="p">.</span>
-
-<span class="w">  </span><span class="n">Notes</span>
-<span class="w">  </span><span class="o">-----</span>
-<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">Only</span><span class="w"> </span><span class="p">.</span><span class="n">mat</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">processed</span><span class="w"> </span><span class="n">volumes</span><span class="w"> </span><span class="n">should</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">filePath</span><span class="p">.</span>
-<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">Any</span><span class="w"> </span><span class="p">.</span><span class="n">mat</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="s">&quot;plane&quot;</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">filename</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">skipped</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">avoid</span>
-<span class="w">    </span><span class="n">re</span><span class="o">-</span><span class="n">processing</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">previously</span><span class="w"> </span><span class="n">motion</span><span class="o">-</span><span class="n">corrected</span><span class="w"> </span><span class="n">plane</span><span class="p">.</span>
-
-<span class="w">  </span><span class="n">See</span><span class="w"> </span><span class="n">also</span><span class="w"> </span><span class="nb">addpath</span><span class="p">,</span><span class="w"> </span><span class="n">gcp</span><span class="p">,</span><span class="w"> </span><span class="nb">dir</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="p">,</span><span class="w"> </span><span class="nb">fullfile</span><span class="p">,</span><span class="w"> </span><span class="nb">fopen</span><span class="p">,</span><span class="w"> </span><span class="nb">regexp</span><span class="p">,</span><span class="w"> </span><span class="nb">contains</span><span class="p">,</span><span class="w"> </span><span class="nb">matfile</span><span class="p">,</span><span class="w"> </span><span class="n">savefast</span>
-</pre></div>
-</div>
-</section>
+<p>For input, use the same directory as <cite>savePath</cite> parameter in <a class="reference internal" href="#convertscanimagetifftovolume">convertScanImageTiffToVolume</a>.</p>
 </section>
 </section>
 
@@ -669,11 +539,7 @@ your “ground truth” per-se, it is the image you want to most accurately repr
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#directory-structure">Directory Structure</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pre-processing2">Pre-processing2</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#motion-correction2">Motion-correction2</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#steps">Steps</a></li>
 </ul>
   </nav></div>
 
