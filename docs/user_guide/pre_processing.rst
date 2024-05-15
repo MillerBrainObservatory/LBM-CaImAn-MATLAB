@@ -1,7 +1,8 @@
 .. _pre_processing:
 
+##############
 Pre-Processing
-==============
+##############
 
 Pre-processing LBM datasets consists of 3 main processes:
 
@@ -91,6 +92,11 @@ You can chain the output of one function to the input of another. Note the path 
 
     convertScanImageTiffToVolume(raw_path, extract_path, 0, 'fix_scan_phase', false);
 
+`fix_scan_phase` = true leads to Bi-Directional scan-phase correlations.
+
+.. image:: ../_static/_images/corr_ncorr_phase_example.png
+   :width: 200
+
 Our data are now saved as a single hdf5 file separated by file and by plane. This storage format
 makes it easy to motion correct each time-series individually. We will be processing small patches of the total image,
 roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.
@@ -140,15 +146,17 @@ Pre-processing2
 
 The raw output of an ScanImage MROI acquisition is a `tiff` (or series of tiffs) with metadata attached to the `artist` tag where:
 
-- Each ROI’s image is stacked one on top of the other vertically.
+- Each ROI’s image is stacked one on top of the other vertically, as seen in A:
+
+.. image:: ../_static/_images/abc_strip.png
+   :width: 200
 
 - Each plane is written before moving onto the next frame, e.g.:
 
-- plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.
+    - plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.
 
 - Frames may be split across multiple files if this option is specified the ScanImage configuration.
 
-- Dimensions: [MxNxZxF], Image size MxN for z planes, F frames,. Default type is uint16.
 
 If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user:
 

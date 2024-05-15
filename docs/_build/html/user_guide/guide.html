@@ -345,11 +345,10 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Core Routines</span></p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">General</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre-Processing</a></li>
-
+<li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre_processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="troubleshoot.html">Troubleshooting</a></li>
@@ -414,6 +413,8 @@ document.write(`
 <span id="id1"></span><h1>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h1>
 <p>A pipeline for processing light beads microscopy (LBM) datasets.</p>
 <p>For background, theory and design of LBM technology, see the reference <a class="reference external" href="https://www.nature.com/articles/s41592-021-01239-8/">publication</a>.</p>
+<a class="reference internal image-reference" href="../_images/overlays.png"><img alt="../_images/overlays.png" src="../_images/overlays.png" style="width: 200px;" />
+</a>
 <p>Currently, inputs to this pipeline are limited to <a class="reference external" href="https://www.mbfbioscience.com/products/scanimage/">ScanImage</a> tiff files.</p>
 <section id="requirements">
 <span id="id2"></span><h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">#</a></h2>
@@ -476,18 +477,8 @@ document.write(`
 </section>
 <section id="tips-and-tricks">
 <span id="id3"></span><h2>Tips and Tricks<a class="headerlink" href="#tips-and-tricks" title="Link to this heading">#</a></h2>
-<p>If the user choses to split frames across multiple <cite>.tiff</cite> files, there will be multiple tiff files in ascending order
-of an suffix appended to the filename: <cite>_000N</cite>, where n=number of files chosen by the user.</p>
-<ul class="simple">
-<li><p>Each session (series of .tiff files) should be in same directory.</p></li>
-<li><p>No other .tiff files should be in this directory. If this happens, an error will throw.</p></li>
-</ul>
-<p><em>For detailed documentation in your MATLAB editor, use:</em></p>
-<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="n">convertScanImageTiffToVolume</span>
-
-<span class="w"> </span><span class="n">modules</span>
-</pre></div>
-</div>
+<a class="reference internal image-reference" href="../_images/storage_rec.png"><img alt="../_images/storage_rec.png" src="../_images/storage_rec.png" style="width: 200px;" />
+</a>
 </section>
 </section>
 

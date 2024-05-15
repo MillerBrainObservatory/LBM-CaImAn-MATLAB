@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>API &#8212; caiman_matlab  documentation</title>
+    <title>Getting Started &#8212; caiman_matlab  documentation</title>
   
   
   
@@ -38,11 +38,9 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/index';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/getting_started';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Core Functions" href="core.html" />
-    <link rel="prev" title="Troubleshooting" href="../user_guide/troubleshoot.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -150,14 +148,14 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                      <a class="nav-link nav-internal" href="index.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
                         API
                       </a>
                     </li>
@@ -253,7 +251,9 @@ document.write(`
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -281,14 +281,14 @@ document.write(`
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                      <a class="nav-link nav-internal" href="index.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
                         API
                       </a>
                     </li>
@@ -340,22 +340,6 @@ document.write(`
     
   </div>
   
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Core Functions:</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="core.html">Core Functions</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="utils.html">Utils</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="simple">
-</ul>
-</li>
-</ul>
-</div>
-</nav></div>
-    </div>
-  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
   </div>
@@ -388,7 +372,7 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">API</li>
+    <li class="breadcrumb-item active" aria-current="page">Getting Started</li>
   </ul>
 </nav>
 </div>
@@ -405,18 +389,75 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="api">
-<span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Link to this heading">#</a></h1>
-<p>Documentation for each function from docstrings.</p>
-<div class="toctree-wrapper compound">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Core Functions:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="core.html">Core Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a><ul class="simple">
-</ul>
-</li>
-</ul>
+  <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h1>
+<p>Before running your first dataset, you should ensure that all dependencies of the pipeline are satisfied.</p>
+<p>Where do you want to keep the raw, extracted, registered data?</p>
+<p>If the user choses to split frames across multiple <cite>.tiff</cite> files, there will be multiple tiff files in ascending order
+of an suffix appended to the filename: <cite>_000N</cite>, where n=number of files chosen by the user.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>All output .tiff files for a single imaging session should be placed in the same directory.
+No other .tiff files should be in this directory. If this happens, an error will throw.</p>
 </div>
+<p>There are 2 primary functions for pre-processing,</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For detailed documentation in your MATLAB editor, use:</p>
+<p>&gt;&gt; help FunctionName
+&gt;&gt; help convertScanImageTiffToVolume</p>
+</div>
+<section id="directory-structure">
+<span id="directory-structure-start"></span><h2>Directory Structure<a class="headerlink" href="#directory-structure" title="Link to this heading">#</a></h2>
+<p>The following is an example of the directory hierarchy
+used for the demo.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Parent
+├── raw
+│   └── basename_00001_0001.tiff
+│   └── basename_00001_0002.tiff
+│   └── basename_00001_00NN.tiff
+├── extraction
+│   └── basename.h5
+├── registration
+│   └── shift_vectors_plane_N.h5
+└── segmentation
+    └── caiman_output_plane_.h5
+
+.. where N = the number of [X, Y, Z] time-series (planes)
+</pre></div>
+</div>
+<p>Following the recommendation described in <a class="reference internal" href="../install.html#recommended-install"><span class="std std-ref">Recommendation</span></a> all necessary functions should already be on your
+MATLAB path. If an error is encountered, such as:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">Undefined</span><span class="w"> </span><span class="s">function</span><span class="w"> </span><span class="s">&#39;convertScanImageTiffToVolume&#39;</span><span class="w"> </span><span class="s">for</span><span class="w"> </span><span class="s">input</span><span class="w"> </span><span class="s">arguments</span><span class="w"> </span><span class="s">of</span><span class="w"> </span><span class="s">type</span><span class="w"> </span><span class="s">&#39;char&#39;.</span>
+</pre></div>
+</div>
+<p>This means the input is not on your MATLAB path. Add this to the top of the script you are running:</p>
+<blockquote>
+<div><div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">fpath</span><span class="p">,</span><span class="w"> </span><span class="n">fname</span><span class="p">,</span><span class="w"> </span><span class="o">~</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">fileparts</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="nb">mfilename</span><span class="p">(</span><span class="s">&#39;fullpath&#39;</span><span class="p">)));</span><span class="w"> </span><span class="c">% path to this script</span>
+<span class="nb">addpath</span><span class="p">(</span><span class="nb">genpath</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;core/&#39;</span><span class="p">)));</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>You can make sure all of the requirements for the package are in the path with the following:</p>
+<blockquote>
+<div><div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">validateRequirements</span><span class="p">();</span><span class="w"> </span><span class="c">% make sure we have dependencies in accessible places</span>
+<span class="k">if</span><span class="w"> </span><span class="nb">ischar</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
+<span class="k">else</span>
+<span class="w">    </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Proceeding with execution...&#39;</span><span class="p">);</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>First, we set up our inputs/outputs.</p>
+<p>You can chain the output of one function to the input of another. Note the path names match <a class="reference internal" href="pre_processing.html#directory-structure"><span class="std std-ref">Directory Structure</span></a>.</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">parentpath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;C:\Users\RBO\Documents\data\bi_hemisphere\&#39;</span><span class="p">;</span>
+<span class="n">raw_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;raw\&#39;</span><span class="p">];</span>
+<span class="n">extract_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;extracted2\&#39;</span><span class="p">];</span>
+<span class="nb">mkdir</span><span class="p">(</span><span class="n">extract_path</span><span class="p">);</span><span class="w"> </span><span class="nb">mkdir</span><span class="p">(</span><span class="n">raw_path</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
 </section>
 
 
@@ -429,24 +470,6 @@ document.write(`
                 <footer class="prev-next-footer">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="../user_guide/troubleshoot.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Troubleshooting</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="core.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Core Functions</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
@@ -458,9 +481,21 @@ document.write(`
 
 
   <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#directory-structure">Directory Structure</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/api/index.rst.txt">
+    <a href="../_sources/user_guide/getting_started.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

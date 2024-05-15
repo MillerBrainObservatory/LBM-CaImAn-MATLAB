@@ -66,3 +66,11 @@ Place these files in the same directory as your `caiman_output_plane_N` files.
     with specified metadata parameters.
 
   See also load, inputdlg, struct, fullfile, exist
+
+The user will be prompted to select the same **feature** / **region-of-interest** / **neuron**:
+
+.. image:: ./_static/_images/compare_planes.png
+   :width: 200
+
+
+After selecting 3 neurons for each plane, you are done with the LBM pipeline.

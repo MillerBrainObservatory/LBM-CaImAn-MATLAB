@@ -38,7 +38,6 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/core';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -579,11 +578,9 @@ or ‘0’ sets it to the default value (12).</p>
 <p class="rubric">Notes</p>
 <ul class="simple">
 <li><p>The function handles large datasets by processing each plane serially.</p></li>
-<li><p>The segmentation settings are based on the assumption of 9.2e4 neurons/mm^3 density in the imaged volume.</p></li>
-<li><p>The FFT is a fast implementation of the discrete Fourier transform:</p></li>
+<li><p>The segmentation settings are based on the assumption of 9.2e4 neurons/mm^3
+density in the imaged volume.</p></li>
 </ul>
-<div class="math notranslate nohighlight">
-\[X(e^{j\omega } ) = x(n)e^{ - j\omega n}\]</div>
 <p>See also <code class="docutils literal notranslate"><span class="pre">ADDPATH</span></code>, <code class="docutils literal notranslate"><span class="pre">FULLFILE</span></code>, <code class="docutils literal notranslate"><span class="pre">DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">LOAD</span></code>, <code class="docutils literal notranslate"><span class="pre">SAVEFAST</span></code></p>
 </dd></dl>
 

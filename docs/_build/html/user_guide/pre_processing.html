@@ -345,11 +345,10 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Core Routines</span></p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="guide.html">General</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Pre-Processing</a></li>
-
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Pre_processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="troubleshoot.html">Troubleshooting</a></li>
@@ -432,9 +431,8 @@ No other .tiff files should be in this directory. If this happens, an error will
 <p>&gt;&gt; help FunctionName
 &gt;&gt; help convertScanImageTiffToVolume</p>
 </div>
-</section>
 <section id="directory-structure">
-<span id="id2"></span><h1>Directory Structure<a class="headerlink" href="#directory-structure" title="Link to this heading">#</a></h1>
+<span id="id2"></span><h2>Directory Structure<a class="headerlink" href="#directory-structure" title="Link to this heading">#</a></h2>
 <p>The following is an example of the directory hierarchy
 used for the demo.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Parent
@@ -486,6 +484,9 @@ MATLAB path. If an error is encountered, such as:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">convertScanImageTiffToVolume</span><span class="p">(</span><span class="n">raw_path</span><span class="p">,</span><span class="w"> </span><span class="n">extract_path</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;fix_scan_phase&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
 </pre></div>
 </div>
+<p><cite>fix_scan_phase</cite> = true leads to Bi-Directional scan-phase correlations.</p>
+<a class="reference internal image-reference" href="_static/_images/corr_ncorr_phase_example.png"><img alt="_static/_images/corr_ncorr_phase_example.png" src="_static/_images/corr_ncorr_phase_example.png" style="width: 200px;" />
+</a>
 <p>Our data are now saved as a single hdf5 file separated by file and by plane. This storage format
 makes it easy to motion correct each time-series individually. We will be processing small patches of the total image,
 roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.</p>
@@ -527,14 +528,22 @@ between each line (row) of each ROI.</p>
 </pre></div>
 </div>
 <section id="pre-processing2">
-<h2>Pre-processing2<a class="headerlink" href="#pre-processing2" title="Link to this heading">#</a></h2>
+<h3>Pre-processing2<a class="headerlink" href="#pre-processing2" title="Link to this heading">#</a></h3>
 <p>The raw output of an ScanImage MROI acquisition is a <cite>tiff</cite> (or series of tiffs) with metadata attached to the <cite>artist</cite> tag where:</p>
 <ul class="simple">
-<li><p>Each ROI’s image is stacked one on top of the other vertically.</p></li>
-<li><p>Each plane is written before moving onto the next frame, e.g.:</p></li>
+<li><p>Each ROI’s image is stacked one on top of the other vertically, as seen in A:</p></li>
+</ul>
+<a class="reference internal image-reference" href="../_images/abc_strip.png"><img alt="../_images/abc_strip.png" src="../_images/abc_strip.png" style="width: 200px;" />
+</a>
+<ul>
+<li><p>Each plane is written before moving onto the next frame, e.g.:</p>
+<blockquote>
+<div><ul class="simple">
 <li><p>plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.</p></li>
+</ul>
+</div></blockquote>
+</li>
 <li><p>Frames may be split across multiple files if this option is specified the ScanImage configuration.</p></li>
-<li><p>Dimensions: [MxNxZxF], Image size MxN for z planes, F frames,. Default type is uint16.</p></li>
 </ul>
 <p>If the user choses to split frames across multiple <cite>.tiff</cite> files, there will be multiple tiff files in ascending order of an suffix appended to the filename: <cite>_000N</cite>, where n=number of files chosen by the user:</p>
 <p>Single File:
@@ -613,7 +622,7 @@ between each line (row) of each ROI.</p>
 <p>See <cite>notebooks/Strip_Exploration</cite> for a walkthrough on how ScanImage trims pixels and concatenates adjacent strips into a single image.</p>
 </section>
 <section id="motion-correction2">
-<h2>Motion-correction2<a class="headerlink" href="#motion-correction2" title="Link to this heading">#</a></h2>
+<h3>Motion-correction2<a class="headerlink" href="#motion-correction2" title="Link to this heading">#</a></h3>
 <p>Perform both piecewise-rigid motion correction using <a class="reference internal" href="#normcorre">NormCORRe</a> to stabilize the imaging data. Each plane is motion corrected sequentially, so
 only a single plane is ever loaded into memory due to large LBM filesizes (&gt;35GB). A template of 150 frames is used to initialize a “reference image”. This image is
 your “ground truth” per-se, it is the image you want to most accurately represent the movement in your video.</p>
@@ -656,6 +665,7 @@ your “ground truth” per-se, it is the image you want to most accurately repr
 <span class="w">  </span><span class="n">See</span><span class="w"> </span><span class="n">also</span><span class="w"> </span><span class="nb">addpath</span><span class="p">,</span><span class="w"> </span><span class="n">gcp</span><span class="p">,</span><span class="w"> </span><span class="nb">dir</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="p">,</span><span class="w"> </span><span class="nb">fullfile</span><span class="p">,</span><span class="w"> </span><span class="nb">fopen</span><span class="p">,</span><span class="w"> </span><span class="nb">regexp</span><span class="p">,</span><span class="w"> </span><span class="nb">contains</span><span class="p">,</span><span class="w"> </span><span class="nb">matfile</span><span class="p">,</span><span class="w"> </span><span class="n">savefast</span>
 </pre></div>
 </div>
+</section>
 </section>
 </section>
 
@@ -705,14 +715,12 @@ your “ground truth” per-se, it is the image you want to most accurately repr
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Pre-Processing</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#directory-structure">Directory Structure</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pre-processing2">Pre-processing2</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motion-correction2">Motion-correction2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#directory-structure">Directory Structure</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pre-processing2">Pre-processing2</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#motion-correction2">Motion-correction2</a></li>
 </ul>
 </li>
 </ul>
-
   </nav></div>
 
   <div class="sidebar-secondary-item">

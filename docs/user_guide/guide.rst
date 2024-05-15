@@ -7,6 +7,9 @@ A pipeline for processing light beads microscopy (LBM) datasets.
 
 For background, theory and design of LBM technology, see the reference `publication`_.
 
+.. image:: ../_static/_images/overlays.png
+   :width: 200
+
 Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files.
 
 .. _requirements:
@@ -49,19 +52,9 @@ There are 4 steps that require user input:
 Tips and Tricks
 ---------------
 
-If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order
-of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user.
+.. image:: ../_static/_images/storage_rec.png
+   :width: 200
 
-- Each session (series of .tiff files) should be in same directory.
-- No other .tiff files should be in this directory. If this happens, an error will throw.
-
-*For detailed documentation in your MATLAB editor, use:*
-
-.. code-block:: MATLAB
-
-   >> help convertScanImageTiffToVolume
-
-    modules
 
 .. _CNMF: https://github.com/simonsfoundation/NoRMCorre
 .. _CaImAn: https://github.com/flatironinstitute/CaImAn-MATLAB/
