@@ -23,3 +23,5 @@ This section aims to define these terms with respect to the LBM Data Processing 
    * - [X, Y, T]
      - Time-Series of a 2D Plane
 
+*Strip* and ROI are used interchangably in the ScanImage documentation. We will be referring to the individual sections of a ScanImage `.tiff` recording as `strips` and refrain from using `ROI`.
+

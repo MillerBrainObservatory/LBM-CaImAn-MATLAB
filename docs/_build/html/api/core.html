@@ -468,16 +468,18 @@ re-processing a previously motion-corrected plane.</p></li>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="segmentPlane">
-<span class="sig-name descname"><span class="pre">segmentPlane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">path</span></em>, <em class="sig-param"><span class="pre">metadata</span></em>, <em class="sig-param"><span class="pre">diagnosticFlag</span></em>, <em class="sig-param"><span class="pre">startPlane</span></em>, <em class="sig-param"><span class="pre">endPlane</span></em>, <em class="sig-param"><span class="pre">numCores</span></em><span class="sig-paren">)</span><a class="headerlink" href="#segmentPlane" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">segmentPlane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">path</span></em>, <em class="sig-param"><span class="pre">savepath</span></em>, <em class="sig-param"><span class="pre">metadata</span></em>, <em class="sig-param"><span class="pre">diagnosticFlag</span></em>, <em class="sig-param"><span class="pre">startPlane</span></em>, <em class="sig-param"><span class="pre">endPlane</span></em>, <em class="sig-param"><span class="pre">numCores</span></em><span class="sig-paren">)</span><a class="headerlink" href="#segmentPlane" title="Link to this definition">#</a></dt>
 <dd><p>SEGMENTPLANE Segment imaging data using CaImAn for motion-corrected data.</p>
 <p>This function applies the CaImAn algorithm to segment neurons from
 motion-corrected, pre-processed and ROI re-assembled MAxiMuM data.
 The processing is conducted for specified planes, and the results
 are saved to disk.</p>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>path</strong><span class="classifier">char</span></dt><dd><p>The path to the local folder containing the motion-corrected data.</p>
+<dt><strong>path</strong><span class="classifier">char</span></dt><dd><p>The path to the folder containing the motion-corrected data.</p>
+</dd>
+<dt><strong>savepath</strong><span class="classifier">char</span></dt><dd><p>The path where the neuronal .</p>
 </dd>
 <dt><strong>metadata: struct</strong></dt><dd><p>Struct of ScanImage metadata containing image width, height, and
 scanfield information relating to each ROI.</p>
@@ -499,54 +501,22 @@ or ‘0’ sets it to the default value (12).</p>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt>None</dt><dd></dd>
-<dt>Outputs are saved to disk, including:</dt><dd></dd>
 </dl>
-<ul class="simple">
-<li><dl class="simple">
-<dt>T_keep: neuronal time series [Km, T] (single)</dt><dd></dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Ac_keep: neuronal footprints [2*tau+1, 2*tau+1, Km] (single)</dt><dd></dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>C_keep: denoised time series [Km, T] (single)</dt><dd></dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Km: number of neurons found (single)</dt><dd></dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Cn: correlation image [x, y] (single)</dt><dd></dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>b: background spatial components [x*y, 3] (single)</dt><dd></dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>f: background temporal components [3, T] (single)</dt><dd></dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>acx: centroid in x direction for each neuron [1, Km] (single)</dt><dd></dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>acy: centroid in y direction for each neuron [1, Km] (single)</dt><dd></dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>acm: sum of component pixels for each neuron [1, Km] (single)</dt><dd></dd>
-</dl>
-</li>
-</ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
 <ul class="simple">
+<li><p>Outputs are saved to disk, including:</p></li>
+<li><p>T_keep: neuronal time series [Km, T] (single)</p></li>
+<li><p>Ac_keep: neuronal footprints [2*tau+1, 2*tau+1, Km] (single)</p></li>
+<li><p>C_keep: denoised time series [Km, T] (single)</p></li>
+<li><p>Km: number of neurons found (single)</p></li>
+<li><p>Cn: correlation image [x, y] (single)</p></li>
+<li><p>b: background spatial components [x*y, 3] (single)</p></li>
+<li><p>f: background temporal components [3, T] (single)</p></li>
+<li><p>acx: centroid in x direction for each neuron [1, Km] (single)</p></li>
+<li><p>acy: centroid in y direction for each neuron [1, Km] (single)</p></li>
+<li><p>acm: sum of component pixels for each neuron [1, Km] (single)</p></li>
 <li><p>The function handles large datasets by processing each plane serially.</p></li>
 <li><p>The segmentation settings are based on the assumption of 9.2e4 neurons/mm^3
 density in the imaged volume.</p></li>

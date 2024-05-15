@@ -383,7 +383,24 @@ document.write(`
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">#</a></h2>
 <p>Before running your first dataset, you should ensure that all dependencies of the pipeline are satisfied.</p>
 <p>This pipeline requires the parallel pool, statistics and machine learning, and image processing toolboxes.</p>
-<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="nb">ver</span>
+<p>To see what toolboxes you have installed, use <code class="code docutils literal notranslate"><span class="pre">ver</span></code> in the MATLAB command window:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">ver</span>
+<span class="w"> </span><span class="o">----------------------------------------------------------------------------------------------------------------</span>
+<span class="w"> </span><span class="n">MATLAB</span><span class="w"> </span><span class="n">Version</span><span class="p">:</span><span class="w"> </span><span class="mf">24.1</span><span class="p">.</span><span class="mf">0.2537033</span><span class="w"> </span><span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="w"> </span><span class="n">MATLAB</span><span class="w"> </span><span class="n">License</span><span class="w"> </span><span class="n">Number</span><span class="p">:</span><span class="w"> </span><span class="mi">41007384</span>
+<span class="w"> </span><span class="n">Operating</span><span class="w"> </span><span class="n">System</span><span class="p">:</span><span class="w"> </span><span class="n">Linux</span><span class="w"> </span><span class="mf">6.2</span><span class="p">.</span><span class="mi">0</span><span class="o">-</span><span class="mi">36</span><span class="o">-</span><span class="n">generic</span><span class="w"> </span>#<span class="mi">37</span><span class="o">~</span><span class="mf">22.04</span><span class="p">.</span><span class="mi">1</span><span class="o">-</span><span class="n">Ubuntu</span><span class="w"> </span><span class="n">SMP</span><span class="w"> </span><span class="n">PREEMPT_DYNAMIC</span><span class="w"> </span><span class="n">Mon</span><span class="w"> </span><span class="n">Oct</span><span class="w">  </span><span class="mi">9</span><span class="w"> </span><span class="mi">15</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mi">04</span><span class="w"> </span><span class="n">UTC</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="n">x86_64</span>
+<span class="w"> </span><span class="n">Java</span><span class="w"> </span><span class="n">Version</span><span class="p">:</span><span class="w"> </span><span class="n">Java</span><span class="w"> </span><span class="mf">1.8</span><span class="p">.</span>0<span class="n">_202</span><span class="o">-</span><span class="n">b08</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">Oracle</span><span class="w"> </span><span class="n">Corporation</span><span class="w"> </span><span class="n">Java</span><span class="w"> </span><span class="n">HotSpot</span><span class="p">(</span><span class="n">TM</span><span class="p">)</span><span class="w"> </span><span class="mi">64</span><span class="o">-</span><span class="n">Bit</span><span class="w"> </span><span class="n">Server</span><span class="w"> </span><span class="n">VM</span><span class="w"> </span><span class="n">mixed</span><span class="w"> </span><span class="nb">mode</span>
+<span class="w"> </span><span class="o">----------------------------------------------------------------------------------------------------------------</span>
+<span class="w"> </span><span class="n">MATLAB</span><span class="w">                                                </span><span class="n">Version</span><span class="w"> </span><span class="mf">24.1</span><span class="w">        </span><span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="w"> </span><span class="n">Computer</span><span class="w"> </span><span class="n">Vision</span><span class="w"> </span><span class="n">Toolbox</span><span class="w">                               </span><span class="n">Version</span><span class="w"> </span><span class="mf">24.1</span><span class="w">        </span><span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="w"> </span><span class="n">Curve</span><span class="w"> </span><span class="n">Fitting</span><span class="w"> </span><span class="n">Toolbox</span><span class="w">                                 </span><span class="n">Version</span><span class="w"> </span><span class="mf">24.1</span><span class="w">        </span><span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="w"> </span><span class="n">Global</span><span class="w"> </span><span class="n">Optimization</span><span class="w"> </span><span class="n">Toolbox</span><span class="w">                           </span><span class="n">Version</span><span class="w"> </span><span class="mf">24.1</span><span class="w">        </span><span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="w"> </span><span class="n">Image</span><span class="w"> </span><span class="n">Processing</span><span class="w"> </span><span class="n">Toolbox</span><span class="w">                              </span><span class="n">Version</span><span class="w"> </span><span class="mf">24.1</span><span class="w">        </span><span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="w"> </span><span class="n">Optimization</span><span class="w"> </span><span class="n">Toolbox</span><span class="w">                                  </span><span class="n">Version</span><span class="w"> </span><span class="mf">24.1</span><span class="w">        </span><span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="w"> </span><span class="n">Parallel</span><span class="w"> </span><span class="n">Computing</span><span class="w"> </span><span class="n">Toolbox</span><span class="w">                            </span><span class="n">Version</span><span class="w"> </span><span class="mf">24.1</span><span class="w">        </span><span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="w"> </span><span class="n">Signal</span><span class="w"> </span><span class="n">Processing</span><span class="w"> </span><span class="n">Toolbox</span><span class="w">                             </span><span class="n">Version</span><span class="w"> </span><span class="mf">24.1</span><span class="w">        </span><span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="w"> </span><span class="n">Statistics</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">Machine</span><span class="w"> </span><span class="n">Learning</span><span class="w"> </span><span class="n">Toolbox</span><span class="w">               </span><span class="n">Version</span><span class="w"> </span><span class="mf">24.1</span><span class="w">        </span><span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="w"> </span><span class="n">Wavelet</span><span class="w"> </span><span class="n">Toolbox</span><span class="w">                                       </span><span class="n">Version</span><span class="w"> </span><span class="mf">24.1</span><span class="w">        </span><span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If the user choses to split frames across multiple <cite>.tiff</cite> files, there will be multiple tiff files in ascending order
@@ -394,12 +411,6 @@ of an suffix appended to the filename: <cite>_000N</cite>, where n=number of fil
 No other .tiff files should be in this directory. If this happens, an error will throw.</p>
 </div>
 <p>There are 2 primary functions for pre-processing,</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>For detailed documentation in your MATLAB editor, use:</p>
-<p>&gt;&gt; help FunctionName
-&gt;&gt; help convertScanImageTiffToVolume</p>
-</div>
 </section>
 <section id="directory-structure">
 <span id="id2"></span><h2>Directory Structure<a class="headerlink" href="#directory-structure" title="Link to this heading">#</a></h2>
@@ -413,7 +424,9 @@ used for the demo.</p>
 ├── extraction
 │   └── basename.h5
 ├── registration
-│   └── shift_vectors_plane_N.h5
+│   └── registered_plane_1.mat
+│   └── registered_plane_2.mat
+│   └── registered_plane_NN.mat
 └── segmentation
     └── caiman_output_plane_.h5
 </pre></div>
@@ -442,14 +455,16 @@ MATLAB path. If an error is encountered, such as:</p>
 </pre></div>
 </div>
 </div></blockquote>
-<p>First, we set up our inputs/outputs.</p>
-<p>You can chain the output of one function to the input of another. Note the path names match <a class="reference internal" href="#directory-structure"><span class="std std-ref">Directory Structure</span></a>.</p>
-<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">parentpath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;C:\Users\RBO\Documents\data\bi_hemisphere\&#39;</span><span class="p">;</span>
-<span class="n">raw_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;raw\&#39;</span><span class="p">];</span>
-<span class="n">extract_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;extracted2\&#39;</span><span class="p">];</span>
-<span class="nb">mkdir</span><span class="p">(</span><span class="n">extract_path</span><span class="p">);</span><span class="w"> </span><span class="nb">mkdir</span><span class="p">(</span><span class="n">raw_path</span><span class="p">);</span>
+<p>It is helpful to first set-up directories where youd like your results to go. Each core function in this pipeline takes a “data” path and a “save” path as arguments. Following the <a class="reference internal" href="#directory-structure"><span class="std std-ref">Directory Structure</span></a>:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">parentpath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;C:\Users\RBO\Documents\data\bi_hemisphere\&#39;</span><span class="p">;</span><span class="w"> </span><span class="c">% outer directory</span>
+<span class="n">raw_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;raw\&#39;</span><span class="p">];</span><span class="w"> </span><span class="c">% raw .tiff files live here</span>
+<span class="n">extract_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;extracted\&#39;</span><span class="p">];</span><span class="w"> </span><span class="c">% re-assembled 4D volumetric time-series live here</span>
+<span class="nb">mkdir</span><span class="p">(</span><span class="n">extract_path</span><span class="p">);</span><span class="w"> </span><span class="nb">mkdir</span><span class="p">(</span><span class="n">raw_path</span><span class="p">);</span><span class="w">  </span><span class="c">% create these paths</span>
 </pre></div>
 </div>
+<p>This produces a nicely organized output structure:</p>
+<a class="reference internal image-reference" href="../_images/output_paths.png"><img alt="../_images/output_paths.png" src="../_images/output_paths.png" style="width: 200px;" />
+</a>
 </section>
 </section>
 

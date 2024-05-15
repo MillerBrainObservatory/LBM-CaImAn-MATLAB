@@ -11,9 +11,27 @@ Before running your first dataset, you should ensure that all dependencies of th
 
 This pipeline requires the parallel pool, statistics and machine learning, and image processing toolboxes.
 
+To see what toolboxes you have installed, use :code:`ver` in the MATLAB command window:
+
 .. code-block:: MATLAB
 
-   ver
+   >> ver
+    ----------------------------------------------------------------------------------------------------------------
+    MATLAB Version: 24.1.0.2537033 (R2024a)
+    MATLAB License Number: 41007384
+    Operating System: Linux 6.2.0-36-generic #37~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Mon Oct  9 15:34:04 UTC 2 x86_64
+    Java Version: Java 1.8.0_202-b08 with Oracle Corporation Java HotSpot(TM) 64-Bit Server VM mixed mode
+    ----------------------------------------------------------------------------------------------------------------
+    MATLAB                                                Version 24.1        (R2024a)
+    Computer Vision Toolbox                               Version 24.1        (R2024a)
+    Curve Fitting Toolbox                                 Version 24.1        (R2024a)
+    Global Optimization Toolbox                           Version 24.1        (R2024a)
+    Image Processing Toolbox                              Version 24.1        (R2024a)
+    Optimization Toolbox                                  Version 24.1        (R2024a)
+    Parallel Computing Toolbox                            Version 24.1        (R2024a)
+    Signal Processing Toolbox                             Version 24.1        (R2024a)
+    Statistics and Machine Learning Toolbox               Version 24.1        (R2024a)
+    Wavelet Toolbox                                       Version 24.1        (R2024a)
 
 
 If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order
@@ -25,13 +43,6 @@ of an suffix appended to the filename: `_000N`, where n=number of files chosen b
     No other .tiff files should be in this directory. If this happens, an error will throw.
 
 There are 2 primary functions for pre-processing,
-
-.. note::
-
-   For detailed documentation in your MATLAB editor, use:
-
-   >> help FunctionName
-   >> help convertScanImageTiffToVolume
 
 .. _directory structure:
 
@@ -51,7 +62,9 @@ used for the demo.
     ├── extraction
     │   └── basename.h5
     ├── registration
-    │   └── shift_vectors_plane_N.h5
+    │   └── registered_plane_1.mat
+    │   └── registered_plane_2.mat
+    │   └── registered_plane_NN.mat
     └── segmentation
         └── caiman_output_plane_.h5
 
@@ -83,13 +96,18 @@ You can make sure all of the requirements for the package are in the path with t
         disp('Proceeding with execution...');
     end
 
-First, we set up our inputs/outputs.
-
-You can chain the output of one function to the input of another. Note the path names match :ref:`Directory Structure`.
+It is helpful to first set-up directories where youd like your results to go. Each core function in this pipeline takes a "data" path and a "save" path as arguments. Following the :ref:`Directory Structure`:
 
 .. code-block:: MATLAB
 
-    parentpath = 'C:\Users\RBO\Documents\data\bi_hemisphere\';
-    raw_path = [ parentpath 'raw\'];
-    extract_path = [ parentpath 'extracted2\'];
-    mkdir(extract_path); mkdir(raw_path);
+    parentpath = 'C:\Users\RBO\Documents\data\bi_hemisphere\'; % outer directory
+    raw_path = [ parentpath 'raw\']; % raw .tiff files live here
+    extract_path = [ parentpath 'extracted\']; % re-assembled 4D volumetric time-series live here
+    mkdir(extract_path); mkdir(raw_path);  % create these paths
+
+This produces a nicely organized output structure:
+
+.. image:: ../_static/_images/output_paths.png
+   :width: 200
+
+

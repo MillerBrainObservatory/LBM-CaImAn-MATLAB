@@ -9,23 +9,36 @@ Installation
 Recommendation
 ==============
 
-The easiest way to download the source code is to visit the 'github repository `github repository <https://github.com/ru-rbo/caiman_matlab.git>`_.
+The easiest way to download the source code is to visit the `github repository <https://github.com/ru-rbo/caiman_matlab.git>`_.
 
-The most reliable installation method is to clone/download the repository and add the path to a `startup.m`_ file located in `~/Documents/MATLAB/startup.m`.
+The most reliable installation method is to clone/download the repository and move it into a folder on your `userpath`:
+
+.. code-block:: MATLAB
+
+    >> userpath
+
+    ans =
+        '/home/<username>/Documents/MATLAB'
+
+Additionally, you can create a `startup.m`_ file located in this same `userpath` directory: `~/Documents/MATLAB/startup.m` and add the following code snippet:
 
 .. code-block:: MATLAB
 
    % <HOME>/Documents/MATLAB/startum.m
    % note "fullfile" isnt needed, but helpfully provides directory autocompletion
-   addpath(genpath(fullfile("path/to/this/caiman_matlab")))
+   addpath(genpath(fullfile("path/to/caiman_matlab")))
 
-Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.
+You can tell if the pipeline is added successfully to the path by looking at the file window:
 
 .. image:: ../_static/_images/matlab_path_explorer.png
-   :width: 1080
+   :width: 200
+
+Notice `/core` and `/packages` are both bright in the files window, this indicates those folders are properly in the MATLAB path but does **not** mean that within that directory, all subdirectories are also on the path. These two folders contain all of the code the pipeline needs to run and are the only two foldrs that **must** be on the path.
 
 By Operating System
 ===================
+
+Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.
 
 .. _windows:
 

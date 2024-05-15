@@ -390,11 +390,11 @@ document.write(`
 <li><p>1 ) Reshaping vertically concatenated strips into horizontally concatenated strips</p></li>
 <li><p>2 ) Peicewise motion-correction</p></li>
 </ul>
-<p>The raw output of an ScanImage MROI acquisition is a <cite>tiff</cite> (or series of tiffs).
-Each ROI’s image is stacked one on top of the other vertically, as seen in A:</p>
-<a class="reference internal image-reference" href="../_images/abc_strip.png"><img alt="../_images/abc_strip.png" src="../_images/abc_strip.png" style="width: 1080px;" />
+<p>Step 1 is accomplished through the use of <a class="reference internal" href="#convertscanimagetifftovolume">convertScanImageTiffToVolume</a> of pre-processing is shown in the image below.</p>
+<a class="reference internal image-reference" href="../_images/abc_strip.png"><img alt="../_images/abc_strip.png" src="../_images/abc_strip.png" style="width: 1440px;" />
 </a>
-<p>Each plane is written before moving onto the next frame, e.g.:</p>
+<p>Fig. part A shows the first <cite>.tiff</cite> page of our raw data. This strip represents sections of our image vertically concatenated.</p>
+<p>Each Z is written before moving onto the next frame, e.g.:</p>
 <ul class="simple">
 <li><p>plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.</p></li>
 </ul>
@@ -410,9 +410,6 @@ No other .tiff files should be in this directory. If this happens, an error will
 <span class="n">raw_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;raw\&#39;</span><span class="p">];</span>
 <span class="n">extract_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;extracted2\&#39;</span><span class="p">];</span>
 <span class="nb">mkdir</span><span class="p">(</span><span class="n">extract_path</span><span class="p">);</span><span class="w"> </span><span class="nb">mkdir</span><span class="p">(</span><span class="n">raw_path</span><span class="p">);</span>
-</pre></div>
-</div>
-<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">convertScanImageTiffToVolume</span><span class="p">(</span><span class="n">raw_path</span><span class="p">,</span><span class="w"> </span><span class="n">extract_path</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;fix_scan_phase&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Setting <cite>fix_scan_phase=true</cite> attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.</p>

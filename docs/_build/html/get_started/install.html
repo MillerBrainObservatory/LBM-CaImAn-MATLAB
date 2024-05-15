@@ -381,19 +381,28 @@ document.write(`
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h1>
 <section id="recommendation">
 <span id="recommended-install"></span><h2>Recommendation<a class="headerlink" href="#recommendation" title="Link to this heading">#</a></h2>
-<p>The easiest way to download the source code is to visit the ‘github repository <a class="reference external" href="https://github.com/ru-rbo/caiman_matlab.git">github repository</a>.</p>
-<p>The most reliable installation method is to clone/download the repository and add the path to a <a class="reference external" href="https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html">startup.m</a> file located in <cite>~/Documents/MATLAB/startup.m</cite>.</p>
-<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="c">% &lt;HOME&gt;/Documents/MATLAB/startum.m</span>
-<span class="c">% note &quot;fullfile&quot; isnt needed, but helpfully provides directory autocompletion</span>
-<span class="nb">addpath</span><span class="p">(</span><span class="nb">genpath</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="s">&quot;path/to/this/caiman_matlab&quot;</span><span class="p">)))</span>
+<p>The easiest way to download the source code is to visit the <a class="reference external" href="https://github.com/ru-rbo/caiman_matlab.git">github repository</a>.</p>
+<p>The most reliable installation method is to clone/download the repository and move it into a folder on your <cite>userpath</cite>:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">userpath</span>
+
+<span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
+<span class="w">    </span><span class="s">&#39;/home/&lt;username&gt;/Documents/MATLAB&#39;</span>
 </pre></div>
 </div>
-<p>Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.</p>
-<a class="reference internal image-reference" href="../_images/matlab_path_explorer.png"><img alt="../_images/matlab_path_explorer.png" src="../_images/matlab_path_explorer.png" style="width: 1080px;" />
+<p>Additionally, you can create a <a class="reference external" href="https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html">startup.m</a> file located in this same <cite>userpath</cite> directory: <cite>~/Documents/MATLAB/startup.m</cite> and add the following code snippet:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="c">% &lt;HOME&gt;/Documents/MATLAB/startum.m</span>
+<span class="c">% note &quot;fullfile&quot; isnt needed, but helpfully provides directory autocompletion</span>
+<span class="nb">addpath</span><span class="p">(</span><span class="nb">genpath</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="s">&quot;path/to/caiman_matlab&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>You can tell if the pipeline is added successfully to the path by looking at the file window:</p>
+<a class="reference internal image-reference" href="../_images/matlab_path_explorer.png"><img alt="../_images/matlab_path_explorer.png" src="../_images/matlab_path_explorer.png" style="width: 200px;" />
 </a>
+<p>Notice <cite>/core</cite> and <cite>/packages</cite> are both bright in the files window, this indicates those folders are properly in the MATLAB path but does <strong>not</strong> mean that within that directory, all subdirectories are also on the path. These two folders contain all of the code the pipeline needs to run and are the only two foldrs that <strong>must</strong> be on the path.</p>
 </section>
 <section id="by-operating-system">
 <h2>By Operating System<a class="headerlink" href="#by-operating-system" title="Link to this heading">#</a></h2>
+<p>Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.</p>
 <section id="windows">
 <span id="id2"></span><h3>Windows<a class="headerlink" href="#windows" title="Link to this heading">#</a></h3>
 <p>The easiest method to download this repository with git is via <a class="reference external" href="https://gitforwindows.org/">mysys</a>

@@ -16,13 +16,14 @@ Pre-processing LBM datasets consists of 2 main processing steps:
 - 1 ) Reshaping vertically concatenated strips into horizontally concatenated strips
 - 2 ) Peicewise motion-correction
 
-The raw output of an ScanImage MROI acquisition is a `tiff` (or series of tiffs).
-Each ROI’s image is stacked one on top of the other vertically, as seen in A:
+Step 1 is accomplished through the use of `convertScanImageTiffToVolume`_ of pre-processing is shown in the image below.
 
 .. image:: ../_static/_images/abc_strip.png
-   :width: 1080
+   :width: 1440
 
-Each plane is written before moving onto the next frame, e.g.:
+Fig. part A shows the first `.tiff` page of our raw data. This strip represents sections of our image vertically concatenated.
+
+Each Z is written before moving onto the next frame, e.g.:
 
 - plane 1 timepoint 1, plane 2 timepoint 1, plane 3 timepoint 1, etc.
 
@@ -43,9 +44,6 @@ You can chain the output of one function to the input of another. Note the path 
     extract_path = [ parentpath 'extracted2\'];
     mkdir(extract_path); mkdir(raw_path);
 
-.. code-block:: MATLAB
-
-    convertScanImageTiffToVolume(raw_path, extract_path, 0, 'fix_scan_phase', true);
 
 Setting `fix_scan_phase=true` attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
 
