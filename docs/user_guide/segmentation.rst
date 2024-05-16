@@ -1,76 +1,64 @@
-.. _segmentation:
 
-Segmentation
-============
+.. _segmentation_deconvolution:
 
-Segment the motion-corrected data and extract neuronal signals.
+******************************
+Segmentation and Deconvolution
+******************************
 
-Currently, this function makes the following assumptions:
+.. image:: ../_static/_images/neuron_to_neuron_correlations.png
+   :width: 600
 
-- 2nd order flourescence dynamics
-- Imaging in mouse cortex (9.2e4 neurons/mm^3)
 
-.. code-block:: MATLAB
+Overview
+--------
+- Use `matfile` to load parameters of the motion-corrected movie without loading the entire movie into memory.
+- Set parameters for CNMF.
+- Perform patched, piecewise, volumetric CNMF.
+- Save outputs containing both neuropil and accepted/rejected components.
 
-   >> help segmentPlane
+segmentPlane.m
+- construct_patches.m (caiman)
+- run_CNMF_patches.m (caiman)
+- classify_components.m (caiman)
+- compute_event_exceptionality (caiman)
+- update_temporal_components (caiman)
+- detrend_df_f (caiman - modified)
+- AtoAc
 
-      segmentPlane Segment imaging data using CaImAn for motion-corrected data.
+Dependencies: CaImAn_Utilities
 
-      This function applies the CaImAn algorithm to segment neurons from
-      motion-corrected, pre-processed and ROI re-assembled MAxiMuM data.
-      The processing is conducted for specified planes, and the results
-      are saved to disk.
+.. note::
 
-      Parameters
-      ----------
-      path : char
-          The path to the local folder containing the motion-corrected data.
-      diagnosticFlag : char
-          When set to '1', the function reports all .mat files in the directory
-          specified by 'path'. Otherwise, it processes files for neuron segmentation.
-      startPlane : char
-          The starting plane index for processing. A non-numeric input or '0' sets
-          it to default (1).
-      endPlane : char
-          The ending plane index for processing. A non-numeric input or '0' sets
-          it to default (maximum available planes).
-      numCores : char
-          The number of cores to use for parallel processing. A non-numeric input
-          or '0' sets it to the default value (12).
+    No time threshold.
 
-      Outputs
-      -------
-        - T_keep: neuronal time series [Km, T] (single)
-        - Ac_keep: neuronal footprints [2*tau+1, 2*tau+1, Km] (single)
-        - C_keep: denoised time series [Km, T] (single)
-        - Km: number of neurons found (single)
-        - Cn: correlation image [x, y] (single)
-        - b: background spatial components [x*y, 3] (single)
-        - f: background temporal components [3, T] (single)
-        - acx: centroid in x direction for each neuron [1, Km] (single)
-        - acy: centroid in y direction for each neuron [1, Km] (single)
-        - acm: sum of component pixels for each neuron [1, Km] (single)
+AtoAc
+-----
+Turn the CaImAn output A (sparse, spatial footprints for entire FOV) into Ac (sparse, spatial footprints localized around each neuron).
+- Standardizes the size of each neuron's footprint to a uniform (4*tau+1, 4*tau+1) matrix, centered on the neuron's centroid [acx x acy].
 
-      Notes
-      -----
-        - The function handles large datasets by processing each plane serially.
-        - Ensure your RAM capacity exceeds the size of a single plane.
-        - The segmentation settings are based on the assumption of 9.2e4 neurons/mm^3
-            density in the imaged volume as seen in the mouse cortex.
+.. image:: ../_static/_images/sparse_rep.png
+   :width: 600
 
-      See also addpath, fullfile, dir, load, savefast
+Component Validation
+--------------------
+- Use the decay time (0.5s) multiplied by the number of frames to estimate the number of samples expected in the movie.
+- Calculate the likelihood of an unexpected event (e.g., a spike) and return a value metric for the quality of the components.
+  - Normal Cumulative Distribution function, input = -min_SNR.
+- Evaluate the likelihood of observing traces given the distribution of noise.
 
-Segmentation has the largest computational and time requirements.
+Tau
+---
+- In general, round up.
+- The kernel is fixed to have this decay and is not fit to the data.
 
-**Output**
-
-The output of _`segmentPlane` is a series of .mat files named caiman_output_plane_N.mat, where N=number of planes.
+Exact CaImAn Parameters
+-----------------------
 
 .. code-block:: MATLAB
 
     merge_thresh = 0.8;
-    min_SNR = 1.4;
-    space_thresh = 0.2; % threhsold for spatial comps
+    min_SNR = 1.4; % liberal threshold, tighten in post
+    space_thresh = 0.2; % threshold for spatial components
     time_thresh = 0.0;
     sz = 0.1; % IF FOOTPRINTS ARE TOO SMALL, CONSIDER sz = 0.1
     mx = ceil(pi.*(1.33.*tau).^2);
@@ -79,5 +67,33 @@ The output of _`segmentPlane` is a series of .mat files named caiman_output_plan
     sizY = size(data);
     patch_size = round(650/pixel_resolution).*[1,1];
     overlap = [1,1].*ceil(50./pixel_resolution);
+    patches = construct_patches(sizY(1:end-1),patch_size,overlap);
     % number of components based on assumption of 9.2e4 neurons/mm^3
-    K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^M2);
+    K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2);
+
+- **merge_thresh**: Checking the temporal correlation between components that overlap in space. If they have at least 1px in common and the correlation is above the merge threshold, merge the components.
+- Factorization via CNMF yields "raw" traces ("y"). These raw traces are noisy and jagged.
+- Each raw trace is deconvolved via "constrained foopsi," which yields the decay (and for p=2, rise) coefficients ("g") and the vector of "spiking" activity ("S") that best explain the raw trace. S should ideally be ~90% zeros.
+- S and g are then used to produce C, which (hopefully) looks like the raw trace Y, but much cleaner and smoother. The optional output YrA is equal to Y-C, representing the original raw trace.
+
+Deconvolution
+-------------
+TODO: put this foopsi trickyness information in "For Developers" section
+
+FOOPSI (Fast OOPSI) is originally from "Fast Nonnegative Deconvolution for Spike Train Inference From Population Calcium Imaging" by Vogelstein et al. (2010).
+- OASIS was introduced in "Fast Active Set Methods for Online Spike Inference from Calcium Imaging" by Friedrich & Paninski (2016).
+- Most of the CAIMAN-MATLAB code uses OASIS, not FOOPSI, despite some functions being named "foopsi_oasis."
+
+
+Branches from the main "deconvolveCa" function in MATLAB_CAIMAN:
+
+**oasis** branches: Despite some being named "foopsi_oasis," they use OASIS math.
+- foopsi_oasisAR1
+- foopsi_oasisAR2
+- constrained_oasisAR1
+- thresholded_oasisAR1
+- thresholded_oasisAR2
+**constrained_foopsi** branch: Used if method="constrained" and model type is not "ar1" (e.g., ar2).
+- Optimization methods: CVX (external), SPGL1 (external), LARS, dual.
+**onnls** branch: Used if method="foopsi" or "thresholded" with model type="exp2" or "kernel." Based on OASIS.
+

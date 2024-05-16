@@ -42,8 +42,6 @@ of an suffix appended to the filename: `_000N`, where n=number of files chosen b
     All output .tiff files for a single imaging session should be placed in the same directory.
     No other .tiff files should be in this directory. If this happens, an error will throw.
 
-There are 2 primary functions for pre-processing,
-
 .. _directory structure:
 
 Directory Structure
@@ -108,6 +106,6 @@ It is helpful to first set-up directories where youd like your results to go. Ea
 This produces a nicely organized output structure:
 
 .. image:: ../_static/_images/output_paths.png
-   :width: 200
+   :width: 300
 
 

@@ -33,6 +33,5 @@ html_logo = "_static/favicon.ico"
 html_theme_options = {
   "external_links": [
       {"name": "MBO", "url": "https://mbo.rockefeller.edu"},
-      {"name": "PyBeads", "url": "https://github.com/ru-rbo/rbo-lbm"}
   ]
 }
