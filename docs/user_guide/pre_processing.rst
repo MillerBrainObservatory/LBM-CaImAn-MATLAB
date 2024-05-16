@@ -73,24 +73,25 @@ This is all you need to start processing your data. Actually, it's quite more th
 - Your raw and extract path can be in any folder you wish without worry of file-name conflicts.
 - All future pipeline steps will automatically exclude these files as they will not have the characters `_plane_` in the filename.
 
-
-
 .. note::
 
    Don't put the characters `_plane_` together in your raw/extracted filenames!
 
-Our data are now saved as a single hdf5 file separated by file and by plane. This storage format
-makes it easy to motion correct each time-series individually. We will be processing small patches of the total image,
-roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.
+`diagnostic_flag` is the next parameter, setting this to 1, '1', or true will display the detected files that would be processed, and stop. This is helpful for controlling which files are processed.
 
-Setting `fix_scan_phase=true` attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
+`fix_scan_phasee` is a very important parameter: it attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
 
 .. image:: ../_static/_images/corr_nocorr_phase_example.png
    :width: 1080
 
 This example shows that shifting every *other* row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.
 
-For each *session*, we will get a single `h5` output file organized by file, then by plane:
+Our data are now saved as a single h5 file separated by file and by plane. This storage format
+makes it easy to motion correct each 3D planar time-series individually. We will be processing small patches of the total image,
+roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.
+After successfully running :func:`convertScanImageTiffToVolume`, there will be a single `.h5` file containing extracted data.
+
+You can use :code:`h5info(h5path)` in the MATLAB command window to reveal some helpful information about our data:
 
 .. code-block:: MATLAB
 
@@ -107,10 +108,8 @@ For each *session*, we will get a single `h5` output file organized by file, the
        Filters: [1×1 struct]
     Attributes: [30×1 struct]
 
-The attributes hold our metadata, the result of calling `get_metadata(raw_path)`:
+The attributes hold our metadata, the result of calling `get_metadata(raw_path)` (see `metadata`_ for more information about the magic behind the scenes here).
 
-
-- After successfully running :func:`convertScanImageTiffToVolume`, there will be a single `.h5` file containing extracted data.
 
 .. _step1_outputs:
 
