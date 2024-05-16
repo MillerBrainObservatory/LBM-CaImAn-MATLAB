@@ -1,5 +1,5 @@
 function writeMatToTiffStack(files, savePath, numFrames)
-% WRITEMATTOH5 Convert a .mat file to to H5 file.
+% WRITEMATTOTIFF Convert a .mat file into a stack.
 %
 % Parameters
 % ----------
@@ -28,7 +28,6 @@ for i = 1:length(files)
         file = fullfile(path, files(i).name);
         mat = matfile(file);
         Y = mat.Y(:,:,1:numFrames);
-        
         Y = double(Y - quantile(Y(:,:,1:100), 0.05, 'all'));
         Y = Y ./ quantile(Y(:,:,1:100), 0.95, 'all'); % normalize
         
@@ -37,9 +36,9 @@ for i = 1:length(files)
 end
 end
 
-function write_tiff_stack( save_fn, volume )
+function write_tiff_stack( save_fn, volume)
 save_fn = fullfile(save_fn);
-imwrite(volume(:,:,1), save_fn)
+imwrite(volume(:,:,1), save_fn);
 for k = 2:size(volume,3)
     imwrite(volume(:,:,k), save_fn, 'WriteMode', 'append');
 end

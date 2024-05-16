@@ -66,12 +66,10 @@ end
         error('No suitable h5 files found in: \n  %s', filePath);
     end
 
-    h5files = dir([filePath '*.h5']);
+    % TODO: function-ize this 
+    h5files = dir([filePath '*.h5']); % will just be 1 file for now
     metainfo = h5files(1);
     h5path = fullfile(metainfo.folder, metainfo.name);
-
-    figpath = fullfile(filePath, 'figures/');
-    mkdir(figpath);
 
     h5data = readH5Metadata(h5path);
     groups = h5data.Groups;
@@ -101,17 +99,22 @@ end
         error("Not enough planes to process given user supplied argument: %d as endPlane when only %d planes exist in this dataset.", endPlane, num_planes);
     end
 
+    figsavepath = fullfile(savePath, 'metrics');
+
     % preallocate based on the total number of time points across all files
     % For each file, grab all data for this plane.
     for plane_idx = startPlane:endPlane
+
+        save_name = sprintf("registered_plane_%d.mat", plane_idx);
+        metrics_save_name = sprintf("metrics_plane_%d.fig", plane_idx);
+        full_savepath = fullfile(savePath, save_name);
+        full_metrics_savepath = fullfile(figsavepath, metrics_save_name);
 
         fprintf('Loading plane %s\n', num2str(plane_idx));
         Y = zeros([metadata.image_size(1) metadata.image_size(2) num_frames_total], 'single');
 
         for file_idx = 1:num_files
             file_group = sprintf("/file_%d/plane_%d", file_idx, plane_idx);
-            save_name = sprintf("file_%d_plane_%d", file_idx, plane_idx);
-
             Y(:,:,(file_idx-1)*num_frames_file+1:file_idx*num_frames_file) = im2single(h5read(h5path, file_group));
         end
 
@@ -135,7 +138,7 @@ end
             'us_fac',20,...
             'init_batch',200,...     % Initial batch size
             'correct_bidir',false... % Correct bidirectional scanning
-            );
+        );
 
         [M1,shifts1,~,~] = normcorre_batch(Y,options_rigid);
         date = datetime(now,'ConvertFrom','datenum');
@@ -150,8 +153,7 @@ end
         template_good = mean(M1(:,:,best_idx),3);
 
         % Non-rigid motion correction using the good tamplate from the rigid
-        % correction.
-          options_nonrigid = NoRMCorreSetParms(...
+        options_nonrigid = NoRMCorreSetParms(...
             'd1',d1,...
             'd2',d2,...
             'bin_width',24,...
@@ -159,34 +161,48 @@ end
             'us_fac',20,...
             'init_batch',120,...
             'correct_bidir',false...
-            );
+        );
 
         % DFT subpixel registration - results used in CNMF
         [M2,shifts2,~,~] = normcorre_batch(Y,options_nonrigid,template_good);
 
-        % % Returns a [2xnum_frames] vector of shifts in x and y
-        % [shifts, ~, ~] = rigid_mcorr(Y,'template', template_good, 'max_shift', max_shift, 'subtract_median', false, 'upsampling', 20);
-        % outputFile = [filePath 'mc_vectors_plane_' num2str(plane_idx) '.mat'];
-
-        [cM2,~,~] = motion_metrics(M2,10);
-
-        savefast(savePath, 'metadata', 'M2', 'shifts2');
+        fprintf("Saving registration results in directory: \n \n %s \n", full_savepath);
 
         disp('Data saved, beginning next plane...')
         date = datetime(now,'ConvertFrom','datenum');
         formatSpec = '%s Motion Correction Complete. Beginning next plane...\n';
         fprintf(fid,formatSpec,date);
 
-        clear M1 c* template_good shifts* M2
         disp('Calculating motion correction metrics...')
+
+        shifts_r = squeeze(cat(3,shifts1(:).shifts));
+        [cY,aa,bb] = motion_metrics(Y,10);
+        [cM1, cc, dd] = motion_metrics(M1,10);
+        [cM2,rr,oo] = motion_metrics(M2,10);
+        
+        motionCorrectionFigure = figure;
+        T=size(Y,3);
+
+        ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2); legend('raw data','rigid','non-rigid'); title('correlation coefficients','fontsize',14,'fontweight','bold')
+                set(gca,'Xtick',[])
+        ax2 = subplot(312); %plot(shifts_x); hold on; 
+        plot(shifts_r(:,1),'--k','linewidth',2); title('displacements along x','fontsize',14,'fontweight','bold')
+                set(gca,'Xtick',[])
+        ax3 = subplot(313); 
+        plot(shifts_r(:,2),'--k','linewidth',2); title('displacements along y','fontsize',14,'fontweight','bold')
+                xlabel('timestep','fontsize',14,'fontweight','bold')
+        linkaxes([ax1,ax2,ax3],'x')
+
+        % Figure: Motion correction Metrics
+        Ym = mean(Y,3);
+        Y = M2;
+        savefast(savePath, 'metadata', 'Y', 'Ym', 'shifts')
+        saveas(motionCorrectionFigure, full_metrics_savepath);
+        close(motionCorrectionFigure)
+        clear M* c* template_good shifts* 
 
         % apply vectors to movie
         % mov_from_vec = translateFrames(Y, t_shifts);
-
-        % [cY,~,~] = motion_metrics(Y,10);
-        % [cM1,~,~] = motion_metrics(M1,10);
-          
-        % [cMT,~,~] = motion_metrics(mov_from_vec,10);
     end
 
     disp('All planes processed...')

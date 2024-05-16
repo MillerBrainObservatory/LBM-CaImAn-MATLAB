@@ -12,7 +12,6 @@ function planeToMovie(data, filename, x, y, frameRate, avgs,  zoom, decenter, bu
 %   y - Vertical coordinates.
 %   frameRate - Frame rate of the output video.
 %   avgs - Number of frames to average.
-%   zoom - Zoom factors. (not implemented)
 %   decenter - Decentering offsets.
 %   crf - Constant Rate Factor for video quality.
 arguments
