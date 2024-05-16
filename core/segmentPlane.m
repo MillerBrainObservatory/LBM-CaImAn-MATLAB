@@ -1,4 +1,4 @@
-function segmentPlane(path, savepath, metadata,diagnosticFlag,startPlane,endPlane,numCores)
+function segmentPlane(path, savepath, metadata, diagnosticFlag, startPlane, endPlane, numCores)
 % SEGMENTPLANE Segment imaging data using CaImAn for motion-corrected data.
 %
 % This function applies the CaImAn algorithm to segment neurons from
@@ -11,7 +11,7 @@ function segmentPlane(path, savepath, metadata,diagnosticFlag,startPlane,endPlan
 % path : char
 %     The path to the folder containing the motion-corrected data.
 % savepath : char
-%     The path where the neuronal .
+%     The path where the neuronal footprints are saved.
 % metadata: struct
 %     Struct of ScanImage metadata containing image width, height, and
 %     scanfield information relating to each ROI.
@@ -64,6 +64,9 @@ end
 if not(isfolder(savepath))
     fprintf('Given savepath %s does not exist. Creating this directory...\n', saveDirPath);
     mkdir(savepath)
+else
+    %TODO: Section here reporting num_files in savepath, warning for
+    %overwriting data
 end
 
 if strcmp(diagnosticFlag,'1') % if the diagnostic flag is set to 1, spit out contents of directory specified by 'path'
@@ -114,15 +117,13 @@ else
 
     numFiles = endPlane-startPlane+1;
     for abc = startPlane:endPlane
-        try
+        % try
             disp(['Beginning calculations for plane ' num2str(abc) ' of ' num2str(numFiles) '...'])
             date = datetime(now,'ConvertFrom','datenum');
             formatSpec = '%s BEGINNING PLANE %u\n';
             fprintf(fid,formatSpec,date,abc);
 
             tic
-
-
             file = [filestem num2str(abc)];
 
             % load data
@@ -143,17 +144,16 @@ else
             formatSpec = '%s data loaded.\n';
             fprintf(fid,formatSpec,date,abc);
 
-            poolobj = gcp('nocreate'); % create a parallel pool
-            if isempty(poolobj)
-                disp('Starting the parallel pool...')
-                poolobj = parpool('local',numCores);
-                tmpDir = tempname();
-                mkdir(tmpDir);
-                poolobj.Cluster.JobStorageLocation = tmpDir;
-            else
-                numworkers = poolobj.NumWorkers;
-                disp(['Continuing with existing pool of ' num2str(numworkers) '.'])
-            end
+            % poolobj = gcp('nocreate'); % create a parallel pool
+            % if isempty(poolobj)
+            %     poolobj = parpool('local',numCores);
+            %     tmpDir = tempname();
+            %     mkdir(tmpDir);
+            %     poolobj.Cluster.JobStorageLocation = tmpDir;
+            % else
+            %     numworkers = poolobj.NumWorkers;
+            %     disp(['Continuing with existing pool of ' num2str(numworkers) '.'])
+            % end
 
             %% CaImAn segmentation
             [d1,d2,T] = size(data);
@@ -217,7 +217,9 @@ else
 
             % Run patched caiman
             disp('Beginning patched, volumetric CNMF...')
-            [A,b,C,f,S,P,~,YrA] = run_CNMF_patches(data,K,patches,tau,p,options);
+
+            %% F.O. 05.16.24: BREAKING - remove parallel eval on memmapped file
+            [A,b,C,f,S,P,~,YrA] = run_CNMF_patches_mbo(data,K,patches,tau,p,options);
             date = datetime(now,'ConvertFrom','datenum');
             formatSpec = '%s Initial CNMF complete.\n';
             fprintf(fid,formatSpec,date,abc);
@@ -293,18 +295,18 @@ else
 
             clearvars -except abc numFiles files path savepath fid filestem numCores startPlane endPlane poolobj metadata tmpDir
 
-            catch ME
-                date = datetime(now,'ConvertFrom','datenum');
-                errorMessage = sprintf('%s Error in function %s() at line %d. Error Message: %s', ...
-                date,ME.stack(1).name, ME.stack(1).line, ME.message);
-                fprintf(1, '%s\n', errorMessage);
-                fprintf(fid,errorMessage,date,ME.stack(1).name, ME.stack(1).line, ME.message);
-
-                disp('Shutting down parallel pool to eliminate error propagation.')
-                poolobj = gcp('nocreate');
-                delete(poolobj)
-                clearvars -except abc numFiles files path savepath fid filestem numCores startPlane endPlane poolobj metadata tmpDir
-            end
+            % catch ME
+            %     date = datetime(now,'ConvertFrom','datenum');
+            %     errorMessage = sprintf('%s Error in function %s() at line %d. Error Message: %s', ...
+            %     date,ME.stack(1).name, ME.stack(1).line, ME.message);
+            %     fprintf(1, '%s\n', errorMessage);
+            %     fprintf(fid,errorMessage,date,ME.stack(1).name, ME.stack(1).line, ME.message);
+            % 
+            %     disp('Shutting down parallel pool to eliminate error propagation.')
+            %     poolobj = gcp('nocreate');
+            %     delete(poolobj)
+            %     clearvars -except abc numFiles files path savepath fid filestem numCores startPlane endPlane poolobj metadata tmpDir
+            % end
         end
 
         date = datetime(now,'ConvertFrom','datenum');
