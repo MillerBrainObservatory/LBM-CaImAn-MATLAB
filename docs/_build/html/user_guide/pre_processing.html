@@ -306,6 +306,7 @@ document.write(`
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Pre_processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tips_tricks.html">Tips and Tricks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
 </ul>
@@ -367,8 +368,8 @@ document.write(`
                   
   <section id="pre-processing">
 <span id="id1"></span><h1>Pre-Processing<a class="headerlink" href="#pre-processing" title="Link to this heading">#</a></h1>
-<p>Before beginning pre-processing, follow setup steps in <a class="reference internal" href="../get_started/getting_started.html#getting-started"><span class="std std-ref">Getting Started</span></a> to make sure the pipeline and dependencies are installed properly.</p>
-<p>See <a class="reference internal" href="troubleshooting.html#troubleshooting"><span class="std std-ref">Troubleshooting Common Problems</span></a> for common issues.</p>
+<p>Before beginning pre-processing, follow setup steps in <span class="xref std std-ref">getting_started</span> to make sure the pipeline and dependencies are installed properly.</p>
+<p>See <a class="reference internal" href="troubleshooting.html#troubleshooting"><span class="std std-ref">Troubleshooting</span></a> for common issues.</p>
 <p>Pre-processing LBM datasets consists of 2 main processing steps:</p>
 <ul class="simple">
 <li><p>1 ) Reshaping vertically concatenated strips into horizontally concatenated strips</p></li>
@@ -377,15 +378,15 @@ document.write(`
 <section id="re-construct-volumetric-time-series">
 <h2>1. Re-Construct Volumetric Time-Series<a class="headerlink" href="#re-construct-volumetric-time-series" title="Link to this heading">#</a></h2>
 <p>Before processing starts, the raw scanimage output needs to be reconstructed to form a correctly-ordered time-series.
-This is accomplished through the use of <span class="xref std std-ref">convertScanImageTiffToVolume</span> of pre-processing.</p>
+This is accomplished through the use of <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a> of pre-processing.</p>
 <p>Shown in the image below is a graphical representation of this reconstruction. In its raw form (see A in the below figure), ScanImage tiff files are multipage tiffs - like a book. Each page
 is one <em>image</em>, but it doesn’t look like an image:</p>
 <a class="reference internal image-reference" href="../_images/abc_strip.png"><img alt="../_images/abc_strip.png" src="../_images/abc_strip.png" style="width: 1440px;" />
 </a>
-<p>The column labeled A in the above image, represents <strong>strips</strong> of our image, which are tiled horizontally into a full image.</p>
+<p id="strips">The column labeled A in the above image, represents <strong>strips</strong> of our image, which are tiled horizontally into a full image.</p>
 <p>Each Z-Plane is written before moving onto the next timestep, e.g.:
 - z-plane 1 &#64; timepoint 1, z-plane 2 &#64; timepoint 1, z-plane 3 &#64; timepoint 1, etc.</p>
-<p>Thus, another task <span class="xref std std-ref">convertScanImageTiffToVolume</span> accomplishes are reordering this tiff stack to be:
+<p>Thus, another task <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a> accomplishes are reordering this tiff stack to be:
 - z-plane 1 &#64; timepont 1, z-plane 1 &#64; timepoint 2, etc ..</p>
 <p>The output <cite>volumetric time-series</cite> has dimensions <cite>[Y,X,Z,T]</cite>.</p>
 <p>If the user chooses to split frames across multiple <cite>.tiff</cite> files, there will be multiple tiff files in ascending order
@@ -398,53 +399,14 @@ No other .tiff files should be in this directory. If this happens, an error will
 <p>You can chain the output of one function to the input of another. Note the path names match <a class="reference internal" href="../get_started/getting_started.html#directory-structure"><span class="std std-ref">Directory Structure</span></a>.</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">parentpath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;C:\Users\RBO\Documents\data\bi_hemisphere\&#39;</span><span class="p">;</span>
 <span class="n">raw_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;raw\&#39;</span><span class="p">];</span>
-<span class="n">extract_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;extracted2\&#39;</span><span class="p">];</span>
+<span class="n">extract_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;extracted\&#39;</span><span class="p">];</span>
 <span class="nb">mkdir</span><span class="p">(</span><span class="n">extract_path</span><span class="p">);</span><span class="w"> </span><span class="nb">mkdir</span><span class="p">(</span><span class="n">raw_path</span><span class="p">);</span>
 </pre></div>
 </div>
+<p>In this example, <cite>raw_path</cite> is where your raw <cite>.tiff</cite> files will be stored.</p>
 <p>Our data are now saved as a single hdf5 file separated by file and by plane. This storage format
 makes it easy to motion correct each time-series individually. We will be processing small patches of the total image,
 roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.</p>
-<p>Using help(function) will show us our parameters:</p>
-<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="n">convertScanImageTiffToVolume</span>
-
-<span class="w">  </span><span class="n">convertScanImageTiffToVolume</span><span class="w"> </span><span class="n">Convert</span><span class="w"> </span><span class="n">ScanImage</span><span class="w"> </span><span class="p">.</span><span class="n">tif</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">into</span><span class="w"> </span><span class="n">a</span><span class="w"> </span>4<span class="n">D</span><span class="w"> </span><span class="n">volumetric</span><span class="w"> </span><span class="nb">time</span><span class="o">-</span><span class="n">series</span><span class="p">.</span>
-
-<span class="w">  </span><span class="n">Parameters</span>
-<span class="w">  </span><span class="o">----------</span>
-<span class="w">  </span><span class="n">filePath</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">char</span>
-<span class="w">      </span><span class="n">The</span><span class="w"> </span><span class="n">directory</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="p">.</span><span class="n">tif</span><span class="w"> </span><span class="n">files</span><span class="p">.</span><span class="w"> </span><span class="n">Only</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="p">.</span><span class="n">tif</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">one</span>
-<span class="w">      </span><span class="n">session</span><span class="w"> </span><span class="n">should</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">directory</span><span class="p">.</span>
-<span class="w">  </span><span class="n">saveDirPath</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">char</span><span class="p">,</span><span class="w"> </span><span class="n">optional</span>
-<span class="w">      </span><span class="n">The</span><span class="w"> </span><span class="n">directory</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="n">processed</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">saved</span><span class="p">.</span><span class="w"> </span><span class="n">It</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">created</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="n">does</span>
-<span class="w">      </span><span class="n">not</span><span class="w"> </span><span class="nb">exist</span><span class="p">.</span><span class="w"> </span><span class="n">Defaults</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">filePath</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">not</span><span class="w"> </span><span class="n">provided</span><span class="p">.</span>
-<span class="w">  </span><span class="n">diagnosticFlag</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">double</span><span class="p">,</span><span class="w"> </span><span class="nb">logical</span><span class="p">,</span><span class="w"> </span><span class="n">optional</span>
-<span class="w">      </span><span class="n">If</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">displays</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">command</span><span class="w"> </span><span class="n">window</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">does</span>
-<span class="w">      </span><span class="n">not</span><span class="w"> </span><span class="k">continue</span><span class="w"> </span><span class="n">processing</span><span class="p">.</span><span class="w"> </span><span class="n">Defaults</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="mf">0.</span>
-<span class="w">  </span><span class="n">nvargs</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">struct</span><span class="p">,</span><span class="w"> </span><span class="n">optional</span>
-
-<span class="w">  </span><span class="n">Notes</span>
-<span class="w">  </span><span class="o">-----</span>
-<span class="w">  </span><span class="n">The</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">adds</span><span class="w"> </span><span class="n">necessary</span><span class="w"> </span><span class="n">paths</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">ScanImage</span><span class="w"> </span><span class="n">utilities</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">processes</span><span class="w"> </span><span class="n">each</span><span class="w"> </span><span class="p">.</span><span class="n">tif</span>
-<span class="w">  </span><span class="n">file</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">specified</span><span class="w"> </span><span class="n">directory</span><span class="p">.</span><span class="w"> </span><span class="n">It</span><span class="w"> </span><span class="n">checks</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">directory</span><span class="w"> </span><span class="n">exists</span><span class="p">,</span><span class="w"> </span><span class="n">handles</span>
-<span class="w">  </span><span class="n">multiple</span><span class="w"> </span><span class="n">or</span><span class="w"> </span><span class="nb">single</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="n">scenarios</span><span class="p">,</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">can</span><span class="w"> </span><span class="n">optionally</span><span class="w"> </span><span class="n">report</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">directory</span><span class="o">&#39;</span><span class="n">s</span><span class="w"> </span><span class="n">contents</span>
-<span class="w">  </span><span class="n">based</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">diagnosticFlag</span><span class="p">.</span>
-
-<span class="w">  </span><span class="n">Each</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="n">processed</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">logged</span><span class="p">,</span><span class="w"> </span><span class="n">assembled</span><span class="w"> </span><span class="n">into</span><span class="w"> </span><span class="n">a</span><span class="w"> </span>4<span class="n">D</span><span class="w"> </span><span class="nb">volume</span><span class="p">,</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">saved</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">specified</span>
-<span class="w">  </span><span class="n">directory</span><span class="w"> </span><span class="n">as</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="p">.</span><span class="n">mat</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">accompanying</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">also</span><span class="w"> </span><span class="n">manages</span><span class="w"> </span><span class="n">errors</span>
-<span class="w">  </span><span class="n">by</span><span class="w"> </span><span class="n">cleaning</span><span class="w"> </span><span class="n">up</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">providing</span><span class="w"> </span><span class="n">detailed</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="n">messages</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">something</span><span class="w"> </span><span class="n">goes</span><span class="w"> </span><span class="n">wrong</span><span class="w"> </span><span class="n">during</span>
-<span class="w">  </span><span class="n">processing</span><span class="p">.</span>
-
-<span class="w">  </span><span class="n">Examples</span>
-<span class="w">  </span><span class="o">--------</span>
-<span class="w">  </span><span class="n">convertScanImageTiffToVolume</span><span class="p">(</span><span class="s">&#39;C:/data/session1/&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;C:/processed/&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<span class="w">  </span><span class="n">convertScanImageTiffToVolume</span><span class="p">(</span><span class="s">&#39;C:/data/session1/&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;C:/processed/&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c">% Diagnostic mode</span>
-
-<span class="w">  </span><span class="n">See</span><span class="w"> </span><span class="n">also</span><span class="w"> </span><span class="nb">fileparts</span><span class="p">,</span><span class="w"> </span><span class="nb">addpath</span><span class="p">,</span><span class="w"> </span><span class="nb">genpath</span><span class="p">,</span><span class="w"> </span><span class="nb">isfolder</span><span class="p">,</span><span class="w"> </span><span class="nb">dir</span><span class="p">,</span><span class="w"> </span><span class="nb">fullfile</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="p">,</span><span class="w"> </span><span class="nb">regexp</span><span class="p">,</span><span class="w"> </span><span class="n">savefast</span>
-
-<span class="w">  </span><span class="p">..</span><span class="w"> </span><span class="n">_ScanImage</span><span class="p">:</span><span class="w"> </span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="p">.</span><span class="n">mbfbioscience</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="n">scanimage</span><span class="o">/</span>
-</pre></div>
-</div>
 <p>Setting <cite>fix_scan_phase=true</cite> attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.</p>
 <a class="reference internal image-reference" href="../_images/corr_nocorr_phase_example.png"><img alt="../_images/corr_nocorr_phase_example.png" src="../_images/corr_nocorr_phase_example.png" style="width: 1080px;" />
 </a>
@@ -465,41 +427,6 @@ roughly 20um in parallel, so attempting to process multiple time-series will dra
 </pre></div>
 </div>
 <p>The attributes hold our metadata, the result of calling <cite>get_metadata(raw_path)</cite>:</p>
-<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">get_metadata</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="n">extract_path</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.tiff&quot;</span><span class="p">))</span>
-
-<span class="w"> </span><span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
-
-<span class="w">   </span><span class="nb">struct</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">fields</span><span class="p">:</span>
-
-<span class="w">                        </span><span class="n">center_xy</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="o">-</span><span class="mf">15.2381</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span>
-<span class="w">                          </span><span class="n">size_xy</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">3.8095</span><span class="w"> </span><span class="mf">38.0952</span><span class="p">]</span>
-<span class="w">                     </span><span class="n">num_pixel_xy</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">144</span><span class="w"> </span><span class="mi">1200</span><span class="p">]</span>
-<span class="w">                  </span><span class="n">lines_per_frame</span><span class="p">:</span><span class="w"> </span><span class="mi">144</span>
-<span class="w">                  </span><span class="n">pixels_per_line</span><span class="p">:</span><span class="w"> </span><span class="mi">128</span>
-<span class="w">     </span><span class="n">num_lines_between_scanfields</span><span class="p">:</span><span class="w"> </span><span class="mi">24</span>
-<span class="w">                     </span><span class="n">image_length</span><span class="p">:</span><span class="w"> </span><span class="mi">11008</span>
-<span class="w">                      </span><span class="n">image_width</span><span class="p">:</span><span class="w"> </span><span class="mi">145</span>
-<span class="w">                </span><span class="n">full_image_height</span><span class="p">:</span><span class="w"> </span><span class="mi">1165</span>
-<span class="w">                 </span><span class="n">full_image_width</span><span class="p">:</span><span class="w"> </span><span class="mi">1197</span>
-<span class="w">                       </span><span class="n">num_planes</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span>
-<span class="w">                         </span><span class="n">num_rois</span><span class="p">:</span><span class="w"> </span><span class="mi">9</span>
-<span class="w">                 </span><span class="n">num_frames_total</span><span class="p">:</span><span class="w"> </span><span class="mi">1176</span>
-<span class="w">                  </span><span class="n">num_frames_file</span><span class="p">:</span><span class="w"> </span><span class="mi">392</span>
-<span class="w">                        </span><span class="n">num_files</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
-<span class="w">                       </span><span class="n">frame_rate</span><span class="p">:</span><span class="w"> </span><span class="mf">2.1797</span>
-<span class="w">             </span><span class="n">objective_resolution</span><span class="p">:</span><span class="w"> </span><span class="mf">157.5000</span>
-<span class="w">                              </span><span class="n">fov</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">600</span><span class="w"> </span><span class="mi">6000</span><span class="p">]</span>
-<span class="w">                </span><span class="n">strip_width_slice</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">8</span><span class="w"> </span><span class="mi">9</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="mi">11</span><span class="w"> </span><span class="mi">12</span><span class="w"> </span><span class="mi">13</span><span class="w"> </span><span class="mi">14</span><span class="w"> </span><span class="mi">15</span><span class="w"> </span><span class="mi">16</span><span class="w"> </span><span class="mi">17</span><span class="w"> </span><span class="mi">18</span><span class="w"> </span><span class="mi">19</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="mi">21</span><span class="w"> </span><span class="mi">22</span><span class="w"> </span><span class="mi">23</span><span class="w"> </span><span class="mi">24</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">26</span><span class="w"> </span><span class="mi">27</span><span class="w"> </span><span class="mi">28</span><span class="w"> </span><span class="mi">29</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="mi">31</span><span class="w"> </span><span class="mi">32</span><span class="w"> </span>…<span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span>×<span class="mi">129</span><span class="w"> </span><span class="nb">double</span><span class="p">)</span>
-<span class="w">                      </span><span class="n">strip_width</span><span class="p">:</span><span class="w"> </span><span class="mi">129</span>
-<span class="w">                 </span><span class="n">pixel_resolution</span><span class="p">:</span><span class="w"> </span><span class="mf">4.5833</span>
-<span class="w">                    </span><span class="n">sample_format</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;int16&#39;</span>
-<span class="w">                   </span><span class="n">extra_width_px</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span>
-<span class="w">          </span><span class="n">extra_width_per_side_px</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span>
-<span class="w">                    </span><span class="n">base_filename</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001&quot;</span>
-<span class="w">                    </span><span class="n">base_filepath</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;\raw&quot;</span>
-<span class="w">                     </span><span class="n">base_fileext</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;.tif&quot;</span>
-</pre></div>
-</div>
 <ul class="simple">
 <li><p>After successfully running <span class="xref std std-ref">convertScanImageTiffToVolume</span>, there will be a single <cite>.h5</cite> file containing extracted data.</p></li>
 </ul>

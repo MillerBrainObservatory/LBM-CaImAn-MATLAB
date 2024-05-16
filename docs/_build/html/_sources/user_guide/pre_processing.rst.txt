@@ -19,7 +19,7 @@ Pre-processing LBM datasets consists of 2 main processing steps:
 --------------------------------------
 
 Before processing starts, the raw scanimage output needs to be reconstructed to form a correctly-ordered time-series.
-This is accomplished through the use of :ref:`convertScanImageTiffToVolume` of pre-processing.
+This is accomplished through the use of :func:`convertScanImageTiffToVolume` of pre-processing.
 
 Shown in the image below is a graphical representation of this reconstruction. In its raw form (see A in the below figure), ScanImage tiff files are multipage tiffs - like a book. Each page
 is one *image*, but it doesn't look like an image:
@@ -27,12 +27,14 @@ is one *image*, but it doesn't look like an image:
 .. image:: ../_static/_images/abc_strip.png
    :width: 1440
 
+.. _strips:
+
 The column labeled A in the above image, represents **strips** of our image, which are tiled horizontally into a full image.
 
 Each Z-Plane is written before moving onto the next timestep, e.g.:
 - z-plane 1 @ timepoint 1, z-plane 2 @ timepoint 1, z-plane 3 @ timepoint 1, etc.
 
-Thus, another task :ref:`convertScanImageTiffToVolume` accomplishes are reordering this tiff stack to be:
+Thus, another task :func:`convertScanImageTiffToVolume` accomplishes are reordering this tiff stack to be:
 - z-plane 1 @ timepont 1, z-plane 1 @ timepoint 2, etc ..
 
 The output `volumetric time-series` has dimensions `[Y,X,Z,T]`.
@@ -51,56 +53,14 @@ You can chain the output of one function to the input of another. Note the path 
 
     parentpath = 'C:\Users\RBO\Documents\data\bi_hemisphere\';
     raw_path = [ parentpath 'raw\'];
-    extract_path = [ parentpath 'extracted2\'];
+    extract_path = [ parentpath 'extracted\'];
     mkdir(extract_path); mkdir(raw_path);
 
+In this example, `raw_path` is where your raw `.tiff` files will be stored.
 
 Our data are now saved as a single hdf5 file separated by file and by plane. This storage format
 makes it easy to motion correct each time-series individually. We will be processing small patches of the total image,
 roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.
-
-Using help(function) will show us our parameters:
-
-.. code-block:: MATLAB
-
-    >> help convertScanImageTiffToVolume
-
-      convertScanImageTiffToVolume Convert ScanImage .tif files into a 4D volumetric time-series.
-
-      Parameters
-      ----------
-      filePath : char
-          The directory containing the raw .tif files. Only raw .tif files from one
-          session should be in the directory.
-      saveDirPath : char, optional
-          The directory where processed files will be saved. It is created if it does
-          not exist. Defaults to the filePath if not provided.
-      diagnosticFlag : double, logical, optional
-          If set to 1, the function displays the files in the command window and does
-          not continue processing. Defaults to 0.
-      nvargs : struct, optional
-
-      Notes
-      -----
-      The function adds necessary paths for ScanImage utilities and processes each .tif
-      file found in the specified directory. It checks if the directory exists, handles
-      multiple or single file scenarios, and can optionally report the directory's contents
-      based on the diagnosticFlag.
-
-      Each file processed is logged, assembled into a 4D volume, and saved in a specified
-      directory as a .mat file with accompanying metadata. The function also manages errors
-      by cleaning up and providing detailed error messages if something goes wrong during
-      processing.
-
-      Examples
-      --------
-      convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 0);
-      convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 1); % Diagnostic mode
-
-      See also fileparts, addpath, genpath, isfolder, dir, fullfile, error, regexp, savefast
-
-      .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
-
 
 Setting `fix_scan_phase=true` attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
 
@@ -127,42 +87,6 @@ For each *session*, we will get a single `h5` output file organized by file, the
     Attributes: [30×1 struct]
 
 The attributes hold our metadata, the result of calling `get_metadata(raw_path)`:
-
-.. code-block:: MATLAB
-
-   >> get_metadata(fullfile(extract_path, "MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.tiff"))
-
-    ans =
-
-      struct with fields:
-
-                           center_xy: [-15.2381 0]
-                             size_xy: [3.8095 38.0952]
-                        num_pixel_xy: [144 1200]
-                     lines_per_frame: 144
-                     pixels_per_line: 128
-        num_lines_between_scanfields: 24
-                        image_length: 11008
-                         image_width: 145
-                   full_image_height: 1165
-                    full_image_width: 1197
-                          num_planes: 30
-                            num_rois: 9
-                    num_frames_total: 1176
-                     num_frames_file: 392
-                           num_files: 3
-                          frame_rate: 2.1797
-                objective_resolution: 157.5000
-                                 fov: [600 6000]
-                   strip_width_slice: [8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 … ] (1×129 double)
-                         strip_width: 129
-                    pixel_resolution: 4.5833
-                       sample_format: 'int16'
-                      extra_width_px: 16
-             extra_width_per_side_px: 8
-                       base_filename: "MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001"
-                       base_filepath: "\raw"
-                        base_fileext: ".tif"
 
 
 - After successfully running :ref:`convertScanImageTiffToVolume`, there will be a single `.h5` file containing extracted data.

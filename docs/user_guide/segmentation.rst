@@ -1,4 +1,3 @@
-
 .. _segmentation_deconvolution:
 
 ******************************
@@ -8,9 +7,9 @@ Segmentation and Deconvolution
 .. image:: ../_static/_images/neuron_to_neuron_correlations.png
    :width: 600
 
-
 Overview
 --------
+
 - Use `matfile` to load parameters of the motion-corrected movie without loading the entire movie into memory.
 - Set parameters for CNMF.
 - Perform patched, piecewise, volumetric CNMF.
@@ -78,6 +77,8 @@ Exact CaImAn Parameters
 
 Deconvolution
 -------------
+
+
 TODO: put this foopsi trickyness information in "For Developers" section
 
 FOOPSI (Fast OOPSI) is originally from "Fast Nonnegative Deconvolution for Spike Train Inference From Population Calcium Imaging" by Vogelstein et al. (2010).
@@ -97,3 +98,5 @@ Branches from the main "deconvolveCa" function in MATLAB_CAIMAN:
 - Optimization methods: CVX (external), SPGL1 (external), LARS, dual.
 **onnls** branch: Used if method="foopsi" or "thresholded" with model type="exp2" or "kernel." Based on OASIS.
 
+.. _NoRMCorre: https://github.com/flatironinstitute/NoRMCorre/
+.. _constrained-foopsi: https://github.com/epnev/constrained-foopsi/

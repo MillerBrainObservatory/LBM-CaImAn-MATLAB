@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Troubleshooting Common Problems &#8212; caiman_matlab  documentation</title>
+    <title>Troubleshooting &#8212; caiman_matlab  documentation</title>
   
   
   
@@ -306,6 +306,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre_processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tips_tricks.html">Tips and Tricks</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Troubleshooting</a></li>
 </ul>
@@ -348,7 +349,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Troubleshoot...</li>
+    <li class="breadcrumb-item active" aria-current="page">Troubleshooting</li>
   </ul>
 </nav>
 </div>
@@ -365,33 +366,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="troubleshooting-common-problems">
-<span id="troubleshooting"></span><h1>Troubleshooting Common Problems<a class="headerlink" href="#troubleshooting-common-problems" title="Link to this heading">#</a></h1>
-<section id="matlab-path-issues">
-<h2>MATLAB Path Issues<a class="headerlink" href="#matlab-path-issues" title="Link to this heading">#</a></h2>
-<p><strong>Problem:</strong> The <cite>run_CNMF_patches</cite> function errors out.</p>
-<p><strong>Cause:</strong> The CaImAn parent folder containing <cite>run_CNMF_patches</cite> is not on the MATLAB path.</p>
-<p><strong>Solution:</strong>
-1. Check the MATLAB path configuration in the <cite>segmentPlane</cite> script, around line 150:</p>
-<blockquote>
-<div><p><code class="docutils literal notranslate"><span class="pre">`matlab</span>
-<span class="pre">%</span> <span class="pre">give</span> <span class="pre">access</span> <span class="pre">to</span> <span class="pre">CaImAn</span> <span class="pre">files</span>
-<span class="pre">addpath(genpath(fullfile('CaImAn-MATLAB-master','CaImAn-MATLAB-master')))</span>
-<span class="pre">addpath(genpath(fullfile('motion_correction/')))</span>
-<span class="pre">`</span></code></p>
-<p>This code adds paths relative to the current directory, which may fail if the <cite>CaImAn-MATLAB-master</cite> folder is not in the same directory as your MATLAB interpreter.</p>
-</div></blockquote>
-<ol class="arabic" start="2">
-<li><p>Move the <cite>CaImAn-MATLAB-master</cite> folder to your userpath, typically <cite>~/Documents/MATLAB/</cite>. You can find this path by typing <cite>userpath</cite> in the MATLAB command window and placing the <cite>CaImAn</cite> folder there.</p></li>
-<li><p>Alternatively, you can modify the <cite>planarSegmentation</cite> script to use an absolute path:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`matlab</span>
-<span class="pre">%</span> <span class="pre">give</span> <span class="pre">access</span> <span class="pre">to</span> <span class="pre">CaImAn</span> <span class="pre">files</span>
-<span class="pre">[currpath,</span> <span class="pre">~,</span> <span class="pre">~]</span> <span class="pre">=</span> <span class="pre">fileparts(fullfile(mfilename('fullpath')));</span> <span class="pre">%</span> <span class="pre">grabs</span> <span class="pre">absolute</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">this</span> <span class="pre">script</span>
-<span class="pre">addpath(genpath(fullfile(currpath,</span> <span class="pre">'../CaImAn-MATLAB-master/CaImAn-MATLAB-master')));</span>
-<span class="pre">`</span></code></p>
-</li>
-</ol>
-</section>
+  <section id="troubleshooting">
+<span id="id1"></span><h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h1>
 <section id="missing-compiled-binary-windows">
 <h2>Missing Compiled Binary (Windows)<a class="headerlink" href="#missing-compiled-binary-windows" title="Link to this heading">#</a></h2>
 <p><strong>Problem:</strong> The <cite>run_CNMF_patches</cite> function errors out on Windows.</p>
@@ -474,7 +450,6 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matlab-path-issues">MATLAB Path Issues</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#missing-compiled-binary-windows">Missing Compiled Binary (Windows)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#less-likely-issues">Less-Likely Issues</a></li>
 </ul>

@@ -1,4 +1,3 @@
-.. _core_api:
 
 Core Functions
 ==============

@@ -3,7 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-
 #################
 LBM Documentation
 #################
@@ -11,10 +10,6 @@ LBM Documentation
 .. image:: ./_static/_images/overlays.png
    :width: 600
 
-.. _overview:
-
-Overview
-========
 
 A pipeline for processing light beads microscopy (LBM) datasets.
 
@@ -23,7 +18,6 @@ For background, theory and design of LBM technology, see the reference `publicat
 
 Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files.
 
-.. _requirements:
 
 Requirements
 ------------

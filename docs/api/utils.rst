@@ -1,5 +1,3 @@
-.. _utils_api:
-
 .. currentmodule:: utils
 
 Utils

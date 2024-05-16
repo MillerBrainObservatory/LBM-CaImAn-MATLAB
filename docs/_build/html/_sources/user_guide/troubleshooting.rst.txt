@@ -1,35 +1,7 @@
 .. _troubleshooting:
 
-Troubleshooting Common Problems
+Troubleshooting
 ===============================
-
-MATLAB Path Issues
-------------------
-
-**Problem:** The `run_CNMF_patches` function errors out.
-
-**Cause:** The CaImAn parent folder containing `run_CNMF_patches` is not on the MATLAB path.
-
-**Solution:**
-1. Check the MATLAB path configuration in the `segmentPlane` script, around line 150:
-
-   ```matlab
-   % give access to CaImAn files
-   addpath(genpath(fullfile('CaImAn-MATLAB-master','CaImAn-MATLAB-master')))
-   addpath(genpath(fullfile('motion_correction/')))
-   ```
-
-   This code adds paths relative to the current directory, which may fail if the `CaImAn-MATLAB-master` folder is not in the same directory as your MATLAB interpreter.
-
-2. Move the `CaImAn-MATLAB-master` folder to your userpath, typically `~/Documents/MATLAB/`. You can find this path by typing `userpath` in the MATLAB command window and placing the `CaImAn` folder there.
-
-3. Alternatively, you can modify the `planarSegmentation` script to use an absolute path:
-
-   ```matlab
-   % give access to CaImAn files
-   [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % grabs absolute path to this script
-   addpath(genpath(fullfile(currpath, '../CaImAn-MATLAB-master/CaImAn-MATLAB-master')));
-   ```
 
 Missing Compiled Binary (Windows)
 ---------------------------------

@@ -20,7 +20,7 @@ source_suffix = {
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'exclude']
-extensions = ["sphinx.ext.autodoc", "sphinxcontrib.matlab", "numpydoc", "sphinx.ext.intersphinx", "sphinx.ext.napoleon"]
+extensions = ["sphinx.ext.autodoc", "sphinxcontrib.matlab", "numpydoc", "sphinx.ext.intersphinx", "sphinx.ext.napoleon", "sphinx.ext.autosectionlabel"]
 
 templates_path = ["_templates"]
 html_theme = "pydata_sphinx_theme"

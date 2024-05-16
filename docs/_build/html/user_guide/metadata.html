@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>API &#8212; caiman_matlab  documentation</title>
+    <title>ScanImage Metadata &#8212; caiman_matlab  documentation</title>
   
   
   
@@ -38,11 +38,11 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/index';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/metadata';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Core Functions" href="core.html" />
-    <link rel="prev" title="Troubleshooting" href="../user_guide/troubleshooting.html" />
+    <link rel="next" title="Tips and Tricks" href="tips_tricks.html" />
+    <link rel="prev" title="Axial-Offset Correction" href="offset_correction.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -142,15 +142,15 @@
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
                         API
                       </a>
                     </li>
@@ -251,15 +251,15 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
                         API
                       </a>
                     </li>
@@ -301,12 +301,14 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Core Functions:</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="core.html">Core Functions</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="utils.html">Utils</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="simple">
-</ul>
-</li>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre_processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips_tricks.html">Tips and Tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
 </ul>
 </div>
 </nav></div>
@@ -344,7 +346,10 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">API</li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ScanImage Metadata</li>
   </ul>
 </nav>
 </div>
@@ -361,17 +366,50 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="api">
-<h1>API<a class="headerlink" href="#api" title="Link to this heading">#</a></h1>
-<p>Documentation for each function from docstrings.</p>
-<div class="toctree-wrapper compound">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Core Functions:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="core.html">Core Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a><ul class="simple">
-</ul>
-</li>
-</ul>
+  <section id="scanimage-metadata">
+<h1>ScanImage Metadata<a class="headerlink" href="#scanimage-metadata" title="Link to this heading">#</a></h1>
+<p>As discussed in <span class="xref std std-ref">strips</span>, reconstructing an image from the ScanImage <cite>.tiff</cite> file is handled internally by the pipeline. This describes
+the metadata that hold all of the values used for that process.</p>
+<p>The funcion <a class="reference internal" href="../api/utils.html#get_metadata" title="get_metadata"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">get_metadata()</span></code></a> takes as input a path to any <a class="reference external" href="https://www.mbfbioscience.com/products/scanimage/">ScanImage</a> tiff file and returns the metadata.</p>
+<div class="admonition note" id="mdetadata-disclaimer">
+<p class="admonition-title">Note</p>
+<p>During aquisition, the user is prompted to split the recorded frames across multiple .tiff files.
+It doesn’t matter which .tiff file is used for this function, the metadata used applies to each file.</p>
+</div>
+<div class="highlight-MATLAB notranslate" id="metadata-code"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">get_metadata</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="n">extract_path</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.tiff&quot;</span><span class="p">))</span>
+
+<span class="w"> </span><span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
+
+<span class="w">   </span><span class="nb">struct</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">fields</span><span class="p">:</span>
+
+<span class="w">                        </span><span class="n">center_xy</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="o">-</span><span class="mf">15.2381</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span>
+<span class="w">                          </span><span class="n">size_xy</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">3.8095</span><span class="w"> </span><span class="mf">38.0952</span><span class="p">]</span>
+<span class="w">                     </span><span class="n">num_pixel_xy</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">144</span><span class="w"> </span><span class="mi">1200</span><span class="p">]</span>
+<span class="w">                  </span><span class="n">lines_per_frame</span><span class="p">:</span><span class="w"> </span><span class="mi">144</span>
+<span class="w">                  </span><span class="n">pixels_per_line</span><span class="p">:</span><span class="w"> </span><span class="mi">128</span>
+<span class="w">     </span><span class="n">num_lines_between_scanfields</span><span class="p">:</span><span class="w"> </span><span class="mi">24</span>
+<span class="w">                     </span><span class="n">image_length</span><span class="p">:</span><span class="w"> </span><span class="mi">11008</span>
+<span class="w">                      </span><span class="n">image_width</span><span class="p">:</span><span class="w"> </span><span class="mi">145</span>
+<span class="w">                </span><span class="n">full_image_height</span><span class="p">:</span><span class="w"> </span><span class="mi">1165</span>
+<span class="w">                 </span><span class="n">full_image_width</span><span class="p">:</span><span class="w"> </span><span class="mi">1197</span>
+<span class="w">                       </span><span class="n">num_planes</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span>
+<span class="w">                         </span><span class="n">num_rois</span><span class="p">:</span><span class="w"> </span><span class="mi">9</span>
+<span class="w">                 </span><span class="n">num_frames_total</span><span class="p">:</span><span class="w"> </span><span class="mi">1176</span>
+<span class="w">                  </span><span class="n">num_frames_file</span><span class="p">:</span><span class="w"> </span><span class="mi">392</span>
+<span class="w">                        </span><span class="n">num_files</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">                       </span><span class="n">frame_rate</span><span class="p">:</span><span class="w"> </span><span class="mf">2.1797</span>
+<span class="w">             </span><span class="n">objective_resolution</span><span class="p">:</span><span class="w"> </span><span class="mf">157.5000</span>
+<span class="w">                              </span><span class="n">fov</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">600</span><span class="w"> </span><span class="mi">6000</span><span class="p">]</span>
+<span class="w">                </span><span class="n">strip_width_slice</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">8</span><span class="w"> </span><span class="mi">9</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="mi">11</span><span class="w"> </span><span class="mi">12</span><span class="w"> </span><span class="mi">13</span><span class="w"> </span><span class="mi">14</span><span class="w"> </span><span class="mi">15</span><span class="w"> </span><span class="mi">16</span><span class="w"> </span><span class="mi">17</span><span class="w"> </span><span class="mi">18</span><span class="w"> </span><span class="mi">19</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="mi">21</span><span class="w"> </span><span class="mi">22</span><span class="w"> </span><span class="mi">23</span><span class="w"> </span><span class="mi">24</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="mi">26</span><span class="w"> </span><span class="mi">27</span><span class="w"> </span><span class="mi">28</span><span class="w"> </span><span class="mi">29</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="mi">31</span><span class="w"> </span><span class="mi">32</span><span class="w"> </span>…<span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span>×<span class="mi">129</span><span class="w"> </span><span class="nb">double</span><span class="p">)</span>
+<span class="w">                      </span><span class="n">strip_width</span><span class="p">:</span><span class="w"> </span><span class="mi">129</span>
+<span class="w">                 </span><span class="n">pixel_resolution</span><span class="p">:</span><span class="w"> </span><span class="mf">4.5833</span>
+<span class="w">                    </span><span class="n">sample_format</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;int16&#39;</span>
+<span class="w">                   </span><span class="n">extra_width_px</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span>
+<span class="w">          </span><span class="n">extra_width_per_side_px</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span>
+<span class="w">                    </span><span class="n">base_filename</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001&quot;</span>
+<span class="w">                    </span><span class="n">base_filepath</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;\raw&quot;</span>
+<span class="w">                     </span><span class="n">base_fileext</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;.tif&quot;</span>
+</pre></div>
 </div>
 </section>
 
@@ -386,20 +424,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../user_guide/troubleshooting.html"
+       href="offset_correction.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Troubleshooting</p>
+        <p class="prev-next-title">Axial-Offset Correction</p>
       </div>
     </a>
     <a class="right-next"
-       href="core.html"
+       href="tips_tricks.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Core Functions</p>
+        <p class="prev-next-title">Tips and Tricks</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -416,7 +454,7 @@ document.write(`
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/api/index.rst.txt">
+    <a href="../_sources/user_guide/metadata.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

@@ -1,10 +1,6 @@
-.. _installation:
-
 ============
 Installation
 ============
-
-.. _recommended-install:
 
 Recommendation
 ==============
@@ -40,8 +36,6 @@ By Operating System
 
 Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.
 
-.. _windows:
-
 Windows
 -------
 
@@ -52,8 +46,6 @@ Or just download the code from code/Download.zip above and unzip to a directory 
 
     If you have MATLAB installed on Windows, you won't be able to run commands from within WSL (i.e. //wsl.localhost/)
     due to the separate filesystems. Pay attention to which environment you install.
-
-.. _wsl:
 
 WSL2 (Windows Subsystem for Linux)
 ----------------------------------
@@ -67,8 +59,6 @@ This means you will not be able to run matlab from the WSL filesystem (i.e. `//w
    $ cd /mnt/c/Users/<Username>/<project-install-path>
 
 This pipeline has been tested on WSL2, Ubuntu 22.04. Though any debian-based distribution should work.
-
-.. _unix:
 
 
 For unix (Linux/MacOS):
