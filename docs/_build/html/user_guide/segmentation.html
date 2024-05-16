@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Segmentation &#8212; caiman_matlab  documentation</title>
+    <title>Segmentation and Deconvolution &#8212; caiman_matlab  documentation</title>
   
   
   
@@ -162,13 +162,6 @@
                   </a>
                 </li>
                 
-
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/ru-rbo/rbo-lbm">
-                    PyBeads
-                  </a>
-                </li>
-                
   </ul>
 </nav></div>
       
@@ -278,13 +271,6 @@ document.write(`
                   </a>
                 </li>
                 
-
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/ru-rbo/rbo-lbm">
-                    PyBeads
-                  </a>
-                </li>
-                
   </ul>
 </nav></div>
         
@@ -362,7 +348,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Segmentation</li>
+    <li class="breadcrumb-item active" aria-current="page">Segmentation...</li>
   </ul>
 </nav>
 </div>
@@ -379,69 +365,60 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="segmentation">
-<span id="id1"></span><h1>Segmentation<a class="headerlink" href="#segmentation" title="Link to this heading">#</a></h1>
-<p>Segment the motion-corrected data and extract neuronal signals.</p>
-<p>Currently, this function makes the following assumptions:</p>
+  <section id="segmentation-and-deconvolution">
+<span id="segmentation-deconvolution"></span><h1>Segmentation and Deconvolution<a class="headerlink" href="#segmentation-and-deconvolution" title="Link to this heading">#</a></h1>
+<a class="reference internal image-reference" href="../_images/neuron_to_neuron_correlations.png"><img alt="../_images/neuron_to_neuron_correlations.png" src="../_images/neuron_to_neuron_correlations.png" style="width: 600px;" />
+</a>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>2nd order flourescence dynamics</p></li>
-<li><p>Imaging in mouse cortex (9.2e4 neurons/mm^3)</p></li>
+<li><p>Use <cite>matfile</cite> to load parameters of the motion-corrected movie without loading the entire movie into memory.</p></li>
+<li><p>Set parameters for CNMF.</p></li>
+<li><p>Perform patched, piecewise, volumetric CNMF.</p></li>
+<li><p>Save outputs containing both neuropil and accepted/rejected components.</p></li>
 </ul>
-<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="n">segmentPlane</span>
-
-<span class="w">   </span><span class="n">segmentPlane</span><span class="w"> </span><span class="n">Segment</span><span class="w"> </span><span class="n">imaging</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="n">using</span><span class="w"> </span><span class="n">CaImAn</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">motion</span><span class="o">-</span><span class="n">corrected</span><span class="w"> </span><span class="n">data</span><span class="p">.</span>
-
-<span class="w">   </span><span class="n">This</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">applies</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">CaImAn</span><span class="w"> </span><span class="n">algorithm</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">segment</span><span class="w"> </span><span class="n">neurons</span><span class="w"> </span><span class="n">from</span>
-<span class="w">   </span><span class="n">motion</span><span class="o">-</span><span class="n">corrected</span><span class="p">,</span><span class="w"> </span><span class="n">pre</span><span class="o">-</span><span class="n">processed</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">ROI</span><span class="w"> </span><span class="n">re</span><span class="o">-</span><span class="n">assembled</span><span class="w"> </span><span class="n">MAxiMuM</span><span class="w"> </span><span class="n">data</span><span class="p">.</span>
-<span class="w">   </span><span class="n">The</span><span class="w"> </span><span class="n">processing</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">conducted</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">specified</span><span class="w"> </span><span class="n">planes</span><span class="p">,</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">results</span>
-<span class="w">   </span><span class="n">are</span><span class="w"> </span><span class="n">saved</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span>
-
-<span class="w">   </span><span class="n">Parameters</span>
-<span class="w">   </span><span class="o">----------</span>
-<span class="w">   </span><span class="nb">path</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">char</span>
-<span class="w">       </span><span class="n">The</span><span class="w"> </span><span class="nb">path</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">local</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">motion</span><span class="o">-</span><span class="n">corrected</span><span class="w"> </span><span class="n">data</span><span class="p">.</span>
-<span class="w">   </span><span class="n">diagnosticFlag</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">char</span>
-<span class="w">       </span><span class="n">When</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="s">&#39;1&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">reports</span><span class="w"> </span><span class="nb">all</span><span class="w"> </span><span class="p">.</span><span class="n">mat</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">directory</span>
-<span class="w">       </span><span class="n">specified</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="s">&#39;path&#39;</span><span class="p">.</span><span class="w"> </span><span class="n">Otherwise</span><span class="p">,</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="n">processes</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">neuron</span><span class="w"> </span><span class="n">segmentation</span><span class="p">.</span>
-<span class="w">   </span><span class="n">startPlane</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">char</span>
-<span class="w">       </span><span class="n">The</span><span class="w"> </span><span class="n">starting</span><span class="w"> </span><span class="n">plane</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">processing</span><span class="p">.</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">non</span><span class="o">-</span><span class="n">numeric</span><span class="w"> </span><span class="nb">input</span><span class="w"> </span><span class="n">or</span><span class="w"> </span><span class="s">&#39;0&#39;</span><span class="w"> </span><span class="n">sets</span>
-<span class="w">       </span><span class="n">it</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">default</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">).</span>
-<span class="w">   </span><span class="n">endPlane</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">char</span>
-<span class="w">       </span><span class="n">The</span><span class="w"> </span><span class="n">ending</span><span class="w"> </span><span class="n">plane</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">processing</span><span class="p">.</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">non</span><span class="o">-</span><span class="n">numeric</span><span class="w"> </span><span class="nb">input</span><span class="w"> </span><span class="n">or</span><span class="w"> </span><span class="s">&#39;0&#39;</span><span class="w"> </span><span class="n">sets</span>
-<span class="w">       </span><span class="n">it</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">default</span><span class="w"> </span><span class="p">(</span><span class="n">maximum</span><span class="w"> </span><span class="n">available</span><span class="w"> </span><span class="n">planes</span><span class="p">).</span>
-<span class="w">   </span><span class="n">numCores</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">char</span>
-<span class="w">       </span><span class="n">The</span><span class="w"> </span><span class="n">number</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">cores</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">use</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">parallel</span><span class="w"> </span><span class="n">processing</span><span class="p">.</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">non</span><span class="o">-</span><span class="n">numeric</span><span class="w"> </span><span class="nb">input</span>
-<span class="w">       </span><span class="n">or</span><span class="w"> </span><span class="s">&#39;0&#39;</span><span class="w"> </span><span class="n">sets</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">default</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="p">(</span><span class="mi">12</span><span class="p">).</span>
-
-<span class="w">   </span><span class="n">Outputs</span>
-<span class="w">   </span><span class="o">-------</span>
-<span class="w">     </span><span class="o">-</span><span class="w"> </span><span class="n">T_keep</span><span class="p">:</span><span class="w"> </span><span class="n">neuronal</span><span class="w"> </span><span class="nb">time</span><span class="w"> </span><span class="n">series</span><span class="w"> </span><span class="p">[</span><span class="n">Km</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">single</span><span class="p">)</span>
-<span class="w">     </span><span class="o">-</span><span class="w"> </span><span class="n">Ac_keep</span><span class="p">:</span><span class="w"> </span><span class="n">neuronal</span><span class="w"> </span><span class="n">footprints</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">tau</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="o">*</span><span class="n">tau</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">Km</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">single</span><span class="p">)</span>
-<span class="w">     </span><span class="o">-</span><span class="w"> </span><span class="n">C_keep</span><span class="p">:</span><span class="w"> </span><span class="n">denoised</span><span class="w"> </span><span class="nb">time</span><span class="w"> </span><span class="n">series</span><span class="w"> </span><span class="p">[</span><span class="n">Km</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">single</span><span class="p">)</span>
-<span class="w">     </span><span class="o">-</span><span class="w"> </span><span class="n">Km</span><span class="p">:</span><span class="w"> </span><span class="n">number</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">neurons</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="p">(</span><span class="nb">single</span><span class="p">)</span>
-<span class="w">     </span><span class="o">-</span><span class="w"> </span><span class="n">Cn</span><span class="p">:</span><span class="w"> </span><span class="n">correlation</span><span class="w"> </span><span class="nb">image</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">single</span><span class="p">)</span>
-<span class="w">     </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="n">background</span><span class="w"> </span><span class="n">spatial</span><span class="w"> </span><span class="n">components</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">single</span><span class="p">)</span>
-<span class="w">     </span><span class="o">-</span><span class="w"> </span><span class="n">f</span><span class="p">:</span><span class="w"> </span><span class="n">background</span><span class="w"> </span><span class="n">temporal</span><span class="w"> </span><span class="n">components</span><span class="w"> </span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">single</span><span class="p">)</span>
-<span class="w">     </span><span class="o">-</span><span class="w"> </span><span class="n">acx</span><span class="p">:</span><span class="w"> </span><span class="nb">centroid</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="n">direction</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">each</span><span class="w"> </span><span class="n">neuron</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">Km</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">single</span><span class="p">)</span>
-<span class="w">     </span><span class="o">-</span><span class="w"> </span><span class="n">acy</span><span class="p">:</span><span class="w"> </span><span class="nb">centroid</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="n">direction</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">each</span><span class="w"> </span><span class="n">neuron</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">Km</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">single</span><span class="p">)</span>
-<span class="w">     </span><span class="o">-</span><span class="w"> </span><span class="n">acm</span><span class="p">:</span><span class="w"> </span><span class="nb">sum</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">component</span><span class="w"> </span><span class="n">pixels</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">each</span><span class="w"> </span><span class="n">neuron</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">Km</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">single</span><span class="p">)</span>
-
-<span class="w">   </span><span class="n">Notes</span>
-<span class="w">   </span><span class="o">-----</span>
-<span class="w">     </span><span class="o">-</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">handles</span><span class="w"> </span><span class="n">large</span><span class="w"> </span><span class="n">datasets</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="n">processing</span><span class="w"> </span><span class="n">each</span><span class="w"> </span><span class="n">plane</span><span class="w"> </span><span class="n">serially</span><span class="p">.</span>
-<span class="w">     </span><span class="o">-</span><span class="w"> </span><span class="n">Ensure</span><span class="w"> </span><span class="n">your</span><span class="w"> </span><span class="n">RAM</span><span class="w"> </span><span class="n">capacity</span><span class="w"> </span><span class="n">exceeds</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="nb">size</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="nb">single</span><span class="w"> </span><span class="n">plane</span><span class="p">.</span>
-<span class="w">     </span><span class="o">-</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">segmentation</span><span class="w"> </span><span class="nb">settings</span><span class="w"> </span><span class="n">are</span><span class="w"> </span><span class="n">based</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">assumption</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="mf">9.2e4</span><span class="w"> </span><span class="n">neurons</span><span class="o">/</span><span class="n">mm</span>^<span class="mi">3</span>
-<span class="w">         </span><span class="n">density</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">imaged</span><span class="w"> </span><span class="nb">volume</span><span class="w"> </span><span class="n">as</span><span class="w"> </span><span class="n">seen</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">mouse</span><span class="w"> </span><span class="n">cortex</span><span class="p">.</span>
-
-<span class="w">   </span><span class="n">See</span><span class="w"> </span><span class="n">also</span><span class="w"> </span><span class="nb">addpath</span><span class="p">,</span><span class="w"> </span><span class="nb">fullfile</span><span class="p">,</span><span class="w"> </span><span class="nb">dir</span><span class="p">,</span><span class="w"> </span><span class="nb">load</span><span class="p">,</span><span class="w"> </span><span class="n">savefast</span>
-</pre></div>
+<p>segmentPlane.m
+- construct_patches.m (caiman)
+- run_CNMF_patches.m (caiman)
+- classify_components.m (caiman)
+- compute_event_exceptionality (caiman)
+- update_temporal_components (caiman)
+- detrend_df_f (caiman - modified)
+- AtoAc</p>
+<p>Dependencies: CaImAn_Utilities</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>No time threshold.</p>
 </div>
-<p>Segmentation has the largest computational and time requirements.</p>
-<p><strong>Output</strong></p>
-<p>The output of <span class="target" id="segmentplane">segmentPlane</span> is a series of .mat files named caiman_output_plane_N.mat, where N=number of planes.</p>
+</section>
+<section id="atoac">
+<h2>AtoAc<a class="headerlink" href="#atoac" title="Link to this heading">#</a></h2>
+<p>Turn the CaImAn output A (sparse, spatial footprints for entire FOV) into Ac (sparse, spatial footprints localized around each neuron).
+- Standardizes the size of each neuron’s footprint to a uniform (4*tau+1, 4*tau+1) matrix, centered on the neuron’s centroid [acx x acy].</p>
+<a class="reference internal image-reference" href="../_images/sparse_rep.png"><img alt="../_images/sparse_rep.png" src="../_images/sparse_rep.png" style="width: 600px;" />
+</a>
+</section>
+<section id="component-validation">
+<h2>Component Validation<a class="headerlink" href="#component-validation" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Use the decay time (0.5s) multiplied by the number of frames to estimate the number of samples expected in the movie.</p></li>
+<li><p>Calculate the likelihood of an unexpected event (e.g., a spike) and return a value metric for the quality of the components.
+- Normal Cumulative Distribution function, input = -min_SNR.</p></li>
+<li><p>Evaluate the likelihood of observing traces given the distribution of noise.</p></li>
+</ul>
+</section>
+<section id="tau">
+<h2>Tau<a class="headerlink" href="#tau" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>In general, round up.</p></li>
+<li><p>The kernel is fixed to have this decay and is not fit to the data.</p></li>
+</ul>
+</section>
+<section id="exact-caiman-parameters">
+<h2>Exact CaImAn Parameters<a class="headerlink" href="#exact-caiman-parameters" title="Link to this heading">#</a></h2>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">merge_thresh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">0.8</span><span class="p">;</span>
-<span class="n">min_SNR</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">1.4</span><span class="p">;</span>
-<span class="n">space_thresh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">0.2</span><span class="p">;</span><span class="w"> </span><span class="c">% threhsold for spatial comps</span>
+<span class="n">min_SNR</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">1.4</span><span class="p">;</span><span class="w"> </span><span class="c">% liberal threshold, tighten in post</span>
+<span class="n">space_thresh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">0.2</span><span class="p">;</span><span class="w"> </span><span class="c">% threshold for spatial components</span>
 <span class="n">time_thresh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
 <span class="n">sz</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">0.1</span><span class="p">;</span><span class="w"> </span><span class="c">% IF FOOTPRINTS ARE TOO SMALL, CONSIDER sz = 0.1</span>
 <span class="n">mx</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">ceil</span><span class="p">(</span><span class="nb">pi</span><span class="o">.*</span><span class="p">(</span><span class="mf">1.33</span><span class="o">.*</span><span class="n">tau</span><span class="p">)</span><span class="o">.^</span><span class="mi">2</span><span class="p">);</span>
@@ -450,10 +427,35 @@ document.write(`
 <span class="n">sizY</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">size</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
 <span class="n">patch_size</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">round</span><span class="p">(</span><span class="mi">650</span><span class="o">/</span><span class="n">pixel_resolution</span><span class="p">)</span><span class="o">.*</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span>
 <span class="n">overlap</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.*</span><span class="nb">ceil</span><span class="p">(</span><span class="mi">50</span><span class="o">./</span><span class="n">pixel_resolution</span><span class="p">);</span>
+<span class="n">patches</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">construct_patches</span><span class="p">(</span><span class="n">sizY</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="k">end</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">patch_size</span><span class="p">,</span><span class="n">overlap</span><span class="p">);</span>
 <span class="c">% number of components based on assumption of 9.2e4 neurons/mm^3</span>
-<span class="n">K</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">ceil</span><span class="p">(</span><span class="mf">9.2e4</span><span class="o">.*</span><span class="mf">20e-9</span><span class="o">.*</span><span class="p">(</span><span class="n">pixel_resolution</span><span class="o">.*</span><span class="n">patch_size</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">.^</span><span class="n">M2</span><span class="p">);</span>
+<span class="n">K</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">ceil</span><span class="p">(</span><span class="mf">9.2e4</span><span class="o">.*</span><span class="mf">20e-9</span><span class="o">.*</span><span class="p">(</span><span class="n">pixel_resolution</span><span class="o">.*</span><span class="n">patch_size</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">.^</span><span class="mi">2</span><span class="p">);</span>
 </pre></div>
 </div>
+<ul class="simple">
+<li><p><strong>merge_thresh</strong>: Checking the temporal correlation between components that overlap in space. If they have at least 1px in common and the correlation is above the merge threshold, merge the components.</p></li>
+<li><p>Factorization via CNMF yields “raw” traces (“y”). These raw traces are noisy and jagged.</p></li>
+<li><p>Each raw trace is deconvolved via “constrained foopsi,” which yields the decay (and for p=2, rise) coefficients (“g”) and the vector of “spiking” activity (“S”) that best explain the raw trace. S should ideally be ~90% zeros.</p></li>
+<li><p>S and g are then used to produce C, which (hopefully) looks like the raw trace Y, but much cleaner and smoother. The optional output YrA is equal to Y-C, representing the original raw trace.</p></li>
+</ul>
+</section>
+<section id="deconvolution">
+<h2>Deconvolution<a class="headerlink" href="#deconvolution" title="Link to this heading">#</a></h2>
+<p>TODO: put this foopsi trickyness information in “For Developers” section</p>
+<p>FOOPSI (Fast OOPSI) is originally from “Fast Nonnegative Deconvolution for Spike Train Inference From Population Calcium Imaging” by Vogelstein et al. (2010).
+- OASIS was introduced in “Fast Active Set Methods for Online Spike Inference from Calcium Imaging” by Friedrich &amp; Paninski (2016).
+- Most of the CAIMAN-MATLAB code uses OASIS, not FOOPSI, despite some functions being named “foopsi_oasis.”</p>
+<p>Branches from the main “deconvolveCa” function in MATLAB_CAIMAN:</p>
+<p><strong>oasis</strong> branches: Despite some being named “foopsi_oasis,” they use OASIS math.
+- foopsi_oasisAR1
+- foopsi_oasisAR2
+- constrained_oasisAR1
+- thresholded_oasisAR1
+- thresholded_oasisAR2
+<strong>constrained_foopsi</strong> branch: Used if method=”constrained” and model type is not “ar1” (e.g., ar2).
+- Optimization methods: CVX (external), SPGL1 (external), LARS, dual.
+<strong>onnls</strong> branch: Used if method=”foopsi” or “thresholded” with model type=”exp2” or “kernel.” Based on OASIS.</p>
+</section>
 </section>
 
 
@@ -493,6 +495,23 @@ document.write(`
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#atoac">AtoAc</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#component-validation">Component Validation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tau">Tau</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exact-caiman-parameters">Exact CaImAn Parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deconvolution">Deconvolution</a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
 
