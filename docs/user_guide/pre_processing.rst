@@ -148,7 +148,12 @@ Attributes hold metadata about the dataset, including details about the imaging 
 
 Due to this organization, to retrieve a 3D time-series for a single Z-plane, you must collect individual time-series from each file.
 
-:ref:`collectPlanes` will do this for you.
+:ref:`combinePlanes` will do this for you given the path to the h5file and the index of which plane you wish to aquire.
+
+.. code-block:: MATLAB
+
+    z_time_series = combinePlanes(h5path, 3);
+    figure; imagesc(z_time_series(:,:,2)); axis image;
 
 Example Usage
 ****************************************************************
