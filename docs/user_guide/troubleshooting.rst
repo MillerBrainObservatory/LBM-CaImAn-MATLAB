@@ -1,35 +1,16 @@
 .. _troubleshooting:
 
-Troubleshooting Common Problems
+Troubleshooting
 ===============================
 
-MATLAB Path Issues
-------------------
+- Out of Memory during deserialization
 
-**Problem:** The `run_CNMF_patches` function errors out.
+  Sometimes during motion-correction, NormCorre will use more memory than it is supposed to. See <Issue Link>.
+  If you're using all of the cores your computing environment has available, that is almost certainly the cause. Decrease
+  the number of cores as the third input of :func:`motionCorrectPlane`. If this doesn't correct the issue, it is likely due to
+  a single 3D-planar time-series being too large to fit in memory, in which case you can prevent caiman from processing the image patches
+  in parallel. Keep in mind this will be noticably slower than the parallel counterpart.
 
-**Cause:** The CaImAn parent folder containing `run_CNMF_patches` is not on the MATLAB path.
-
-**Solution:**
-1. Check the MATLAB path configuration in the `segmentPlane` script, around line 150:
-
-   ```matlab
-   % give access to CaImAn files
-   addpath(genpath(fullfile('CaImAn-MATLAB-master','CaImAn-MATLAB-master')))
-   addpath(genpath(fullfile('motion_correction/')))
-   ```
-
-   This code adds paths relative to the current directory, which may fail if the `CaImAn-MATLAB-master` folder is not in the same directory as your MATLAB interpreter.
-
-2. Move the `CaImAn-MATLAB-master` folder to your userpath, typically `~/Documents/MATLAB/`. You can find this path by typing `userpath` in the MATLAB command window and placing the `CaImAn` folder there.
-
-3. Alternatively, you can modify the `planarSegmentation` script to use an absolute path:
-
-   ```matlab
-   % give access to CaImAn files
-   [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % grabs absolute path to this script
-   addpath(genpath(fullfile(currpath, '../CaImAn-MATLAB-master/CaImAn-MATLAB-master')));
-   ```
 
 Missing Compiled Binary (Windows)
 ---------------------------------
@@ -41,18 +22,19 @@ Missing Compiled Binary (Windows)
 **Solution:**
 1. Compile the binary in MATLAB via the command window:
 
-   ```matlab
+.. code-block:: MATLAB
+
    >> mex .\CaImAn_Utilities\CaImAn-MATLAB-master\CaImAn-MATLAB-master\utilities\graph_conn_comp_mex.cpp
    Building with 'MinGW64 Compiler (C++)'.
    MEX completed successfully.
-   ```
 
-Less-Likely Issues
-------------------
+Matlab Server Issues
+--------------------
 
-**Problem:** The `run_CNMF_patches` function still fails after addressing the common issues.
+These come in many flavors and are mostly `windows` issues due to their backgroundn serrvice.
 
-**Solution:**
+Here is the general fix for all of them:
+
 1. Task Manager:
 - End all MATLAB-related tasks.
 2. Check MATLAB License:
@@ -68,4 +50,3 @@ Less-Likely Issues
 - Run `which -all pathdef.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\pathdef.m`.
 - Run `which -all matlabrc.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\matlabrc.m`.
 
-If these solutions do not resolve the issue, please reach out for further assistance or schedule a Zoom call for additional troubleshooting.
