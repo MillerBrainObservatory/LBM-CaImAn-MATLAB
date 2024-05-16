@@ -11,9 +11,6 @@ LBM Documentation
    :width: 600
 
 
-Overview
-========
-
 A pipeline for processing light beads microscopy (LBM) datasets.
 
 For background, theory and design of LBM technology, see the reference `publication`_.

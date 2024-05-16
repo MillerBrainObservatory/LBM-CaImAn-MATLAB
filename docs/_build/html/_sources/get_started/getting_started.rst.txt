@@ -65,7 +65,7 @@ used for the demo.
 
 where `N` = the number of `[X, Y, T]` planar time-series.
 
-Following the recommendation described in :ref:`recommended-install` all necessary functions should already be on your
+Following the recommendation described in :ref:`install recommendation` all necessary functions should already be on your
 MATLAB path. If an error is encountered, such as:
 
 .. code-block:: MATLAB

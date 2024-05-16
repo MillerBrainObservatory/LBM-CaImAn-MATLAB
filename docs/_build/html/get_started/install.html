@@ -365,8 +365,8 @@ document.write(`
                   
   <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h1>
-<section id="recommendation">
-<h2>Recommendation<a class="headerlink" href="#recommendation" title="Link to this heading">#</a></h2>
+<section id="install-recommendation">
+<h2>Install Recommendation<a class="headerlink" href="#install-recommendation" title="Link to this heading">#</a></h2>
 <p>The easiest way to download the source code is to visit the <a class="reference external" href="https://github.com/ru-rbo/caiman_matlab.git">github repository</a>.</p>
 <p>The most reliable installation method is to clone/download the repository and move it into a folder on your <cite>userpath</cite>:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">userpath</span>
@@ -399,8 +399,9 @@ Or just download the code from code/Download.zip above and unzip to a directory 
 due to the separate filesystems. Pay attention to which environment you install.</p>
 </div>
 </section>
+</section>
 <section id="wsl2-windows-subsystem-for-linux">
-<h3>WSL2 (Windows Subsystem for Linux)<a class="headerlink" href="#wsl2-windows-subsystem-for-linux" title="Link to this heading">#</a></h3>
+<h2>WSL2 (Windows Subsystem for Linux)<a class="headerlink" href="#wsl2-windows-subsystem-for-linux" title="Link to this heading">#</a></h2>
 <p>Windows subsystem for Linux (WSL/WSL2) is a local environment on your windows machine that is capable of running linux commands using a separate filesystem. As of 2024, Mathworks does not officially support and is not planning support for MATLAB on WSL or WSL2.
 If you have MATLAB installed on Windows and wish to use this repository from a WSL instance, see <a class="reference external" href="https://ww2.mathworks.cn/matlabcentral/answers/1597219-can-microsoft-s-wslg-windows-subsystem-for-linux-gui-support-running-matlab">this discussion on how to accomplish this</a>.
 This means you will not be able to run matlab from the WSL filesystem (i.e. <cite>//wsl.localhost/</cite>), but you can use a mounted <cite>C://</cite> drive path like so:</p>
@@ -410,7 +411,7 @@ This means you will not be able to run matlab from the WSL filesystem (i.e. <cit
 <p>This pipeline has been tested on WSL2, Ubuntu 22.04. Though any debian-based distribution should work.</p>
 </section>
 <section id="for-unix-linux-macos">
-<h3>For unix (Linux/MacOS):<a class="headerlink" href="#for-unix-linux-macos" title="Link to this heading">#</a></h3>
+<h2>For unix (Linux/MacOS):<a class="headerlink" href="#for-unix-linux-macos" title="Link to this heading">#</a></h2>
 <p>In Linux, Mac, WSL or mysys, clone this repository with the pre-installed git client:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>~/Documents/MATLAB
 $<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ru-rbo/caiman_matlab.git
@@ -418,10 +419,8 @@ $<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>caima
 $<span class="w"> </span>matlab
 </pre></div>
 </div>
-</section>
-</section>
 <section id="find-matlab-install-location">
-<h2>Find MATLAB Install Location:<a class="headerlink" href="#find-matlab-install-location" title="Link to this heading">#</a></h2>
+<h3>Find MATLAB Install Location:<a class="headerlink" href="#find-matlab-install-location" title="Link to this heading">#</a></h3>
 <p>The location of the installation is often in <cite>~/Documents/MATLAB/</cite>.
 If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI.</p>
 <p>Modern versions of MATLAB (2017+) solve most Linux/Windows filesystem conflicts.</p>
@@ -453,6 +452,7 @@ If you put the root directory elsewhere, you will need to navigate to that direc
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">addpath</span><span class="p">(</span><span class="nb">genpath</span><span class="p">(</span><span class="s">&quot;path/to/caiman_matlab&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
+</section>
 </section>
 </section>
 
@@ -502,14 +502,16 @@ If you put the root directory elsewhere, you will need to navigate to that direc
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recommendation">Recommendation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-recommendation">Install Recommendation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#by-operating-system">By Operating System</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#windows">Windows</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#wsl2-windows-subsystem-for-linux">WSL2 (Windows Subsystem for Linux)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#for-unix-linux-macos">For unix (Linux/MacOS):</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#find-matlab-install-location">Find MATLAB Install Location:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#wsl2-windows-subsystem-for-linux">WSL2 (Windows Subsystem for Linux)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#for-unix-linux-macos">For unix (Linux/MacOS):</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#find-matlab-install-location">Find MATLAB Install Location:</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

@@ -373,7 +373,7 @@ document.write(`
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="convertScanImageTiffToVolume">
-<span class="sig-name descname"><span class="pre">convertScanImageTiffToVolume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filePath</span></em>, <em class="sig-param"><span class="pre">saveDirPath</span></em>, <em class="sig-param"><span class="pre">diagnosticFlag</span></em>, <em class="sig-param"><span class="pre">nvargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convertScanImageTiffToVolume" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">convertScanImageTiffToVolume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filePath</span></em>, <em class="sig-param"><span class="pre">saveDirPath</span></em>, <em class="sig-param"><span class="pre">diagnosticFlag</span></em>, <em class="sig-param"><span class="pre">fix_scan_phase</span></em>, <em class="sig-param"><span class="pre">overwrite</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convertScanImageTiffToVolume" title="Link to this definition">#</a></dt>
 <dd><p>CONVERTSCANIMAGETIFFTOVOLUME Convert ScanImage .tif files into a 4D volume.</p>
 <p>Convert raw <a class="reference external" href="https://www.mbfbioscience.com/products/scanimage/">ScanImage</a> multi-roi .tif files from a single session
 into a single 4D volume (x, y, z, t). It’s designed to process files for the
@@ -390,7 +390,9 @@ not exist. Defaults to the filePath if not provided.</p>
 <dt><strong>diagnosticFlag</strong><span class="classifier">double, logical, optional</span></dt><dd><p>If set to 1, the function displays the files in the command window and does
 not continue processing. Defaults to 0.</p>
 </dd>
-<dt><strong>nvargs</strong><span class="classifier">struct, optional</span></dt><dd><p>Options to pass to motion correction.</p>
+<dt><strong>fix_scan_phase</strong><span class="classifier">double, logical, optional</span></dt><dd><p>Whether to correct for bi-directional scanning. Default is 1, True</p>
+</dd>
+<dt><strong>overwrite</strong><span class="classifier">double, logical, optional</span></dt><dd><p>If True, data saved in the saveDirPath will be overwritten, otherwise the file will be skipped. Default is 0, False.</p>
 </dd>
 </dl>
 </dd>
@@ -399,14 +401,12 @@ not continue processing. Defaults to 0.</p>
 <p>The function adds necessary paths for ScanImage utilities and processes each .tif
 file found in the specified directory. It checks if the directory exists, handles
 multiple or single file scenarios, and can optionally report the directory’s contents
-based on the diagnosticFlag.</p>
-<p>Each file processed is logged, assembled into a 4D volume, and saved in a specified
-directory as a .mat file with accompanying metadata. The function also manages errors
-by cleaning up and providing detailed error messages if something goes wrong during
-processing.</p>
+based on the diagnosticFlag. Each file processed is logged, assembled into a 4D volumetric time-series, and saved in a specified
+directory as a .h5 file with accompanying metadata saved in the attributes. The function also manages errors
+by cleaning up and providing detailed error messages if something goes wrong during processing.</p>
 <p class="rubric">Examples</p>
-<p>convertScanImageTiffToVolume(‘C:/data/session1/’, ‘C:/processed/’, 0);
-convertScanImageTiffToVolume(‘C:/data/session1/’, ‘C:/processed/’, 1); % Diagnostic mode</p>
+<p>convertScanImageTiffToVolume(‘C:/data/session1/’, ‘C:/processed/’, 0); % Function will run
+convertScanImageTiffToVolume(‘C:/data/session1/’, ‘C:/processed/’, 1); % Only files will display</p>
 <p>See also <code class="docutils literal notranslate"><span class="pre">FILEPARTS</span></code>, <code class="docutils literal notranslate"><span class="pre">ADDPATH</span></code>, <code class="docutils literal notranslate"><span class="pre">GENPATH</span></code>, <code class="docutils literal notranslate"><span class="pre">ISFOLDER</span></code>, <code class="docutils literal notranslate"><span class="pre">DIR</span></code>, <code class="docutils literal notranslate"><span class="pre">FULLFILE</span></code>, <code class="docutils literal notranslate"><span class="pre">ERROR</span></code>, <code class="docutils literal notranslate"><span class="pre">REGEXP</span></code>, <code class="docutils literal notranslate"><span class="pre">SAVEFAST</span></code></p>
 </dd></dl>
 

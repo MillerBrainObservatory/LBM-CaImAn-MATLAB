@@ -367,27 +367,37 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="pre-processing">
-<span id="id1"></span><h1>Pre-Processing<a class="headerlink" href="#pre-processing" title="Link to this heading">#</a></h1>
-<p>Before beginning pre-processing, follow setup steps in <span class="xref std std-ref">getting_started</span> to make sure the pipeline and dependencies are installed properly.</p>
-<p>See <a class="reference internal" href="troubleshooting.html#troubleshooting"><span class="std std-ref">Troubleshooting</span></a> for common issues.</p>
+<h1>Pre-Processing<a class="headerlink" href="#pre-processing" title="Link to this heading">#</a></h1>
+<p>Before beginning pre-processing, follow setup steps in <a class="reference internal" href="../get_started/getting_started.html#getting-started"><span class="std std-ref">Getting Started</span></a> to make sure the pipeline and dependencies are installed properly.
+See <a class="reference internal" href="troubleshooting.html#troubleshooting"><span class="std std-ref">Troubleshooting</span></a> for common issues.</p>
 <p>Pre-processing LBM datasets consists of 2 main processing steps:</p>
-<ul class="simple">
-<li><p>1 ) Reshaping vertically concatenated strips into horizontally concatenated strips</p></li>
-<li><p>2 ) Piecewise motion-correction</p></li>
-</ul>
+<ol class="arabic simple">
+<li><p>Reshaping vertically concatenated strips into horizontally concatenated strips</p></li>
+<li><p>Piecewise motion-correction</p></li>
+</ol>
 <section id="re-construct-volumetric-time-series">
-<h2>1. Re-Construct Volumetric Time-Series<a class="headerlink" href="#re-construct-volumetric-time-series" title="Link to this heading">#</a></h2>
+<span id="pipeline-step-1"></span><h2>1. Re-Construct Volumetric Time-Series<a class="headerlink" href="#re-construct-volumetric-time-series" title="Link to this heading">#</a></h2>
 <p>Before processing starts, the raw scanimage output needs to be reconstructed to form a correctly-ordered time-series.
-This is accomplished through the use of <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a> of pre-processing.</p>
-<p>Shown in the image below is a graphical representation of this reconstruction. In its raw form (see A in the below figure), ScanImage tiff files are multipage tiffs - like a book. Each page
+This is accomplished through the use of <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a>.</p>
+<p>Shown in the image below is a graphical representation of this reconstruction.</p>
+<p>In its raw form (see A in the below figure), ScanImage tiff files are multipage tiffs - like a book. Each page
 is one <em>image</em>, but it doesn’t look like an image:</p>
 <a class="reference internal image-reference" href="../_images/abc_strip.png"><img alt="../_images/abc_strip.png" src="../_images/abc_strip.png" style="width: 1440px;" />
 </a>
-<p id="strips">The column labeled A in the above image, represents <strong>strips</strong> of our image, which are tiled horizontally into a full image.</p>
-<p>Each Z-Plane is written before moving onto the next timestep, e.g.:
-- z-plane 1 &#64; timepoint 1, z-plane 2 &#64; timepoint 1, z-plane 3 &#64; timepoint 1, etc.</p>
-<p>Thus, another task <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a> accomplishes are reordering this tiff stack to be:
-- z-plane 1 &#64; timepont 1, z-plane 1 &#64; timepoint 2, etc ..</p>
+<div class="line-block">
+<div class="line">A: In the above image, represents vertically concatenated <strong>strip</strong> of our image.</div>
+<div class="line">B: Strips are cut and horizontally concatenated.</div>
+<div class="line">C: After a scan-phase correction, lines between strips become unnoticable (ideally)</div>
+</div>
+<p>If you were to open up a raw ScanImage .tiff file in ImageJ, you would see a very long, thin bar as is shown in A.</p>
+<p>Each Z-Plane is written before moving onto the next timestep:</p>
+<ul class="simple">
+<li><p>z-plane 1 &#64; timepoint 1, z-plane 2 &#64; timepoint 1, z-plane 3 &#64; timepoint 1, etc.</p></li>
+</ul>
+<p>Thus, another task <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a> accomplishes are reordering this tiff stack to be:</p>
+<ul class="simple">
+<li><p>z-plane 1 &#64; timepont 1, z-plane 1 &#64; timepoint 2, etc ..</p></li>
+</ul>
 <p>The output <cite>volumetric time-series</cite> has dimensions <cite>[Y,X,Z,T]</cite>.</p>
 <p>If the user chooses to split frames across multiple <cite>.tiff</cite> files, there will be multiple tiff files in ascending order
 of a suffix appended to the filename: <cite>_000N</cite>, where n=number of files chosen by the user.</p>
@@ -397,13 +407,13 @@ of a suffix appended to the filename: <cite>_000N</cite>, where n=number of file
 No other .tiff files should be in this directory. If this happens, an error will throw.</p>
 </div>
 <p>You can chain the output of one function to the input of another. Note the path names match <a class="reference internal" href="../get_started/getting_started.html#directory-structure"><span class="std std-ref">Directory Structure</span></a>.</p>
-<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">parentpath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;C:\Users\RBO\Documents\data\bi_hemisphere\&#39;</span><span class="p">;</span>
-<span class="n">raw_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;raw\&#39;</span><span class="p">];</span>
-<span class="n">extract_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;extracted\&#39;</span><span class="p">];</span>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">parent_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;C:\Users\&lt;username&gt;\Documents\data\bi_hemisphere\&#39;</span><span class="p">;</span><span class="w"> </span><span class="c">%</span>
+<span class="n">raw_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parent_path</span><span class="w"> </span><span class="s">&#39;raw\&#39;</span><span class="p">];</span><span class="w"> </span><span class="c">% where our raw .tiffs go</span>
+<span class="n">extract_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parent_path</span><span class="w"> </span><span class="s">&#39;extracted\&#39;</span><span class="p">];</span>
 <span class="nb">mkdir</span><span class="p">(</span><span class="n">extract_path</span><span class="p">);</span><span class="w"> </span><span class="nb">mkdir</span><span class="p">(</span><span class="n">raw_path</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In this example, <cite>raw_path</cite> is where your raw <cite>.tiff</cite> files will be stored.</p>
+<p>In this example, <cite>raw_path</cite> is where your raw <cite>.tiff</cite> files will be stored and is the first parameter of <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a>.</p>
 <p>Our data are now saved as a single hdf5 file separated by file and by plane. This storage format
 makes it easy to motion correct each time-series individually. We will be processing small patches of the total image,
 roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.</p>
@@ -428,13 +438,11 @@ roughly 20um in parallel, so attempting to process multiple time-series will dra
 </div>
 <p>The attributes hold our metadata, the result of calling <cite>get_metadata(raw_path)</cite>:</p>
 <ul class="simple">
-<li><p>After successfully running <span class="xref std std-ref">convertScanImageTiffToVolume</span>, there will be a single <cite>.h5</cite> file containing extracted data.</p></li>
+<li><p>After successfully running <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a>, there will be a single <cite>.h5</cite> file containing extracted data.</p></li>
 </ul>
-<section id="outputs">
-<span id="step1-outputs"></span><h3>Outputs<a class="headerlink" href="#outputs" title="Link to this heading">#</a></h3>
-<p>The HDF5 file contains imaging data and metadata for the dataset. Below is a detailed description of the structure and contents of the HDF5 file.</p>
+<p id="step1-outputs">The H5 file contains imaging data and metadata for the dataset. Below is a detailed description of the structure and contents of the HDF5 file.</p>
 <section id="file-structure">
-<h4>File Structure<a class="headerlink" href="#file-structure" title="Link to this heading">#</a></h4>
+<h3>File Structure<a class="headerlink" href="#file-structure" title="Link to this heading">#</a></h3>
 <p>The HDF5 file is structured into groups and datasets to store the imaging data. The main components are as follows:</p>
 <ul class="simple">
 <li><p><strong>Groups</strong>: The file contains several groups, each representing a different file and plane of imaging data.</p></li>
@@ -455,7 +463,7 @@ roughly 20um in parallel, so attempting to process multiple time-series will dra
 </div>
 </section>
 <section id="groups-and-datasets">
-<h4>Groups and Datasets<a class="headerlink" href="#groups-and-datasets" title="Link to this heading">#</a></h4>
+<h3>Groups and Datasets<a class="headerlink" href="#groups-and-datasets" title="Link to this heading">#</a></h3>
 <p>Each group represents a different file and contains multiple planes of imaging data. For example:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">Filename</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;C:\Users\RBO\Documents\data\bi_hemisphere\extracted\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5&#39;</span>
 <span class="n">Name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;plane_1&#39;</span>
@@ -472,9 +480,11 @@ roughly 20um in parallel, so attempting to process multiple time-series will dra
 <li><p><strong>/file_N/plane_1</strong> through <strong>/file_N/plane_M</strong>: Each subgroup represents a different plane within the file, where <cite>M</cite> is the number of planar time-series.</p></li>
 </ul>
 <p>Attributes hold metadata about the dataset, including details about the imaging process, dimensions, and other relevant information.</p>
+<p>Due to this organization, to retrieve a 3D time-series for a single Z-plane, you must collect individual time-series from each file.</p>
+<p><span class="xref std std-ref">collectPlanes</span> will do this for you.</p>
 </section>
 <section id="example-usage">
-<h4>Example Usage<a class="headerlink" href="#example-usage" title="Link to this heading">#</a></h4>
+<h3>Example Usage<a class="headerlink" href="#example-usage" title="Link to this heading">#</a></h3>
 <p>You can access the HDF5 file contents using MATLAB commands as follows:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="c">% Load HDF5 file information</span>
 <span class="n">info</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">h5info</span><span class="p">(</span><span class="s">&#39;C:\Users\RBO\Documents\data\bi_hemisphere\extracted\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5&#39;</span><span class="p">);</span>
@@ -483,8 +493,6 @@ roughly 20um in parallel, so attempting to process multiple time-series will dra
 <span class="n">plane_info</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">h5info</span><span class="p">(</span><span class="s">&#39;C:\Users\RBO\Documents\data\bi_hemisphere\extracted\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;/file_1/plane_1&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>This provides detailed information about the file structure, groups, datasets, and attributes, helping you to navigate and understand the contents of the HDF5 file.</p>
-</section>
 </section>
 </section>
 <section id="piecewise-rigid-motion-correction">
@@ -525,7 +533,7 @@ roughly 20um in parallel, so attempting to process multiple time-series will dra
 <p>Perform both piecewise-rigid motion correction using <a class="reference internal" href="#normcorre">NormCORRe</a> to stabilize the imaging data. Each plane is motion corrected sequentially, so
 only a single plane is ever loaded into memory due to large LBM filesizes (&gt;35GB). A template of 150 frames is used to initialize a “reference image”.</p>
 <p>This image is your “ground truth” per-se, it is the image you want to most accurately represent the movement in your video.</p>
-<p>For input, use the same directory as <cite>savePath</cite> parameter in <span class="xref std std-ref">convertScanImageTiffToVolume</span>.</p>
+<p>For input, use the same directory as <cite>savePath</cite> parameter in <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a>.</p>
 <p>Metrics:</p>
 <a class="reference internal image-reference" href="../_images/motion_metrics.png"><img alt="../_images/motion_metrics.png" src="../_images/motion_metrics.png" style="width: 1440px;" />
 </a>
@@ -579,12 +587,9 @@ only a single plane is ever loaded into memory due to large LBM filesizes (&gt;3
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#re-construct-volumetric-time-series">1. Re-Construct Volumetric Time-Series</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs">Outputs</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#file-structure">File Structure</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#groups-and-datasets">Groups and Datasets</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#example-usage">Example Usage</a></li>
-</ul>
-</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#file-structure">File Structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#groups-and-datasets">Groups and Datasets</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-usage">Example Usage</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#piecewise-rigid-motion-correction">2. Piecewise-Rigid Motion-Correction</a></li>

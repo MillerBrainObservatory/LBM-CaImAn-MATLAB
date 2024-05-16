@@ -1,12 +1,11 @@
 
-###############
 Tips and Tricks
 ###############
 
 .. _help_functions:
 
 Learn about Functions
----------------------
+*********************
 
 | Run 'help <function>' in the command window for a detailed overview on function parameters, outputs and examples.
 
@@ -52,5 +51,69 @@ Learn about Functions
             convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 1); % just display files
 
       See also fileparts, addpath, genpath, isfolder, dir, fullfile, error, regexp, savefast
+
+MATLAB and Python
+******************
+
+Transitioning data pipelines between MATLAB and Python can be tricky. The two primary reasons for this are the indexing and row/column major array operations.
+
+Indexing
+========
+In modern-day computer science, most programming languages such as Python, Ruby, PHP, and Java have array indices starting at zero.
+A big reason for this is that it provides a clear distinction that ordinal forms (e.g. first, second, third) has a well-established meaning that the zeroth derivative of a function.
+
+Matlab, like Julia, was created for scientific computing tailored to beginners and thus adopted the more intuitive 1 based indexing.
+
+Row/Column Operations
+=====================
+
+In terms of practically transfering data between programming languages, 0 or 1 based indexing can be managed by single `enumerating <https://stackoverflow.com/a/7233597/12953787>`_ for loops.
+
+Number of Cores/Workers
+**********************************
+By default, Matlab creates as many workers as logical CPU cores. On Intel CPUs, the OS reports two logical cores per each physical core due to hyper-threading, for a total of 4 workers on a dual-core machine. However, in many situations, hyperthreading does not improve the performance of a program and may even degrade it (I deliberately wish to avoid the heated debate over this: you can find endless discussions about it online and decide for yourself). Coupled with the non-negligible overhead of starting, coordinating and communicating with twice as many Matlab instances (workers are headless [=GUI-less] Matlab processes after all), we reach a conclusion that it may actually be better in many cases to use only as many workers as physical (not logical) cores.
+I know the documentation and configuration panel seem to imply that parpool uses the number of physical cores by default, but in my tests I have seen otherwise (namely, logical cores). Maybe this is system-dependent, and maybe there is a switch somewhere that controls this, I don’t know. I just know that in many cases I found it beneficial to reduce the number of workers to the actual number of physical cores:
+
+.. code-block:: MATLAB
+
+    p = parpool;     % NOT RECOMMENDED, CaImAn will very likely run out of resources error
+    p = parpool(2);  % use only 2 parallel workers
+
+This can vary greatly across programs and platforms, so you should first ensure the pipeline will run using <1/2 available cores before increasing the compute demands.
+It would of course be better to dynamically retrieve the number of physical cores, rather than hard-coding a constant value (number of workers) into our program.
+
+We can get this value in Matlab using the undocumented feature(‘numcores’) function:
+
+.. code-block:: MATLAB
+
+    numCores = feature('numcores');
+    p = parpool(numCores);
+
+Running :code:`feature(‘numcores’)` without assigning its output displays some general debugging information:
+
+.. code-block:: MATLAB
+
+    >> feature('numcores')
+    MATLAB detected: 24 physical cores.
+    MATLAB detected: 32 logical cores.
+    MATLAB was assigned: 32 logical cores by the OS.
+    MATLAB is using: 24 logical cores.
+    MATLAB is not using all logical cores because hyper-threading is enabled.
+
+    ans =
+
+        24
+
+You can use this return value to decide how how much of your computers total processing power should be dedicated toward running this pipeline:
+
+.. code-block:: MATLAB
+
+    >> feature('numcores') - 2 % leave 2 cores open for the rest of the system
+
+    ans =
+
+        23
+
+This specific tip is equally valid for parfor/eval loops and spmd blocks, since both of them use the pool of workers started by parpool.
 
 

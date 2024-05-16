@@ -1,5 +1,5 @@
-function convertScanImageTiffToVolume(filePath, saveDirPath, diagnosticFlag, nvargs)
-%CONVERTSCANIMAGETIFFTOVOLUME Convert ScanImage .tif files into a 4D volume.
+function convertScanImageTiffToVolume(filePath, saveDirPath, diagnosticFlag, fix_scan_phase, overwrite)
+% CONVERTSCANIMAGETIFFTOVOLUME Convert ScanImage .tif files into a 4D volume.
 %
 % Convert raw `ScanImage`_ multi-roi .tif files from a single session
 % into a single 4D volume (x, y, z, t). It's designed to process files for the
@@ -16,38 +16,34 @@ function convertScanImageTiffToVolume(filePath, saveDirPath, diagnosticFlag, nva
 % diagnosticFlag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
-% nvargs : struct, optional
-%    Options to pass to motion correction.
+% fix_scan_phase : double, logical, optional
+%     Whether to correct for bi-directional scanning. Default is 1, True
+% overwrite : double, logical, optional
+%     If True, data saved in the saveDirPath will be overwritten, otherwise the file will be skipped. Default is 0, False.
 %
 % Notes
 % -----
 % The function adds necessary paths for ScanImage utilities and processes each .tif
 % file found in the specified directory. It checks if the directory exists, handles
 % multiple or single file scenarios, and can optionally report the directory's contents
-% based on the diagnosticFlag.
-%
-% Each file processed is logged, assembled into a 4D volume, and saved in a specified
-% directory as a .mat file with accompanying metadata. The function also manages errors
-% by cleaning up and providing detailed error messages if something goes wrong during
-% processing.
+% based on the diagnosticFlag. Each file processed is logged, assembled into a 4D volumetric time-series, and saved in a specified
+% directory as a .h5 file with accompanying metadata saved in the attributes. The function also manages errors
+% by cleaning up and providing detailed error messages if something goes wrong during processing.
 %
 % Examples
 % --------
-% convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 0);
-% convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 1); % Diagnostic mode
+% convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 0); % Function will run
+% convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 1); % Only files will display
 %
 % See also FILEPARTS, ADDPATH, GENPATH, ISFOLDER, DIR, FULLFILE, ERROR, REGEXP, SAVEFAST
-%
-% .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
 arguments
     filePath (1,:) char  % The directory containing the raw .tif files
     saveDirPath (1,:) char  = filePath   % The directory where processed files will be saved, created if id doesn't exist. Defaults to the filePath.
     diagnosticFlag (1,1) double {mustBeNumericOrLogical} = 0 % If 1, display the files in the command window and stop the process.
-    nvargs.fix_scan_phase logical = 1 % Correct bi-directional scanning (can be done in a separate step
-    nvargs.overwrite logical = 1 % Example
+    fix_scan_phase logical = 1 % Correct bi-directional scanning (can also be done in a separately)
+    overwrite logical = 1
 end
 
-%% ScanImage path
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
 % addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/SI2016bR1_2017-09-28-140040_defde478ed/')));
 addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/ScanImage/')));
@@ -109,14 +105,14 @@ else
         logFileName = sprintf('matlab_log_%d_%02d_%02d_%02d_%02d.txt', clck(1), clck(2), clck(3), clck(4), clck(5));
         logFullPath = fullfile(filePath, logFileName);
         fid = fopen(logFullPath, 'w');
-        
+
         %%  (I) Assemble ROI's from ScanImage
         %%% Loop through raw .tif files and reassemble planes/frames.
         numFiles = length(filesToProcess);
         for ijk = 1:numFiles
-            
+
             disp(['Loading file ' num2str(ijk) ' of ' num2str(numFiles) '...'])
-            
+
             date = datetime(now,'ConvertFrom','datenum');
             formatSpec = '%s Beginning file %u...\n';
             fprintf(fid,formatSpec,date,ijk);
