@@ -61,8 +61,23 @@ You can chain the output of one function to the input of another. Note the path 
     extract_path = [ parent_path 'extracted\'];
     mkdir(extract_path); mkdir(raw_path);
 
-In this example, `raw_path` is where your raw `.tiff` files will be stored and is the first parameter of :func:`convertScanImageTiffToVolume`.
+.. note::
 
+    The term "parameter" throughout this guide refers to the inputs to each function.
+    For example, running >>>help convertScanImageTiffToVolume in the command window will
+    show to you and describe the parameters of that function.
+
+This is all you need to start processing your data. Actually, it's quite more than you need.
+`raw_path` is where your raw `.tiff` files will be stored and is the first parameter of :func:`convertScanImageTiffToVolume`.
+`extract_path` is where our data will be saved, and is the second parameter.
+- Your raw and extract path can be in any folder you wish without worry of file-name conflicts.
+- All future pipeline steps will automatically exclude these files as they will not have the characters `_plane_` in the filename.
+
+
+
+.. note::
+
+   Don't put the characters `_plane_` together in your raw/extracted filenames!
 
 Our data are now saved as a single hdf5 file separated by file and by plane. This storage format
 makes it easy to motion correct each time-series individually. We will be processing small patches of the total image,
@@ -148,12 +163,13 @@ Attributes hold metadata about the dataset, including details about the imaging 
 
 Due to this organization, to retrieve a 3D time-series for a single Z-plane, you must collect individual time-series from each file.
 
-:ref:`combinePlanes` will do this for you given the path to the h5file and the index of which plane you wish to aquire.
+:func:`combinePlanes` will do this for you given the path to the h5file and the index of which plane you wish to aquire.
 
 .. code-block:: MATLAB
 
     z_time_series = combinePlanes(h5path, 3);
     figure; imagesc(z_time_series(:,:,2)); axis image;
+
 
 Example Usage
 ****************************************************************

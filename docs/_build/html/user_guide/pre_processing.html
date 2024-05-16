@@ -413,7 +413,21 @@ No other .tiff files should be in this directory. If this happens, an error will
 <span class="nb">mkdir</span><span class="p">(</span><span class="n">extract_path</span><span class="p">);</span><span class="w"> </span><span class="nb">mkdir</span><span class="p">(</span><span class="n">raw_path</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In this example, <cite>raw_path</cite> is where your raw <cite>.tiff</cite> files will be stored and is the first parameter of <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The term “parameter” throughout this guide refers to the inputs to each function.
+For example, running &gt;&gt;&gt;help convertScanImageTiffToVolume in the command window will
+show to you and describe the parameters of that function.</p>
+</div>
+<p>This is all you need to start processing your data. Actually, it’s quite more than you need.
+<cite>raw_path</cite> is where your raw <cite>.tiff</cite> files will be stored and is the first parameter of <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a>.
+<cite>extract_path</cite> is where our data will be saved, and is the second parameter.
+- Your raw and extract path can be in any folder you wish without worry of file-name conflicts.
+- All future pipeline steps will automatically exclude these files as they will not have the characters <cite>_plane_</cite> in the filename.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Don’t put the characters <cite>_plane_</cite> together in your raw/extracted filenames!</p>
+</div>
 <p>Our data are now saved as a single hdf5 file separated by file and by plane. This storage format
 makes it easy to motion correct each time-series individually. We will be processing small patches of the total image,
 roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.</p>
@@ -481,7 +495,7 @@ roughly 20um in parallel, so attempting to process multiple time-series will dra
 </ul>
 <p>Attributes hold metadata about the dataset, including details about the imaging process, dimensions, and other relevant information.</p>
 <p>Due to this organization, to retrieve a 3D time-series for a single Z-plane, you must collect individual time-series from each file.</p>
-<p><span class="xref std std-ref">combinePlanes</span> will do this for you given the path to the h5file and the index of which plane you wish to aquire.</p>
+<p><a class="reference internal" href="../api/utils.html#combinePlanes" title="combinePlanes"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">combinePlanes()</span></code></a> will do this for you given the path to the h5file and the index of which plane you wish to aquire.</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">z_time_series</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">combinePlanes</span><span class="p">(</span><span class="n">h5path</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
 <span class="nb">figure</span><span class="p">;</span><span class="w"> </span><span class="nb">imagesc</span><span class="p">(</span><span class="n">z_time_series</span><span class="p">(:,:,</span><span class="mi">2</span><span class="p">));</span><span class="w"> </span><span class="n">axis</span><span class="w"> </span><span class="s">image</span><span class="p">;</span>
 </pre></div>
