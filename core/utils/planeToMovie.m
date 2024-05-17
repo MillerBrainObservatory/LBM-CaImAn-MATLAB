@@ -1,5 +1,5 @@
 function planeToMovie(data, filename, x, y, frameRate, avgs,  zoom, decenter, buffer, crf, transcode_flag, scale_flag)
-%MAKEMOVIE Generate a movie from image data.
+% PLANETOMOVIE Generate a movie from image data.
 %
 % This function processes a 3D array of image data to create a video file,
 % applying optional zooming, cropping, and color scaling. The final video is
@@ -130,18 +130,18 @@ for k = 1:numFrames
             plot([max(x)-1.5*scaleBar max(x)-0.5*scaleBar],0.5.*[scaleBar scaleBar],'r-','LineWidth',6)
         end
         set(gca,'YDir','normal','XDir','reverse')
-        
+
         frame = getframe;
         I = frame.cdata(buffer+1:sizY+buffer,buffer+1:sizX+buffer,:);
         writeVideo(writerObj,I);
         clf(h)
-        
+
     elseif do_zoom == 1 && zoom(k) > 1
-        
-        if kfreeze == 0 
+
+        if kfreeze == 0
             kfreeze = k;
         end
-        
+
         imagesc(x,y,data(:,:,kfreeze))
         axis image
         axis off
@@ -152,14 +152,14 @@ for k = 1:numFrames
             plot([max(x)-1.5*scaleBar max(x)-0.5*scaleBar],0.5.*[scaleBar scaleBar],'r-','LineWidth',6)
         end
         set(gca,'YDir','normal','XDir','reverse')
-        
+
         dp = data(rect(1):rect(2),rect(3):rect(4),k);
         imagesc(zoom(k,2).*xp+decenter(k,2),zoom(k,1).*yp+decenter(k,1),dp)
         plot(zoom(k,2).*xp+decenter(k,2),zoom(k,1).*yp(1).*ones(size(xp))+decenter(k,1),'r-','LineWidth',2)
         plot(zoom(k,2).*xp+decenter(k,2),zoom(k,1).*yp(end).*ones(size(xp))+decenter(k,1),'r-','LineWidth',2)
         plot(zoom(k,2).*xp(1).*ones(size(yp))+decenter(k,2),zoom(k,1).*yp+decenter(k,1),'r-','LineWidth',2)
         plot(zoom(k,2).*xp(end).*ones(size(yp))+decenter(k,2),zoom(k,1).*yp+decenter(k,1),'r-','LineWidth',2)
-        
+
         frame = getframe;
         I = frame.cdata(buffer+1:sizY+buffer,buffer+1:sizX+buffer,:);
         writeVideo(writerObj,I);
