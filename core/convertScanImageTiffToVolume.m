@@ -125,7 +125,6 @@ else
             if ijk == 1
                 % metadata that will be the same for each file
                 metadata = get_metadata(current_fullfile);
-                metadata.savepath = saveDirPath;
             end
             [metadata] = assembleCorrectedROITiff(current_fullfile, metadata, 'group_path', grouppath, 'fix_scan_phase', nvargs.fix_scan_phase);
 
