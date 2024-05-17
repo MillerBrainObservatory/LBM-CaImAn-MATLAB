@@ -4,7 +4,7 @@ Segmentation and Deconvolution
 ###########################################
 
 
-.. image:: ../_static/_images/neuron_to_neuron_correlations.png
+.. thumbnail:: ../_static/_images/neuron_to_neuron_correlations.png
    :width: 600
 
 Overview
@@ -69,7 +69,7 @@ AtoAc
 Turn the CaImAn output A (sparse, spatial footprints for entire FOV) into Ac (sparse, spatial footprints localized around each neuron).
 - Standardizes the size of each neuron's footprint to a uniform (4*tau+1, 4*tau+1) matrix, centered on the neuron's centroid [acx x acy].
 
-.. image:: ../_static/_images/sparse_rep.png
+.. thumbnail:: ../_static/_images/sparse_rep.png
    :width: 600
 
 Component Validation

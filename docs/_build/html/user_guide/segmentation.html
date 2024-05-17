@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
@@ -38,6 +39,8 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/segmentation';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -368,9 +371,18 @@ document.write(`
                   
   <section id="segmentation-and-deconvolution">
 <span id="segmentation-deconvolution"></span><h1>Segmentation and Deconvolution<a class="headerlink" href="#segmentation-and-deconvolution" title="Link to this heading">#</a></h1>
-<a class="reference internal image-reference" href="../_images/neuron_to_neuron_correlations.png"><img alt="../_images/neuron_to_neuron_correlations.png" src="../_images/neuron_to_neuron_correlations.png" style="width: 600px;" />
-</a>
-<section id="overview">
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/neuron_to_neuron_correlations1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/neuron_to_neuron_correlations1.png"
+                     class=""
+                     width="600"
+                     height="auto"
+                     alt=""/>
+                </a><section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
 <p>The flourescence of the proteins in our neurons is <strong>correlated</strong> with how active the neuron is.
 Turning this flourescence into “spikes” relies on several operations:</p>
@@ -428,9 +440,18 @@ Turning this flourescence into “spikes” relies on several operations:</p>
 <h2>AtoAc<a class="headerlink" href="#atoac" title="Link to this heading">#</a></h2>
 <p>Turn the CaImAn output A (sparse, spatial footprints for entire FOV) into Ac (sparse, spatial footprints localized around each neuron).
 - Standardizes the size of each neuron’s footprint to a uniform (4*tau+1, 4*tau+1) matrix, centered on the neuron’s centroid [acx x acy].</p>
-<a class="reference internal image-reference" href="../_images/sparse_rep.png"><img alt="../_images/sparse_rep.png" src="../_images/sparse_rep.png" style="width: 600px;" />
-</a>
-</section>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/sparse_rep1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/sparse_rep1.png"
+                     class=""
+                     width="600"
+                     height="auto"
+                     alt=""/>
+                </a></section>
 <section id="component-validation">
 <h2>Component Validation<a class="headerlink" href="#component-validation" title="Link to this heading">#</a></h2>
 <p>The key idea for validating our neurons is that <strong>we know how long the brightness indicating neurons activity should stay bright</strong> as a function
