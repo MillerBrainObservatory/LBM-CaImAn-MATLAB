@@ -428,14 +428,16 @@ show to you and describe the parameters of that function.</p>
 <p class="admonition-title">Note</p>
 <p>Don’t put the characters <cite>_plane_</cite> together in your raw/extracted filenames!</p>
 </div>
-<p>Our data are now saved as a single hdf5 file separated by file and by plane. This storage format
-makes it easy to motion correct each time-series individually. We will be processing small patches of the total image,
-roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.</p>
-<p>Setting <cite>fix_scan_phase=true</cite> attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.</p>
+<p><cite>diagnostic_flag</cite> is the next parameter, setting this to 1, ‘1’, or true will display the detected files that would be processed, and stop. This is helpful for controlling which files are processed.</p>
+<p><cite>fix_scan_phasee</cite> is a very important parameter: it attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.</p>
 <a class="reference internal image-reference" href="../_images/corr_nocorr_phase_example.png"><img alt="../_images/corr_nocorr_phase_example.png" src="../_images/corr_nocorr_phase_example.png" style="width: 1080px;" />
 </a>
 <p>This example shows that shifting every <em>other</em> row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.</p>
-<p>For each <em>session</em>, we will get a single <cite>h5</cite> output file organized by file, then by plane:</p>
+<p>Our data are now saved as a single h5 file separated by file and by plane. This storage format
+makes it easy to motion correct each 3D planar time-series individually. We will be processing small patches of the total image,
+roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.
+After successfully running <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a>, there will be a single <cite>.h5</cite> file containing extracted data.</p>
+<p>You can use <code class="code docutils literal notranslate"><span class="pre">h5info(h5path)</span></code> in the MATLAB command window to reveal some helpful information about our data:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="nb">h5info</span><span class="p">(</span><span class="n">extract_path</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;file_1/plane_1&#39;</span><span class="p">)</span>
 
 <span class="w">  </span><span class="nb">struct</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">fields</span><span class="p">:</span>
@@ -450,10 +452,7 @@ roughly 20um in parallel, so attempting to process multiple time-series will dra
 <span class="n">Attributes</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">30</span>×<span class="mi">1</span><span class="w"> </span><span class="nb">struct</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>The attributes hold our metadata, the result of calling <cite>get_metadata(raw_path)</cite>:</p>
-<ul class="simple">
-<li><p>After successfully running <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a>, there will be a single <cite>.h5</cite> file containing extracted data.</p></li>
-</ul>
+<p>The attributes hold our metadata, the result of calling <cite>get_metadata(raw_path)</cite> (see <a class="reference internal" href="metadata.html#scanimage-metadata"><span class="std std-ref">ScanImage Metadata</span></a> for more information about the magic behind the scenes here).</p>
 <p id="step1-outputs">The H5 file contains imaging data and metadata for the dataset. Below is a detailed description of the structure and contents of the HDF5 file.</p>
 <section id="file-structure">
 <h3>File Structure<a class="headerlink" href="#file-structure" title="Link to this heading">#</a></h3>
