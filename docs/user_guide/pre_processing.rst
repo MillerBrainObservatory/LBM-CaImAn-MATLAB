@@ -64,7 +64,7 @@ You can chain the output of one function to the input of another. Note the path 
 .. note::
 
     The term "parameter" throughout this guide refers to the inputs to each function.
-    For example, running >>>help convertScanImageTiffToVolume in the command window will
+    For example, running "help convertScanImageTiffToVolume" in the command window will
     show to you and describe the parameters of that function.
 
 This is all you need to start processing your data. Actually, it's quite more than you need.
@@ -79,6 +79,8 @@ This is all you need to start processing your data. Actually, it's quite more th
 
 `diagnostic_flag` is the next parameter, setting this to 1, '1', or true will display the detected files that would be processed, and stop. This is helpful for controlling which files are processed.
 
+`overwrite`, similar to diagnostic flag, can be set to 1, '1', or true to enable overwriting any previously extracted data. Otherwise, a warning will show and no data will be saved.
+
 `fix_scan_phasee` is a very important parameter: it attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
 
 .. image:: ../_static/_images/corr_nocorr_phase_example.png
@@ -86,12 +88,52 @@ This is all you need to start processing your data. Actually, it's quite more th
 
 This example shows that shifting every *other* row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.
 
+Output
+****************************************************************
+
 Our data are now saved as a single h5 file separated by file and by plane. This storage format
 makes it easy to motion correct each 3D planar time-series individually. We will be processing small patches of the total image,
 roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.
 After successfully running :func:`convertScanImageTiffToVolume`, there will be a single `.h5` file containing extracted data.
 
-You can use :code:`h5info(h5path)` in the MATLAB command window to reveal some helpful information about our data:
+You can use :code:`h5info(h5path)` in the MATLAB command window to reveal some helpful information about our data.
+
+The following is an example structure of the HDF5 file at the outermost level:
+
+.. code-block:: MATLAB
+
+    h5info(extract_path, '/')
+
+    Filename: 'C:\Users\<username>\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5'
+    Name: '/'
+    Groups:
+        /file_1
+        /file_2
+        /file_3
+    Datasets: []
+    Datatypes: []
+    Links: []
+    Attributes: []
+
+We see here that our "parent" group has 3 subgroups corresponding to the number of raw .tiff files. Lets explore one of these "file" subgroups:
+
+.. code-block:: MATLAB
+
+    >> h5info(extract_path, '/file_1')
+
+    info =
+
+      struct with fields:
+
+          Filename: 'C:\Users\RBO\Documents\data\bi_hemisphere\extracted\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5'
+              Name: '/file_1'
+            Groups: []
+          Datasets: [30×1 struct]
+         Datatypes: []
+             Links: []
+        Attributes: []
+
+We see that there are 30 datasets corresponding to each of our Z-planes, but no groups or attributes. That information is stored within each plane:
 
 .. code-block:: MATLAB
 
@@ -108,57 +150,8 @@ You can use :code:`h5info(h5path)` in the MATLAB command window to reveal some h
        Filters: [1×1 struct]
     Attributes: [30×1 struct]
 
-The attributes hold our metadata, the result of calling `get_metadata(raw_path)` (see `metadata`_ for more information about the magic behind the scenes here).
-
-
-.. _step1_outputs:
-
-The H5 file contains imaging data and metadata for the dataset. Below is a detailed description of the structure and contents of the HDF5 file.
-
-File Structure
-****************************************************************
-
-The HDF5 file is structured into groups and datasets to store the imaging data. The main components are as follows:
-
-- **Groups**: The file contains several groups, each representing a different file and plane of imaging data.
-- **Attributes**: Metadata associated with each group and dataset.
-
-The following is an example structure of the HDF5 file:
-
-.. code-block:: MATLAB
-
-    Filename: 'C:\Users\<username>\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5'
-    Name: '/'
-    Groups:
-        /file_1
-        /file_2
-        /file_3
-    Datasets: []
-    Datatypes: []
-    Links: []
-    Attributes: []
-
-Groups and Datasets
-****************************************************************
-
-Each group represents a different file and contains multiple planes of imaging data. For example:
-
-.. code-block:: MATLAB
-
-    Filename: 'C:\Users\RBO\Documents\data\bi_hemisphere\extracted\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5'
-    Name: 'plane_1'
-    Datatype: [1×1 struct]
-    Dataspace: [1×1 struct]
-    ChunkSize: [1165 1202 1]
-    FillValue: 0
-    Filters: [1×1 struct]
-    Attributes: [30×1 struct]
-
-
-- **/file_1** - **/file_N**: Each group corresponds to a different file, where `N` is the total number of files.
-- **/file_N/plane_1** through **/file_N/plane_M**: Each subgroup represents a different plane within the file, where `M` is the number of planar time-series.
-
-Attributes hold metadata about the dataset, including details about the imaging process, dimensions, and other relevant information.
+- **Groups**: h5 files can be thought of like directories where a 3D time-series is self contained within its own folder (or group).
+- **Attributes**: Attributes are special "tags" attached to a group. This is where we store metadata associated with each group and dataset. The result of calling `get_metadata(raw_path)` (see :ref:`scanimage metadata` for more information about the magic behind the scenes here).
 
 Due to this organization, to retrieve a 3D time-series for a single Z-plane, you must collect individual time-series from each file.
 
@@ -166,28 +159,24 @@ Due to this organization, to retrieve a 3D time-series for a single Z-plane, you
 
 .. code-block:: MATLAB
 
+    % retrieve a 3D time-series for the third z-plane
     z_time_series = combinePlanes(h5path, 3);
+
+    % visualize the second timestep
     figure; imagesc(z_time_series(:,:,2)); axis image;
 
-
-Example Usage
-****************************************************************
-
-You can access the HDF5 file contents using MATLAB commands as follows:
-
-.. code-block:: MATLAB
-
-    % Load HDF5 file information
-    info = h5info('C:\Users\RBO\Documents\data\bi_hemisphere\extracted\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5');
-
-    % Access information about a specific plane
-    plane_info = h5info('C:\Users\RBO\Documents\data\bi_hemisphere\extracted\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5', '/file_1/plane_1');
+.. image:: ../_static/_images/quickview_blue.png
+   :width: 1440
 
 2. Piecewise-Rigid Motion-Correction
 ================================================================
 
-.. image:: ../_static/_images/storage_rec.png
-   :width: 1440
+The goal of motion correction is to make sure that our neuron in the first frame is in the same spatial location as in frame N throughout the time-series.
+Natural movement by the animal during experimental tasks can cause our images spatial potition varying slightly frame by frame. The extent of this movement can also vary widely depending
+on the type of task the animal is performing.
+
+For this reason, it is very important for the researcher to verify that any motion artifacts in the movie are removed before moving onto any subsequent computations.
+
 
 Motion correction relies on _`NoRMCorre` for piecewise-rigid motion correction resulting in shifts for each patch.
 
@@ -205,6 +194,9 @@ To run motion-correction, call `motionCorrectPlane()`:
 - The output is a 2D column vector [x, y] with shifts that allow you to reconstruct the motion-corrected movie with _`core.utils.translateFrames`.
 - shifts(:,1) represent pixel-shifts in *x*
 - shifts(:,2) represent pixel-shifts in *y*
+
+.. image:: ../_static/_images/storage_rec.png
+   :width: 1440
 
 .. code-block:: MATLAB
 
