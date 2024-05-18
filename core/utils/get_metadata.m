@@ -32,19 +32,22 @@ hTiff = Tiff(filename);
 
 % Metadata in JSON format stored by ScanImage in the 'Artist' tag
 roiStr = hTiff.getTag('Artist');
+
 roiStr(roiStr == 0) = []; % Remove null termination from string
+
 mdata = most.json.loadjson(roiStr); % Decode JSON string to structure
 mdata = mdata.RoiGroups.imagingRoiGroup.rois; % Pull out a single ROI, assumes ROIs will always be the same
 num_rois = length(mdata); % only accurate way to determine the number of ROI's
 mdata = mdata{:};
-scanfields = mdata.scanfields;
+
 
 % ROI (scanfield) metadata, gives us pixel sizes
+scanfields = mdata.scanfields;
 center_xy = scanfields.centerXY;
 size_xy = scanfields.sizeXY;
 num_pixel_xy = scanfields.pixelResolutionXY; % misleading name
 
-% TIFF header data for additional metadata
+% TIFF header data for raw image sizes
 [header, ~] = scanimage.util.private.getHeaderData(hTiff);
 image_length = hTiff.getTag('ImageLength'); % Image height in pixels
 image_width = hTiff.getTag('ImageWidth'); % Image width in pixels
