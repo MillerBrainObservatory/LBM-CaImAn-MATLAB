@@ -6,12 +6,14 @@ function translatedFrames = translateFrames(Y, shifts_2D)
 % independently, and the result is returned as a 3D stack of 
 % (Height x Width x num_frames) translated frames.
 %
-% Inputs:
-%   Y - A 3D time series of image frames (Height x Width x Number of Frames).
-%   t_shifts - An Nx2 matrix of translation vectors for each frame (N is the number of frames).
+% Parameters:
+% -----------
+% Y - A 3D time series of image frames (Height x Width x Number of Frames).
+% t_shifts - An Nx2 matrix of translation vectors for each frame (N is the number of frames).
 %
-% Output:
-%   translatedFrames - A 3D array of translated image frames, same size and type as Y.
+% Returns:
+% --------
+% translatedFrames - A 3D array of translated image frames, same size and type as Y.
     arguments
         Y double {mustBeNumeric, mustBeNonempty}
         shifts_2D (:,2) double {mustBeNumeric, mustBeNonempty} % should match size as well

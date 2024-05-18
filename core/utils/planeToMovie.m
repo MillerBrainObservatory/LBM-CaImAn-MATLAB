@@ -1,19 +1,20 @@
 function planeToMovie(data, filename, x, y, frameRate, avgs,  zoom, decenter, buffer, crf, transcode_flag, scale_flag)
-%MAKEMOVIE Generate a movie from image data.
+%PLANETOMOVIE Generate a movie from image data.
 %
 % This function processes a 3D array of image data to create a video file,
 % applying optional zooming, cropping, and color scaling. The final video is
 % saved in AVI format and can be transcoded to MP4.
 %
-% Inputs:
-%   data - 3D matrix of image data.
-%   filename - Name of the output video file.
-%   x - Horizontal coordinates.
-%   y - Vertical coordinates.
-%   frameRate - Frame rate of the output video.
-%   avgs - Number of frames to average.
-%   decenter - Decentering offsets.
-%   crf - Constant Rate Factor for video quality.
+% Parameters:
+% -----------
+% data - 3D matrix of image data.
+% filename - Name of the output video file.
+% x - Horizontal coordinates.
+% y - Vertical coordinates.
+% frameRate - Frame rate of the output video.
+% avgs - Number of frames to average.
+% decenter - Decentering offsets.
+% crf - Constant Rate Factor for video quality.
 arguments
     data {mustBeNumeric}
     filename (1,:) char
