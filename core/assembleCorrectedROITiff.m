@@ -19,14 +19,14 @@ function [metadata] = assembleCorrectedROITiff(filename, metadata, nvargs)
     Aout = hTif.data();
     Aout = most.memfunctions.inPlaceTranspose(Aout); % the ScanImageTiffReader reads data in row major order
 
-    % deinterleave zT
+    % de-interleave zplanes and timepoints
     Aout = reshape(Aout,[size(Aout,1) size(Aout,2) metadata.num_planes, metadata.num_frames_file]);
     
-    raw_roi_width = metadata.num_pixel_xy(1);
+    raw_roi_width = metadata.num_pixel_xy(1); % before trimming
     raw_roi_height = metadata.num_pixel_xy(2);
 
-    trim_roi_width_start = 6;
-    trim_roi_width_end = raw_roi_width - 6;
+    trim_roi_width_start = 7;
+    trim_roi_width_end = 138;
 
     new_roi_width_range = trim_roi_width_start:trim_roi_width_end;
     new_roi_width = size(new_roi_width_range, 2);
@@ -37,10 +37,10 @@ function [metadata] = assembleCorrectedROITiff(filename, metadata, nvargs)
     new_roi_height_range = trim_roi_height_start:trim_roi_height_end; % controls the width on each side of the concatenated strips
     
     if nvargs.fix_scan_phase
-        trimmed_height = trim_roi_height_end - (trim_roi_height_start - 1);
-        trimmed_width = new_roi_width * metadata.num_rois;
+        % trimmed_height = trim_roi_height_end - (trim_roi_height_start - 1);
+        % trimmed_width = new_roi_width * metadata.num_rois;
         arr_dtype = 'single';
-        trimmed_array = zeros(trimmed_width, trimmed_height, metadata.num_frames_file, arr_dtype);
+        % trimmed_array = zeros(trimmed_width, trimmed_height, metadata.num_frames_file, arr_dtype);
     else
         arr_dtype='uint16';
     end
