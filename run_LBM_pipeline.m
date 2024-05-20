@@ -19,7 +19,7 @@
 % manually by right clicking caiman_matlab folder and "add packages and
 % subpackages to path" or via the startup.m file. Both methods described in
 % more detail in the README.
-clc
+clc, clear;
 [fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
 addpath(genpath(fullfile(fpath, 'core/')));
 
@@ -35,25 +35,29 @@ end
 
 parent_path = 'C:\Users\RBO\Documents\data\bi_hemisphere\';
 raw_path = [ parent_path 'raw\'];
-extract_path = [ parent_path 'extracted\'];
+extract_path = [ parent_path 'extracted_gt_strip\'];
 mc_path = [ parent_path 'registration\'];
-traces_path = [ parent_path 'traces\'];
+traces_path = [ parent_path 'traces_gt_strip\'];
+mdata = get_metadata(fullfile(raw_path ,"MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.tif"));
+mdata.base_filename = "MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001";
 
 mkdir(extract_path); mkdir(raw_path); mkdir(mc_path); mkdir(traces_path);
 
 %% 1a) Pre-Processing
 
-% convertScanImageTiffToVolume(raw_path, extract_path, 0,'fix_scan_phase', false);
+convertScanImageTiffToVolume(raw_path, extract_path, 0, 'fix_scan_phase', false);
 
 %% 1b) Motion Correction
 
 mdata = get_metadata(fullfile(raw_path ,"MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.tif"));
 mdata.base_filename = "MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001";
+mc_path_new = [ parent_path 'registration_test\'];
 
-% motionCorrectPlane(extract_path, mc_path, 23, 1, 30);
+motionCorrectPlane(extract_path, mc_path_new, 23, 1, 30);
 
 %% 2) CNMF Plane-by-plane SegmentationS
-segmentPlane(mc_path, traces_path, mdata, '0','1','30','23');
+
+segmentPlane(mc_path, traces_path, mdata, '0','30','30','23');
 
 %% 3) Axial Offset Correction
 collatePlanes()

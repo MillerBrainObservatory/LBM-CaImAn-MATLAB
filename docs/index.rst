@@ -7,9 +7,9 @@
 LBM Documentation
 #################
 
-.. image:: ./_static/_images/overlays.png
-   :width: 600
-
+.. thumbnail:: ./_static/_images/overlays.png
+   :download: true
+   :align: center
 
 A pipeline for processing light beads microscopy (LBM) datasets.
 

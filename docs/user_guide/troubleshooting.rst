@@ -1,7 +1,11 @@
-.. _troubleshooting:
-
 Troubleshooting
-===============================
+===============
+
+Memory
+####################
+
+- Number of Workers/Cores > 100: There a a known bug in MATLAB R2023a for cases when the number of workers is more than 100.
+  Refer to the following `bug report`_ for a workaround to resolve the issue. Additionally, steps taken in :ref:`matlab server issues` can help to solve this problem.
 
 - Out of Memory during deserialization
 
@@ -13,11 +17,11 @@ Troubleshooting
 
 
 Missing Compiled Binary (Windows)
----------------------------------
+#################################
 
-**Problem:** The `run_CNMF_patches` function errors out on Windows.
+- Typically seen as: `run_CNMF_patches` function errors out on Windows.
 
-**Cause:** Missing compiled binary for `graph_conn_comp_mex.mexw64`.
+**Cause:** Likely caused by missing compiled binary for `graph_conn_comp_mex.mexw64 (win)`/ `graph_conn_comp_mex.mexa64 (unix)`
 
 **Solution:**
 1. Compile the binary in MATLAB via the command window:
@@ -28,10 +32,16 @@ Missing Compiled Binary (Windows)
    Building with 'MinGW64 Compiler (C++)'.
    MEX completed successfully.
 
-Matlab Server Issues
---------------------
+.. note::
 
-These come in many flavors and are mostly `windows` issues due to their backgroundn serrvice.
+   Newest version 0.2.0+ include both precompiled binaries.
+
+Matlab Server Issues
+#################################
+
+.. _server_issues:
+
+These come in many flavors and are mostly `windows` issues due to their background serrvice.
 
 Here is the general fix for all of them:
 
@@ -50,3 +60,4 @@ Here is the general fix for all of them:
 - Run `which -all pathdef.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\pathdef.m`.
 - Run `which -all matlabrc.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\matlabrc.m`.
 
+ .. _bug report: https://www.mathworks.com/support/bugreports/details/2968710.html`

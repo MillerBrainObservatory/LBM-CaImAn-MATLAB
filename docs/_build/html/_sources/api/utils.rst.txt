@@ -7,5 +7,10 @@ Utils
     :maxdepth: 1
     :caption: Utility Functions:
 
-.. autofunction:: translateFrames
 .. autofunction:: get_metadata
+.. autofunction:: combinePlanes
+.. autofunction:: planeToMovie
+.. autofunction:: planeToH5
+.. autofunction:: planeToTiff
+.. autofunction:: writeMatToTiffStack
+.. autofunction:: translateFrames

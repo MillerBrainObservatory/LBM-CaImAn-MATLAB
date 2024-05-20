@@ -10,3 +10,5 @@ Core Functions
 .. autofunction:: segmentPlane
 .. autofunction:: collatePlanes
 .. autofunction:: calculateZOffset
+
+.. _ScanImage: https://www.mbfbioscience.com/products/scanimage/

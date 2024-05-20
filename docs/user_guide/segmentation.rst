@@ -1,14 +1,17 @@
 .. _segmentation_deconvolution:
 
-******************************
 Segmentation and Deconvolution
-******************************
+###########################################
 
-.. image:: ../_static/_images/neuron_to_neuron_correlations.png
+
+.. thumbnail:: ../_static/_images/neuron_to_neuron_correlations.png
    :width: 600
 
 Overview
---------
+==================
+
+The flourescence of the proteins in our neurons is **correlated** with how active the neuron is.
+Turning this flourescence into "spikes" relies on several operations:
 
 - Use `matfile` to load parameters of the motion-corrected movie without loading the entire movie into memory.
 - Set parameters for CNMF.
@@ -28,30 +31,80 @@ Dependencies: CaImAn_Utilities
 
 .. note::
 
-    No time threshold.
+    No time threshold is used for component validation.
+
+Function Usage
+====================================
+
+segmentPlane
+************************************
+
+:ref:`segmentPlane` contains the bulk of the computational complexity in this pipeline and will take significantly longer than the previous steps.
+
+Inputs to :ref:`segmentPlane` are similar to those seen previously. Most importantly:
+
+- data_path: full path to motion-corrected `.mat` files::
+
+    data_path should contain a single .mat file for **each 3D planar time-series**
+
+    The pipeline forces filenames to contain _plane_N.mat, which is used to isolate only motion-corrected
+    mat files for this session.
+
+- save_path: full path to a folder where you would like to save the neuron/neuropil components and traces::
+
+    This will, as of v0.2.0, overwrite any previously obtained data in this folder.
+
+When running :ref:`segmentPlane`, check the command window for reports that match the number of files you expect to be processed:
+
+.. code-block:: MATLAB
+
+    Processing 30 files found in directory C:\Users\<username>\Documents\data\bi_hemisphere\registration\...  %% our data_path
+    Beginning calculations for plane 1 of 30...  %% check this matches the number of Z-Planes you expect
+    Data loaded in. This process takes 0.024489 minutes.
+    Beginning patched, volumetric CNMF...
 
 AtoAc
------
+====================================
+
 Turn the CaImAn output A (sparse, spatial footprints for entire FOV) into Ac (sparse, spatial footprints localized around each neuron).
 - Standardizes the size of each neuron's footprint to a uniform (4*tau+1, 4*tau+1) matrix, centered on the neuron's centroid [acx x acy].
 
-.. image:: ../_static/_images/sparse_rep.png
+.. thumbnail:: ../_static/_images/sparse_rep.png
    :width: 600
 
 Component Validation
---------------------
+====================================
+
+The key idea for validating our neurons is that **we know how long the brightness indicating neurons activity should stay bright** as a function
+of the number of frames. That is, our calcium indicator (in this example: GCaMP-6s), with a rise-time of 250ms and a decay-time of 500ms = 750ms, while we
+record at 4.7 frames/second = “Samples per transient\=round(4.7Hz×(0.2s+0.55s))\=3”
+
 - Use the decay time (0.5s) multiplied by the number of frames to estimate the number of samples expected in the movie.
 - Calculate the likelihood of an unexpected event (e.g., a spike) and return a value metric for the quality of the components.
   - Normal Cumulative Distribution function, input = -min_SNR.
 - Evaluate the likelihood of observing traces given the distribution of noise.
 
+Parameters
+====================================
+
+There are many, many parameters used in segmentation and deconvolution. Many of the parameters are sensitive to the  pixel resolution and FOV of the recording. This section discusses such parameters.
+The most influencial parameters hold information about the size of neurons and dynamics of the calcium indicator in time.
+
 Tau
----
+************************************
+
+- Tau is the `half-size` of a neuron. If a neuron is 10 micron, tau will be a 5 micon.
 - In general, round up.
 - The kernel is fixed to have this decay and is not fit to the data.
 
+merge_thresh
+************************************
+
+- The value of the correlation coefficient (between 0-1) at which two neurons are considered "the same neuron!", thus merge them.
+- This correlation is done temporally.
+
 Exact CaImAn Parameters
------------------------
+************************************
 
 .. code-block:: MATLAB
 
@@ -76,8 +129,7 @@ Exact CaImAn Parameters
 - S and g are then used to produce C, which (hopefully) looks like the raw trace Y, but much cleaner and smoother. The optional output YrA is equal to Y-C, representing the original raw trace.
 
 Deconvolution
--------------
-
+============================
 
 TODO: put this foopsi trickyness information in "For Developers" section
 

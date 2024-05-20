@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
@@ -38,6 +39,8 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/metadata';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -368,7 +371,7 @@ document.write(`
                   
   <section id="scanimage-metadata">
 <h1>ScanImage Metadata<a class="headerlink" href="#scanimage-metadata" title="Link to this heading">#</a></h1>
-<p>As discussed in <span class="xref std std-ref">strips</span>, reconstructing an image from the ScanImage <cite>.tiff</cite> file is handled internally by the pipeline. This describes
+<p>As discussed in <a class="reference internal" href="pre_processing.html#pipeline-step-1"><span class="std std-ref">1. Re-Construct Volumetric Time-Series</span></a>, reconstructing an image from the ScanImage <cite>.tiff</cite> file is handled internally by the pipeline. This describes
 the metadata that hold all of the values used for that process.</p>
 <p>The funcion <a class="reference internal" href="../api/utils.html#get_metadata" title="get_metadata"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">get_metadata()</span></code></a> takes as input a path to any <a class="reference external" href="https://www.mbfbioscience.com/products/scanimage/">ScanImage</a> tiff file and returns the metadata.</p>
 <div class="admonition note" id="mdetadata-disclaimer">

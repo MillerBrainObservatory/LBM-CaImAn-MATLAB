@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
@@ -38,6 +39,8 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/tips_tricks';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -416,6 +419,58 @@ document.write(`
 </pre></div>
 </div>
 </section>
+<section id="matlab-and-python">
+<h2>MATLAB and Python<a class="headerlink" href="#matlab-and-python" title="Link to this heading">#</a></h2>
+<p>Transitioning data pipelines between MATLAB and Python can be tricky. The two primary reasons for this are the indexing and row/column major array operations.</p>
+<section id="indexing">
+<h3>Indexing<a class="headerlink" href="#indexing" title="Link to this heading">#</a></h3>
+<p>In modern-day computer science, most programming languages such as Python, Ruby, PHP, and Java have array indices starting at zero.
+A big reason for this is that it provides a clear distinction that ordinal forms (e.g. first, second, third) has a well-established meaning that the zeroth derivative of a function.</p>
+<p>Matlab, like Julia, was created for scientific computing tailored to beginners and thus adopted the more intuitive 1 based indexing.</p>
+</section>
+<section id="row-column-operations">
+<h3>Row/Column Operations<a class="headerlink" href="#row-column-operations" title="Link to this heading">#</a></h3>
+<p>In terms of practically transfering data between programming languages, 0 or 1 based indexing can be managed by single <a class="reference external" href="https://stackoverflow.com/a/7233597/12953787">enumerating</a> for loops.</p>
+</section>
+</section>
+<section id="number-of-cores-workers">
+<h2>Number of Cores/Workers<a class="headerlink" href="#number-of-cores-workers" title="Link to this heading">#</a></h2>
+<p>By default, Matlab creates as many workers as logical CPU cores. On Intel CPUs, the OS reports two logical cores per each physical core due to hyper-threading, for a total of 4 workers on a dual-core machine. However, in many situations, hyperthreading does not improve the performance of a program and may even degrade it (I deliberately wish to avoid the heated debate over this: you can find endless discussions about it online and decide for yourself). Coupled with the non-negligible overhead of starting, coordinating and communicating with twice as many Matlab instances (workers are headless [=GUI-less] Matlab processes after all), we reach a conclusion that it may actually be better in many cases to use only as many workers as physical (not logical) cores.
+I know the documentation and configuration panel seem to imply that parpool uses the number of physical cores by default, but in my tests I have seen otherwise (namely, logical cores). Maybe this is system-dependent, and maybe there is a switch somewhere that controls this, I don’t know. I just know that in many cases I found it beneficial to reduce the number of workers to the actual number of physical cores:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">parpool</span><span class="p">;</span><span class="w">     </span><span class="c">% NOT RECOMMENDED, CaImAn will very likely run out of resources error</span>
+<span class="n">p</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">parpool</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span><span class="w">  </span><span class="c">% use only 2 parallel workers</span>
+</pre></div>
+</div>
+<p>This can vary greatly across programs and platforms, so you should first ensure the pipeline will run using &lt;1/2 available cores before increasing the compute demands.
+It would of course be better to dynamically retrieve the number of physical cores, rather than hard-coding a constant value (number of workers) into our program.</p>
+<p>We can get this value in Matlab using the undocumented feature(‘numcores’) function:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">numCores</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">feature</span><span class="p">(</span><span class="s">&#39;numcores&#39;</span><span class="p">);</span>
+<span class="n">p</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">parpool</span><span class="p">(</span><span class="n">numCores</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Running <code class="code docutils literal notranslate"><span class="pre">feature(‘numcores’)</span></code> without assigning its output displays some general debugging information:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">feature</span><span class="p">(</span><span class="s">&#39;numcores&#39;</span><span class="p">)</span>
+<span class="n">MATLAB</span><span class="w"> </span><span class="s">detected:</span><span class="w"> </span><span class="s">24</span><span class="w"> </span><span class="s">physical</span><span class="w"> </span><span class="s">cores.</span>
+<span class="n">MATLAB</span><span class="w"> </span><span class="s">detected:</span><span class="w"> </span><span class="s">32</span><span class="w"> </span><span class="s">logical</span><span class="w"> </span><span class="s">cores.</span>
+<span class="n">MATLAB</span><span class="w"> </span><span class="s">was</span><span class="w"> </span><span class="s">assigned:</span><span class="w"> </span><span class="s">32</span><span class="w"> </span><span class="s">logical</span><span class="w"> </span><span class="s">cores</span><span class="w"> </span><span class="s">by</span><span class="w"> </span><span class="s">the</span><span class="w"> </span><span class="s">OS.</span>
+<span class="n">MATLAB</span><span class="w"> </span><span class="s">is</span><span class="w"> </span><span class="s">using:</span><span class="w"> </span><span class="s">24</span><span class="w"> </span><span class="s">logical</span><span class="w"> </span><span class="s">cores.</span>
+<span class="n">MATLAB</span><span class="w"> </span><span class="s">is</span><span class="w"> </span><span class="s">not</span><span class="w"> </span><span class="s">using</span><span class="w"> </span><span class="s">all</span><span class="w"> </span><span class="s">logical</span><span class="w"> </span><span class="s">cores</span><span class="w"> </span><span class="s">because</span><span class="w"> </span><span class="s">hyper-threading</span><span class="w"> </span><span class="s">is</span><span class="w"> </span><span class="s">enabled.</span>
+
+<span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
+
+<span class="w">    </span><span class="mi">24</span>
+</pre></div>
+</div>
+<p>You can use this return value to decide how how much of your computers total processing power should be dedicated toward running this pipeline:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">feature</span><span class="p">(</span><span class="s">&#39;numcores&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="c">% leave 2 cores open for the rest of the system</span>
+
+<span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
+
+<span class="w">    </span><span class="mi">23</span>
+</pre></div>
+</div>
+<p>This specific tip is equally valid for parfor/eval loops and spmd blocks, since both of them use the pool of workers started by parpool.</p>
+</section>
 </section>
 
 
@@ -465,6 +520,12 @@ document.write(`
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#learn-about-functions">Learn about Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matlab-and-python">MATLAB and Python</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#indexing">Indexing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#row-column-operations">Row/Column Operations</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#number-of-cores-workers">Number of Cores/Workers</a></li>
 </ul>
   </nav></div>
 

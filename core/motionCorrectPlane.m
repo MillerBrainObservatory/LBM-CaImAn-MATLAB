@@ -107,8 +107,13 @@ end
 
         save_name = sprintf("registered_plane_%d.mat", plane_idx);
         metrics_save_name = sprintf("metrics_plane_%d.fig", plane_idx);
+
         full_savepath = fullfile(savePath, save_name);
         full_metrics_savepath = fullfile(figsavepath, metrics_save_name);
+        
+        if ~isfolder(figsavepath)
+            mkdir(figsavepath);
+        end
 
         fprintf('Loading plane %s\n', num2str(plane_idx));
         Y = zeros([metadata.image_size(1) metadata.image_size(2) num_frames_total], 'single');
@@ -184,19 +189,19 @@ end
         T=size(Y,3);
 
         ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2); legend('raw data','rigid','non-rigid'); title('correlation coefficients','fontsize',14,'fontweight','bold')
-                set(gca,'Xtick',[])
+        set(gca,'Xtick',[])
         ax2 = subplot(312); %plot(shifts_x); hold on; 
         plot(shifts_r(:,1),'--k','linewidth',2); title('displacements along x','fontsize',14,'fontweight','bold')
-                set(gca,'Xtick',[])
+        set(gca,'Xtick',[])
         ax3 = subplot(313); 
         plot(shifts_r(:,2),'--k','linewidth',2); title('displacements along y','fontsize',14,'fontweight','bold')
-                xlabel('timestep','fontsize',14,'fontweight','bold')
+        xlabel('timestep','fontsize',14,'fontweight','bold')
         linkaxes([ax1,ax2,ax3],'x')
 
         % Figure: Motion correction Metrics
         Ym = mean(Y,3);
         Y = M2;
-        savefast(savePath, 'metadata', 'Y', 'Ym', 'shifts')
+        savefast(savePath, 'metadata', 'Y', 'Ym', 'shifts_r', 'M1', 'shifts1')
         saveas(motionCorrectionFigure, full_metrics_savepath);
         close(motionCorrectionFigure)
         clear M* c* template_good shifts* 

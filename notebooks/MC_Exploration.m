@@ -1,5 +1,5 @@
 addpath(genpath('C:\Users\RBO\Documents\MATLAB\caiman_pipeline'));
-load(fullfile("../Pre_Processing_Executable/temp.mat"));
+load(fullfile("../../Documents/data/bi_hemisphere/registration/registered_plane_1.mat"));
 
 %% 
 clc

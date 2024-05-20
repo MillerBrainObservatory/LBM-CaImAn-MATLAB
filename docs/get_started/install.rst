@@ -1,9 +1,8 @@
-============
 Installation
-============
+############
 
-Recommendation
-==============
+Install Recommendation
+****************************************
 
 The easiest way to download the source code is to visit the `github repository <https://github.com/ru-rbo/caiman_matlab.git>`_.
 
@@ -32,12 +31,12 @@ You can tell if the pipeline is added successfully to the path by looking at the
 Notice `/core` and `/packages` are both bright in the files window, this indicates those folders are properly in the MATLAB path but does **not** mean that within that directory, all subdirectories are also on the path. These two folders contain all of the code the pipeline needs to run and are the only two foldrs that **must** be on the path.
 
 By Operating System
-===================
+****************************************
 
 Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.
 
 Windows
--------
+=================
 
 The easiest method to download this repository with git is via `mysys <https://gitforwindows.org/>`_
 Or just download the code from code/Download.zip above and unzip to a directory of your choosing.
@@ -48,7 +47,7 @@ Or just download the code from code/Download.zip above and unzip to a directory 
     due to the separate filesystems. Pay attention to which environment you install.
 
 WSL2 (Windows Subsystem for Linux)
-----------------------------------
+****************************************
 
 Windows subsystem for Linux (WSL/WSL2) is a local environment on your windows machine that is capable of running linux commands using a separate filesystem. As of 2024, Mathworks does not officially support and is not planning support for MATLAB on WSL or WSL2.
 If you have MATLAB installed on Windows and wish to use this repository from a WSL instance, see `this discussion on how to accomplish this <https://ww2.mathworks.cn/matlabcentral/answers/1597219-can-microsoft-s-wslg-windows-subsystem-for-linux-gui-support-running-matlab>`_.
@@ -62,7 +61,7 @@ This pipeline has been tested on WSL2, Ubuntu 22.04. Though any debian-based dis
 
 
 For unix (Linux/MacOS):
------------------------
+****************************************
 
 In Linux, Mac, WSL or mysys, clone this repository with the pre-installed git client:
 

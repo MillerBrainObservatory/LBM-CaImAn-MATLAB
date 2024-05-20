@@ -20,7 +20,13 @@ source_suffix = {
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'exclude']
-extensions = ["sphinx.ext.autodoc", "sphinxcontrib.matlab", "numpydoc", "sphinx.ext.intersphinx", "sphinx.ext.napoleon", "sphinx.ext.autosectionlabel"]
+extensions = ["sphinx.ext.autodoc","sphinxcontrib.images" ,"sphinxcontrib.matlab", "numpydoc", "sphinx.ext.intersphinx", "sphinx.ext.napoleon", "sphinx.ext.autosectionlabel"]
+
+images_config = dict(backend='LightBox2',
+                     default_image_width='100%',
+                     default_show_title='True',
+                     default_group='default'
+    )
 
 templates_path = ["_templates"]
 html_theme = "pydata_sphinx_theme"

@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
@@ -38,6 +39,8 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/troubleshooting';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -367,26 +370,44 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="troubleshooting">
-<span id="id1"></span><h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h1>
+<h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h1>
+<section id="memory">
+<h2>Memory<a class="headerlink" href="#memory" title="Link to this heading">#</a></h2>
+<ul>
+<li><p>Number of Workers/Cores &gt; 100: There a a known bug in MATLAB R2023a for cases when the number of workers is more than 100.
+Refer to the following <a class="reference external" href="https://www.mathworks.com/support/bugreports/details/2968710.html`">bug report</a> for a workaround to resolve the issue. Additionally, steps taken in <a class="reference internal" href="#matlab-server-issues"><span class="std std-ref">Matlab Server Issues</span></a> can help to solve this problem.</p></li>
+<li><p>Out of Memory during deserialization</p>
+<p>Sometimes during motion-correction, NormCorre will use more memory than it is supposed to. See &lt;Issue Link&gt;.
+If you’re using all of the cores your computing environment has available, that is almost certainly the cause. Decrease
+the number of cores as the third input of <a class="reference internal" href="../api/core.html#motionCorrectPlane" title="motionCorrectPlane"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">motionCorrectPlane()</span></code></a>. If this doesn’t correct the issue, it is likely due to
+a single 3D-planar time-series being too large to fit in memory, in which case you can prevent caiman from processing the image patches
+in parallel. Keep in mind this will be noticably slower than the parallel counterpart.</p>
+</li>
+</ul>
+</section>
 <section id="missing-compiled-binary-windows">
 <h2>Missing Compiled Binary (Windows)<a class="headerlink" href="#missing-compiled-binary-windows" title="Link to this heading">#</a></h2>
-<p><strong>Problem:</strong> The <cite>run_CNMF_patches</cite> function errors out on Windows.</p>
-<p><strong>Cause:</strong> Missing compiled binary for <cite>graph_conn_comp_mex.mexw64</cite>.</p>
+<ul class="simple">
+<li><p>Typically seen as: <cite>run_CNMF_patches</cite> function errors out on Windows.</p></li>
+</ul>
+<p><strong>Cause:</strong> Likely caused by missing compiled binary for <cite>graph_conn_comp_mex.mexw64 (win)</cite>/ <cite>graph_conn_comp_mex.mexa64 (unix)</cite></p>
 <p><strong>Solution:</strong>
 1. Compile the binary in MATLAB via the command window:</p>
-<blockquote>
-<div><p><code class="docutils literal notranslate"><span class="pre">`matlab</span>
-<span class="pre">&gt;&gt;</span> <span class="pre">mex</span> <span class="pre">.\CaImAn_Utilities\CaImAn-MATLAB-master\CaImAn-MATLAB-master\utilities\graph_conn_comp_mex.cpp</span>
-<span class="pre">Building</span> <span class="pre">with</span> <span class="pre">'MinGW64</span> <span class="pre">Compiler</span> <span class="pre">(C++)'.</span>
-<span class="pre">MEX</span> <span class="pre">completed</span> <span class="pre">successfully.</span>
-<span class="pre">`</span></code></p>
-</div></blockquote>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">mex</span><span class="w"> </span><span class="o">.\</span><span class="n">CaImAn_Utilities</span><span class="o">\</span><span class="n">CaImAn</span><span class="o">-</span><span class="n">MATLAB</span><span class="o">-</span><span class="n">master</span><span class="o">\</span><span class="n">CaImAn</span><span class="o">-</span><span class="n">MATLAB</span><span class="o">-</span><span class="n">master</span><span class="o">\</span><span class="n">utilities</span><span class="o">\</span><span class="n">graph_conn_comp_mex</span><span class="p">.</span><span class="n">cpp</span>
+<span class="n">Building</span><span class="w"> </span><span class="s">with</span><span class="w"> </span><span class="s">&#39;MinGW64 Compiler (C++)&#39;.</span>
+<span class="n">MEX</span><span class="w"> </span><span class="s">completed</span><span class="w"> </span><span class="s">successfully.</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Newest version 0.2.0+ include both precompiled binaries.</p>
+</div>
 </section>
-<section id="less-likely-issues">
-<h2>Less-Likely Issues<a class="headerlink" href="#less-likely-issues" title="Link to this heading">#</a></h2>
-<p><strong>Problem:</strong> The <cite>run_CNMF_patches</cite> function still fails after addressing the common issues.</p>
-<p><strong>Solution:</strong>
-1. Task Manager:
+<section id="matlab-server-issues">
+<h2>Matlab Server Issues<a class="headerlink" href="#matlab-server-issues" title="Link to this heading">#</a></h2>
+<p id="server-issues">These come in many flavors and are mostly <cite>windows</cite> issues due to their background serrvice.</p>
+<p>Here is the general fix for all of them:</p>
+<p>1. Task Manager:
 - End all MATLAB-related tasks.
 2. Check MATLAB License:
 - Run <cite>license checkout Distrib_Computing_Toolbox</cite>.
@@ -400,7 +421,8 @@ document.write(`
 - Run <cite>which -all startup.m</cite>. If not found, it’s not the issue.
 - Run <cite>which -all pathdef.m</cite>. Ensure it’s located in <cite>C:Program FilesMATLABR2023btoolboxlocalpathdef.m</cite>.
 - Run <cite>which -all matlabrc.m</cite>. Ensure it’s located in <cite>C:Program FilesMATLABR2023btoolboxlocalmatlabrc.m</cite>.</p>
-<p>If these solutions do not resolve the issue, please reach out for further assistance or schedule a Zoom call for additional troubleshooting.</p>
+<blockquote>
+<div></div></blockquote>
 </section>
 </section>
 
@@ -450,8 +472,9 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#memory">Memory</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#missing-compiled-binary-windows">Missing Compiled Binary (Windows)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#less-likely-issues">Less-Likely Issues</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matlab-server-issues">Matlab Server Issues</a></li>
 </ul>
   </nav></div>
 

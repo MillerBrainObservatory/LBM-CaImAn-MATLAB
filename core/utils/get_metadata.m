@@ -1,7 +1,7 @@
 function [metadata_out] = get_metadata(filename)
 %GET_METADATA Extract metadata quickly from a ScanImage TIFF file.
-% 
-% Read and parse Tiff metadata stored in the .tiff header
+%
+% Read and parse Tiff metadata stored in the ScanImage n.tiff file
 % and ScanImage metadata stored in the 'Artist' tag which contains ROI sizes/locations and scanning configuration
 % details in a JSON format.
 %
@@ -31,20 +31,23 @@ hTiff = Tiff(filename);
 [fpath, fname, ext] = fileparts(filename);
 
 % Metadata in JSON format stored by ScanImage in the 'Artist' tag
-roiStr = hTiff.getTag('Artist'); 
+roiStr = hTiff.getTag('Artist');
+
 roiStr(roiStr == 0) = []; % Remove null termination from string
+
 mdata = most.json.loadjson(roiStr); % Decode JSON string to structure
 mdata = mdata.RoiGroups.imagingRoiGroup.rois; % Pull out a single ROI, assumes ROIs will always be the same
 num_rois = length(mdata); % only accurate way to determine the number of ROI's
 mdata = mdata{:};
-scanfields = mdata.scanfields;
 
-% ROI (scanfield) metadata, gives us pixel sizes 
+
+% ROI (scanfield) metadata, gives us pixel sizes
+scanfields = mdata.scanfields;
 center_xy = scanfields.centerXY;
 size_xy = scanfields.sizeXY;
 num_pixel_xy = scanfields.pixelResolutionXY; % misleading name
 
-% TIFF header data for additional metadata
+% TIFF header data for raw image sizes
 [header, ~] = scanimage.util.private.getHeaderData(hTiff);
 image_length = hTiff.getTag('ImageLength'); % Image height in pixels
 image_width = hTiff.getTag('ImageWidth'); % Image width in pixels
@@ -56,7 +59,7 @@ switch sample_format
     case 2
         sample_format = 'int16';
 otherwise
-    error('Invalid image datatype')     
+    error('Invalid image datatype')
 end
 
 % Extracting frame and plane information from the header
@@ -114,7 +117,8 @@ metadata_out = struct( ...
     'num_frames_total', num_frames_total, ...
     'num_frames_file', num_frames_file, ...
     'num_files', num_files, ...
-    ... % 
+
+    ... %
     'frame_rate', frame_rate, ...
     'objective_resolution', objective_resolution, ...
     'fov', fov, ...

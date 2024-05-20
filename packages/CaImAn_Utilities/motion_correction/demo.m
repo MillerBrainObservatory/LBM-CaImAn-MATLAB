@@ -1,18 +1,11 @@
 clear
-gcp;
+% gcp;
 
-name = 'granule_love2.tif';
-if ~exist(name,'file')  % download file if it doesn't exist in the directory
-    url = 'https://www.dropbox.com/s/mjmtwn4pdgydkny/granule_love2.tif.zip?dl=1';
-    filename = 'granule_love2.tif.zip';
-    fprintf('downloading the file...');
-    outfilename = websave(filename,url);
-    fprintf('...done. Now unzipping...')
-    unzip(filename);
-    fprintf('done.');
-end
+data = fullfile("C:\Users\RBO\Documents\data\bi_hemisphere\extracted\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5");
+M1 = load("../../Documents/data/M1.mat");
+Y = combinePlanes(data, 1);
 
-tic; Y = read_file(name); toc; % read the file (optional, you can also pass the path in the function instead of Y)
+%%
 Y = single(Y);                 % convert to single precision 
 T = size(Y,ndims(Y));
 %Y = Y - min(Y(:));
@@ -34,6 +27,8 @@ mmY = quantile(Y(:),0.995);
 
 [cY,mY,vY] = motion_metrics(Y,10);
 
+%%
+
 [cM2,mM2,vM2] = motion_metrics(M2,10);
 
 T = length(cY);
@@ -47,6 +42,7 @@ xlabel('raw data','fontsize',14,'fontweight','bold'); ylabel('rigid corrected','
 subplot(2,3,6); scatter(cM1,cM2); hold on; plot([0.9*min(cY),1.05*max(cM1)],[0.9*min(cY),1.05*max(cM1)],'--r'); axis square;
 xlabel('rigid corrected','fontsize',14,'fontweight','bold'); ylabel('non-rigid corrected','fontsize',14,'fontweight','bold');
 linkaxes([ax1,ax2,ax3],'xy')
+
 %% plot shifts        
 
 shifts_r = squeeze(cat(3,shifts1(:).shifts));
