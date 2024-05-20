@@ -1,86 +1,158 @@
-function [metadata] = assembleCorrectedROITiff(filename, metadata, nvargs) 
-    arguments
-        filename
-        metadata (1,1) struct % Metadata values
-        nvargs.dataset (1,1) string = "/Y"
-        nvargs.group_path (1,1) string = "/data"
-        nvargs.fileMode (1,1) string = "separate"
-        nvargs.chunksize (1,:) = []
-        nvargs.compression (1,1) double = 0
-        nvargs.overwrite (1,1) logical = true
-        nvargs.fix_scan_phase (1,1) logical = true
+function [metadata] = assembleCorrectedROITiff(filename, metadata, varargin)
+% assembleCorrectedROITiff Assembles a corrected ROI TIFF file.
+%
+% Parameters
+% ----------
+% filename : string
+%     The name of the TIFF file to be read.
+% dataset : string, optional
+%     Dataset path within the file (default is "/Y").
+% group_path : string, optional
+%     Group path within the file (default is "/data").
+% fileMode : string, optional
+%     Mode for the file handling (default is "separate").
+% chunksize : array, optional
+%     Chunk size for the file.
+% compression : double, optional
+%     Compression level for the file (default is 0).
+% overwrite : logical, optional
+%     Whether to overwrite existing files (default is true).
+% fix_scan_phase : logical, optional
+%     Whether to fix scan phase (default is true).
+%
+% Returns
+% -------
+% metadata : struct
+%     Updated metadata after processing the TIFF file. This will be the
+%     same metadata attached to the h5 attributes and can be used in
+%     subsequent steps of the pipeline.
+%
+% Examples
+% --------
+% metadata = assembleCorrectedROITiff('file.tif', metadata);
+%
+% Notes
+% -----
+% This function requires the ScanImage utilities package.
+
+p = inputParser;
+addRequired(p, 'filename', @ischar);
+addRequired(p, 'metadata', @isstruct);
+addParameter(p, 'dataset', "/Y", @isstring);
+addParameter(p, 'group_path', "/data", @isstring);
+addParameter(p, 'fileMode', "separate", @isstring);
+addParameter(p, 'chunksize', [], @isnumeric);
+addParameter(p, 'compression', 0, @isnumeric);
+addParameter(p, 'overwrite', true, @islogical);
+addParameter(p, 'fix_scan_phase', true, @islogical);
+parse(p, filename, metadata, varargin{:});
+    
+nvargs = p.Results;
+
+% This may not be needed since it's called from another package
+% function.
+[currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
+addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/ScanImage/')));
+addpath(genpath("utils"));
+
+%% Load data for entire file
+hTif = scanimage.util.ScanImageTiffReader(filename);
+Aout = hTif.data();
+Aout = most.memfunctions.inPlaceTranspose(Aout); % the ScanImageTiffReader reads data in row major order
+
+% de-interleave zplanes and timepoints
+Aout = reshape(Aout,[size(Aout,1) size(Aout,2) metadata.num_planes, metadata.num_frames_file]);
+
+%% Pre-compute some dimensions given the timmed pixel size
+raw_roi_width = metadata.num_pixel_xy(1); % before trimming
+raw_roi_height = metadata.num_pixel_xy(2);
+
+trim_roi_width_start = 7;
+trim_roi_width_end = 138;
+
+new_roi_width_range = trim_roi_width_start:trim_roi_width_end;
+new_roi_width = size(new_roi_width_range, 2);
+
+trim_roi_height_start = round(raw_roi_height*0.03);
+trim_roi_height_end = raw_roi_height;
+
+new_roi_height_range = trim_roi_height_start:trim_roi_height_end; % controls the width on each side of the concatenated strips
+
+if nvargs.fix_scan_phase
+    % trimmed_height = trim_roi_height_end - (trim_roi_height_start - 1);
+    % trimmed_width = new_roi_width * metadata.num_rois;
+    arr_dtype = 'single';
+    % trimmed_array = zeros(trimmed_width, trimmed_height, metadata.num_frames_file, arr_dtype);
+else
+    arr_dtype='uint16';
+end
+full_image_height = raw_roi_height - (trim_roi_height_start-1);
+full_image_width = new_roi_width*metadata.num_rois;
+
+for plane_idx = 1:metadata.num_planes
+    frameTemp = zeros(full_image_height, full_image_width, metadata.num_frames_file, arr_dtype);
+    cnt=1;
+    for roi_idx = 1:metadata.num_rois
+        if cnt == 1 
+            % The first one will be at the very top
+            % This could be the cause for the first frame containing 
+            % irregular pixels on the top of the strip.
+            offset_y = 0;
+            offset_x = 0;
+        else
+            % For the rest of the rois, there will be a recurring numLinesBetweenScanfields spacing
+            offset_y = offset_y + raw_roi_height + metadata.num_lines_between_scanfields; 
+            offset_x = offset_x + new_roi_width;
+        end
+        for frame_idx = 1:metadata.num_frames_file
+            frameTemp(:, offset_x+(1:length(new_roi_width_range)), frame_idx) = Aout(offset_y+new_roi_height_range, new_roi_width_range, plane_idx, frame_idx);
+        end
+        cnt=cnt+1;
     end
 
-    [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
-    addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/ScanImage/')));
-    addpath(genpath("utils"));
+    % metadata.corr = returnScanOffset(frameTemp, 1, arr_dtype);
+    % metadata.image_size = size(frameTemp);
+    % if metadata.corr ~= 0 && nvargs.fix_scan_phase
+    %     trimmed_array = fixScanPhase(frameTemp, ...
+    %         metadata.corr, ...
+    %         1, ...
+    %         arr_dtype ...
+    %     );
+    % end
 
-    hTif = scanimage.util.ScanImageTiffReader(filename);
-    Aout = hTif.data();
-    Aout = most.memfunctions.inPlaceTranspose(Aout); % the ScanImageTiffReader reads data in row major order
+    filesavepath = sprintf("%s.h5", metadata.base_filename);
+    datasavepath = sprintf("%s/plane_%d", nvargs.group_path, plane_idx);
+    finalPath = fullfile(metadata.savepath, filesavepath);
+    if ~isfile(filePath)
+        fprintf("%s does not exist, Creating the h5 file... \n", filePath)
+       h5create(filePath, datasetPath, size(data), 'Datatype', 'uint16', ...
+            'ChunkSize', [size(data, 1), size(data, 2), 1], 'Deflate', nvargs.compression); 
+        h5write(filePath, datasetPath, data);
 
-    % de-interleave zplanes and timepoints
-    Aout = reshape(Aout,[size(Aout,1) size(Aout,2) metadata.num_planes, metadata.num_frames_file]);
-    
-    raw_roi_width = metadata.num_pixel_xy(1); % before trimming
-    raw_roi_height = metadata.num_pixel_xy(2);
-
-    trim_roi_width_start = 7;
-    trim_roi_width_end = 138;
-
-    new_roi_width_range = trim_roi_width_start:trim_roi_width_end;
-    new_roi_width = size(new_roi_width_range, 2);
-
-    trim_roi_height_start = round(raw_roi_height*0.03);
-    trim_roi_height_end = raw_roi_height;
-
-    new_roi_height_range = trim_roi_height_start:trim_roi_height_end; % controls the width on each side of the concatenated strips
-    
-    if nvargs.fix_scan_phase
-        % trimmed_height = trim_roi_height_end - (trim_roi_height_start - 1);
-        % trimmed_width = new_roi_width * metadata.num_rois;
-        arr_dtype = 'single';
-        % trimmed_array = zeros(trimmed_width, trimmed_height, metadata.num_frames_file, arr_dtype);
     else
-        arr_dtype='uint16';
-    end
-    full_image_height = raw_roi_height - (trim_roi_height_start-1);
-    full_image_width = new_roi_width*metadata.num_rois;
-    for plane_idx = 1:metadata.num_planes
-        frameTemp = zeros(full_image_height, full_image_width, metadata.num_frames_file, arr_dtype);
-        cnt=1;
-        for roi_idx = 1:metadata.num_rois
-            if cnt == 1 
-                % The first one will be at the very top
-                offset_y = 0;
-                offset_x = 0;
-            else
-                % For the rest of the rois, there will be a recurring numLinesBetweenScanfields spacing
-                offset_y = offset_y + raw_roi_height + metadata.num_lines_between_scanfields; 
-                offset_x = offset_x + new_roi_width;
-            end
-            for frame_idx = 1:metadata.num_frames_file
-                frameTemp(:, offset_x+(1:length(new_roi_width_range)), frame_idx) = Aout(offset_y+new_roi_height_range, new_roi_width_range, plane_idx, frame_idx);
-            end
-            cnt=cnt+1;
-        end
+        h5create(filePath, datasetPath, size(data), 'Datatype', 'uint16', ...
+            'ChunkSize', [size(data, 1), size(data, 2), 1], 'Deflate', nvargs.compression); 
+        h5write(filePath, datasetPath, data);
 
-        metadata.corr = returnScanOffset(frameTemp, 1, arr_dtype);
-        metadata.image_size = size(frameTemp);
-        if metadata.corr ~= 0 && nvargs.fix_scan_phase
-            trimmed_array = fixScanPhase(frameTemp, ...
-                metadata.corr, ...
-                1, ...
-                arr_dtype ...
-            );
-        end
+        if nvargs.overwrite == 1
+            fprintf('File: %s \n ...with dataset-path: %s already exists, but user input overwrite = 1, writing over the file...', filePath, datasetPath);
+            delete(filePath);
 
-        filesavepath = sprintf("%s.h5", metadata.base_filename);
-        datasavepath = sprintf("%s/plane_%d", nvargs.group_path, plane_idx);
-        finalPath = fullfile(metadata.savepath, filesavepath);
+            h5create(filePath, datasetPath, [size(data,1), size(data,2), Inf], 'Datatype', 'uint16', ...
+            'ChunkSize', [size(data, 1), size(data, 2), 1], 'Deflate', nvargs.compression);
         
-        writeDataToH5(frameTemp, metadata, finalPath, datasavepath, nvargs);
+            h5write(filePath, datasetPath, data, [1, 1, startFrame], [size(data,1), size(data,2), size(data,3)]);
+
+        else
+            fprintf('File: %s \n ...with dataset-path: %s already exists, skipping this file...', filePath, datasetPath);
+        end
     end
+    fields = string(fieldnames(metadata));
+    for f = fields'
+        h5writeatt(filePath, datasetPath, f, metadata.(f));
+    end
+    writeDataToH5(frameTemp, metadata, finalPath, datasavepath, nvargs);
+end
 end
 
 function dataOut = fixScanPhase(dataIn,offset,dim, dtype)
