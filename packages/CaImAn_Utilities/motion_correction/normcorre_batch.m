@@ -374,7 +374,6 @@ for it = 1:iter
                     end                    
             
                 otherwise
-                    
                     shifts(ii).shifts_up = shifts(ii).shifts;
                     if nd == 3                
                         shifts_up = zeros([options.d1,options.d2,options.d3,3]);

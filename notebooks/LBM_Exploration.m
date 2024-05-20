@@ -5,7 +5,7 @@
 % numpixels should not be used, this was deprecated in scanimage 2016 (current version being used)
 % ...this includes si.hroiManager.pixelsPerLine
 % scanimage 2016 does not use scanimagetiffreader()
-% for image [hxw], the standard tiff imagelength and imagewidth values are used
+% for image [H x W], the standard tiff imagelength and imagewidth values are used
 % to get the distance between rois/scanfields:
 %       - flytotimeperscanfield / hroiManager.lineperiod
 
@@ -27,13 +27,10 @@ slice = vol2(:, :, 21, 2:202);
 clear all
 data = matfile("C:\\Users\RBO\Documents\MATLAB\benchmarks\high_resolution\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.mat");
 
-
 %%
 metadata = get_metadata(filename);
 
 % imshow(vol(:,:,floor(size(vol,3)/2)),[]);
-
-% this is 2016, the version uploaded to the public lbm repository
 
 %% extract data for the 4 datasets before any scanimage manipulations
 base = "C:\Users\RBO\Documents\MATLAB\benchmarks\";
@@ -207,7 +204,6 @@ function exploreImageFrames(dataset)
     end
 end
 
-
 function [data] = extract_data(filepath)
     data = struct;
 
@@ -343,16 +339,5 @@ function [data] = extract_roi_data(filepath)
     data.flybacktime = header.SI.hScan2D.flybackTimePerFrame;
     data.flytotime = header.SI.hScan2D.flytoTimePerScanfield;
     data.time_per_pixel = header.SI.hScan2D.scanPixelTimeMean;
-
 end
 
- %% Debug: get info out of a .tif quickly
-
-% [~, data] = scanimage.util.opentif('/data2/fpo/data/mh89_hemisphere_FOV_50_550um_depth_250mW_dual_stimuli_30min_00001_00001.tif');
-% data = squeeze(data(:, :, 1, 1));
-% hTiff = Tiff('/data2/fpo/data/mh89_hemisphere_FOV_50_550um_depth_250mW_dual_stimuli_30min_00001_00001.tif');
-% roiStr = hTiff.getTag('Artist'); % where scanimage decided to store image data
-% roiStr(roiStr == 0) = []; % remove null termination
-% mdata = most.json.loadjson(roiStr);
-% mdata = mdata.RoiGroups.imagingRoiGroup.rois;
-% mdata1 = mdata{1}.scanfields;

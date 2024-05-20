@@ -101,7 +101,10 @@ end
 RESULTS = CNMF();
 RESULTS(n_patches) = CNMF();
 
-%% F.O. 0
+%% F.O. 05.16.2024: remove this darned parfor loop that makes debugging a nightmare
+% there needs to be a programmatic way to stop parpools from being created
+% here
+
 if memmaped   
 %     disp('CHANGED PARALLEL LOOP')
     % parfor i = 1:n_patches
