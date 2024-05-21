@@ -28,11 +28,7 @@ function writeMetadataToAttribute(metadata, h5_fullfile, group_path)
     fields = fieldnames(metadata);
     for f = fields'
         value = metadata.(f{1});
-        if ischar(value)
-            h5writeatt(h5_fullfile, group_path, f{1}, value);
-        elseif isnumeric(value)
-            h5writeatt(h5_fullfile, group_path, f{1}, mat2str(value));
-        elseif isstruct(value)
+        if isstruct(value)
             % Flatten struct fields that aren't supported by hdf5
             subfields = fieldnames(value);
             for sf = subfields'
@@ -44,6 +40,8 @@ function writeMetadataToAttribute(metadata, h5_fullfile, group_path)
                     h5writeatt(h5_fullfile, group_path, att_name, mat2str(subvalue));
                 end
             end
+        else
+            h5writeatt(h5_fullfile, group_path, f{1}, value);
         end
     end
 end
