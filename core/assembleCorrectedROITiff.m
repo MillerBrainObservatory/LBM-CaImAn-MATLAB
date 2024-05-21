@@ -63,7 +63,7 @@ Aout = most.memfunctions.inPlaceTranspose(Aout); % the ScanImageTiffReader reads
 % de-interleave zplanes and timepoints
 Aout = reshape(Aout,[size(Aout,1) size(Aout,2) metadata.num_planes, metadata.num_frames_file]);
 
-%% Pre-compute some dimensions given the timmed pixel size
+
 raw_roi_width = metadata.num_pixel_xy(1); % before trimming
 raw_roi_height = metadata.num_pixel_xy(2);
 
