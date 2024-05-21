@@ -13,6 +13,8 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 % save_path : char, optional
 %     The directory where processed files will be saved. It is created if it does
 %     not exist. Defaults to the filePath if not provided.
+% group_path : string, optional
+%     Group path within the file (default is "/raw").
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
@@ -20,8 +22,6 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 %     Whether to correct for bi-directional scan artifacts. (default is true).
 % overwrite : logical, optional
 %     Whether to overwrite existing files (default is 1).
-% group_path : string, optional
-%     Group path within the file (default is "/raw").
 % chunk_size : array, optional
 %     Chunk size for the file.
 % compression : double, optional
@@ -33,30 +33,25 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 % The function adds necessary paths for ScanImage utilities and processes each .tif
 % file found in the specified directory. It checks if the directory exists, handles
 % multiple or single file scenarios, and can optionally report the directory's contents
-% based on the diagnosticFlag.
+% based on the debug_flag.
 %
 % Each file processed is logged, assembled into a 4D volume, and saved in a specified
 % directory as a .mat file with accompanying metadata. The function also manages errors
 % by cleaning up and providing detailed error messages if something goes wrong during
 % processing.
 %
-% Examples
-% --------
-% convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 0);
-% convertScanImageTiffToVolume('C:/data/session1/', 'C:/processed/', 1); % Diagnostic mode
-%
 % See also FILEPARTS, ADDPATH, GENPATH, ISFOLDER, DIR, FULLFILE, ERROR, REGEXP, SAVEFAST
 %
 % .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
 
-    p = inputParser;
+   p = inputParser;
     addRequired(p, 'data_path', @ischar);
     addOptional(p, 'save_path', data_path, @ischar);
+    addParameter(p, 'group_path', "/raw", @isstring);
     addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
     addParameter(p, 'fix_scan_phase', 1, @(x) isnumeric(x) || islogical(x));
     addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
     addParameter(p, 'trim_pixels', [0 0 0 0], @isnumeric);
-    addParameter(p, 'group_path', "/raw", @isstring);
     addParameter(p, 'chunk_size', [], @isnumeric);
     addParameter(p, 'compression', 0, @isnumeric);
     parse(p, data_path, save_path, varargin{:});
@@ -97,9 +92,17 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
     try
         clck = clock;
         logFileName = sprintf('extraction_log_%d_%02d_%02d_%02d_%02d.txt', clck(1), clck(2), clck(3), clck(4), clck(5));
-        logFullPath = fullfile(data_path, logFileName);
+        logFullPath = fullfile(save_path, logFileName);
+        
+        % Check if we can open the file
         fid = fopen(logFullPath, 'a');
-        closeCleanupObj = onCleanup(@() fclose(fid));
+        if fid == -1
+            error('Cannot create or open log file: %s', logFullPath);
+        end
+        closeCleanupObj = onCleanup(@() closeLogFile(fid));
+
+        % Confirm the log file creation
+        fprintf('Log file created: %s\n', logFullPath);
 
         files = dir(fullfile(data_path, '*.tif'));
         if isempty(files)
@@ -129,7 +132,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
         end
 
         for i = 1:length(files)
-            fprintf(fid, '%d: %s\n', i, files(i).name);
+            fprintf(fid, 'Processing %d: %s\n', i, files(i).name);
 
             % Read and process the TIFF file
             hTif = scanimage.util.ScanImageTiffReader(fullfile(data_path, files(i).name));
@@ -162,8 +165,22 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
                     end
                     cnt = cnt + 1;
                 end
+                elapsed_time = toc;
+                fprintf(fid, 'Processed plane %d in %.2f seconds\n', plane_idx, elapsed_time);
                 h5write(h5_filename, dataset_path, frameTemp, [1, 1, (i-1) * num_frames_file + 1], [trimmed_y, trimmed_x * metadata.num_strips, num_frames_file]);
-                toc
+            end
+
+            % Log the metadata
+            fprintf(fid, 'Metadata for file %d:\n', i);
+            metadata_fields = fieldnames(metadata);
+            for j = 1:length(metadata_fields)
+                field_name = metadata_fields{j};
+                field_value = metadata.(field_name);
+                if ischar(field_value)
+                    fprintf(fid, '%s: %s\n', field_name, field_value);
+                elseif isnumeric(field_value)
+                    fprintf(fid, '%s: %s\n', field_name, mat2str(field_value));
+                end
             end
         end
         fields = string(fieldnames(metadata));
@@ -173,28 +190,17 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 
         tt = toc / 3600;
         disp(['Volume loaded and processed. Elapsed time: ' num2str(tt) ' hours. Saving volume to temp...']);
+
     catch ME
-        if exist('fid','var')
+        if exist('fid', 'var') && fid ~= -1
             fprintf('closing logfile: %s\n', logFullPath);
             fclose(fid);
         end
-        if exist('logFullPath','var') && isfile(logFullPath)
+        if exist('logFullPath', 'var') && isfile(logFullPath)
             fprintf('deleting logfile: %s\n', logFullPath);
             delete(logFullPath);
         end
         rethrow(ME);
-    end
-end
-
-function closeLogFile(fid)
-    fclose(fid);
-end
-
-function cleanupLogFile(fid, logFullPath)
-    fclose(fid);
-    if exist('logFullPath', 'var') && isfile(logFullPath)
-        fprintf('deleting logfile: %s\n', logFullPath);
-        delete(logFullPath);
     end
 end
 
