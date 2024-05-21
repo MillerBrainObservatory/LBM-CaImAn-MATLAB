@@ -22,11 +22,8 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 %     Whether to correct for bi-directional scan artifacts. (default is true).
 % overwrite : logical, optional
 %     Whether to overwrite existing files (default is 1).
-% chunk_size : array, optional
-%     Chunk size for the file.
 % compression : double, optional
 %     Compression level for the file (default is 0).
-
 %
 % Notes
 % -----
@@ -52,18 +49,17 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
     addParameter(p, 'fix_scan_phase', 1, @(x) isnumeric(x) || islogical(x));
     addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
     addParameter(p, 'trim_pixels', [0 0 0 0], @isnumeric);
-    addParameter(p, 'chunk_size', [], @isnumeric);
     addParameter(p, 'compression', 0, @isnumeric);
     parse(p, data_path, save_path, varargin{:});
 
     data_path = p.Results.data_path;
     save_path = p.Results.save_path;
+    group_path = p.Results.group_path;
     debug_flag = p.Results.debug_flag;
     fix_scan_phase = p.Results.fix_scan_phase;
     overwrite = p.Results.overwrite;
     trim_pixels = p.Results.trim_pixels;
-    group_path = p.Results.group_path;
-    chunk_size = p.Results.chunk_size;
+    
     compression = p.Results.compression;
 
     if isempty(save_path)
@@ -99,7 +95,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
         if fid == -1
             error('Cannot create or open log file: %s', logFullPath);
         end
-        closeCleanupObj = onCleanup(@() closeLogFile(fid));
+        closeCleanupObj = onCleanup(@() fclose(fid));
 
         % Confirm the log file creation
         fprintf('Log file created: %s\n', logFullPath);
@@ -115,20 +111,30 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
         end
 
         firstFileFullPath = fullfile(files(1).folder, files(1).name);
+
+        % We add some values to the metadata to attach to H5 attributes and
+        % make file access / parameter access easier down the pipeline.
         metadata = get_metadata(firstFileFullPath);
+        metadata.extraction_params = p.Results;
+        metadata.group_path = group_path;
 
         [t_left, t_right, t_top, t_bottom] = deal(trim_pixels(1), trim_pixels(2), trim_pixels(3), trim_pixels(4));
+        metadata.trim_pixels = [t_left, t_right, t_top, t_bottom]; % store the number of pixels to trim
         raw_x = metadata.num_pixel_xy(1);
         raw_y = metadata.num_pixel_xy(2);
         trimmed_x = raw_x - t_left - t_right;
         trimmed_y = raw_y - t_top - t_bottom;
+        metadata.plane_size = [trimmed_y, trimmed_x * metadata.num_strips, metadata.num_frames_file];
+
         num_planes = metadata.num_planes;
         num_frames_file = metadata.num_frames_file;
 
-        h5_filename = fullfile(save_path, sprintf('%s.h5', metadata.raw_filename));
-        if overwrite && isfile(h5_filename)
-            fprintf("Deleting file: %s\n", h5_filename);
-            delete(h5_filename);
+        h5_fullfile = fullfile(save_path, sprintf('%s.h5', metadata.raw_filename));
+        metadata.h5_fullfile = h5_fullfile; % store the location of our h5 file
+
+        if overwrite && isfile(h5_fullfile)
+            fprintf("Deleting file: %s\n", h5_fullfile);
+            delete(h5_fullfile);
         end
 
         for i = 1:length(files)
@@ -141,11 +147,9 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
             Aout = reshape(Aout, [size(Aout, 1), size(Aout, 2), num_planes, num_frames_file]);
 
             for plane_idx = 1:num_planes
-
                 dataset_path = sprintf('%s/plane_%d', group_path, plane_idx);
-
-                if i == 1  % Only create the dataset once per plane
-                    h5create(h5_filename, dataset_path, [trimmed_y, trimmed_x * metadata.num_strips, Inf], 'Datatype', metadata.sample_format, ...
+                if i == 1
+                    h5create(h5_fullfile, dataset_path, [trimmed_y, trimmed_x * metadata.num_strips, Inf], 'Datatype', metadata.sample_format, ...
                         'ChunkSize', [trimmed_y, trimmed_x * metadata.num_strips, 1], 'Deflate', compression);
                 end
 
@@ -167,7 +171,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
                 end
                 elapsed_time = toc;
                 fprintf(fid, 'Processed plane %d in %.2f seconds\n', plane_idx, elapsed_time);
-                h5write(h5_filename, dataset_path, frameTemp, [1, 1, (i-1) * num_frames_file + 1], [trimmed_y, trimmed_x * metadata.num_strips, num_frames_file]);
+                h5write(h5_fullfile, dataset_path, frameTemp, [1, 1, (i-1) * num_frames_file + 1], [trimmed_y, trimmed_x * metadata.num_strips, num_frames_file]);
             end
 
             % Log the metadata
@@ -185,7 +189,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
         end
         fields = string(fieldnames(metadata));
         for f = fields'
-            h5writeatt(h5_filename, '/raw', f, metadata.(f));
+            h5writeatt(h5_fullfile, group_path, f, metadata.(f));
         end
 
         tt = toc / 3600;
