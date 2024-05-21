@@ -137,7 +137,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
         for i = 1:length(files)
             tfile = tic;
             fprintf(fid, 'Processing %d: %s\n', i, files(i).name);
-            % Read and process the TIFF file
+
             hTif = scanimage.util.ScanImageTiffReader(fullfile(data_path, files(i).name));
             Aout = hTif.data();
             Aout = most.memfunctions.inPlaceTranspose(Aout);
@@ -146,20 +146,16 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
             for plane_idx = 1:num_planes
                 tplane = tic;
                 dataset_path = sprintf('%s/plane_%d', group_path, plane_idx);
-                if i == 1
-                    try
-                        h5create(h5_fullfile, dataset_path, [trimmed_y, trimmed_x * metadata.num_strips, Inf], 'Datatype', metadata.sample_format, ...
-                            'ChunkSize', [trimmed_y, trimmed_x * metadata.num_strips, 1], 'Deflate', compression);
-                    catch ME
-                        if strcmp(ME.identifier, 'MATLAB:imagesci:h5create:datasetAlreadyExists')
-                            fprintf(fid, 'Dataset %s already exists. Skipping creation.\n', dataset_path);
-                        else
-                            rethrow(ME);
-                        end
+                try
+                    h5create(h5_fullfile, dataset_path, [trimmed_y, trimmed_x * metadata.num_strips, Inf], 'Datatype', metadata.sample_format, ...
+                        'ChunkSize', [trimmed_y, trimmed_x * metadata.num_strips, 1], 'Deflate', compression);
+                catch ME
+                    if strcmp(ME.identifier, 'MATLAB:imagesci:h5create:datasetAlreadyExists')
+                        fprintf(fid, 'Dataset %s already exists. Skipping creation.\n', dataset_path);
+                    else
+                        rethrow(ME);
                     end
-
                 end
-
                 frameTemp = zeros(trimmed_y, trimmed_x * metadata.num_strips, metadata.num_frames_file, 'like', Aout);
                 cnt = 1;
                 offset_y = 0;

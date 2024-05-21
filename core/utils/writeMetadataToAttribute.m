@@ -1,5 +1,7 @@
 function writeMetadataToAttribute(metadata, h5_fullfile, group_path)
-    % Write metadata fields to HDF5 attributes
+    % WRITEMETADATATOATTRIBUTE Write scanimage metadata fields to HDF5
+    % attributes, taking care of flattening structured arrays to their
+    % key:value pairs.
     %
     % Parameters
     % ----------
