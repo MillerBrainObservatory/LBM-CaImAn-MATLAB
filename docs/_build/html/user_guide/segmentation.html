@@ -1,12 +1,13 @@
 
+
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="../" >
+<html lang="en" data-content_root="" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Segmentation and Deconvolution &#8212; caiman_matlab  documentation</title>
   
@@ -18,29 +19,31 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
 
-    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
-    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/segmentation';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -55,9 +58,10 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
+
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -98,7 +102,7 @@
 </form></div>
   </div>
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -136,6 +140,12 @@
       
         <div class="navbar-item">
 <nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -226,13 +236,10 @@ document.write(`
   
 </div>
 
-    </header>
+    </nav>
   
-
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
-      
-      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -245,6 +252,12 @@ document.write(`
         
           <div class="navbar-item">
 <nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -367,10 +380,10 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article">
+                <article class="bd-article" role="main">
                   
   <section id="segmentation-and-deconvolution">
-<span id="segmentation-deconvolution"></span><h1>Segmentation and Deconvolution<a class="headerlink" href="#segmentation-and-deconvolution" title="Link to this heading">#</a></h1>
+<span id="segmentation-deconvolution"></span><h1>Segmentation and Deconvolution<a class="headerlink" href="#segmentation-and-deconvolution" title="Permalink to this heading">#</a></h1>
 <a class=""
                data-lightbox="group-default"
                href="../_images/neuron_to_neuron_correlations1.png"
@@ -383,7 +396,7 @@ document.write(`
                      height="auto"
                      alt=""/>
                 </a><section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h2>
 <p>The flourescence of the proteins in our neurons is <strong>correlated</strong> with how active the neuron is.
 Turning this flourescence into “spikes” relies on several operations:</p>
 <ul class="simple">
@@ -407,9 +420,9 @@ Turning this flourescence into “spikes” relies on several operations:</p>
 </div>
 </section>
 <section id="function-usage">
-<h2>Function Usage<a class="headerlink" href="#function-usage" title="Link to this heading">#</a></h2>
+<h2>Function Usage<a class="headerlink" href="#function-usage" title="Permalink to this heading">#</a></h2>
 <section id="segmentplane">
-<h3>segmentPlane<a class="headerlink" href="#segmentplane" title="Link to this heading">#</a></h3>
+<h3>segmentPlane<a class="headerlink" href="#segmentplane" title="Permalink to this heading">#</a></h3>
 <p><a class="reference internal" href="#segmentplane"><span class="std std-ref">segmentPlane</span></a> contains the bulk of the computational complexity in this pipeline and will take significantly longer than the previous steps.</p>
 <p>Inputs to <a class="reference internal" href="#segmentplane"><span class="std std-ref">segmentPlane</span></a> are similar to those seen previously. Most importantly:</p>
 <ul>
@@ -437,7 +450,7 @@ Turning this flourescence into “spikes” relies on several operations:</p>
 </section>
 </section>
 <section id="atoac">
-<h2>AtoAc<a class="headerlink" href="#atoac" title="Link to this heading">#</a></h2>
+<h2>AtoAc<a class="headerlink" href="#atoac" title="Permalink to this heading">#</a></h2>
 <p>Turn the CaImAn output A (sparse, spatial footprints for entire FOV) into Ac (sparse, spatial footprints localized around each neuron).
 - Standardizes the size of each neuron’s footprint to a uniform (4*tau+1, 4*tau+1) matrix, centered on the neuron’s centroid [acx x acy].</p>
 <a class=""
@@ -453,7 +466,7 @@ Turning this flourescence into “spikes” relies on several operations:</p>
                      alt=""/>
                 </a></section>
 <section id="component-validation">
-<h2>Component Validation<a class="headerlink" href="#component-validation" title="Link to this heading">#</a></h2>
+<h2>Component Validation<a class="headerlink" href="#component-validation" title="Permalink to this heading">#</a></h2>
 <p>The key idea for validating our neurons is that <strong>we know how long the brightness indicating neurons activity should stay bright</strong> as a function
 of the number of frames. That is, our calcium indicator (in this example: GCaMP-6s), with a rise-time of 250ms and a decay-time of 500ms = 750ms, while we
 record at 4.7 frames/second = “Samples per transient=round(4.7Hz×(0.2s+0.55s))=3”</p>
@@ -465,11 +478,11 @@ record at 4.7 frames/second = “Samples per transient=round(4.7Hz×(0.2s+0.55s)
 </ul>
 </section>
 <section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading">#</a></h2>
 <p>There are many, many parameters used in segmentation and deconvolution. Many of the parameters are sensitive to the  pixel resolution and FOV of the recording. This section discusses such parameters.
 The most influencial parameters hold information about the size of neurons and dynamics of the calcium indicator in time.</p>
 <section id="tau">
-<h3>Tau<a class="headerlink" href="#tau" title="Link to this heading">#</a></h3>
+<h3>Tau<a class="headerlink" href="#tau" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Tau is the <cite>half-size</cite> of a neuron. If a neuron is 10 micron, tau will be a 5 micon.</p></li>
 <li><p>In general, round up.</p></li>
@@ -477,14 +490,14 @@ The most influencial parameters hold information about the size of neurons and d
 </ul>
 </section>
 <section id="merge-thresh">
-<h3>merge_thresh<a class="headerlink" href="#merge-thresh" title="Link to this heading">#</a></h3>
+<h3>merge_thresh<a class="headerlink" href="#merge-thresh" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>The value of the correlation coefficient (between 0-1) at which two neurons are considered “the same neuron!”, thus merge them.</p></li>
 <li><p>This correlation is done temporally.</p></li>
 </ul>
 </section>
 <section id="exact-caiman-parameters">
-<h3>Exact CaImAn Parameters<a class="headerlink" href="#exact-caiman-parameters" title="Link to this heading">#</a></h3>
+<h3>Exact CaImAn Parameters<a class="headerlink" href="#exact-caiman-parameters" title="Permalink to this heading">#</a></h3>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">merge_thresh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">0.8</span><span class="p">;</span>
 <span class="n">min_SNR</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">1.4</span><span class="p">;</span><span class="w"> </span><span class="c">% liberal threshold, tighten in post</span>
 <span class="n">space_thresh</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">0.2</span><span class="p">;</span><span class="w"> </span><span class="c">% threshold for spatial components</span>
@@ -510,7 +523,7 @@ The most influencial parameters hold information about the size of neurons and d
 </section>
 </section>
 <section id="deconvolution">
-<h2>Deconvolution<a class="headerlink" href="#deconvolution" title="Link to this heading">#</a></h2>
+<h2>Deconvolution<a class="headerlink" href="#deconvolution" title="Permalink to this heading">#</a></h2>
 <p>TODO: put this foopsi trickyness information in “For Developers” section</p>
 <p>FOOPSI (Fast OOPSI) is originally from “Fast Nonnegative Deconvolution for Spike Train Inference From Population Calcium Imaging” by Vogelstein et al. (2010).
 - OASIS was introduced in “Fast Active Set Methods for Online Spike Inference from Calcium Imaging” by Friedrich &amp; Paninski (2016).
@@ -565,14 +578,12 @@ The most influencial parameters hold information about the size of neurons and d
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-
   <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
+
+  <div class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+  <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#function-usage">Function Usage</a><ul class="nav section-nav flex-column">
@@ -613,8 +624,8 @@ The most influencial parameters hold information about the size of neurons and d
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -634,7 +645,7 @@ The most influencial parameters hold information about the size of neurons and d
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     <br/>
   </p>
 </div>
@@ -647,7 +658,7 @@ The most influencial parameters hold information about the size of neurons and d
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
 </p></div>
       
     </div>
