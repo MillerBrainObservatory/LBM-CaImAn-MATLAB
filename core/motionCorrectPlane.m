@@ -1,55 +1,62 @@
-function motionCorrectPlane(filePath, savePath, numCores, startPlane, endPlane)
-% MOTIONCORRECTPLANE Perform rigid and non-rigid motion correction on imaging data.
-%
-% This function processes imaging data by sequentially loading individual
-% processed planes, applying rigid motion correction to generate a template,
-% followed by patched non-rigid motion correction. Each motion-corrected plane
-% is saved separately with relevant shifts and metadata.
-%
-% Parameters
-% ----------
-% filePath : char
-%     Path to the directory containing the files extracted via convertScanImageTiffToVolume.
-% savePath : char
-%     Path to the directory to save the motion vectors.
-% numCores : double, integer, positive
-%     Number of cores to use for computation. The value is limited to a maximum
-%     of 24 cores.
-% startPlane : double, integer, positive
-%     The starting plane index for processing.
-% endPlane : double, integer, positive
-%     The ending plane index for processing. Must be greater than or equal to
-%     startPlane.
-%
-% Returns
-% -------
-% Each motion-corrected plane is saved as a .mat file containing the following:
-% shifts : array
-%     2D motion vectors as single precision.
-%
-% Notes
-% -----
-% - Only .h5 files containing processed volumes should be in the filePath.
-% - Any .h5 files with "plane" in the filename will be skipped to avoid
-%   re-processing a previously motion-corrected plane.
-%
-% See also ADDPATH, GCP, DIR, ERROR, FULLFILE, FOPEN, REGEXP, CONTAINS, MATFILE, SAVEFAST
-arguments
-    filePath (1,:) char                    % Path to the directory with input files.
-    savePath (1,:) char                    % Path to the directory to save outputs.
-    numCores (1,1) double {mustBeInteger, mustBePositive, mustBeLessThanOrEqual(numCores,24)} = 1
-    startPlane (1,1) double {mustBeInteger, mustBePositive} = 1
-    endPlane (1,1) double {mustBeInteger, mustBePositive, mustBeGreaterThanOrEqual(endPlane,startPlane)} = 1
-end
+
+function motionCorrectPlane(data_path, save_path, varargin)
+    % motion_correct_plane Perform rigid and non-rigid motion correction on imaging data.
+    %
+    % Parameters
+    % ----------
+    % data_path : char
+    %     Path to the directory containing the files extracted via convertScanImageTiffToVolume.
+    % save_path : char
+    %     Path to the directory to save the motion vectors.
+    % overwrite : logical, optional
+    %     Whether to overwrite existing files (default is 1).
+    % num_cores : double, integer, positive
+    %     Number of cores to use for computation. The value is limited to a maximum
+    %     of 24 cores.
+    % start_plane : double, integer, positive
+    %     The starting plane index for processing.
+    % end_plane : double, integer, positive
+    %     The ending plane index for processing. Must be greater than or equal to
+    %     start_plane.
+    %
+    % Returns
+    % -------
+    % Each motion-corrected plane is saved as a .mat file containing the following:
+    % shifts : array
+    %     2D motion vectors as single precision.
+    %
+    % Notes
+    % -----
+    % - Only .h5 files containing processed volumes should be in the file_path.
+    % - Any .h5 files with "plane" in the filename will be skipped to avoid
+    %   re-processing a previously motion-corrected plane.
+
+    p = inputParser;
+    addRequired(p, 'file_path', @ischar);
+    addRequired(p, 'save_path', @ischar);
+    addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
+    addParameter(p, 'num_cores', 1, @(x) isnumeric(x) && x > 0 && x <= 24);
+    addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
+    addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
+    parse(p, data_path, save_path, varargin{:});
+    
+    data_path = p.Results.file_path;
+    save_path = p.Results.save_path;
+    num_cores = p.Results.num_cores;
+    start_plane = p.Results.start_plane;
+    end_plane = p.Results.end_plane;
+    overwrite = p.Results.overwrite;
+
     [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
     addpath(genpath(fullfile(currpath, '../packages/CaImAn_Utilities/motion_correction/')));
     addpath(genpath(fullfile(currpath, "utils")));
 
     tic;
     clck = clock; % Generate a timestamp for the log file name.
-    logFileName = sprintf('matlab_log_%d_%02d_%02d_%02d_%02d.txt', clck(1), clck(2), clck(3), clck(4), clck(5));
-    logFullPath = fullfile(filePath, logFileName);
-    fid = fopen(logFullPath, 'w');
+    log_file_name = sprintf('matlab_log_%d_%02d_%02d_%02d_%02d.txt', clck(1), clck(2), clck(3), clck(4), clck(5));
+    log_full_path = fullfile(data_path, log_file_name);
+    fid = fopen(log_full_path, 'w');
+    close_cleanup_obj = onCleanup(@() fclose(fid));
 
     poolobj = gcp('nocreate');
     if ~isempty(poolobj)
@@ -58,79 +65,52 @@ end
     end
 
     disp('Beginning processing routine.');
-    numCores = max(numCores, 23);
+    num_cores = max(num_cores, 23);
     fprintf(fid, '%s Beginning processing routine...\n', datetime);
 
-    files = dir(fullfile(filePath, '*.h5'));
+    files = dir(fullfile(data_path, '*.h5'));
     if isempty(files)
-        error('No suitable h5 files found in: \n  %s', filePath);
+        error('No suitable h5 files found in: \n  %s', data_path);
     end
 
-    % TODO: function-ize this 
-    h5files = dir([filePath '*.h5']); % will just be 1 file for now
-    metainfo = h5files(1);
-    h5path = fullfile(metainfo.folder, metainfo.name);
+    h5_file_path = fullfile(files(1).folder, files(1).name);
+    h5_data = h5info(h5_file_path);
+    session_info = h5_data.Groups;
 
-    h5data = readH5Metadata(h5path);
-    groups = h5data.Groups;
-    num_files = length(groups);    
-    for file_idx=1:num_files        
-        file_info = groups(file_idx);
-        planes = file_info.Datasets;
-        for j=1:length(planes)
-            loc_plane = sprintf("/plane_%d", j);
-            full_path = sprintf("%s%s", file_info.Name, loc_plane);
-            datasetInfo = h5info(h5path, full_path);
-            metadata = struct();
-            for k = 1:length(datasetInfo.Attributes)
-                attrName = datasetInfo.Attributes(k).Name;
-                attrValue = h5readatt(h5path, full_path, attrName);
-                metadata.(matlab.lang.makeValidName(attrName)) = attrValue;
-            end
-        end
+    metadata = struct();
+    for k = 1:length(session_info.Attributes)
+        attr_name = session_info.Attributes(k).Name;
+        attr_value = h5readatt(h5_file_path, session_info.Name, attr_name);
+        metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
     end
 
-    pixel_resolution = metadata.pixel_resolution;
-    num_planes = metadata.num_planes;
-    num_frames_file = metadata.num_frames_file;
-    num_frames_total = metadata.num_frames_total;
-
-    if ~(num_planes >= endPlane)
-        error("Not enough planes to process given user supplied argument: %d as endPlane when only %d planes exist in this dataset.", endPlane, num_planes);
-    end
-
-    figsavepath = fullfile(savePath, 'metrics');
-
-    % preallocate based on the total number of time points across all files
-    % For each file, grab all data for this plane.
-    for plane_idx = startPlane:endPlane
-
-        save_name = sprintf("registered_plane_%d.mat", plane_idx);
-        metrics_save_name = sprintf("metrics_plane_%d.fig", plane_idx);
-
-        full_savepath = fullfile(savePath, save_name);
-        full_metrics_savepath = fullfile(figsavepath, metrics_save_name);
+    for plane_idx = start_plane:end_plane
+        dataset_path = sprintf('/raw/plane_%d', plane_idx);
+        plane_info = h5info(h5_file_path, dataset_path);
         
-        if ~isfolder(figsavepath)
-            mkdir(figsavepath);
+        pixel_resolution = metadata.pixel_resolution;
+        % num_frames_file = metadata.num_frames_file;
+        % num_frames_total = metadata.num_frames_total;
+
+        if ~(metadata.num_planes >= end_plane)
+            error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
         end
 
-        fprintf('Loading plane %s\n', num2str(plane_idx));
-        Y = zeros([metadata.image_size(1) metadata.image_size(2) num_frames_total], 'single');
-
-        for file_idx = 1:num_files
-            file_group = sprintf("/file_%d/plane_%d", file_idx, plane_idx);
-            Y(:,:,(file_idx-1)*num_frames_file+1:file_idx*num_frames_file) = im2single(h5read(h5path, file_group));
+        fig_save_path = fullfile(save_path, 'metrics');
+        if ~isfolder(fig_save_path)
+            mkdir(fig_save_path);
         end
 
+        fprintf(fid, 'Loading plane %d\n', plane_idx);
+        Y = h5read(h5_file_path, dataset_path);
         volume_size = size(Y);
         d1 = volume_size(1);
         d2 = volume_size(2);
-        Y = Y-min(Y(:));
+        Y = Y - min(Y(:));
 
-        fprintf(fid, '%s Beginning processing for plane %s with %s matlab workers.', datetime, plane_idx);
-        if size(gcp("nocreate"),1)==0
-            parpool(numCores);
+        fprintf(fid, '%s Beginning processing for plane %d with %d matlab workers.\n', datetime, plane_idx, num_cores);
+        if isempty(gcp('nocreate'))
+            parpool(num_cores);
         end
 
         %% Motion correction: Create Template
@@ -139,81 +119,118 @@ end
             'd1',d1,...
             'd2',d2,...
             'bin_width',200,...       % Bin width for motion correction
-            'max_shift',round(20/pixel_resolution),...        % Max shift in px
+            'max_shift', max_shift,...        % Max shift in px
             'us_fac',20,...
             'init_batch',200,...     % Initial batch size
             'correct_bidir',false... % Correct bidirectional scanning
         );
 
-        [M1,shifts1,~,~] = normcorre_batch(Y,options_rigid);
+        [M1,shifts1,~,~] = normcorre_batch(Y, options_rigid);
         date = datetime(now,'ConvertFrom','datenum');
-        formatSpec = '%s Rigid MC Complete, beginning non-rigid mc...\n';
-        fprintf(fid,formatSpec,date);
+        format_spec = '%s Rigid MC Complete, beginning non-rigid MC...\n';
+        fprintf(fid, format_spec, date);
 
         % create the template using X/Y shift displacements
         shifts_r = squeeze(cat(3,shifts1(:).shifts));
-        shifts_v = movvar(shifts_r,24,1);
-        [srt,minv_idx] = sort(shifts_v,120);
-        best_idx = unique(reshape(minv_idx,1,[]));
-        template_good = mean(M1(:,:,best_idx),3);
+        shifts_v = movvar(shifts_r, 24, 1);
+        [srt, minv_idx] = sort(shifts_v, 120);
+        best_idx = unique(reshape(minv_idx, 1, []));
+        template_good = mean(M1(:,:,best_idx), 3);
 
-        % Non-rigid motion correction using the good tamplate from the rigid
+        % Non-rigid motion correction using the good template from the rigid
         options_nonrigid = NoRMCorreSetParms(...
-            'd1',d1,...
-            'd2',d2,...
-            'bin_width',24,...
+            'd1', d1,...
+            'd2', d2,...
+            'bin_width', 24,...
             'max_shift', max_shift,...
-            'us_fac',20,...
-            'init_batch',120,...
-            'correct_bidir',false...
+            'us_fac', 20,...
+            'init_batch', 120,...
+            'correct_bidir', false...
         );
 
         % DFT subpixel registration - results used in CNMF
-        [M2,shifts2,~,~] = normcorre_batch(Y,options_nonrigid,template_good);
+        [M2, shifts2, ~, ~] = normcorre_batch(Y, options_nonrigid, template_good);
 
-        fprintf("Saving registration results in directory: \n \n %s \n", full_savepath);
+        save_name = sprintf('registered_plane_%d.mat', plane_idx);
+        metrics_save_name = sprintf('metrics_plane_%d.fig', plane_idx);
 
-        disp('Data saved, beginning next plane...')
+        full_save_path = fullfile(save_path, save_name);
+        full_metrics_save_path = fullfile(fig_save_path, metrics_save_name);
+
+        fprintf('Saving registration results in directory: \n \n %s \n', full_save_path);
+
+        disp('Data saved, beginning next plane...');
         date = datetime(now,'ConvertFrom','datenum');
-        formatSpec = '%s Motion Correction Complete. Beginning next plane...\n';
-        fprintf(fid,formatSpec,date);
+        format_spec = '%s Motion Correction Complete. Beginning next plane...\n';
+        fprintf(fid, format_spec, date);
 
-        disp('Calculating motion correction metrics...')
+        disp('Calculating motion correction metrics...');
 
         shifts_r = squeeze(cat(3,shifts1(:).shifts));
-        [cY,aa,bb] = motion_metrics(Y,10);
-        [cM1, cc, dd] = motion_metrics(M1,10);
-        [cM2,rr,oo] = motion_metrics(M2,10);
+        [cY, aa, bb] = motion_metrics(Y, 10);
+        [cM1, cc, dd] = motion_metrics(M1, 10);
+        [cM2, rr, oo] = motion_metrics(M2, 10);
         
-        motionCorrectionFigure = figure;
-        T=size(Y,3);
+        motion_correction_figure = figure;
+        T = size(Y, 3);
 
-        ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2); legend('raw data','rigid','non-rigid'); title('correlation coefficients','fontsize',14,'fontweight','bold')
-        set(gca,'Xtick',[])
+        ax1 = subplot(311); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid'); title('correlation coefficients', 'fontsize', 14, 'fontweight', 'bold')
+        set(gca, 'Xtick', [])
         ax2 = subplot(312); %plot(shifts_x); hold on; 
-        plot(shifts_r(:,1),'--k','linewidth',2); title('displacements along x','fontsize',14,'fontweight','bold')
-        set(gca,'Xtick',[])
+        plot(shifts_r(:,1), '--k', 'linewidth', 2); title('displacements along x', 'fontsize', 14, 'fontweight', 'bold')
+        set(gca, 'Xtick', [])
         ax3 = subplot(313); 
-        plot(shifts_r(:,2),'--k','linewidth',2); title('displacements along y','fontsize',14,'fontweight','bold')
-        xlabel('timestep','fontsize',14,'fontweight','bold')
-        linkaxes([ax1,ax2,ax3],'x')
+        plot(shifts_r(:,2), '--k', 'linewidth', 2); title('displacements along y', 'fontsize', 14, 'fontweight', 'bold')
+        xlabel('timestep', 'fontsize', 14, 'fontweight', 'bold')
+        linkaxes([ax1, ax2, ax3], 'x')
 
-        % Figure: Motion correction Metrics
-        Ym = mean(Y,3);
-        Y = M2;
-        savefast(savePath, 'metadata', 'Y', 'Ym', 'shifts_r', 'M1', 'shifts1')
-        saveas(motionCorrectionFigure, full_metrics_savepath);
-        close(motionCorrectionFigure)
-        clear M* c* template_good shifts* 
+        Ym = mean(Y, 3);
+        save(full_save_path, 'Y', 'Ym', 'shifts_r', 'M1', 'shifts1', "-v7.3");
 
-        % apply vectors to movie
-        % mov_from_vec = translateFrames(Y, t_shifts);
+        registration_group = '/registration';
+
+        if ~isfile(h5_filename)
+            h5create(h5_filename, [registration_group, '/Ym'], size(Ym), 'Datatype', 'single');
+            h5create(h5_filename, [registration_group, '/Y'], size(Y), 'Datatype', 'single');
+            h5create(h5_filename, [registration_group, '/shifts_r'], size(shifts_r), 'Datatype', 'single');
+            h5create(h5_filename, [registration_group, '/M1'], size(M1), 'Datatype', 'single');
+            h5create(h5_filename, [registration_group, '/shifts1'], size(shifts1));
+        elseif overwrite == 1
+        
+            info = h5info(h5_filename, registration_group);
+            datasets = {info.Datasets.Name};
+            for d = 1:numel(datasets)
+                h5delete([registration_group, '/', datasets{d}]);
+            end
+
+            h5create(h5_filename, [registration_group, '/Ym'], size(Ym), 'Datatype', 'single');
+            h5create(h5_filename, [registration_group, '/Y'], size(Y), 'Datatype', 'single');
+            h5create(h5_filename, [registration_group, '/shifts_r'], size(shifts_r), 'Datatype', 'single');
+            h5create(h5_filename, [registration_group, '/M1'], size(M1), 'Datatype', 'single');
+            h5create(h5_filename, [registration_group, '/shifts1'], size(shifts1));
+
+            % Write the data to the HDF5 file
+            h5write(h5_filename, [registration_group, '/Ym'], Ym);
+            h5write(h5_filename, [registration_group, '/Y'], Y);
+            h5write(h5_filename, [registration_group, '/shifts_r'], shifts_r);
+            h5write(h5_filename, [registration_group, '/M1'], M1);
+            h5write(h5_filename, [registration_group, '/shifts1'], shifts1);
+        end
+        
+        saveas(motion_correction_figure, full_metrics_save_path);
+        close(motion_correction_figure);
+        clear M* c* template_good shifts*;
+
     end
 
-    disp('All planes processed...')
+    disp('All planes processed...');
     t = toc;
-    disp(['Routine complete. Total run time ' num2str(t./3600) ' hours.'])
+    disp(['Routine complete. Total run time ' num2str(t./3600) ' hours.']);
     date = datetime(now,'ConvertFrom','datenum');
-    formatSpec = '%s Routine complete.';
-    fprintf(fid,formatSpec,date);
+    format_spec = '%s Routine complete.\n';
+    fprintf(fid, format_spec, date);
+end
+
+function close_log_file(fid)
+    fclose(fid);
 end
