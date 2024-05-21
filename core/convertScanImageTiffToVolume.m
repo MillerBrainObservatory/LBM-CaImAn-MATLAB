@@ -59,7 +59,6 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
     fix_scan_phase = p.Results.fix_scan_phase;
     overwrite = p.Results.overwrite;
     trim_pixels = p.Results.trim_pixels;
-    
     compression = p.Results.compression;
 
     if isempty(save_path)
@@ -116,7 +115,6 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
         % make file access / parameter access easier down the pipeline.
         metadata = get_metadata(firstFileFullPath);
         metadata.extraction_params = p.Results;
-        metadata.group_path = group_path;
 
         [t_left, t_right, t_top, t_bottom] = deal(trim_pixels(1), trim_pixels(2), trim_pixels(3), trim_pixels(4));
         metadata.trim_pixels = [t_left, t_right, t_top, t_bottom]; % store the number of pixels to trim
@@ -124,7 +122,6 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
         raw_y = metadata.num_pixel_xy(2);
         trimmed_x = raw_x - t_left - t_right;
         trimmed_y = raw_y - t_top - t_bottom;
-        metadata.plane_size = [trimmed_y, trimmed_x * metadata.num_strips, metadata.num_frames_file];
 
         num_planes = metadata.num_planes;
         num_frames_file = metadata.num_frames_file;
@@ -136,10 +133,10 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
             fprintf("Deleting file: %s\n", h5_fullfile);
             delete(h5_fullfile);
         end
-
+        t0 = tic;
         for i = 1:length(files)
+            tfile = tic;
             fprintf(fid, 'Processing %d: %s\n', i, files(i).name);
-
             % Read and process the TIFF file
             hTif = scanimage.util.ScanImageTiffReader(fullfile(data_path, files(i).name));
             Aout = hTif.data();
@@ -147,10 +144,20 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
             Aout = reshape(Aout, [size(Aout, 1), size(Aout, 2), num_planes, num_frames_file]);
 
             for plane_idx = 1:num_planes
+                tplane = tic;
                 dataset_path = sprintf('%s/plane_%d', group_path, plane_idx);
                 if i == 1
-                    h5create(h5_fullfile, dataset_path, [trimmed_y, trimmed_x * metadata.num_strips, Inf], 'Datatype', metadata.sample_format, ...
-                        'ChunkSize', [trimmed_y, trimmed_x * metadata.num_strips, 1], 'Deflate', compression);
+                    try
+                        h5create(h5_fullfile, dataset_path, [trimmed_y, trimmed_x * metadata.num_strips, Inf], 'Datatype', metadata.sample_format, ...
+                            'ChunkSize', [trimmed_y, trimmed_x * metadata.num_strips, 1], 'Deflate', compression);
+                    catch ME
+                        if strcmp(ME.identifier, 'MATLAB:imagesci:h5create:datasetAlreadyExists')
+                            fprintf(fid, 'Dataset %s already exists. Skipping creation.\n', dataset_path);
+                        else
+                            rethrow(ME);
+                        end
+                    end
+
                 end
 
                 frameTemp = zeros(trimmed_y, trimmed_x * metadata.num_strips, metadata.num_frames_file, 'like', Aout);
@@ -158,7 +165,6 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
                 offset_y = 0;
                 offset_x = 0;
 
-                tic;
                 for roi_idx = 1:metadata.num_strips
                     if cnt > 1
                         offset_y = offset_y + raw_y + metadata.num_lines_between_scanfields;
@@ -169,44 +175,32 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
                     end
                     cnt = cnt + 1;
                 end
-                elapsed_time = toc;
-                fprintf(fid, 'Processed plane %d in %.2f seconds\n', plane_idx, elapsed_time);
                 h5write(h5_fullfile, dataset_path, frameTemp, [1, 1, (i-1) * num_frames_file + 1], [trimmed_y, trimmed_x * metadata.num_strips, num_frames_file]);
+                fprintf(fid, 'Processed plane %d: %.2f seconds\n', plane_idx, toc(tplane));
             end
 
-            % Log the metadata
-            fprintf(fid, 'Metadata for file %d:\n', i);
-            metadata_fields = fieldnames(metadata);
-            for j = 1:length(metadata_fields)
-                field_name = metadata_fields{j};
-                field_value = metadata.(field_name);
-                if ischar(field_value)
-                    fprintf(fid, '%s: %s\n', field_name, field_value);
-                elseif isnumeric(field_value)
-                    fprintf(fid, '%s: %s\n', field_name, mat2str(field_value));
-                end
+            if i == 1 % Log the metadata first file only
+                writeMetadataToAttribute(metadata, h5_fullfile, group_path);
             end
+            fprintf(fid, "File %d of %d processed. time: %.2f seconds\n", i, length(files), toc(tfile));
         end
-        fields = string(fieldnames(metadata));
-        for f = fields'
-            h5writeatt(h5_fullfile, group_path, f, metadata.(f));
-        end
-
-        tt = toc / 3600;
-        disp(['Volume loaded and processed. Elapsed time: ' num2str(tt) ' hours. Saving volume to temp...']);
-
+        fprintf(fid, "Processing complete. time: %.2f seconds\n", i, length(files), toc(tfile));
     catch ME
         if exist('fid', 'var') && fid ~= -1
-            fprintf('closing logfile: %s\n', logFullPath);
+            fprintf('Closing logfile: %s\n', logFullPath);
             fclose(fid);
         end
         if exist('logFullPath', 'var') && isfile(logFullPath)
-            fprintf('deleting logfile: %s\n', logFullPath);
+            fprintf('Deleting errored logfile: %s\n', logFullPath);
+            for k = 1:length(ME.stack)
+                fprintf('Error in %s (line %d)\n', ME.stack(k).file, ME.stack(k).line);
+            end
             delete(logFullPath);
         end
         rethrow(ME);
     end
 end
+
 
 function dataOut = fixScanPhase(dataIn,offset,dim, dtype)
     % Find the lateral shift that maximizes the correlation between
