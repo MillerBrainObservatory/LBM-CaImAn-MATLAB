@@ -1,4 +1,4 @@
-function segmentPlane(path, savepath, metadata, diagnosticFlag, startPlane, endPlane, numCores)
+function segmentPlane(data_path, save_path, varargin)
 % SEGMENTPLANE Segment imaging data using CaImAn for motion-corrected data.
 %
 % This function applies the CaImAn algorithm to segment neurons from
@@ -8,30 +8,33 @@ function segmentPlane(path, savepath, metadata, diagnosticFlag, startPlane, endP
 %
 % Parameters
 % ----------
-% path : char
-%     The path to the folder containing the motion-corrected data.
-% savepath : char
-%     The path where the neuronal footprints are saved.
-% metadata: struct
-%     Struct of ScanImage metadata containing image width, height, and
-%     scanfield information relating to each ROI.
-% diagnosticFlag : char
-%     When set to '1', the function reports all .mat files in the directory
-%     specified by 'path'. Otherwise, it processes files for neuron segmentation.
-% startPlane : char
-%     The starting plane index for processing. A non-numeric input or '0' sets
-%     it to default (1).
-% endPlane : char
-%     The ending plane index for processing. A non-numeric input or '0' sets
-%     it to default (maximum available planes).
-% numCores : char
-%     The number of cores to use for parallel processing. A non-numeric input
-%     or '0' sets it to the default value (12).
+% data_path : char
+%     Path to the directory containing the files extracted via convertScanImageTiffToVolume.
+% save_path : char
+%     Path to the directory to save the motion vectors.
+% data_input_group : string, optional
+%     Group path within the hdf5 file that contains raw data.
+%     Default is 'registration'.
+% data_output_group : string, optional
+%     Group path within the hdf5 file to save the registered data.
+%     Default is 'registration'.
+% debug_flag : double, logical, optional
+%     If set to 1, the function displays the files in the command window and does
+%     not continue processing. Defaults to 0.
+% overwrite : logical, optional
+%     Whether to overwrite existing files (default is 1).
+% num_cores : double, integer, positive
+%     Number of cores to use for computation. The value is limited to a maximum
+%     of 24 cores.
+% start_plane : double, integer, positive
+%     The starting plane index for processing.
+% end_plane : double, integer, positive
+%     The ending plane index for processing. Must be greater than or equal to
+%     start_plane.
 %
 % Returns
 % -------
 % None
-%
 %
 % Notes
 % -----
@@ -52,38 +55,61 @@ function segmentPlane(path, savepath, metadata, diagnosticFlag, startPlane, endP
 %
 % See also ADDPATH, FULLFILE, DIR, LOAD, SAVEFAST
 
+p = inputParser;
+addRequired(p, 'data_path', @ischar);
+addRequired(p, 'save_path', @ischar);
+addParameter(p, 'data_input_group', "/extraction", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addParameter(p, 'data_output_group', "/registration", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'num_cores', 1, @(x) isnumeric(x) && x > 0 && x <= 24);
+addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
+addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
+parse(p, data_path, save_path, varargin{:});
+
+data_path = p.Results.data_path;
+save_path = p.Results.save_path;
+data_input_group = p.Results.data_input_group;
+data_output_group = p.Results.data_output_group;
+
+debug_flag = p.Results.debug_flag;
+num_cores = p.Results.num_cores;
+start_plane = p.Results.start_plane;
+end_plane = p.Results.end_plane;
+overwrite = p.Results.overwrite;
+
 % give access to CaImAn files
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
 addpath(genpath(fullfile(currpath, '../packages/CaImAn_Utilities/CaImAn-MATLAB-master/CaImAn-MATLAB-master/')));
 
-filePath = fullfile(path);
+filePath = fullfile(data_path);
 if ~isfolder(filePath)
     error("Filepath %s does not exist", filePath);
 end
 
-if not(isfolder(savepath))
+if not(isfolder(save_path))
     fprintf('Given savepath %s does not exist. Creating this directory...\n', saveDirPath);
-    mkdir(savepath)
+    mkdir(save_path)
 else
     %TODO: Section here reporting num_files in savepath, warning for
     %overwriting data
 end
 
-if strcmp(diagnosticFlag,'1') % if the diagnostic flag is set to 1, spit out contents of directory specified by 'path'
-    dir([path,'*.mat'])
+if strcmp(debug_flag,'1') % if the diagnostic flag is set to 1, spit out contents of directory specified by 'path'
+    dir([data_path,'*.mat'])
 else
-    files = dir([path, '*.mat']); % find all .mat files in the data directory
+    files = dir([data_path, '*.mat']); % find all .mat files in the data directory
 
     numFiles = size(files,1);
 
     if numFiles < 1
-        error('no valid files in %s', path)
+        error('no valid files in %s', data_path)
     end
 
     clck = clock; % use current time and date to make a log file
-    fid = fopen(fullfile(path,['matlab_log_' num2str(clck(1)) '_' num2str(clck(2)) '_' num2str(clck(3)) '_' num2str(clck(4)) '_' num2str(clck(5)) '.txt']),'w');
+    fid = fopen(fullfile(data_path,['matlab_log_' num2str(clck(1)) '_' num2str(clck(2)) '_' num2str(clck(3)) '_' num2str(clck(4)) '_' num2str(clck(5)) '.txt']),'w');
 
-    disp(['Processing ' num2str(numFiles) ' files found in directory ' path '...'])
+    disp(['Processing ' num2str(numFiles) ' files found in directory ' data_path '...'])
 
     poolobj = gcp('nocreate'); % if a parallel pool is running, kill it and restart it to make sure parameters are correct
     if ~isempty(poolobj)
@@ -96,26 +122,26 @@ else
     filestem = filestem(1:inds(end));
 
     % use defaults or determine range of planes to process based on input arguments
-    if str2double(startPlane) == 0 || size(str2double(startPlane),1) == 0
-        startPlane = 1;
+    if str2double(start_plane) == 0 || size(str2double(start_plane),1) == 0
+        start_plane = 1;
     else
-        startPlane = str2double(startPlane);
+        start_plane = str2double(start_plane);
     end
 
-    if str2double(endPlane) == 0 || size(str2double(endPlane),1) == 0
-        endPlane = numFiles;
+    if str2double(end_plane) == 0 || size(str2double(end_plane),1) == 0
+        end_plane = numFiles;
     else
-        endPlane = str2double(endPlane);
+        end_plane = str2double(end_plane);
     end
 
-    if str2double(numCores) == 0 || size(str2double(numCores),1) == 0
-        numCores = 24;
+    if str2double(num_cores) == 0 || size(str2double(num_cores),1) == 0
+        num_cores = 24;
     else
-        numCores = str2double(numCores);
+        num_cores = str2double(num_cores);
     end
 
-    numFiles = endPlane-startPlane+1;
-    for abc = startPlane:endPlane
+    numFiles = end_plane-start_plane+1;
+    for abc = start_plane:end_plane
             disp(['Beginning calculations for plane ' num2str(abc) ' of ' num2str(numFiles) '...'])
             date = datetime(now,'ConvertFrom','datenum');
             formatSpec = '%s BEGINNING PLANE %u\n';
@@ -125,7 +151,7 @@ else
             file = [filestem num2str(abc)];
 
             % load data
-            d = load(fullfile(path, [file '.mat']));
+            d = load(fullfile(data_path, [file '.mat']));
             % data = translateFrames(Y, shifts);
             data = d.M2;
 
@@ -141,7 +167,7 @@ else
 
             poolobj = gcp('nocreate'); % create a parallel pool
             if isempty(poolobj)
-                poolobj = parpool('local',numCores);
+                poolobj = parpool('local',num_cores);
                 tmpDir = tempname();
                 mkdir(tmpDir);
                 poolobj.Cluster.JobStorageLocation = tmpDir;
@@ -280,7 +306,7 @@ else
             f = single(f);
 
             % Save data
-            savefast(fullfile(savepath, ['caiman_output_plane_' num2str(abc) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')
+            savefast(fullfile(save_path, ['caiman_output_plane_' num2str(abc) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')
 
             t4 = toc;
             disp(['Segmentation complete and data saved. Total time elapsed for current iteration ' num2str(t4./60) ' minutes.'])

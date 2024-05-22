@@ -12,16 +12,21 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 %     session should be in the directory.
 % save_path : char, optional
 %     The directory where processed files will be saved. It is created if it does
-%     not exist. Defaults to the filePath if not provided.
+%     not exist. Defaults to the data_path directory.
 % group_path : string, optional
-%     Group path within the file (default is "/raw").
+%     Group path within the hdf5 file to save the extracted data. Default is
+%     '/extraction'.
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
-% fix_scan_phase : logical, optional
-%     Whether to correct for bi-directional scan artifacts. (default is true).
 % overwrite : logical, optional
 %     Whether to overwrite existing files (default is 1).
+% fix_scan_phase : logical, optional
+%     Whether to correct for bi-directional scan artifacts. (default is true).
+% trim_pixels : double, optional
+%     Pixels to trim from left, right,top, bottom of each scanfield before
+%     horizontally concatenating the scanfields within an image. Default is
+%     [0 0 0 0].
 % compression : double, optional
 %     Compression level for the file (default is 0).
 %
@@ -41,23 +46,23 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 %
 % .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
 
-   p = inputParser;
+    p = inputParser;
     addRequired(p, 'data_path', @ischar);
     addOptional(p, 'save_path', data_path, @ischar);
-    addParameter(p, 'group_path', "/raw", @isstring);
+    addParameter(p, 'group_path', "/extraction", @isstring);
     addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
-    addParameter(p, 'fix_scan_phase', 1, @(x) isnumeric(x) || islogical(x));
     addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
+    addParameter(p, 'fix_scan_phase', 1, @(x) isnumeric(x) || islogical(x));
     addParameter(p, 'trim_pixels', [0 0 0 0], @isnumeric);
     addParameter(p, 'compression', 0, @isnumeric);
     parse(p, data_path, save_path, varargin{:});
-
+    
     data_path = p.Results.data_path;
     save_path = p.Results.save_path;
     group_path = p.Results.group_path;
     debug_flag = p.Results.debug_flag;
-    fix_scan_phase = p.Results.fix_scan_phase;
     overwrite = p.Results.overwrite;
+    fix_scan_phase = p.Results.fix_scan_phase;
     trim_pixels = p.Results.trim_pixels;
     compression = p.Results.compression;
 
@@ -93,11 +98,11 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
         fid = fopen(logFullPath, 'a');
         if fid == -1
             error('Cannot create or open log file: %s', logFullPath);
+        else
+            fprintf('Log file created: %s\n', logFullPath);
         end
-        closeCleanupObj = onCleanup(@() fclose(fid));
 
-        % Confirm the log file creation
-        fprintf('Log file created: %s\n', logFullPath);
+        closeCleanupObj = onCleanup(@() fclose(fid));
 
         files = dir(fullfile(data_path, '*.tif'));
         if isempty(files)
@@ -110,7 +115,6 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
         end
 
         firstFileFullPath = fullfile(files(1).folder, files(1).name);
-
         % We add some values to the metadata to attach to H5 attributes and
         % make file access / parameter access easier down the pipeline.
         metadata = get_metadata(firstFileFullPath);
@@ -174,13 +178,12 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
                 h5write(h5_fullfile, dataset_path, frameTemp, [1, 1, (i-1) * num_frames_file + 1], [trimmed_y, trimmed_x * metadata.num_strips, num_frames_file]);
                 fprintf(fid, 'Processed plane %d: %.2f seconds\n', plane_idx, toc(tplane));
             end
-
             if i == 1 % Log the metadata first file only
                 writeMetadataToAttribute(metadata, h5_fullfile, group_path);
             end
-            fprintf(fid, "File %d of %d processed. time: %.2f seconds\n", i, length(files), toc(tfile));
+            fprintf(fid, "File %d of %d processed: %.2f seconds\n", i, length(files), toc(tplane));
         end
-        fprintf(fid, "Processing complete. time: %.2f seconds\n", i, length(files), toc(tfile));
+        fprintf(fid, "Processing complete. Time: %.2f seconds\n", i, length(files), toc(tfile));
     catch ME
         if exist('fid', 'var') && fid ~= -1
             fprintf('Closing logfile: %s\n', logFullPath);
