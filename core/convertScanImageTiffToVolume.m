@@ -124,6 +124,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
         metadata.trim_pixels = [t_left, t_right, t_top, t_bottom]; % store the number of pixels to trim
         raw_x = metadata.num_pixel_xy(1);
         raw_y = metadata.num_pixel_xy(2);
+
         trimmed_x = raw_x - t_left - t_right;
         trimmed_y = raw_y - t_top - t_bottom;
 
@@ -137,7 +138,6 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
             fprintf("Deleting file: %s\n", h5_fullfile);
             delete(h5_fullfile);
         end
-        t0 = tic;
         for i = 1:length(files)
             tfile = tic;
             fprintf(fid, 'Processing %d: %s\n', i, files(i).name);
@@ -171,11 +171,19 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
                         offset_x = offset_x + trimmed_x;
                     end
                     for frame_idx = 1:num_frames_file
-                        frameTemp(:, (offset_x + 1):(offset_x + trimmed_x), frame_idx) = Aout((offset_y + t_top + 1):(offset_y + raw_y - t_bottom), (t_left + 1):(raw_x - t_right), plane_idx, frame_idx);
+                         frameTemp(:, (offset_x + 1):(offset_x + trimmed_x), frame_idx) = ...
+                            Aout((offset_y + t_top + 1):(offset_y + raw_y - t_bottom), ...
+                                 (t_left + 1):(raw_x - t_right), plane_idx, frame_idx);
                     end
                     cnt = cnt + 1;
                 end
-                h5write(h5_fullfile, dataset_path, frameTemp, [1, 1, (i-1) * num_frames_file + 1], [trimmed_y, trimmed_x * metadata.num_strips, num_frames_file]);
+                h5write( ...
+                    h5_fullfile, ... % h5 filename
+                    dataset_path, ... % location /group_path/plane_N/
+                    frameTemp, ... % 3D planar time-series
+                    [1, 1, (i-1) * num_frames_file + 1], ... % start index 
+                    [trimmed_y, trimmed_x * metadata.num_strips, num_frames_file] ... % stride
+                    );
                 fprintf(fid, 'Processed plane %d: %.2f seconds\n', plane_idx, toc(tplane));
             end
             if i == 1 % Log the metadata first file only
