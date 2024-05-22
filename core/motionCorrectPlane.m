@@ -110,22 +110,12 @@ end
 
 dataset_paths = {'shifts2', 'Y', 'shifts1'};
 
-% keep track of dataset paths and their corresponding names
-dataset_map = containers.Map();
-dataset_map('shifts2') = 'shifts2';
-dataset_map('Y') = 'Y';
-dataset_map('shifts1') = 'shifts1';
-
-% poolobj = gcp('nocreate');
-% if ~isempty(poolobj)
-%     disp('Removing existing parallel pool.');
-%     delete(poolobj);
-% end
 num_cores = max(num_cores, 23);
 fprintf(fid, '%s Beginning processing routine with %d cores...\n', datetime, num_cores);
 plane_map = dictionary; tic; 
 for plane_idx = 1:metadata.num_planes
     pst = sprintf('plane_%d', plane_idx);
+    fprintf("Processing: %s", pst);
     input_path = sprintf('%s/%s', data_input_group, pst);
     registration_path = sprintf('%s/%s', data_output_group, pst);
     skip_plane = false;
@@ -142,18 +132,12 @@ for plane_idx = 1:metadata.num_planes
             end
         else
             fprintf(fid, 'Creating dataset %s for plane %d.\n', dataset_name, plane_idx);
-            % Create the dataset with the correct size
-            % Assuming h5_data.Datasets(i).Dataspace.Size contains the size
             h5create(h5_fullfile, dataset_path, h5_data.Datasets(i).Dataspace.Size, 'Datatype', 'single');
         end
     end
     if skip_plane
         continue; % skip to next iteration of plane_idx loop
     end
-    
-    shifts_path =  sprintf('%s/shifts2', registration_path);
-    movie_path =  sprintf('%s/Y', registration_path);
-    template_shifts_path =  sprintf('%s/shifts1', registration_path);
    
     pixel_resolution = metadata.pixel_resolution;
     max_shift = round(20/pixel_resolution);
@@ -169,7 +153,7 @@ for plane_idx = 1:metadata.num_planes
     volume_size = size(Y);
     d1 = volume_size(1);
     d2 = volume_size(2);
-    
+
     fprintf(fid, '%s Beginning processing for plane %d with %d matlab workers.\n', datetime, plane_idx, num_cores);
     if isempty(gcp('nocreate')) && num_cores > 1
         parpool(num_cores);
@@ -197,7 +181,7 @@ for plane_idx = 1:metadata.num_planes
     [srt, minv_idx] = sort(shifts_v, 120);
     best_idx = unique(reshape(minv_idx, 1, []));
     template_good = mean(M1(:,:,best_idx), 3);
-    % 
+    
     % % Non-rigid motion correction using the good template from the rigid
     options_nonrigid = NoRMCorreSetParms(...
         'd1', d1,...
@@ -208,45 +192,17 @@ for plane_idx = 1:metadata.num_planes
         'init_batch', 120,...
         'correct_bidir', false...
     );
-    % 
-    % % DFT subpixel registration - results used in CNMF
+
+    % DFT subpixel registration - results used in CNMF
     [M2, shifts2, ~, ~] = normcorre_batch(Y, options_nonrigid, template_good);
-    % 
-    % save_name = sprintf('registered_%s.mat', pst);
-    % metrics_save_name = sprintf('metrics_%s.fig', pst);
-    % 
-    % full_save_path = fullfile(save_path, save_name);
-    % full_metrics_save_path = fullfile(fig_save_path, metrics_save_name);
-    % 
-    % fprintf('Saving registration results in directory: \n \n %s \n', full_save_path);
-    % 
-    
 
-    % disp('Calculating motion correction metrics...');
-    % 
-    % shifts_r = squeeze(cat(3,shifts1(:).shifts));
-    % [cY, aa, bb] = motion_metrics(Y, 10);
-    % [cM1, cc, dd] = motion_metrics(M1, 10);
-    % [cM2, rr, oo] = motion_metrics(M2, 10);
-    
-    % motion_correction_figure = figure;
-    % T = size(Y, 3);
-    % 
-    % ax1 = subplot(311); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid'); title('correlation coefficients', 'fontsize', 14, 'fontweight', 'bold')
-    % set(gca, 'Xtick', [])
-    % ax2 = subplot(312); %plot(shifts_x); hold on; 
-    % plot(shifts_r(:,1), '--k', 'linewidth', 2); title('displacements along x', 'fontsize', 14, 'fontweight', 'bold')
-    % set(gca, 'Xtick', [])
-    % ax3 = subplot(313); 
-    % plot(shifts_r(:,2), '--k', 'linewidth', 2); title('displacements along y', 'fontsize', 14, 'fontweight', 'bold')
-    % xlabel('timestep', 'fontsize', 14, 'fontweight', 'bold')
-    % linkaxes([ax1, ax2, ax3], 'x')
+    movie_path =  sprintf('%s/Y', registration_path);
+    shifts_path =  sprintf('%s/shifts2', registration_path);
+    template_shifts_path =  sprintf('%s/shifts1', registration_path);
 
-    % Ym = mean(Y, 3);
-    % save(full_save_path, 'Y', 'Ym', 'shifts_r', 'M1', 'shifts1', "-v7.3");
-    write_dataset(h5_fullfile, [registration_path, '/Y'], Y, fid);
-    write_dataset(h5_fullfile, [registration_path, '/shifts1'], shifts1, fid);
-    write_dataset(h5_fullfile, [registration_path, '/shifts2'], shifts2, fid);
+    write_dataset(h5_fullfile, movie_path, Y, fid);
+    write_dataset(h5_fullfile, shifts_path, squeeze(cat(3,shifts1(:).shifts)), fid);
+    write_dataset(h5_fullfile, template_shifts_path, squeeze(cat(3,shifts1(:).shifts)), fid);
 
     % saveas(motion_correction_figure, full_metrics_save_path);
     % close(motion_correction_figure);
@@ -290,7 +246,7 @@ function write_dataset(filename, location, data, fid)
         h5create(filename, location, size(data), 'Datatype', 'single')
     catch ME
         if strcmp(ME.identifier, 'MATLAB:imagesci:h5create:datasetAlreadyExists')
-            fprintf(fid, 'Dataset %s already exists. Skipping creation.\n', location);
+            fprintf('Dataset %s already exists. Skipping creation.\n', location);
         else
             rethrow(ME);
         end
@@ -309,3 +265,36 @@ function exists = check_dataloc_exists(filename, location)
         exists = false;
     end
 end
+
+    % save_name = sprintf('registered_%s.mat', pst);
+    % metrics_save_name = sprintf('metrics_%s.fig', pst);
+    % 
+    % full_save_path = fullfile(save_path, save_name);
+    % full_metrics_save_path = fullfile(fig_save_path, metrics_save_name);
+    % 
+    % fprintf('Saving registration results in directory: \n \n %s \n', full_save_path);
+    % 
+    
+
+    % disp('Calculating motion correction metrics...');
+    % 
+    % shifts_r = squeeze(cat(3,shifts1(:).shifts));
+    % [cY, aa, bb] = motion_metrics(Y, 10);
+    % [cM1, cc, dd] = motion_metrics(M1, 10);
+    % [cM2, rr, oo] = motion_metrics(M2, 10);
+    
+    % motion_correction_figure = figure;
+    % T = size(Y, 3);
+    % 
+    % ax1 = subplot(311); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid'); title('correlation coefficients', 'fontsize', 14, 'fontweight', 'bold')
+    % set(gca, 'Xtick', [])
+    % ax2 = subplot(312); %plot(shifts_x); hold on; 
+    % plot(shifts_r(:,1), '--k', 'linewidth', 2); title('displacements along x', 'fontsize', 14, 'fontweight', 'bold')
+    % set(gca, 'Xtick', [])
+    % ax3 = subplot(313); 
+    % plot(shifts_r(:,2), '--k', 'linewidth', 2); title('displacements along y', 'fontsize', 14, 'fontweight', 'bold')
+    % xlabel('timestep', 'fontsize', 14, 'fontweight', 'bold')
+    % linkaxes([ax1, ax2, ax3], 'x')
+
+    % Ym = mean(Y, 3);
+    % save(full_save_path, 'Y', 'Ym', 'shifts_r', 'M1', 'shifts1', "-v7.3");

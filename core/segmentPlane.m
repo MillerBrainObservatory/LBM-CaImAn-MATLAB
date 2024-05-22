@@ -190,7 +190,6 @@ else
             end
 
             % CaImAn settings
-            % TODO: Parameterize
             merge_thresh = 0.8; % threshold for merging
             min_SNR = 1.4; % liberal threshold, can tighten up in additional post-processing
             space_thresh = 0.2; % threhsold for selection of neurons by space
@@ -234,7 +233,8 @@ else
             'min_size_thr',mn,...                       % minimum size of each component in pixels (default: 9)
             'refine_flag',0,...
             'rolling_length',ceil(FrameRate*5),...
-            'fr', FrameRate);
+            'fr', FrameRate ...
+            );
 
             % Run patched caiman
             disp('Beginning patched, volumetric CNMF...')
