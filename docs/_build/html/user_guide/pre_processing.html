@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Pre-Processing &#8212; caiman_matlab  documentation</title>
   
@@ -19,31 +18,29 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js"></script>
-    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js"></script>
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/pre_processing';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -58,10 +55,9 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -102,7 +98,7 @@
 </form></div>
   </div>
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -140,12 +136,6 @@
       
         <div class="navbar-item">
 <nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -236,10 +226,13 @@ document.write(`
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -252,12 +245,6 @@ document.write(`
         
           <div class="navbar-item">
 <nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -380,10 +367,10 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="pre-processing">
-<h1>Pre-Processing<a class="headerlink" href="#pre-processing" title="Permalink to this heading">#</a></h1>
+<h1>Pre-Processing<a class="headerlink" href="#pre-processing" title="Link to this heading">#</a></h1>
 <p>Before beginning pre-processing, follow setup steps in <a class="reference internal" href="../get_started/getting_started.html#getting-started"><span class="std std-ref">Getting Started</span></a> to make sure the pipeline and dependencies are installed properly.
 See <a class="reference internal" href="troubleshooting.html#troubleshooting"><span class="std std-ref">Troubleshooting</span></a> for common issues.</p>
 <p>Pre-processing LBM datasets consists of 2 main processing steps:</p>
@@ -392,7 +379,7 @@ See <a class="reference internal" href="troubleshooting.html#troubleshooting"><s
 <li><p>Piecewise motion-correction</p></li>
 </ol>
 <section id="re-construct-volumetric-time-series">
-<span id="pipeline-step-1"></span><h2>1. Re-Construct Volumetric Time-Series<a class="headerlink" href="#re-construct-volumetric-time-series" title="Permalink to this heading">#</a></h2>
+<span id="pipeline-step-1"></span><h2>1. Re-Construct Volumetric Time-Series<a class="headerlink" href="#re-construct-volumetric-time-series" title="Link to this heading">#</a></h2>
 <p>Before processing starts, the raw scanimage output needs to be reconstructed to form a correctly-ordered time-series.
 This is accomplished through the use of <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a>.</p>
 <p>Shown in the image below is a graphical representation of this reconstruction.</p>
@@ -432,7 +419,7 @@ of a suffix appended to the filename: <cite>_000N</cite>, where n=number of file
 No other .tiff files should be in this directory. If this happens, an error will throw.</p>
 </div>
 <section id="extraction-input">
-<h3>Extraction Input<a class="headerlink" href="#extraction-input" title="Permalink to this heading">#</a></h3>
+<h3>Extraction Input<a class="headerlink" href="#extraction-input" title="Link to this heading">#</a></h3>
 <p>First, we set up our directory paths. You can chain the output of one function to the input of another. Note the path names match <a class="reference internal" href="../get_started/getting_started.html#directory-structure"><span class="std std-ref">Directory Structure</span></a>:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">parent_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;C:\Users\&lt;username&gt;\Documents\data\bi_hemisphere\&#39;</span><span class="p">;</span><span class="w"> </span><span class="c">%</span>
 <span class="n">raw_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parent_path</span><span class="w"> </span><span class="s">&#39;raw\&#39;</span><span class="p">];</span><span class="w"> </span><span class="c">% where our raw .tiffs go</span>
@@ -472,7 +459,7 @@ show to you and describe the parameters of that function.</p>
                 </a><p>This example shows that shifting every <em>other</em> row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.</p>
 </section>
 <section id="extraction-output">
-<h3>Extraction Output<a class="headerlink" href="#extraction-output" title="Permalink to this heading">#</a></h3>
+<h3>Extraction Output<a class="headerlink" href="#extraction-output" title="Link to this heading">#</a></h3>
 <p>Our data are now saved as a single h5 file separated by file and by plane. This storage format
 makes it easy to motion correct each 3D planar time-series individually. We will be processing small patches of the total image,
 roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.
@@ -551,7 +538,7 @@ After successfully running <a class="reference internal" href="../api/core.html#
                 </a></section>
 </section>
 <section id="piecewise-rigid-motion-correction">
-<h2>2. Piecewise-Rigid Motion-Correction<a class="headerlink" href="#piecewise-rigid-motion-correction" title="Permalink to this heading">#</a></h2>
+<h2>2. Piecewise-Rigid Motion-Correction<a class="headerlink" href="#piecewise-rigid-motion-correction" title="Link to this heading">#</a></h2>
 <p>For a quick demo on how to run motion correction, see the demo_registration.m script.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -562,7 +549,7 @@ Natural movement by the animal during experimental tasks can cause our images sp
 on the type of task the animal is performing.</p>
 <p>For this reason, it is <em>very</em> important for the researcher to verify that any motion artifacts in the movie are removed before moving onto any subsequent computations.</p>
 <section id="rigid-vs-non-rigid">
-<h3>Rigid vs Non-Rigid<a class="headerlink" href="#rigid-vs-non-rigid" title="Permalink to this heading">#</a></h3>
+<h3>Rigid vs Non-Rigid<a class="headerlink" href="#rigid-vs-non-rigid" title="Link to this heading">#</a></h3>
 <p>The motion artifacts present in a movie also come in two flavors, <cite>rigid</cite> and <cite>non-rigid</cite>.
 Purely rigid motion is simple, straightforeward movement that applies to each-and-every pixel equally.
 The entire 2D image is shifted by a number of pixels in the x direction and y direction.</p>
@@ -602,7 +589,7 @@ The entire 2D image is shifted by a number of pixels in the x direction and y di
 </div>
 </section>
 <section id="registration-output">
-<h3>Registration Output<a class="headerlink" href="#registration-output" title="Permalink to this heading">#</a></h3>
+<h3>Registration Output<a class="headerlink" href="#registration-output" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>The output is a 2D column vector [x, y] with shifts that allow you to reconstruct the motion-corrected movie with <span class="target" id="core-utils-translateframes">core.utils.translateFrames</span>.</p></li>
 <li><p>shifts(:,1) represent pixel-shifts in <em>x</em></p></li>
@@ -652,7 +639,7 @@ only a single plane is ever loaded into memory due to large LBM filesizes (&gt;3
                      alt=""/>
                 </a></section>
 <section id="metrics">
-<h3>Metrics<a class="headerlink" href="#metrics" title="Permalink to this heading">#</a></h3>
+<h3>Metrics<a class="headerlink" href="#metrics" title="Link to this heading">#</a></h3>
 <p>CaImAn provides some useful metrics to determine the effectiveness of registration.
 These will be placed in the same directory as your save_path, <cite>metrics/registration_metrics_plane_N</cite>.</p>
 <a class=""
@@ -722,12 +709,14 @@ Underneath you see the rigid shifts for X and Y, respectively.</p>
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-  <div class="sidebar-secondary-item">
 
-  <div class="page-toc tocsection onthispage">
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#re-construct-volumetric-time-series">1. Re-Construct Volumetric Time-Series</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extraction-input">Extraction Input</a></li>
@@ -765,8 +754,8 @@ Underneath you see the rigid shifts for X and Y, respectively.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -786,7 +775,7 @@ Underneath you see the rigid shifts for X and Y, respectively.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     <br/>
   </p>
 </div>
@@ -799,7 +788,7 @@ Underneath you see the rigid shifts for X and Y, respectively.</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>
