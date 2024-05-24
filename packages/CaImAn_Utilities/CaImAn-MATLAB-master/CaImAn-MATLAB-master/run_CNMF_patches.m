@@ -101,9 +101,11 @@ end
 RESULTS = CNMF();
 RESULTS(n_patches) = CNMF();
 
+%% F.O. 0
 if memmaped   
 %     disp('CHANGED PARALLEL LOOP')
-    parfor i = 1:n_patches
+    % parfor i = 1:n_patches
+    for i = 1:n_patches
         patch_idx = patch_to_indices(patches{i});
         Yp = data.Y(patch_idx{:},:);
         RESULTS(i) = process_patch_object(Yp,F_dark, K, p, tau, options);
