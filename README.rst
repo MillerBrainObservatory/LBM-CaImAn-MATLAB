@@ -53,32 +53,7 @@ There are 4 steps that require user input:
 3. Plane-by-plane 2D neuronal segmentation and deconvolution.
 4. Axial (Z) offset correction.
 
-Further reading:
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Get started:
-
-    get_started/index
-
-.. toctree::
-    :maxdepth: 2
-    :caption: User Guide
-
-    user_guide/index
-
-.. toctree::
-    :maxdepth: 2
-    :caption: API:
-
-    api/index
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+See the (WIP) Documentation for more information.
 
 .. _CNMF: https://github.com/simonsfoundation/NoRMCorre
 .. _CaImAn: https://github.com/flatironinstitute/CaImAn-MATLAB/
