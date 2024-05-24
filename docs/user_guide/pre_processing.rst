@@ -1,5 +1,3 @@
-
-
 Pre-Processing
 #######################################
 
@@ -18,7 +16,6 @@ Pre-processing LBM datasets consists of 2 main processing steps:
 
 Before processing starts, the raw scanimage output needs to be reconstructed to form a correctly-ordered time-series.
 This is accomplished through the use of :func:`convertScanImageTiffToVolume`.
-
 
 Shown in the image below is a graphical representation of this reconstruction.
 

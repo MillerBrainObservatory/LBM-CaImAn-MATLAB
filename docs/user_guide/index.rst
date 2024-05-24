@@ -9,6 +9,7 @@ This section covers each step in the pipeline in more detail.
     :maxdepth: 2
     :caption: User Guide:
 
+    Parameters <parameters>
     Pre_processing <pre_processing>
     Segmentation <segmentation>
     Axial Alignment <offset_correction>
