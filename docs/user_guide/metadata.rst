@@ -1,5 +1,5 @@
+.. _metadata:
 
-##################
 ScanImage Metadata
 ##################
 
