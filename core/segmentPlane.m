@@ -31,6 +31,9 @@ function segmentPlane(data_path, save_path, varargin)
 % end_plane : double, integer, positive
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
+% cnmf_options : dictionary, mapping
+%     key:value pairs of all of your CNMF parameters.
+%     See the example parameters in the LBM_demo_pipeline.
 %
 % Returns
 % -------
