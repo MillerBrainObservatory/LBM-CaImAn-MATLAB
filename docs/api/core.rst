@@ -1,10 +1,10 @@
+.. _core:
 
 Core Functions
 ==============
 
 .. currentmodule:: .
 
-.. autofunction:: assembleCorrectedROITiff
 .. autofunction:: convertScanImageTiffToVolume
 .. autofunction:: motionCorrectPlane
 .. autofunction:: segmentPlane

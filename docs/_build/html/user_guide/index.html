@@ -44,7 +44,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/index';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Pre-Processing" href="pre_processing.html" />
+    <link rel="next" title="Parameters" href="parameters.html" />
     <link rel="prev" title="Getting Started" href="../get_started/getting_started.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -306,10 +306,12 @@ document.write(`
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre_processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registration.html">Registration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tips_tricks.html">Tips and Tricks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
 </ul>
@@ -372,22 +374,31 @@ document.write(`
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="parameters.html#definitions">Definitions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre_processing</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pre_processing.html#re-construct-volumetric-time-series">1. Re-Construct Volumetric Time-Series</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pre_processing.html#piecewise-rigid-motion-correction">2. Piecewise-Rigid Motion-Correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pre_processing.html#re-assemble-volumetric-time-series">1. Re-Assemble Volumetric Time-Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pre_processing.html#evaluate-output">Evaluate output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="registration.html">Registration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="registration.html#rigid-vs-non-rigid">Rigid vs Non-Rigid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registration.html#registration-output">Registration Output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registration.html#metrics">Metrics</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="segmentation.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="segmentation.html#function-usage">Function Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="segmentation.html#source-extraction">Source Extraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="segmentation.html#atoac">AtoAc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="segmentation.html#component-validation">Component Validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="segmentation.html#parameters">Parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="segmentation.html#deconvolution">Deconvolution</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tips_tricks.html">Tips and Tricks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tips_tricks.html#learn-about-functions">Learn about Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tips_tricks.html#matlab-and-python">MATLAB and Python</a></li>
@@ -424,11 +435,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="pre_processing.html"
+       href="parameters.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Pre-Processing</p>
+        <p class="prev-next-title">Parameters</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

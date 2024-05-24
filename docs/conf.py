@@ -33,7 +33,7 @@ html_theme = "pydata_sphinx_theme"
 html_short_title="LBM"
 html_static_path = ["_static"]
 
-# html_css_files = ['caiman_matlab.css']
+html_css_files = ['caiman_matlab.css']
 html_logo = "_static/favicon.ico"
 
 html_theme_options = {
