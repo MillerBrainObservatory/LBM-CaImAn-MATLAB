@@ -14,10 +14,7 @@ function segmentPlane(data_path, save_path, varargin)
 %     Path to the directory to save the motion vectors.
 % data_input_group : string, optional
 %     Group path within the hdf5 file that contains raw data.
-%     Default is 'registration'.
-% data_output_group : string, optional
-%     Group path within the hdf5 file to save the registered data.
-%     Default is 'registration'.
+%     Default is '/registration'.
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
@@ -62,7 +59,6 @@ p = inputParser;
 addRequired(p, 'data_path', @ischar);
 addRequired(p, 'save_path', @ischar);
 addParameter(p, 'data_input_group', "/extraction", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
-addParameter(p, 'data_output_group', "/registration", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x) && x > 0 && x <= 24);
@@ -73,7 +69,6 @@ parse(p, data_path, save_path, varargin{:});
 data_path = p.Results.data_path;
 save_path = p.Results.save_path;
 data_input_group = p.Results.data_input_group;
-data_output_group = p.Results.data_output_group;
 
 debug_flag = p.Results.debug_flag;
 num_cores = p.Results.num_cores;

@@ -3,23 +3,29 @@
 Segmentation and Deconvolution
 ###########################################
 
-.. thumbnail:: ../_static/_images/neuron_to_neuron_correlations.png
-   :width: 600
-
-Overview
-==================
-
 The flourescence of the proteins in our neurons is **correlated** with how active the neuron is.
 Turning this flourescence into "spikes" relies on several mathmatical operations to:
 
 - isolate neuronal activity from background activity (:ref:`source extraction`).
 - infer the times of action potentials from the fluorescence traces (:ref:`deconvolution`).
 
-Before calling , make sure you:
+.. note::
+
+   TERMS:
+
+   The term `segmentation` simply refers to dividing an image based on the contents of that image, in our case, based on neuron location.
+   The term `source extraction` is more an umbrella term for all of the individual processes that produce a segmented image.
+   The term `deconvolution` is a separate step applied to the resulting traces to infer spike times from flourescence values.
+
+Before running segmentation, make sure you:
 
 - Understand the parameters and how they effect the output.
 - Confirmed no stitching artifacts or bad frames.
 - Validate your movie is accurately motion corrected.
+
+.. thumbnail:: ../_static/_images/neuron_to_neuron_correlations.png
+   :width: 600
+
 
 Source Extraction
 ==================
@@ -41,14 +47,17 @@ This is a structured array containing key:value pairs of all of your CNMF parame
 See the example parameters in the LBM_demo_pipeline.
 
 - If this parameter is not included, they will be calculated for you based on the pixel resolution, frame rate and image size in the metadata.
-- For example, `Tau` is a widely talked about parameter being the half-size of your neuron. This is calculated by default as (7.5/pixel_resolution, 7.5/pixelresolution).
+- For example, `Tau` is a widely talked about parameter being the half-size of your neuron.
+
+This is calculated by default as :math:`(7.5/pixel_resolution, 7.5/pixelresolution)`.
 
 There are several different thresholds, indicating correlation coefficients as barriers for whether to perform a process or not.
 
 merge_thresh
 ************************************
 
-A correlation corefficient determining the amount of correlation between pixels in time needed to consider two neurons the same neuron.
+A correlation coefficient determining the amount of correlation between pixels in time needed to consider two neurons the same neuron.
+
 - The lower your resolution, the more "difficult" it is for CNMF to distinguish between two tight neurons, thus use a lower merge threshold.
 - This parameter heavily effects the number of neurons processed. It's always better to have to many neurons vs too few, as you can never get a lost neuron back, but you can invalidate neurons in post-processing.
 
@@ -57,9 +66,13 @@ min_SNR
 
  The minimum "shot noise" to calcium activity to accept a neurons initialization.
 
-- Tau is the `half-size` of a neuron. If a neuron is 10 micron, tau will be a 5 micon.
+Tau
+************************************
+
+Half-size of your neurons.
+
+- Tau is the `half-size` of a neuron. If a neuron is 10 micron, tau will be a 5 micron.
 - In general, round up.
-- The kernel is fixed to have this decay and is not fit to the data.
 
 P
 ************************************
@@ -67,6 +80,11 @@ P
 The term autoregression indicates that it is a regression of the variable against itself. Thus, an autoregressive model of order p can be written as yt=c+ϕ1yt−1+ϕ2yt−2+⋯+ϕpyt−p+εt,
 
 - I dont know what that means, but that's wikipedia. P = 1 is used when you have a fast indicator, for the reasons mentioned above regarding decay time. Use p=2 for slow indicators where you only expect 1-3 frames.
+
+Example
+==================
+
+Here is a look at all of the parameters you can provide to CNMF:
 
 .. code-block:: MATLAB
 
@@ -124,8 +142,15 @@ The key idea for validating our neurons is that **we know how long the
 brightness indicating neurons activity should stay bright** as a function
 of the *number of frames*.
 
-That is, our calcium indicator (in this example: GCaMP-6s), with a rise-time of 250ms and a decay-time of 500ms = 750ms, while we
-record at 4.7 frames/second = “Samples per transient\=round(4.7Hz×(0.2s+0.55s))\=3”
+That is, our calcium indicator (in this example: GCaMP-6s):
+- rise-time of 250ms
+- decay-time of 500ms
+- total transient time = 750ms
+- Frame rate = 4.7 frames/second
+
+4.7hz * (0.2+0.55) = 3 frames per transient.
+
+And thus the general process of validating neuronal components is as follows:
 
 - Use the decay time (0.5s) multiplied by the number of frames to estimate the number of samples expected in the movie.
 - Calculate the likelihood of an unexpected event (e.g., a spike) and return a value metric for the quality of the components.
