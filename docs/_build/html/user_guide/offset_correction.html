@@ -30,6 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+    <link rel="stylesheet" type="text/css" href="../_static/caiman_matlab.css?v=8c8b7c0d" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
@@ -374,19 +375,28 @@ document.write(`
   <section id="axial-offset-correction">
 <span id="offset-correction"></span><h1>Axial-Offset Correction<a class="headerlink" href="#axial-offset-correction" title="Link to this heading">#</a></h1>
 <p>Before proceeding:</p>
-<ul>
+<ul class="simple">
 <li><p>You will need to be in a GUI environment for this step. Calculate offset will show you two images, click the feature that matches in both images.</p></li>
-<li><p>You will need the following calibration files:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>pollen_calibration_Z_vs_N.fig</cite></p></li>
-<li><p><cite>pllen_calibration_x_y_offsets.fig</cite></p></li>
 </ul>
-</div></blockquote>
-</li>
-</ul>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/compare_planes1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/compare_planes1.png"
+                     class=""
+                     width="600"
+                     height="auto"
+                     alt=""/>
+                </a><p>You will need the following calibration files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pollen_calibration_Z_vs_N</span><span class="o">.</span><span class="n">mat</span>
+<span class="n">pollen_calibration_x_y_offsets</span><span class="o">.</span><span class="n">fig</span>
+</pre></div>
+</div>
 <p>Place these files in the same directory as your <cite>caiman_output_plane_N</cite> files.</p>
-<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="w">      </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="n">collatePlanes</span>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="n">collatePlanes</span>
+
 <span class="n">collatePlanes</span><span class="w"> </span><span class="s">Analyzes</span><span class="w"> </span><span class="s">and</span><span class="w"> </span><span class="s">processes</span><span class="w"> </span><span class="s">imaging</span><span class="w"> </span><span class="s">data</span><span class="w"> </span><span class="s">by</span><span class="w"> </span><span class="s">extracting</span><span class="w"> </span><span class="s">and</span><span class="w"> </span><span class="s">correcting</span><span class="w"> </span><span class="s">features</span><span class="w"> </span><span class="s">across</span><span class="w"> </span><span class="s">multiple</span><span class="w"> </span><span class="s">planes.</span>
 
 <span class="n">This</span><span class="w"> </span><span class="s">function</span><span class="w"> </span><span class="s">analyzes</span><span class="w"> </span><span class="s">imaging</span><span class="w"> </span><span class="s">data</span><span class="w"> </span><span class="s">from</span><span class="w"> </span><span class="s">a</span><span class="w"> </span><span class="s">specified</span><span class="w"> </span><span class="s">directory,</span><span class="w"> </span><span class="s">applying</span>
@@ -399,58 +409,50 @@ document.write(`
 <span class="n">processing</span><span class="w"> </span><span class="s">parameters.</span><span class="w"> </span><span class="s">It</span><span class="w"> </span><span class="s">adjusts</span><span class="w"> </span><span class="s">parameters</span><span class="w"> </span><span class="s">dynamically</span><span class="w"> </span><span class="s">based</span><span class="w"> </span><span class="s">on</span><span class="w"> </span><span class="s">the</span><span class="w"> </span><span class="s">content</span>
 <span class="n">of</span><span class="w"> </span><span class="s">metadata</span><span class="w"> </span><span class="s">and</span><span class="w"> </span><span class="s">filters,</span><span class="w"> </span><span class="s">merges</span><span class="w"> </span><span class="s">data</span><span class="w"> </span><span class="s">across</span><span class="w"> </span><span class="s">imaging</span><span class="w"> </span><span class="s">planes,</span><span class="w"> </span><span class="s">and</span><span class="w"> </span><span class="s">performs</span>
 <span class="n">z</span><span class="o">-</span><span class="n">plane</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">field</span><span class="w"> </span><span class="n">curvature</span><span class="w"> </span><span class="n">corrections</span><span class="p">.</span>
-
-<span class="n">Parameters</span>
-<span class="o">----------</span>
-<span class="n">dataPath</span><span class="w"> </span><span class="s">:</span><span class="w"> </span><span class="s">string</span>
-<span class="w">    </span><span class="n">Path</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">directory</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">analysis</span><span class="p">.</span>
-<span class="n">data</span><span class="w"> </span><span class="s">:</span><span class="w"> </span><span class="s">string</span><span class="w"> </span><span class="s">(unused,</span><span class="w"> </span><span class="s">placeholder</span><span class="w"> </span><span class="s">for</span><span class="w"> </span><span class="s">future</span><span class="w"> </span><span class="s">use)</span>
-<span class="w">    </span><span class="n">Placeholder</span><span class="w"> </span><span class="n">parameter</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">passing</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="n">directly</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">needed</span><span class="p">.</span>
-<span class="n">metadata</span><span class="w"> </span><span class="s">:</span><span class="w"> </span><span class="s">struct</span>
-<span class="w">    </span><span class="n">Structure</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">metadata</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">processing</span><span class="p">.</span><span class="w"> </span><span class="n">Must</span><span class="w"> </span><span class="n">include</span><span class="w"> </span><span class="n">fields</span><span class="p">:</span>
-<span class="w">    </span><span class="n">r_thr</span><span class="p">,</span><span class="w"> </span><span class="n">pixel_resolution</span><span class="p">,</span><span class="w"> </span><span class="n">min_snr</span><span class="p">,</span><span class="w"> </span><span class="n">frame_rate</span><span class="p">,</span><span class="w"> </span><span class="n">fovx</span><span class="p">,</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">fovy</span><span class="p">.</span>
-<span class="n">startDepth</span><span class="w"> </span><span class="s">:</span><span class="w"> </span><span class="s">double</span>
-<span class="w">    </span><span class="n">The</span><span class="w"> </span><span class="n">starting</span><span class="w"> </span><span class="n">depth</span><span class="w"> </span><span class="p">(</span><span class="n">z0</span><span class="p">)</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="nb">which</span><span class="w"> </span><span class="n">processing</span><span class="w"> </span><span class="n">should</span><span class="w"> </span><span class="n">begin</span><span class="p">;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">not</span>
-<span class="w">    </span><span class="n">provided</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="nb">dialog</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">prompt</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nb">input</span><span class="p">.</span>
-
-<span class="n">Returns</span>
-<span class="o">-------</span>
-<span class="n">None</span>
-
-<span class="s">Outputs</span>
-<span class="o">-------</span>
-<span class="o">-</span><span class="w"> </span><span class="p">.</span><span class="n">fig</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">showing</span><span class="w"> </span><span class="n">neuron</span><span class="w"> </span><span class="n">distributions</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">z</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">radial</span><span class="w"> </span><span class="n">directions</span><span class="p">.</span>
-<span class="o">-</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="p">.</span><span class="n">mat</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">collated</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">processed</span><span class="w"> </span><span class="n">imaging</span><span class="w"> </span><span class="n">data</span><span class="p">.</span>
-
-<span class="n">Notes</span>
-<span class="o">-----</span>
-<span class="o">-</span><span class="w"> </span><span class="n">Expects</span><span class="w"> </span><span class="s">&#39;three_neuron_mean_offsets.mat&#39;</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="s">&#39;pollen_calibration_Z_vs_N.fig&#39;</span>
-<span class="w">  </span><span class="n">within</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">dataPath</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">processing</span><span class="p">.</span>
-<span class="o">-</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">uses</span><span class="w"> </span><span class="n">parallel</span><span class="w"> </span><span class="n">processing</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">some</span><span class="w"> </span><span class="n">calculations</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">improve</span>
-<span class="w">  </span><span class="n">performance</span><span class="p">.</span>
-
-<span class="n">Examples</span>
-<span class="o">--------</span>
-<span class="n">collatePlanes</span><span class="p">(</span><span class="s">&#39;C:/data/images/&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">struct</span><span class="p">(</span><span class="s">&#39;r_thr&#39;</span><span class="p">:</span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;pixel_resolution&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;min_snr&#39;</span><span class="p">:</span><span class="mf">1.5</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;frame_rate&#39;</span><span class="p">:</span><span class="mf">9.61</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;fovx&#39;</span><span class="p">:</span><span class="mi">1200</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;fovy&#39;</span><span class="p">:</span><span class="mi">1164</span><span class="p">),</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
-<span class="w">  </span><span class="n">This</span><span class="w"> </span><span class="s">example</span><span class="w"> </span><span class="s">processes</span><span class="w"> </span><span class="s">data</span><span class="w"> </span><span class="s">from</span><span class="w"> </span><span class="s">&#39;C:/data/images/&#39;,</span><span class="w"> </span><span class="s">starting</span><span class="w"> </span><span class="s">at</span><span class="w"> </span><span class="s">a</span><span class="w"> </span><span class="s">depth</span><span class="w"> </span><span class="s">of</span><span class="w"> </span><span class="s">100</span><span class="w"> </span><span class="s">microns,</span>
-<span class="w">  </span><span class="n">with</span><span class="w"> </span><span class="n">specified</span><span class="w"> </span><span class="n">metadata</span><span class="w"> </span><span class="n">parameters</span><span class="p">.</span>
-
-<span class="n">See</span><span class="w"> </span><span class="s">also</span><span class="w"> </span><span class="s">load,</span><span class="w"> </span><span class="s">inputdlg,</span><span class="w"> </span><span class="s">struct,</span><span class="w"> </span><span class="s">fullfile,</span><span class="w"> </span><span class="s">exist</span>
 </pre></div>
 </div>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>dataPath<span class="classifier">string</span></dt><dd><p>Path to the directory containing the data files for analysis.</p>
+</dd>
+<dt>data<span class="classifier">string (unused, placeholder for future use)</span></dt><dd><p>Placeholder parameter for passing data directly if needed.</p>
+</dd>
+<dt>metadata<span class="classifier">struct</span></dt><dd><p>Structure containing metadata for processing. Must include fields:
+r_thr, pixel_resolution, min_snr, frame_rate, fovx, and fovy.</p>
+</dd>
+<dt>startDepth<span class="classifier">double</span></dt><dd><p>The starting depth (z0) from which processing should begin; if not
+provided, a dialog will prompt for input.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">#</a></h2>
+<p>None</p>
+</section>
+<section id="outputs">
+<h2>Outputs<a class="headerlink" href="#outputs" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>.fig files showing neuron distributions in z and radial directions.</p></li>
+<li><p>A .mat file with collated and processed imaging data.</p></li>
+</ul>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Expects ‘three_neuron_mean_offsets.mat’ and ‘pollen_calibration_Z_vs_N.fig’ within the dataPath for processing.</p></li>
+<li><p>The function uses parallel processing for some calculations to improve performance.</p></li>
+</ul>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<p>collatePlanes(‘C:/data/images/’, ‘’, struct(‘r_thr’:0.4, ‘pixel_resolution’:2, ‘min_snr’:1.5, ‘frame_rate’:9.61, ‘fovx’:1200, ‘fovy’:1164), 100);
+This example processes data from ‘C:/data/images/’, starting at a depth of 100 microns,
+with specified metadata parameters.</p>
+<p>See also load, inputdlg, struct, fullfile, exist</p>
 <p>The user will be prompted to select the same <strong>feature</strong> / <strong>region-of-interest</strong> / <strong>neuron</strong>:</p>
-<a class=""
-               data-lightbox="group-default"
-               href="../_images/compare_planes1.png"
-               title=""
-               data-title=""
-               
-               ><img src="../_images/compare_planes1.png"
-                     class=""
-                     width="600"
-                     height="auto"
-                     alt=""/>
-                </a><p>After selecting 3 neurons for each plane, you are done with the LBM pipeline.</p>
+<p>After selecting 3 neurons for each plane, you are done with the LBM pipeline.</p>
+</section>
 </section>
 
 
@@ -490,6 +492,22 @@ document.write(`
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#returns">Returns</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs">Outputs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes">Notes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
 

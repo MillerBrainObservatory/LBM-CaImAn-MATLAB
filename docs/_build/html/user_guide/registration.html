@@ -30,6 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+    <link rel="stylesheet" type="text/css" href="../_static/caiman_matlab.css?v=8c8b7c0d" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
@@ -448,7 +449,7 @@ only a single plane is ever loaded into memory due to large LBM filesizes (&gt;3
                href="../_images/quickview_blue1.png"
                title=""
                data-title=""
-               id="registration-storage"
+               id="storage"
                ><img src="../_images/quickview_blue1.png"
                      class="align-center"
                      width="100%"
@@ -456,7 +457,7 @@ only a single plane is ever loaded into memory due to large LBM filesizes (&gt;3
                      alt=""/>
                 </a><p>The above represents a general overview for how we want to handle data. We want to minimize the amount of storage space,
 so rather than saving 2 versions of a video that differ by simply shifting some pixels, we can instead save only the shift vectors
-and reconstruct the video afterwards. <span class="xref std std-ref">translateFrames</span> will accomplish this:</p>
+and reconstruct the video afterwards. <a class="reference internal" href="../api/utils.html#translateFrames" title="translateFrames"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">translateFrames()</span></code></a> will accomplish this:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="n">translateFrames</span>
 
 <span class="w">  </span><span class="n">translateFrames</span><span class="w"> </span><span class="n">Translate</span><span class="w"> </span><span class="nb">image</span><span class="w"> </span><span class="n">frames</span><span class="w"> </span><span class="n">based</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">provided</span><span class="w"> </span><span class="n">translation</span><span class="w"> </span><span class="n">vectors</span><span class="p">.</span>

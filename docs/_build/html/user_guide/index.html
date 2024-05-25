@@ -30,6 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+    <link rel="stylesheet" type="text/css" href="../_static/caiman_matlab.css?v=8c8b7c0d" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
@@ -41,6 +42,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
     <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/index';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -391,14 +393,22 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="segmentation.html#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="segmentation.html#source-extraction">Source Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="segmentation.html#example">Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="segmentation.html#atoac">AtoAc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="segmentation.html#component-validation">Component Validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="segmentation.html#deconvolution">Deconvolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="segmentation.html#results">Results</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="offset_correction.html#parameters">Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="offset_correction.html#returns">Returns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="offset_correction.html#outputs">Outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="offset_correction.html#notes">Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="offset_correction.html#examples">Examples</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="tips_tricks.html">Tips and Tricks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tips_tricks.html#learn-about-functions">Learn about Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tips_tricks.html#matlab-and-python">MATLAB and Python</a></li>

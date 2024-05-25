@@ -58,7 +58,7 @@ of a suffix appended to the filename: `_000N`, where n=number of files chosen by
 
 .. _scan_phase:
 
-`fix_scan_phasee` is a very important parameter: it attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
+:func:`fix_scan_phase` is a very important parameter: it attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
 
 .. thumbnail:: ../_static/_images/corr_nocorr_phase_example.png
    :width: 1080

@@ -42,61 +42,7 @@ Definitions
 
 
 The recommended method for saving data is to save each step in a separate HDF5 file and name the group after the step being executed.
-This is demonstrated in the :ref:`demo_LBM_pipeline` file:
-
-.. code-block:: MATLAB
-
-   >> help convertScanImageTiffToVolume
-
-  convertScanImageTiffToVolume Convert ScanImage .tif files into a 4D volume.
-
-  Convert raw `ScanImage`_ multi-roi .tif files from a single session
-  into a single 4D volumetric time-series (x, y, z, t). It's designed to process files for the
-  ScanImage Version: 2016 software.
-
-  Parameters
-  ----------
-  data_path : char
-      The directory containing the raw .tif files. Only raw .tif files from one
-      session should be in the directory.
-  save_path : char, optional
-      The directory where processed files will be saved. It is created if it does
-      not exist. Defaults to the data_path directory.
-  group_path : string, optional
-      Group path within the hdf5 file to save the extracted data. Default is
-      '/extraction'.
-  debug_flag : double, logical, optional
-      If set to 1, the function displays the files in the command window and does
-      not continue processing. Defaults to 0.
-  num_cores : double, logical, optional
-      Not yet implemented.
-  overwrite : logical, optional
-      Whether to overwrite existing files (default is 1).
-  fix_scan_phase : logical, optional
-      Whether to correct for bi-directional scan artifacts. (default is true).
-  trim_pixels : double, optional
-      Pixels to trim from left, right,top, bottom of each scanfield before
-      horizontally concatenating the scanfields within an image. Default is
-      [0 0 0 0].
-  compression : double, optional
-      Compression level for the file (default is 0).
-
-  Notes
-  -----
-  The function adds necessary paths for ScanImage utilities and processes each .tif
-  file found in the specified directory. It checks if the directory exists, handles
-  multiple or single file scenarios, and can optionally report the directory's contents
-  based on the debug_flag.
-
-  Each file processed is logged, assembled into a 4D volume, and saved in a specified
-  directory as a .mat file with accompanying metadata. The function also manages errors
-  by cleaning up and providing detailed error messages if something goes wrong during
-  processing.
-
-  See also fileparts, addpath, genpath, isfolder, dir, fullfile, error, regexp, savefast
-
-  .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
-
+This is demonstrated in the :scpt:`demo_LBM_pipeline` at the root of this repository.
 
 For information about the parameters unique to each function, see the :ref:`api` or the help documentation for that individual function.
 
