@@ -41,13 +41,13 @@ if ~isfolder(save_path)
 end
 
 %% 1a) Pre-Processing
-group_path = "/extraction"; % where data is saved in the h5 file (this is default)
+dataset_path = "/extraction"; % where data is saved in the h5 file (this is default)
 compute = 1;
 if compute
     convertScanImageTiffToVolume( ...
         data_path, ...
         save_path, ...
-        'dataset_name', group_path, ...
+        'dataset_name', dataset_path, ...
         'debug_flag', 0, ...
         'fix_scan_phase', 0, ...
         'trim_pixels', [6 6 17 0], ...
@@ -56,35 +56,32 @@ if compute
 end
 
 %% quick vis
+clc;
+h5file = 'C:\Users\RBO\Documents\data\high_res\extracted\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.h5';
+metadata = read_h5_metadata(h5file, '/extraction');
+
 plane = 1;
 frame_start = 10;
-frame_end = 220;
+frame_end = 100;
+xs=(236:408);
+ys=(210:377);
+ts=(2:202);
+dataset_path = sprintf('/extraction/plane_%d', plane);
+info = h5info(h5file, dataset_path);
 
-h5files = dir([save_path '*.h5']);
-h5name = fullfile(save_path, h5files(1).name);
-dataset_path = sprintf('/mov/plane_%d', plane);
-data_path = sprintf("%s/Y", dataset_path);
-info = h5info(h5name, data_path);
+count_x = length(xs);
+count_y = length(ys);
+count_t = frame_end - frame_start + 1;
 
-% data = h5read( ...
-%     h5name, ... % filename
-%     dataset_path, ... % dataset location
-%     [1, 1, frame_start], ... % start index for each dimension [X,Y,T]
-%     [Inf, Inf,  frame_end - frame_start + 1] ... % count for each dimension [X,Y,T]
-%     );
-
-% 
-% figure;
-% for x = 1:size(data, 3)
-%     imshow(data(236:408, 210:377, x), []);
-%     title(sprintf('Frame %d', start_frame + x - 1));
-% end
+data = h5read( ...
+    h5file, ... % filename
+    dataset_path, ... % dataset location
+    [xs(1), ys(1), frame_start], ... % start index for each dimension [X,Y,T]
+    [count_x, count_y, count_t] ... % count for each dimension [X,Y,T]
+    );
 
 %% 1b) Motion Correction
 
-% mdata = get_metadata(fullfile(raw_path ,"MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.tif"));
-% mdata.base_filename = "MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001";
-% mc_path_new = [ parent_path 'registration_test\'];
 compute = 0;
 if compute
     motionCorrectPlane( ...
@@ -99,10 +96,8 @@ if compute
         );
 end
 
-% 
-% % 
 %% 2) CNMF Plane-by-plane SegmentationS
-% % 
+
 compute = 1;
 if compute
     segmentPlane( ...
@@ -117,15 +112,5 @@ if compute
         );
 end
 
-% % 
-% % %% 3) Axial Offset Correction
-% % collatePlanes()
-% 
-% function has_mc = has_registration(ih5_path)
-%     if numel(h5info(ih5_path, '/').Groups) < 2
-%         has_mc = false;
-%     else
-%         has_mc = true;
-%     end
-% end
-
+%% 3) Axial Offset Correction
+collatePlanes()
