@@ -27,8 +27,6 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 %     Pixels to trim from left, right,top, bottom of each scanfield before
 %     horizontally concatenating the scanfields within an image. Default is
 %     [0 0 0 0].
-% compression : double, optional
-%     Compression level for the file (default is 0).
 %
 % Notes
 % -----
@@ -54,7 +52,6 @@ addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'fix_scan_phase', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'trim_pixels', [0 0 0 0], @isnumeric);
-addParameter(p, 'compression', 0, @isnumeric);
 parse(p, data_path, save_path, varargin{:});
 
 data_path = p.Results.data_path;
@@ -64,7 +61,6 @@ debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
 fix_scan_phase = p.Results.fix_scan_phase;
 trim_pixels = p.Results.trim_pixels;
-compression = p.Results.compression;
 
 if isempty(save_path)
     save_path = data_path;
@@ -128,6 +124,7 @@ num_frames_total = metadata.num_frames_total;
 
 h5_fullfile = fullfile(save_path, sprintf('%s.h5', metadata.raw_filename));
 metadata.h5_fullfile = h5_fullfile; % store the location of our h5 file
+metadata.dataset_name = dataset_name;
 
 if isfile(h5_fullfile)
     if overwrite
@@ -140,7 +137,6 @@ if isfile(h5_fullfile)
 end
 
 try
-
     for i = 1:length(files)
         tfile = tic;
         fprintf(fid, 'Processing %d: %s\n', i, files(i).name);
@@ -178,7 +174,10 @@ try
                 end
                 cnt = cnt + 1;
             end
-            write_chunk_h5(h5_fullfile, frameTemp);
+            write_chunk_h5(h5_fullfile, frameTemp, size(frameTemp,3), dataset_path);
+        end
+        if i == 1
+            metadata.new_imagesize = size(frameTemp);
             writeMetadataToAttribute(metadata, h5_fullfile, dataset_name);
         end
         fprintf(fid, "File %d of %d processed: %.2f seconds\n", i, length(files), toc(tplane));
