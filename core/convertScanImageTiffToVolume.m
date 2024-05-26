@@ -13,9 +13,9 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 % save_path : char, optional
 %     The directory where processed files will be saved. It is created if it does
 %     not exist. Defaults to the data_path directory.
-% group_path : string, optional
-%     Group path within the hdf5 file to save the extracted data. Default is
-%     '/extraction'.
+% dataset_name : string, optional
+%     Name of the group (h5 dataset) to save the extracted data. Default is
+%     '/extraction. Must contain a leading slash.
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
@@ -49,7 +49,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
     p = inputParser;
     addRequired(p, 'data_path', @ischar);
     addOptional(p, 'save_path', data_path, @ischar);
-    addParameter(p, 'group_path', "/extraction", @isstring);
+    addParameter(p, 'dataset_name', "/extraction", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
     addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
     addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
     addParameter(p, 'fix_scan_phase', 1, @(x) isnumeric(x) || islogical(x));
@@ -59,7 +59,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
     
     data_path = p.Results.data_path;
     save_path = p.Results.save_path;
-    group_path = p.Results.group_path;
+    dataset_name = p.Results.dataset_name;
     debug_flag = p.Results.debug_flag;
     overwrite = p.Results.overwrite;
     fix_scan_phase = p.Results.fix_scan_phase;
@@ -90,18 +90,14 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
     end
 
     try
-        log_file_name = sprintf("%s_segmentation", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
+        log_file_name = sprintf("%s_extraction", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
         log_full_path = fullfile(save_path, log_file_name);
         fid = fopen(log_full_path, 'w');
-        
-        % Check if we can open the file
-        fid = fopen(logFullPath, 'a');
         if fid == -1
             error('Cannot create or open log file: %s', logFullPath);
         else
             fprintf('Log file created: %s\n', logFullPath);
         end
-
         closeCleanupObj = onCleanup(@() fclose(fid));
 
         files = dir(fullfile(data_path, '*.tif'));
@@ -149,7 +145,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 
             for plane_idx = 1:num_planes
                 tplane = tic;
-                dataset_path = sprintf('%s/plane_%d', group_path, plane_idx);
+                dataset_path = sprintf('%s/plane_%d', dataset_name, plane_idx);
                 try
                     h5create( ...
                         h5_fullfile, ... % filename
@@ -182,7 +178,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
                 end
                 h5write( ...
                     h5_fullfile, ... % h5 filename
-                    dataset_path, ... % location /group_path/plane_N/
+                    dataset_path, ... % location /dataset_path/plane_N/
                     frameTemp, ... % 3D planar time-series
                     [1, 1, (i-1) * num_frames_file + 1], ... % start index 
                     [trimmed_y, trimmed_x * metadata.num_strips, num_frames_file] ... % stride
@@ -190,7 +186,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
                 fprintf(fid, 'Processed plane %d: %.2f seconds\n', plane_idx, toc(tplane));
             end
             if i == 1 % Log the metadata first file only
-                writeMetadataToAttribute(metadata, h5_fullfile, group_path);
+                writeMetadataToAttribute(metadata, h5_fullfile, dataset_name);
             end
             fprintf(fid, "File %d of %d processed: %.2f seconds\n", i, length(files), toc(tplane));
         end
