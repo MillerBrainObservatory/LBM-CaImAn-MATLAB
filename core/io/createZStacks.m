@@ -23,7 +23,7 @@ for abc = 1:numFiles
     fullFileName = fullfile(filepath, planeName);
     t = Tiff(fullFileName, 'w');
    
-     thisSlice = d.Y(:, :, 20);
+    thisSlice = d.Y(:, :, 20);
     
     % Set necessary TIFF tags for the slice
     t.setTag('ImageLength', size(thisSlice, 1));
