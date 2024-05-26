@@ -136,7 +136,6 @@ end
 log_file_name = sprintf("%s_segmentation", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
 log_full_path = fullfile(data_path, log_file_name);
 fid = fopen(log_full_path, 'w');
-
 fprintf(fid, "Beginning processing with %d cores on %d planes: %d - %d\n...", num_planes_to_process, start_plane, end_plane);
 
 dataset_paths = {'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm'};

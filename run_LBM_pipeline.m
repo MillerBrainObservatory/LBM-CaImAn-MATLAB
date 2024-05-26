@@ -19,7 +19,9 @@
 % more detail in the README.
 clc, clear;
 [fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
-addpath(genpath(fullfile(fpath, 'core/')));
+addpath(genpath(fullfile(fpath, 'core')));
+addpath(genpath(fullfile(fpath, 'core', 'utils')));
+addpath(genpath(fullfile(fpath, 'core', 'io')));
 
 %% Here you can validate that all packages are on the path and accessible
 % from within this pipeline.
@@ -31,42 +33,44 @@ else
     disp('Proceeding with execution...');
 end
 
-parent_path = 'C:\Users\RBO\Documents\data\bi_hemisphere\';
-raw_path = [ parent_path 'raw\'];
-extraction_path = [ parent_path '\extracted_final\'];
-registration_path = [ parent_path 'registration_final\'];
-segmentation_path = [ parent_path 'traces_final\'];
- mkdir(registration_path); mkdir(segmentation_path);
+parent_path = fullfile('C:\Users\RBO\Documents\data\high_res');
+raw_path = fullfile(parent_path, 'raw');
+output_path = fullfile(parent_path, 'extracted');
+if ~isfolder(output_path)
+    mkdir(output_path)
+end
 
 %% 1a) Pre-Processing
-if ~isfolder(extraction_path)
-    mkdir(extraction_path);
-end
 group_path = "/extraction"; % where data is saved in the h5 file (this is default)
-convertScanImageTiffToVolume( ...
-    raw_path, ...
-    extraction_path, ...
-    'group_path', group_path, ...
-    'fix_scan_phase', false, ...
-    'trim_pixels', [8 8 29 0], ...
-    'overwrite', 1 ...
-    );
+compute = 0;
+if compute
+    convertScanImageTiffToVolume( ...
+        raw_path, ...
+        output_path, ...
+        'group_path', group_path, ...
+        'fix_scan_phase', true, ...
+        'trim_pixels', [6 6 17 0], ...
+        'overwrite', 1 ...
+        );
+end
 
 %% quick vis
 plane = 1;
 frame_start = 10;
 frame_end = 220;
 
-h5files = dir([extraction_path '*.h5']);
-h5name = fullfile(extraction_path, h5files(1).name);
-dataset_path = sprintf('/extraction/plane_%d', plane);
-has_mc(h5name)
-data = h5read( ...
-    h5name, ... % filename
-    dataset_path, ... % dataset location
-    [1, 1, frame_start], ... % start index for each dimension [X,Y,T]
-    [Inf, Inf,  frame_end - frame_start + 1] ... % count for each dimension [X,Y,T]
-    );
+h5files = dir([output_path '*.h5']);
+h5name = fullfile(output_path, h5files(1).name);
+dataset_path = sprintf('/registration/plane_%d', plane);
+data_path = sprintf("%s/Y", dataset_path);
+info = h5info(h5name, data_path);
+
+% data = h5read( ...
+%     h5name, ... % filename
+%     dataset_path, ... % dataset location
+%     [1, 1, frame_start], ... % start index for each dimension [X,Y,T]
+%     [Inf, Inf,  frame_end - frame_start + 1] ... % count for each dimension [X,Y,T]
+%     );
 
 % 
 % figure;
@@ -80,33 +84,47 @@ data = h5read( ...
 % mdata = get_metadata(fullfile(raw_path ,"MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.tif"));
 % mdata.base_filename = "MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001";
 % mc_path_new = [ parent_path 'registration_test\'];
-% 
-if ~isfolder(registration_path)
-    mkdir(registration_path);
+compute = 0;
+if compute
+    motionCorrectPlane( ...
+        output_path, ...
+        output_path, ...
+        'data_input_group', '/extraction', ... % from the last step
+        'data_output_group', "/registration", ... % "str" or 'char' both work for inputs
+        'overwrite', 1, ...
+        'num_cores', 23, ...
+        'start_plane', 2, ...
+        'end_plane', 30  ...
+        );
 end
-motionCorrectPlane( ...
-    extraction_path, ...
-    registration_path, ...
-    'data_input_group', '/extraction', ... % from the last step
-    'data_output_group', "/registration", ... % "str" or 'char' both work for inputs
-    'overwrite', 1, ...
-    'num_cores', 23, ...
-    'start_plane', 29, ...
-    'end_plane', 29 ...
-    );
 
-% %% 2) CNMF Plane-by-plane SegmentationS
 % 
-% segmentPlane(mc_path, traces_path, mdata, '0','30','30','23');
-% 
-% %% 3) Axial Offset Correction
-% collatePlanes()
-
-function has_mc = has_registration(ih5_path)
-    if numel(h5info(ih5_path, '/').Groups) < 2
-        has_mc = false;
-    else
-        has_mc = true;
-    end
+% % 
+%% 2) CNMF Plane-by-plane SegmentationS
+% % 
+compute = 1;
+if compute
+    segmentPlane( ...
+        output_path, ...
+        output_path, ...
+        'data_input_group', '/registration', ... % from the last step
+        'data_output_group', "/segmentation", ... % "str" or 'char' both work for inputs
+        'overwrite', 1, ...
+        'num_cores', 23, ...
+        'start_plane', 1, ...
+        'end_plane', 1  ...
+        );
 end
+
+% % 
+% % %% 3) Axial Offset Correction
+% % collatePlanes()
+% 
+% function has_mc = has_registration(ih5_path)
+%     if numel(h5info(ih5_path, '/').Groups) < 2
+%         has_mc = false;
+%     else
+%         has_mc = true;
+%     end
+% end
 

@@ -30,11 +30,7 @@ v2_extracted = fullfile("../../Documents/data/bi_hemisphere/extracted/MH184_both
 % num_frames_file = metadata.num_frames_file;
 % num_frames_total = metadata.num_frames_total;
 % 
-% Y = zeros([metadata.image_size(1) metadata.image_size(2) num_frames_total], 'single');
-% for file_idx = 1:num_files
-%     file_group = sprintf("/file_%d/plane_%d", file_idx, plane_idx);
-%     Y(:,:,(file_idx-1)*num_frames_file+1:file_idx*num_frames_file) = im2single(h5read(h5path, file_group));
-% end
+
 tic; [Y, metadata] = combinePlanes(v2_extracted, 1); toc
 Y = Y(:,:, 2:600);
 %% 

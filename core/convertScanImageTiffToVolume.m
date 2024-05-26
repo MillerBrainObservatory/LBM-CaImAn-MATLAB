@@ -90,9 +90,9 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
     end
 
     try
-        clck = clock;
-        logFileName = sprintf('extraction_log_%d_%02d_%02d_%02d_%02d.txt', clck(1), clck(2), clck(3), clck(4), clck(5));
-        logFullPath = fullfile(save_path, logFileName);
+        log_file_name = sprintf("%s_segmentation", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
+        log_full_path = fullfile(save_path, log_file_name);
+        fid = fopen(log_full_path, 'w');
         
         % Check if we can open the file
         fid = fopen(logFullPath, 'a');
@@ -151,11 +151,14 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
                 tplane = tic;
                 dataset_path = sprintf('%s/plane_%d', group_path, plane_idx);
                 try
-                    h5create(h5_fullfile, dataset_path, [trimmed_y, trimmed_x * metadata.num_strips, Inf], 'Datatype', metadata.sample_format, ...
+                    h5create( ...
+                        h5_fullfile, ... % filename
+                        dataset_path, ... $ dataset name (group_name)
+                        [trimmed_y, trimmed_x * metadata.num_strips, Inf], 'Datatype', metadata.sample_format, ...
                         'ChunkSize', [trimmed_y, trimmed_x * metadata.num_strips, 1], 'Deflate', compression);
                 catch ME
                     if strcmp(ME.identifier, 'MATLAB:imagesci:h5create:datasetAlreadyExists')
-                        fprintf(fid, 'Dataset %s already exists. Skipping creation.\n', dataset_path);
+                        fprintf(fid, 'Dataset %s already exists. Skipping creation. To re-extract data, set overwrite = true.\n', dataset_path);
                     else
                         rethrow(ME);
                     end
