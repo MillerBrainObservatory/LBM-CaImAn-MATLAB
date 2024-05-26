@@ -1,4 +1,4 @@
-function write_chunk_h5(filename,Y_in, chunk)
+function write_chunk_h5(file,Y_in, chunk)
 
 % rewrites a file into a hdf5 file
 if ~exist('chunk','var') || isempty(chunk); chunk = 2000; end
@@ -17,13 +17,13 @@ else
     end
     sizY(end) = sizY(end)-1;
 end
-[pathstr, name, ext] = fileparts(filename);
+[pathstr, name, ~] = fileparts(file);
 h5_filename = [pathstr,'/',name,'.h5'];
 h5create(h5_filename,'/mov',[sizY(1:nd),Inf],'Chunksize',[sizY(1:nd),min(chunk,sizY(end))],'Datatype',cl);
 h5write(h5_filename,'/mov',Y_in,[ones(1,nd),1],sizY);
 cnt = sizY(end);
 while keep_reading
-    Y_in = read_file(filename,cnt+1,chunk+1);
+    Y_in = read_file(file,cnt+1,chunk+1);
     sizY = size(Y_in);
     if sizY(end) < chunk+1
         keep_reading = false;
