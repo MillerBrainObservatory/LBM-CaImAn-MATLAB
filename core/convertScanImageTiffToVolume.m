@@ -95,7 +95,7 @@ else
 end
 closeCleanupObj = onCleanup(@() fclose(fid));
 
-files = dir(fullfile(data_path, '*.tif'));
+files = dir(fullfile(data_path, '*.tif*'));
 if isempty(files)
     error('No suitable tiff files found in: \n  %s', data_path);
 end
@@ -174,6 +174,8 @@ try
                 end
                 cnt = cnt + 1;
             end
+
+
             write_chunk_h5(h5_fullfile, frameTemp, size(frameTemp,3), dataset_path);
         end
         if i == 1
@@ -194,7 +196,6 @@ catch ME
     rethrow(ME);
 end
 end
-
 
 function dataOut = fixScanPhase(dataIn,offset,dim, dtype)
 % Find the lateral shift that maximizes the correlation between
@@ -245,7 +246,6 @@ elseif numel(size(Iin)) == 4
 end
 
 n = 8;
-
 switch dim
     case 1
         Iv1 = Iin(1:2:end,:);
