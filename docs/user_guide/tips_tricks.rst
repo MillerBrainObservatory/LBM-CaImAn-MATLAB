@@ -114,6 +114,5 @@ You can use this return value to decide how how much of your computers total pro
 
         23
 
-This specific tip is equally valid for parfor/eval loops and spmd blocks, since both of them use the pool of workers started by parpool.
-
+This is equally valid for parfor/eval loops and spmd blocks, since both of them use the pool of workers started by parpool.
 
