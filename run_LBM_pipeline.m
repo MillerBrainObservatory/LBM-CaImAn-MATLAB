@@ -33,24 +33,24 @@ else
     disp('Proceeding with execution...');
 end
 
-parent_path = fullfile('C:\Users\RBO\Documents\data\high_res');
+parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\extracted\');
 data_path = fullfile(parent_path, 'raw');
-save_path = fullfile(parent_path, 'extracted');
+save_path = fullfile(parent_path, 'results');
 if ~isfolder(save_path)
     mkdir(save_path)
 end
 
 %% 1a) Pre-Processing
-dataset_path = "/extraction"; % where data is saved in the h5 file (this is default)
+clc;
 compute = 1;
 if compute
     convertScanImageTiffToVolume( ...
         data_path, ...
         save_path, ...
-        'dataset_name', dataset_path, ...
-        'debug_flag', 0, ...
-        'fix_scan_phase', 0, ...
-        'trim_pixels', [6 6 17 0], ...
+        'dataset_name', '/extracted', ... % default
+        'debug_flag', 0, ... % default, if 1 will display files and return
+        'fix_scan_phase', 1, ... % default, keep to 1
+        'trim_pixels', [6 6 17 0], ... % default, num pixels to trim for each roi
         'overwrite', 1 ...
         );
 end
@@ -58,7 +58,7 @@ end
 %% quick vis
 clc;
 h5file = 'C:\Users\RBO\Documents\data\high_res\extracted\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.h5';
-metadata = read_h5_metadata(h5file, '/extraction');
+metadata = read_h5_metadata(h5file, '/extracted');
 
 plane = 1;
 frame_start = 10;
@@ -66,7 +66,7 @@ frame_end = 100;
 xs=(236:408);
 ys=(210:377);
 ts=(2:202);
-dataset_path = sprintf('/extraction/plane_%d', plane);
+dataset_path = sprintf('/extracted/plane_%d', plane);
 info = h5info(h5file, dataset_path);
 
 count_x = length(xs);
@@ -87,8 +87,7 @@ if compute
     motionCorrectPlane( ...
         save_path, ...
         save_path, ...
-        'data_input_group', '/extraction', ... % from the last step
-        'data_output_group', "/registration", ... % "str" or 'char' both work for inputs
+        'data_input_group', '/extracted', ... % from the last step
         'overwrite', 1, ...
         'num_cores', 23, ...
         'start_plane', 2, ...
