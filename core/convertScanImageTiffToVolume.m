@@ -150,38 +150,72 @@ try
         if num_frames_file ~= metadata.num_frames_file
             warning("Frames inconsistent: metadata frames per file: %d\nCalculated from Aout: %d", metadata.num_frames_file, num_frames_file)
         end
+
         Aout = most.memfunctions.inPlaceTranspose(Aout);
         Aout = reshape(Aout, [size(Aout, 1), size(Aout, 2), num_planes, num_frames_file]);
 
+        start_y_indices = (0:metadata.num_strips-1) * (raw_y + metadata.num_lines_between_scanfields) + t_top + 1;
+        end_y_indices = start_y_indices + raw_y - t_top - t_bottom - 1;
+        t = squeeze(Aout(start_y_indices:end_y_indices,:,2,:));
+        
+        z_timeseries = zeros(trimmed_y, trimmed_x * metadata.num_strips, num_planes, 'like', Aout);
         for plane_idx = 1:num_planes
             tplane = tic;
-            dataset_path = sprintf('%s/plane_%d', dataset_name, plane_idx);
-
-            frameTemp = zeros(trimmed_y, trimmed_x * metadata.num_strips, num_frames_file, 'like', Aout);
             cnt = 1;
             offset_y = 0;
             offset_x = 0;
-
+            tic;
             for roi_idx = 1:metadata.num_strips
                 if cnt > 1
                     offset_y = offset_y + raw_y + metadata.num_lines_between_scanfields;
                     offset_x = offset_x + trimmed_x;
                 end
                 for frame_idx = 1:num_frames_total
-                    frameTemp(:, (offset_x + 1):(offset_x + trimmed_x), frame_idx) = ...
-                        Aout((offset_y + t_top + 1):(offset_y + raw_y - t_bottom), ...
-                        (t_left + 1):(raw_x - t_right), plane_idx, frame_idx);
+                    z_timeseries( ...
+                        :, ... % all Y
+                        (offset_x + 1):(offset_x + trimmed_x), ... % offset X
+                        frame_idx ...
+                        ) = Aout( ...
+                        (offset_y + t_top + 1):(offset_y + raw_y - t_bottom), ...
+                        (t_left + 1):(raw_x - t_right), plane_idx, ...
+                        frame_idx ...
+                        );
                 end
+                
                 cnt = cnt + 1;
             end
+            if fix_scan_phase
+                offset = returnScanOffset(z_timeseries(:,:,2), 1, 'int16');
+                if offset ~= 0                 
+                    z_timeseries = fixScanPhase(z_timeseries, offset, 1, 'int16');
+                    f = figure('Color', 'white', 'Visible', 'off', 'Position', [100, 100, 1400, 600]); % Adjust figure size as needed
+                    sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'k');
+                    tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact'); % Use 'compact' to minimize extra space
 
+                    nexttile;
+                    imagesc(square_image_from_center(z_timeseries(:,:,2), 30));
+                    axis image;
+                    axis tight; % Ensure tight axis
+                    axis off;
+                    colormap('gray');
+                    title(sprintf('Pre %d pixel offset', offset), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
 
-            write_chunk_h5(h5_fullfile, frameTemp, size(frameTemp,3), dataset_path);
+                    nexttile;
+                    imagesc(square_image_from_center(z_ts(:,:,2), 30));
+                    axis image;
+                    axis tight; % Ensure tight axis
+                    axis off;
+                    colormap('gray');
+                    title(sprintf('Post %d pixel offset', offset), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
+                    saveas(f, fullfile(save_path, sprintf('scan_correction_validation_plane_%d_offset_%d.png', plane_idx,offset)));
+                end
+            end
+            % write_chunk_h5(h5_fullfile, z_timeseries, size(z_timeseries,3), dataset_path);
         end
-        if i == 1
-            metadata.new_imagesize = size(frameTemp);
-            writeMetadataToAttribute(metadata, h5_fullfile, dataset_name);
-        end
+        % if i == 1
+        %     metadata.new_imagesize = size(z_timeseries);
+        %     writeMetadataToAttribute(metadata, h5_fullfile, dataset_name);
+        % end
         fprintf(fid, "File %d of %d processed: %.2f seconds\n", i, length(files), toc(tplane));
     end
     fprintf(fid, "Processing complete. Time: %.2f seconds\n", i, length(files), toc(tfile));
@@ -233,6 +267,7 @@ elseif dim == 2
     end
 
 end
+dataOut = dataOut(:,abs(offset) + 1:end - abs(offset),:);
 end
 
 
