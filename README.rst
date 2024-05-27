@@ -14,10 +14,23 @@ Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files. Howev
 first step of this pipeline which converts the multi-ROI .tiff into a 4D volumetric time-series
 requires scanimage .tiff files.
 
+Quickstart
+=============
+
+The easiest way to get started with the pipeline is to follow the LBM_demo_pipeline script.
+
+Pipeline Steps
+*****************
+
+There are 4 core steps in this pipeline:
+
+:func:`convertScanImageTiffToVolume()`
+:func:`motionCorrectPlane()`
+:func:`segmentPlane()`
+:func:`collatePlane()`
 
 Requirements
 =============
-
 
 - MATLAB (Tested on 2023a, 2023b, 2024b)
 - Toolboxes:
@@ -35,23 +48,6 @@ The following algorithms perform the main computations and are included by defau
 - `constrained-foopsi`_ constrained deconvolution spike inference.
 
 
-Quickstart
-=============
-
-The easiest way to get started with the pipeline is to follow the LBM_demo_pipeline script.
-
-Installation
-*****************
-
-Pipeline Steps
-*****************
-
-There are 4 steps that require user input:
-
-1. Convert ScanImage .Tiff to 4D [Y, X, Z, T] array.
-2. Piecewise-rigid motion correction.
-3. Plane-by-plane 2D neuronal segmentation and deconvolution.
-4. Axial (Z) offset correction.
 
 See the (WIP) Documentation for more information.
 
