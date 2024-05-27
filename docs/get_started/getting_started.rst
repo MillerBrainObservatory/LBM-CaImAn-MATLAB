@@ -57,13 +57,13 @@ used for the demo.
     ├── extraction
     │   └── basename.h5
     ├── registration
-    │   └── registered_plane_1.mat
-    │   └── registered_plane_2.mat
-    │   └── registered_plane_NN.mat
+    │   └── registered_plane_1.h5
+    │   └── registered_plane_2.h5
+    │   └── registered_plane_NN.h5
     └── segmentation
         └── caiman_output_plane_.h5
 
-where `N` = the number of `[X, Y, T]` planar time-series.
+where `N` = the number of `[Y, X, T]` planar time-series.
 
 Following the recommendation described in :ref:`install recommendation` all necessary functions should already be on your
 MATLAB path. If an error is encountered, such as:
