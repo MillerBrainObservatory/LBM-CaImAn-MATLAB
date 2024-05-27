@@ -19,7 +19,9 @@
 % more detail in the README.
 clc, clear;
 [fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
-addpath(genpath(fullfile(fpath, 'core/')));
+addpath(genpath(fullfile(fpath, 'core')));
+addpath(genpath(fullfile(fpath, 'core', 'utils')));
+addpath(genpath(fullfile(fpath, 'core', 'io')));
 
 %% Here you can validate that all packages are on the path and accessible
 % from within this pipeline.
@@ -31,82 +33,84 @@ else
     disp('Proceeding with execution...');
 end
 
-parent_path = 'C:\Users\RBO\Documents\data\bi_hemisphere\';
-raw_path = [ parent_path 'raw\'];
-extraction_path = [ parent_path '\extracted_final\'];
-registration_path = [ parent_path 'registration_final\'];
-segmentation_path = [ parent_path 'traces_final\'];
- mkdir(registration_path); mkdir(segmentation_path);
+parent_path = fullfile('C:\Users\RBO\Documents\data\high_res');
+data_path = fullfile(parent_path, 'raw');
+save_path = fullfile(parent_path, 'extracted');
+if ~isfolder(save_path)
+    mkdir(save_path)
+end
 
 %% 1a) Pre-Processing
-if ~isfolder(extraction_path)
-    mkdir(extraction_path);
+dataset_path = "/extraction"; % where data is saved in the h5 file (this is default)
+compute = 1;
+if compute
+    convertScanImageTiffToVolume( ...
+        data_path, ...
+        save_path, ...
+        'dataset_name', dataset_path, ...
+        'debug_flag', 0, ...
+        'fix_scan_phase', 0, ...
+        'trim_pixels', [6 6 17 0], ...
+        'overwrite', 1 ...
+        );
 end
-group_path = "/extraction"; % where data is saved in the h5 file (this is default)
-convertScanImageTiffToVolume( ...
-    raw_path, ...
-    extraction_path, ...
-    'group_path', group_path, ...
-    'fix_scan_phase', false, ...
-    'trim_pixels', [8 8 29 0], ...
-    'overwrite', 1 ...
-    );
 
 %% quick vis
+clc;
+h5file = 'C:\Users\RBO\Documents\data\high_res\extracted\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.h5';
+metadata = read_h5_metadata(h5file, '/extraction');
+
 plane = 1;
 frame_start = 10;
-frame_end = 220;
-
-h5files = dir([extraction_path '*.h5']);
-h5name = fullfile(extraction_path, h5files(1).name);
+frame_end = 100;
+xs=(236:408);
+ys=(210:377);
+ts=(2:202);
 dataset_path = sprintf('/extraction/plane_%d', plane);
-has_mc(h5name)
-data = h5read( ...
-    h5name, ... % filename
-    dataset_path, ... % dataset location
-    [1, 1, frame_start], ... % start index for each dimension [X,Y,T]
-    [Inf, Inf,  frame_end - frame_start + 1] ... % count for each dimension [X,Y,T]
-    );
+info = h5info(h5file, dataset_path);
 
-% 
-% figure;
-% for x = 1:size(data, 3)
-%     imshow(data(236:408, 210:377, x), []);
-%     title(sprintf('Frame %d', start_frame + x - 1));
-% end
+count_x = length(xs);
+count_y = length(ys);
+count_t = frame_end - frame_start + 1;
+
+data = h5read( ...
+    h5file, ... % filename
+    dataset_path, ... % dataset location
+    [xs(1), ys(1), frame_start], ... % start index for each dimension [X,Y,T]
+    [count_x, count_y, count_t] ... % count for each dimension [X,Y,T]
+    );
 
 %% 1b) Motion Correction
 
-% mdata = get_metadata(fullfile(raw_path ,"MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.tif"));
-% mdata.base_filename = "MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001";
-% mc_path_new = [ parent_path 'registration_test\'];
-% 
-if ~isfolder(registration_path)
-    mkdir(registration_path);
-end
-motionCorrectPlane( ...
-    extraction_path, ...
-    registration_path, ...
-    'data_input_group', '/extraction', ... % from the last step
-    'data_output_group', "/registration", ... % "str" or 'char' both work for inputs
-    'overwrite', 1, ...
-    'num_cores', 23, ...
-    'start_plane', 29, ...
-    'end_plane', 29 ...
-    );
-
-% %% 2) CNMF Plane-by-plane SegmentationS
-% 
-% segmentPlane(mc_path, traces_path, mdata, '0','30','30','23');
-% 
-% %% 3) Axial Offset Correction
-% collatePlanes()
-
-function has_mc = has_registration(ih5_path)
-    if numel(h5info(ih5_path, '/').Groups) < 2
-        has_mc = false;
-    else
-        has_mc = true;
-    end
+compute = 0;
+if compute
+    motionCorrectPlane( ...
+        save_path, ...
+        save_path, ...
+        'data_input_group', '/extraction', ... % from the last step
+        'data_output_group', "/registration", ... % "str" or 'char' both work for inputs
+        'overwrite', 1, ...
+        'num_cores', 23, ...
+        'start_plane', 2, ...
+        'end_plane', 30  ...
+        );
 end
 
+%% 2) CNMF Plane-by-plane SegmentationS
+
+compute = 1;
+if compute
+    segmentPlane( ...
+        save_path, ...
+        save_path, ...
+        'data_input_group', '/registration', ... % from the last step
+        'data_output_group', "/segmentation", ... % "str" or 'char' both work for inputs
+        'overwrite', 1, ...
+        'num_cores', 23, ...
+        'start_plane', 1, ...
+        'end_plane', 1  ...
+        );
+end
+
+%% 3) Axial Offset Correction
+collatePlanes()
