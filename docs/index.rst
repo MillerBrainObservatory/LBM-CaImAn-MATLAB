@@ -3,6 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. import: ../../README.rst
+
 #################
 LBM Documentation
 #################
@@ -15,9 +17,7 @@ A pipeline for processing light beads microscopy (LBM) datasets.
 
 For background, theory and design of LBM technology, see the reference `publication`_.
 
-
 Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files.
-
 
 Requirements
 ------------
@@ -35,18 +35,6 @@ The following algorithms perform the main computations and are included by defau
 - `CNMF`_ segmentation and neuronal source extraction.
 - `NoRMCorre`_ piecewise rigid motion correction.
 - `constrained-foopsi`_ constrained deconvolution spike inference.
-
-
-Quickstart
-----------
-
-There are 4 steps that require user input:
-
-1. Convert ScanImage .Tiff to 4D [Y, X, Z, T] array.
-2. Piecewise-rigid motion correction.
-3. Plane-by-plane 2D neuronal segmentation and deconvolution.
-4. Axial (Z) offset correction.
-
 
 .. toctree::
     :maxdepth: 2
