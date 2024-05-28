@@ -1,5 +1,5 @@
 function write_chunk_h5(file, Y_in, chunk, dataset_name)
-if ~exist('dataset_name','var') || isempty(dataset_name)dataset_name = '/extracted';end
+if ~exist('dataset_name','var') || isempty(dataset_name);dataset_name = '/mov';end
 if ~exist('chunk','var') || isempty(chunk) chunk = 2000; end
 keep_reading = true;
 cl = class(Y_in);
