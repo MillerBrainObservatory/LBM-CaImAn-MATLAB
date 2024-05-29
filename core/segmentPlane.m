@@ -110,22 +110,25 @@ end
 
 %% Pull metadata from attributes attached to this group
 num_cores = max(num_cores, 23);
-fprintf(fid, '%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); tall=tic;
+fprintf(fid, '%s : Beginning registration with %d cores...\n\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); tall=tic;
 t_all=tic;
+first = true;
 for plane_idx = start_plane:end_plane
     fprintf(fid, '%s : Beginning plane %d\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_idx);
     z_str = sprintf('plane_%d', plane_idx);
-    plane_name = sprintf("%s/motion_corrected_%s.h5", data_path, z_str);
-    plane_name_save = sprintf("%s/segmented_%s.h5", save_path, z_str);
+    plane_name = sprintf("%s//motion_corrected_%s.h5", data_path, z_str);
+    plane_name_save = sprintf("%s//segmented_%s.h5", save_path, z_str);
     if isfile(plane_name_save)
-        fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_save_name);
+        fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
         if overwrite
-            fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_save_name);
+            fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
             delete(plane_name_save)
         else
-            fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_save_name);
+            fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
         end
     end
+
+    %% Attach metadata to attributes for this plane
     h5_data = h5info(plane_name, dataset_name);
     metadata = struct();
     for k = 1:numel(h5_data.Attributes)
@@ -133,32 +136,29 @@ for plane_idx = start_plane:end_plane
         attr_value = h5readatt(plane_name, sprintf("/%s",h5_data.Name), attr_name);
         metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
     end
-
+    if first % log metadata once
+        meta_str=formattedDisplayText(metadata);
+        writelines(meta_str, log_full_path);
+        first = false;
+    end
     % if isempty(gcp('nocreate')) && num_cores > 1
     %     parpool(num_cores);
     % end
-
-    pixel_resolution = metadata.pixel_resolution;
     if ~(metadata.num_planes >= end_plane)
         error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
     end
 
+    %% Load in data
     data = h5read(plane_name, dataset_name);
     data = data - min(data(:));
-
-    %% CaImAn segmentation
-    td_start = tic;
+    t_start = tic;
     pixel_resolution = metadata.pixel_resolution;
-    volume_rate = metadata.frame_rate;
+    frame_rate = metadata.frame_rate;
     [d1,d2,T] = size(data);
     d = d1*d2; % total number of samples
-
-    t0 = toc(td_start);
-    fprintf(fid, "%s : Data loaded in. This process took: %0.1f seconds",datetime("now"), toc(td_start));
-
-    FrameRate = volume_rate;
     tau = ceil(7.5./pixel_resolution);
 
+    % expansion factor for the ellipse
     if pixel_resolution>3
         dist = 1.5;
     else
@@ -202,18 +202,16 @@ for plane_idx = start_plane:end_plane
         'size_thr', sz, ...
         'search_method','ellipse',...
         'min_size', round(tau), ...                 % minimum size of ellipse axis (default: 3)
-        'max_size', 2*round(tau), ...              % maximum size of ellipse axis (default: 8)
+        'max_size', 2*round(tau), ...               % maximum size of ellipse axis (default: 8)
         'dist', dist, ...                           % expansion factor of ellipse (default: 3)
         'max_size_thr',mx,...                       % maximum size of each component in pixels (default: 300)
         'time_thresh',time_thresh,...
         'min_size_thr',mn,...                       % minimum size of each component in pixels (default: 9)
         'refine_flag',0,...
-        'rolling_length',ceil(FrameRate*5),...
-        'fr', FrameRate ...
+        'rolling_length',ceil(frame_rate*5),...
+        'fr', frame_rate ...
         );
-
-    % Run patched caiman
-    disp('Beginning patched, volumetric CNMF...')
+    fprintf(fid, "%s : Data loaded in. This process took: %0.2f seconds.\nBeginning CNMF.\n\n",datetime("now"), toc(t_start));
     t_cnmf = tic;
 
     %% F.O. 05.16.24: BREAKING - remove parallel eval on memmapped file
@@ -242,6 +240,12 @@ for plane_idx = start_plane:end_plane
     rVals = rval_space(keep);
     fprintf(fid, '%s : First CNMF iteration complete. Process took: %.2f seconds\nUpdating tamporal components... ...', datetime("now"), toc(t_test));
 
+    %% Convert sparse A matrix to full 3D matrix
+    t_sparse = tic;
+    [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2);  % Ac_keep has dims. [2*tau+1,2*tau+1,K] where each element Ki is a 2D map centered on centroid of component acx(Ki),axy(Ki), and acm(Ki) = sum(sum(Ac_keep(:,:,Ki))
+    fprintf(fid, '%s : Created sparse component matrix. Process took: %.2f seconds\nSaving data ...', datetime("now"), toc(t_sparse));
+
+    %% Update temporal components
     P.p = 0;
     options.nb = options.gnb;
 
@@ -249,21 +253,17 @@ for plane_idx = start_plane:end_plane
     [C_keep,f,~,~,R_keep] = update_temporal_components(reshape(data,d,T),A_keep,b,C_keep,f,P,options);
     fprintf(fid, '%s : Temporal components updates. Process took: %.2f seconds\nDetrending from raw traces ...', datetime("now"), toc(t_update));
 
-    t_detrend = tic;
-    if size(A_keep,2) < 2 % Calculate "raw" traces in terms of delta F/F0
-        [T_keep,F0] = detrend_df_f([A_keep,ones(d1*d2,1)],[b,ones(d1*d2,1)],[C_keep;ones(1,T)],[f;-min(min(min(data)))*ones(1,T)],[R_keep; ones(1,T)],options);
-    else
-        [T_keep,F0] = detrend_df_f(A_keep,[b,ones(d1*d2,1)],C_keep,[f;-min(min(min(data)))*ones(1,T)],R_keep,options);
-    end
-    fprintf(fid, '%s : Traces detrended. Process took: %.2f seconds\nConverting to sparse matrix ...', datetime("now"), toc(t_detrend));
+    %% Detrend
+    % t_detrend = tic;
+    % if size(A_keep,2) < 2 % Calculate "raw" traces in terms of delta F/F0
+    %     [T_keep,F0] = detrend_df_f([A_keep,ones(d1*d2,1)],[b,ones(d1*d2,1)],[C_keep;ones(1,T)],[f;-min(min(min(data)))*ones(1,T)],[R_keep; ones(1,T)],options);
+    % else
+    %     [T_keep,F0] = detrend_df_f(A_keep,[b,ones(d1*d2,1)],C_keep,[f;-min(min(min(data)))*ones(1,T)],R_keep,options);
+    % end
+    % fprintf(fid, '%s : Traces detrended. Process took: %.2f seconds\nConverting to sparse matrix ...', datetime("now"), toc(t_detrend));
 
-    % Convert sparse A matrix to full 3D matrix
-    t_ac = tic;
-    [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2);  % Ac_keep has dims. [2*tau+1,2*tau+1,K] where each element Ki is a 2D map centered on centroid of component acx(Ki),axy(Ki), and acm(Ki) = sum(sum(Ac_keep(:,:,Ki))
-    fprintf(fid, '%s : Created sparse component matrix. Process took: %.2f seconds\nSaving data ...', datetime("now"), toc(t_ac));
 
     % Convert ouputs to single to reduce memory consumption
-    Ym = single(mean(data,3));
     Cn = single(Cn);
     C_keep = single(C_keep);
     b = single(b);
@@ -271,13 +271,12 @@ for plane_idx = start_plane:end_plane
 
     % Save data
     t_save = tic;
-
-    write_chunk_h5(plane_name_save, T_keep, 2000, '/T_keep');
+    fprintf(fid, "%s : Writing data.\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'));
+    % write_chunk_h5(plane_name_save, T_keep, 2000, '/T_keep');
     write_chunk_h5(plane_name_save, Ac_keep, 2000, '/Ac_keep');
     write_chunk_h5(plane_name_save, C_keep, 2000, '/C_keep');
     write_chunk_h5(plane_name_save, Km, 2000, '/Km');
     write_chunk_h5(plane_name_save, rVals, 2000, '/rVals');
-    write_chunk_h5(plane_name_save, Ym, 2000, '/Ym');
     write_chunk_h5(plane_name_save, Cn, 2000, '/Cn');
     write_chunk_h5(plane_name_save, b, 2000, '/b');
     write_chunk_h5(plane_name_save, f, 2000, '/f');
@@ -290,7 +289,7 @@ for plane_idx = start_plane:end_plane
 
     % savefast(fullfile(save_path, ['caiman_output_plane_' num2str(plane_idx) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')
     fprintf(fid, '%s : Data saved. Process took: %.2f seconds\n', datetime("now"), toc(t_save));
-    fprintf(fid, '%s : Plane complete. Process took: %.2f seconds\nBeginning next plane ...', datetime("now"), toc(td_start));
+    fprintf(fid, '%s : Plane complete. Process took: %.2f seconds\nBeginning next plane ...', datetime("now"), toc(t_start));
 end
 
 fprintf(fid, '%s : Routine complete. Total Completion time: %.2f hours\n', datetime("now"), toc(t_all)./3600);
