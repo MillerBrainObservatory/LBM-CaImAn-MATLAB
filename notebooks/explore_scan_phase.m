@@ -25,6 +25,7 @@ sq_cut = square_image_from_center(corrected_cut, 25);
 sq_square = square_image_from_center(corrected_square, 25);
 
 %%
+
 figure;
 rows = 1;
 cols = 3;
@@ -33,7 +34,8 @@ nexttile;imagesc(sq_raw(3:end,3:end));axis image; axis off;colormap 'gray'; subt
 nexttile;imagesc(sq_square(3:end,3:end));axis image;axis off;colormap 'gray'; subtitle(sprintf("583x132 (trimmed) Input: offset=%d", scanphase_cut)); 
 nexttile;imagesc(sq_cut(3:end,3:end));axis image;axis off;colormap 'gray'; subtitle(sprintf("40x40 (square) Input: offset=%d", scanphase_square)); 
 
-%%
+%% Load registration results
+% TODO: Functionize this
 
 clc;
 start = 1;
@@ -43,13 +45,14 @@ plane = 1;
 h5file = 'C:\Users\RBO\Documents\data\high_res\corrected\motion_corrected_plane_1.h5';
 full_ds_path = "/mov";
 info = h5info(h5file, full_ds_path);
+metadata = read_h5_metadata(h5file, full_ds_path);
 ds_size = info.Dataspace.Size;
 
-mxs = (1:ds_size(1));
-mys = (1:ds_size(2));
+mys = (1:ds_size(1));
+mxs = (1:ds_size(2));
 mts = (1:ds_size(3));
 
-xs = mxs(1:144);
+xs = mxs;
 ys = mys;
 ts = mts;
 
@@ -60,11 +63,11 @@ data = h5read( ...
     [length(ys), length(xs), length(ts)] ... % count for each dimension [X,Y,T]
 );
 %%
-save_path = fullfile('C:\Users\RBO\Documents\data\high_res\motion_corrected_plane1.mp4');
+save_path = fullfile('C:\Users\RBO\Documents\data\high_res\motion_corrected_plane1_200.mp4');
 img_frame = data(:,:,200);
 [r, c] = find(img_frame == max(img_frame(:)));
-[slicey, slicex] = get_central_indices(img_frame,r,c,100);
-planeToMovie(data(slicey,slicex,2:402), save_path, metadata.frame_rate);
+[slicey, slicex] = get_central_indices(img_frame,r,c,200);
+planeToMovie(data(:,:,2:402), save_path, metadata.frame_rate);
 
 %%
 % imagesc(groundt.Iin); axis image; axis off; xlim([69.2 88.2]); ylim([510.4 589.4]);

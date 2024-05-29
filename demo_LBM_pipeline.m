@@ -37,11 +37,11 @@ end
 
 parent_path = fullfile('C:\Users\RBO\Documents\data\high_res');
 data_path = fullfile(parent_path, 'raw');
-save_path = fullfile(parent_path, 'extracted');
+save_path = fullfile(parent_path, 'extracted_2');
 
 %% 1) Pre-Processing
 clc;
-compute = 0;
+compute = 1;
 if compute
     convertScanImageTiffToVolume( ...
         data_path, ...
