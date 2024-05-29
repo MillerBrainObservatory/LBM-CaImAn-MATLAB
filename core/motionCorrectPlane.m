@@ -8,11 +8,8 @@ function motionCorrectPlane(data_path, save_path, varargin)
 %     Path to the directory containing the files extracted via convertScanImageTiffToVolume.
 % save_path : char
 %     Path to the directory to save the motion vectors.
-% data_input_group : string, optional
+% dataset_name : string, optional
 %     Group path within the hdf5 file that contains raw data.
-%     Default is 'registration'.
-% data_output_group : string, optional
-%     Group path within the hdf5 file to save the registered data.
 %     Default is 'registration'.
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
@@ -42,104 +39,76 @@ function motionCorrectPlane(data_path, save_path, varargin)
 p = inputParser;
 addRequired(p, 'data_path', @ischar);
 addRequired(p, 'save_path', @ischar);
-addParameter(p, 'data_input_group', "/extraction", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
-addParameter(p, 'data_output_group', "/registration", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addParameter(p, 'dataset_name', "/extraction", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
-addParameter(p, 'num_cores', 1, @(x) isnumeric(x) && x > 0 && x <= 24);
+addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
 addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
 parse(p, data_path, save_path, varargin{:});
 
 data_path = p.Results.data_path;
 save_path = p.Results.save_path;
-data_input_group = p.Results.data_input_group;
-data_output_group = p.Results.data_output_group;
-
+dataset_name = p.Results.dataset_name;
 debug_flag = p.Results.debug_flag;
+overwrite = p.Results.overwrite;
 num_cores = p.Results.num_cores;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
-overwrite = p.Results.overwrite;
 
-clck = clock; % Generate a timestamp for the log file name.
-log_file_name = sprintf('registration_%d_%02d_%02d_%02d_%02d.txt', clck(1), clck(2), clck(3), clck(4), clck(5));
-log_full_path = fullfile(data_path, log_file_name);
-fid = fopen(log_full_path, 'w');
-close_cleanup_obj = onCleanup(@() fclose(fid));
+if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", data_path); end
+if debug_flag == 1; dir([data_path, '*.tif']); return; end
 
 if isempty(save_path)
+    warning("No save_path given. Saving data in data_path: %s\n", data_path);
     save_path = data_path;
 end
 
-data_path = fullfile(data_path);
-if ~isfolder(data_path)
-    error("Filepath %s does not exist", data_path);
-end
+fig_save_path = fullfile(save_path, "figures");
+if ~isfolder(fig_save_path); mkdir(fig_save_path); end
 
-if debug_flag == 1
-    dir([data_path, '*.tif']);
-    return;
-end
-
-if ~isfolder(save_path)
-    fprintf('Given savepath %s does not exist. Creating this directory...\n', save_path);
-    mkdir(save_path);
-end
-
-fig_save_path = fullfile(save_path, 'figures');
-if ~isfolder(fig_save_path)
-    mkdir(fig_save_path);
-end
-
-files = dir(fullfile(data_path, '*.h5'));
+files = dir(fullfile(data_path, '*.h*'));
 if isempty(files)
-    error('No suitable h5 files found in: \n  %s', data_path);
+    error('No suitable data files found in: \n  %s', data_path);
 end
 
-h5_fullfile = fullfile(files(1).folder, files(1).name);
+log_file_name = sprintf("%s_extraction", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+log_full_path = fullfile(save_path, log_file_name);
+fid = fopen(log_full_path, 'w');
+if fid == -1
+    error('Cannot create or open log file: %s', log_full_path);
+else
+    fprintf('Log file created: %s\n', log_full_path);
+end
+% closeCleanupObj = onCleanup(@() fclose(fid));
 
 %% Pull metadata from attributes attached to this group
-h5_data = h5info(h5_fullfile, data_input_group);
-metadata = struct();
-for k = 1:numel(h5_data.Attributes)
-    attr_name = h5_data.Attributes(k).Name;
-    attr_value = h5readatt(h5_fullfile, h5_data.Name, attr_name);
-    metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
-end
-
-dataset_paths = {'shifts2', 'Y', 'shifts1'};
-
 num_cores = max(num_cores, 23);
-fprintf(fid, '%s Beginning processing routine with %d cores...\n', datetime, num_cores);
-plane_map = dictionary; tic;
-for plane_idx = 1:metadata.num_planes
+fprintf(fid, '%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); tall=tic;
+for plane_idx = start_plane:end_plane
+    fprintf(fid, '%s : Beginning plane %d\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_idx);
 
-    fprintf(fid,'%s : BEGINNING PLANE %u\n', datetime("now"), plane_idx);
-
-    pst = sprintf('plane_%d', plane_idx);
-    input_path = sprintf('%s/%s', data_input_group, pst);
-    output_path = sprintf('%s/%s', data_output_group, pst);
-
-    skip_plane = false;
-    for i = 1:length(dataset_paths)
-        dataset_name = dataset_paths{i};
-        dataset_path = sprintf('%s/%s', output_path, dataset_name);
-        if check_dataloc_exists(h5_fullfile, dataset_path)
-            if overwrite == 0
-                fprintf(fid, 'Dataset %s for plane %d already exists. Skipping.\n', dataset_name, plane_idx);
-                skip_plane = true;
-                break; % Exit the dataset loop
-            else
-                fprintf(fid, 'Dataset %s for plane %d already exists. Proceeding...\n', dataset_name, plane_idx);
-            end
-        else
-            fprintf(fid, 'Creating dataset %s for plane %d.\n', dataset_name, plane_idx);
-            h5create(h5_fullfile, dataset_path, h5_data.Datasets(i).Dataspace.Size, 'Datatype', 'single');
+    z_str = sprintf('plane_%d', plane_idx);
+    plane_name = sprintf("%s/extracted_%s.h5", data_path, z_str);
+    plane_name_save = sprintf("%s/motion_corrected_%s.h5", save_path, z_str);
+    if isfile(plane_name_save)
+        fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+        if overwrite
+            fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+            delete(plane_name_save)
         end
     end
-    if skip_plane
-        continue; % skip to next iteration of plane_idx loop
+
+    h5_data = h5info(plane_name, dataset_name);
+    metadata = struct();
+    for k = 1:numel(h5_data.Attributes)
+        attr_name = h5_data.Attributes(k).Name;
+        attr_value = h5readatt(plane_name, sprintf("/%s",h5_data.Name), attr_name);
+        metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
+    end
+
+    if isempty(gcp('nocreate')) && num_cores > 1
+        parpool(num_cores);
     end
 
     pixel_resolution = metadata.pixel_resolution;
@@ -149,18 +118,11 @@ for plane_idx = 1:metadata.num_planes
         error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
     end
 
-    fprintf(fid, 'Loading plane  %d with %d workers/cores.\n', plane_idx, num_cores);
-
-    Y = h5read(h5_fullfile, input_path);
+    Y = h5read(plane_name, dataset_name);
     Y = Y - min(Y(:));
     volume_size = size(Y);
     d1 = volume_size(1);
     d2 = volume_size(2);
-
-    fprintf(fid, '%s Beginning processing for plane %d with %d matlab workers.\n', datetime, plane_idx, num_cores);
-    if isempty(gcp('nocreate')) && num_cores > 1
-        parpool(num_cores);
-    end
 
     %% Motion correction: Create Template
     options_rigid = NoRMCorreSetParms(...
@@ -173,15 +135,16 @@ for plane_idx = 1:metadata.num_planes
         'correct_bidir',false... % Correct bidirectional scanning
         );
 
-    [M1,shifts1,~,~] = normcorre_batch(Y, options_rigid);
-    date = datetime(now,'ConvertFrom','datenum');
-    format_spec = '%s Rigid MC Complete, beginning non-rigid MC...\n';
-    fprintf(fid, format_spec, date);
+    % start timer for registration after parpool to avoid inconsistent
+    % pool startup times.
+    t_rigid=tic;
+    [M1,shifts_template,~,~] = normcorre_batch(Y, options_rigid);
+    fprintf(fid, "%s : Rigid registration complete. Elapsed time: %.3f minutes\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_rigid)/60);
 
     % create the template using X/Y shift displacements
-    shifts_r = squeeze(cat(3,shifts1(:).shifts));
-    shifts_v = movvar(shifts_r, 24, 1);
-    [srt, minv_idx] = sort(shifts_v, 120);
+    shifts_template = squeeze(cat(3,shifts_template(:).shifts));
+    shifts_v = movvar(shifts_template, 24, 1);
+    [~, minv_idx] = sort(shifts_v, 120);
     best_idx = unique(reshape(minv_idx, 1, []));
     template_good = mean(M1(:,:,best_idx), 3);
 
@@ -197,83 +160,24 @@ for plane_idx = 1:metadata.num_planes
         );
 
     % DFT subpixel registration - results used in CNMF
-    [M2, shifts2, ~, ~] = normcorre_batch(Y, options_nonrigid, template_good);
+    t_nonrigid=tic;
+    fprintf(fid, "%s : Non-rigid registration complete. Elapsed time: %.3f minutes\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_nonrigid)/60);
+    [M2, shifts_nr, ~, ~] = normcorre_batch(Y, options_nonrigid, template_good);
+    shifts_nr = squeeze(cat(3,shifts_nr(:).shifts));
+    t_save=tic;
 
-    movie_path =  sprintf('%s/Y', output_path);
-    shifts_path =  sprintf('%s/shifts2', output_path);
-    template_shifts_path =  sprintf('%s/shifts1', output_path);
+    write_chunk_h5(plane_name_save, M2, size(M2,3), '/mov');
+    write_chunk_h5(plane_name_save, shifts_nr, size(shifts_nr,2), '/shifts');
+    write_chunk_h5(plane_name_save, shifts_template, size(shifts_template,2), '/template');
+    write_metadata_h5(metadata, plane_name_save, '/mov');
+    fprintf(fid, "%s : Data saved. Elapsed time: %.2f seconds\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_save)/60);
 
-    write_dataset(h5_fullfile, movie_path, M2, fid);
-    write_dataset(h5_fullfile, shifts_path, squeeze(cat(3,shifts1(:).shifts)), fid);
-    write_dataset(h5_fullfile, template_shifts_path, squeeze(cat(3,shifts1(:).shifts)), fid);
-
-    % saveas(motion_correction_figure, full_metrics_save_path);
-    % close(motion_correction_figure);
-    clear M* c* template_good shifts*;
-
-    disp('Data saved, beginning next plane...');
-    date = datetime(now,'ConvertFrom','datenum');
-    format_spec = '%s Motion Correction Complete. Beginning next plane...\n';
-    fprintf(fid, format_spec, date);
-end
-
-disp('All planes processed...');
-t = toc;
-disp(['Routine complete. Total run time ' num2str(t./3600) ' hours.']);
-date = datetime(now,'ConvertFrom','datenum');
-format_spec = '%s Routine complete.\n';
-fprintf(fid, format_spec, date);
-end
-
-function write_dataset(filename, location, data, fid)
-try
-    h5create(filename, location, size(data), 'DatatypeS', 'single')
-catch ME
-    if strcmp(ME.identifier, 'MATLAB:imagesci:h5create:datasetAlreadyExists')
-        fprintf(fid, "%s : Skipping dataset creation.\n", location);
-    else
-        rethrow(ME);
+    clear M1 M2 shifts template;
+    try
+        fprintf(fid, "%s : Motion correction for plane %d complete. Time: %.2f minutes. Beginning next plane...\n", datestr(datetime('now'), 'yyyy_mm_dd HH:MM:SS'), plane_idx, toc(t_rigid)/60);
+    catch ME
+        warning("File ID, no longer valid: %d", fid);
+        return;
     end
+fprintf(fid, "%s : Processing complete. Time: %.2f hours\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tall)/3600);
 end
-try
-    h5write(filename, location, data);
-    fprintf(fid, "%s : Dataset written\n", location);
-catch ME
-    disp(ME)
-end
-end
-
-
-
-% save_name = sprintf('registered_%s.mat', pst);
-% metrics_save_name = sprintf('metrics_%s.fig', pst);
-%
-% full_save_path = fullfile(save_path, save_name);
-% full_metrics_save_path = fullfile(fig_save_path, metrics_save_name);
-%
-% fprintf('Saving registration results in directory: \n \n %s \n', full_save_path);
-%
-
-
-% disp('Calculating motion correction metrics...');
-%
-% shifts_r = squeeze(cat(3,shifts1(:).shifts));
-% [cY, aa, bb] = motion_metrics(Y, 10);
-% [cM1, cc, dd] = motion_metrics(M1, 10);
-% [cM2, rr, oo] = motion_metrics(M2, 10);
-
-% motion_correction_figure = figure;
-% T = size(Y, 3);
-%
-% ax1 = subplot(311); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid'); title('correlation coefficients', 'fontsize', 14, 'fontweight', 'bold')
-% set(gca, 'Xtick', [])
-% ax2 = subplot(312); %plot(shifts_x); hold on;
-% plot(shifts_r(:,1), '--k', 'linewidth', 2); title('displacements along x', 'fontsize', 14, 'fontweight', 'bold')
-% set(gca, 'Xtick', [])
-% ax3 = subplot(313);
-% plot(shifts_r(:,2), '--k', 'linewidth', 2); title('displacements along y', 'fontsize', 14, 'fontweight', 'bold')
-% xlabel('timestep', 'fontsize', 14, 'fontweight', 'bold')
-% linkaxes([ax1, ax2, ax3], 'x')
-
-% Ym = mean(Y, 3);
-% save(full_save_path, 'Y', 'Ym', 'shifts_r', 'M1', 'shifts1', "-v7.3");

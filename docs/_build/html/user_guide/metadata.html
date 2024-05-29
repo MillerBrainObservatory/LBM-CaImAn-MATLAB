@@ -30,6 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+    <link rel="stylesheet" type="text/css" href="../_static/caiman_matlab.css?v=8c8b7c0d" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
@@ -44,8 +45,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/metadata';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Tips and Tricks" href="tips_tricks.html" />
-    <link rel="prev" title="Axial-Offset Correction" href="offset_correction.html" />
+    <link rel="next" title="Pre-Processing" href="pre_processing.html" />
+    <link rel="prev" title="Parameters" href="parameters.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -306,10 +307,12 @@ document.write(`
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre_processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registration.html">Registration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tips_tricks.html">Tips and Tricks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
 </ul>
@@ -370,9 +373,9 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="scanimage-metadata">
-<h1>ScanImage Metadata<a class="headerlink" href="#scanimage-metadata" title="Link to this heading">#</a></h1>
-<p>As discussed in <a class="reference internal" href="pre_processing.html#pipeline-step-1"><span class="std std-ref">1. Re-Construct Volumetric Time-Series</span></a>, reconstructing an image from the ScanImage <cite>.tiff</cite> file is handled internally by the pipeline. This describes
-the metadata that hold all of the values used for that process.</p>
+<span id="metadata"></span><h1>ScanImage Metadata<a class="headerlink" href="#scanimage-metadata" title="Link to this heading">#</a></h1>
+<p>As discussed in <a class="reference internal" href="pre_processing.html#pre-processing"><span class="std std-ref">Pre-Processing</span></a>, reconstructing an image from the ScanImage <cite>.tiff</cite> file is handled internally by the pipeline.
+This describes the metadata that hold all of the values used for that process.</p>
 <p>The funcion <a class="reference internal" href="../api/utils.html#get_metadata" title="get_metadata"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">get_metadata()</span></code></a> takes as input a path to any <a class="reference external" href="https://www.mbfbioscience.com/products/scanimage/">ScanImage</a> tiff file and returns the metadata.</p>
 <div class="admonition note" id="mdetadata-disclaimer">
 <p class="admonition-title">Note</p>
@@ -427,20 +430,20 @@ It doesn’t matter which .tiff file is used for this function, the metadata use
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="offset_correction.html"
+       href="parameters.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Axial-Offset Correction</p>
+        <p class="prev-next-title">Parameters</p>
       </div>
     </a>
     <a class="right-next"
-       href="tips_tricks.html"
+       href="pre_processing.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Tips and Tricks</p>
+        <p class="prev-next-title">Pre-Processing</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

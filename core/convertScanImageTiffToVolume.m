@@ -15,7 +15,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 %     not exist. Defaults to the data_path directory.
 % dataset_name : string, optional
 %     Name of the group (h5 dataset) to save the extracted data. Default is
-%     '/extraction. Must contain a leading slash.
+%     '/Y'. Must contain a leading slash.
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
@@ -44,10 +44,14 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 %
 % .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
 
+[currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath')));
+addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/ScanImage/')));
+addpath(genpath("utils"));
+
 p = inputParser;
 addRequired(p, 'data_path', @ischar);
 addOptional(p, 'save_path', data_path, @ischar);
-addParameter(p, 'dataset_name', "/extraction", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addParameter(p, 'dataset_name', "/Y", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'fix_scan_phase', 1, @(x) isnumeric(x) || islogical(x));
@@ -62,27 +66,25 @@ overwrite = p.Results.overwrite;
 fix_scan_phase = p.Results.fix_scan_phase;
 trim_pixels = p.Results.trim_pixels;
 
+if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", data_path); end
+if debug_flag == 1; dir([data_path, '*.tif']); return; end
+
 if isempty(save_path)
+    warning("No save_path given. Saving data in data_path: %s\n", data_path);
     save_path = data_path;
 end
 
-[currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath')));
-addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/ScanImage/')));
-addpath(genpath("utils"));
+fig_save_path = fullfile(save_path, "figures");
+if ~isfolder(fig_save_path); mkdir(fig_save_path); end
 
-data_path = fullfile(data_path);
-if ~isfolder(data_path)
-    error("Filepath %s does not exist", data_path);
+files = dir(fullfile(data_path, '*.tif*'));
+if isempty(files)
+    error('No suitable tiff files found in: \n  %s', data_path);
 end
 
-if ~isfolder(save_path)
-    fprintf('Given savepath %s does not exist. Creating this directory...\n', save_path);
-    mkdir(save_path);
-end
-
-if debug_flag == 1
-    dir([data_path, '*.tif']);
-    return;
+fprintf("Files found in data path:\n");
+for i = 1:length(files)
+    fprintf('%d: %s\n', i, files(i).name);
 end
 
 log_file_name = sprintf("%s_extraction", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
@@ -94,16 +96,6 @@ else
     fprintf('Log file created: %s\n', log_full_path);
 end
 closeCleanupObj = onCleanup(@() fclose(fid));
-
-files = dir(fullfile(data_path, '*.tif*'));
-if isempty(files)
-    error('No suitable tiff files found in: \n  %s', data_path);
-end
-
-fprintf("Files found in data path:\n");
-for i = 1:length(files)
-    fprintf('%d: %s\n', i, files(i).name);
-end
 
 firstFileFullPath = fullfile(files(1).folder, files(1).name);
 % We add some values to the metadata to attach to H5 attributes and
@@ -121,26 +113,12 @@ trimmed_y = raw_y - t_top - t_bottom;
 
 num_planes = metadata.num_planes;
 num_frames_total = metadata.num_frames_total;
-
-h5_fullfile = fullfile(save_path, sprintf('%s.h5', metadata.raw_filename));
-metadata.h5_fullfile = h5_fullfile; % store the location of our h5 file
 metadata.dataset_name = dataset_name;
 
-if isfile(h5_fullfile)
-    if overwrite
-        fprintf("Deleting file: %s\n", h5_fullfile);
-        delete(h5_fullfile);
-    else
-        fprintf("Not Implemented Error:\nSave_file %s already exists\nUser set overwrite = 0.\nReturning without extracting data.\nTo extract this dataset, change the save_path, partial overwrites are not implemented.", h5_fullfile);
-        return
-    end
-end
-
 try
+    fprintf(fid, '%s : Processing %d file(s) with %d planes.\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), length(files), num_planes);
     for i = 1:length(files)
         tfile = tic;
-        fprintf(fid, 'Processing %d: %s\n', i, files(i).name);
-
         hTif = scanimage.util.ScanImageTiffReader(fullfile(data_path, files(i).name));
         Aout = hTif.data();
 
@@ -150,41 +128,81 @@ try
         if num_frames_file ~= metadata.num_frames_file
             warning("Frames inconsistent: metadata frames per file: %d\nCalculated from Aout: %d", metadata.num_frames_file, num_frames_file)
         end
+
         Aout = most.memfunctions.inPlaceTranspose(Aout);
         Aout = reshape(Aout, [size(Aout, 1), size(Aout, 2), num_planes, num_frames_file]);
 
+        % start_y_indices = (0:metadata.num_strips-1) * (raw_y + metadata.num_lines_between_scanfields) + t_top + 1;
+        % end_y_indices = start_y_indices + raw_y - t_top - t_bottom - 1;
+        % t = squeeze(Aout(start_y_indices:end_y_indices,:,2,:));
+
+        z_timeseries = zeros(trimmed_y, trimmed_x * metadata.num_strips, num_planes, 'like', Aout);
         for plane_idx = 1:num_planes
             tplane = tic;
-            dataset_path = sprintf('%s/plane_%d', dataset_name, plane_idx);
+            p_str = sprintf("plane_%d", plane_idx);
+            plane_fullfile = sprintf("%s/extracted_%s.h5", save_path, p_str);
+            if isfile(plane_fullfile)
+                if overwrite
+                    fprintf(fid, "%s : Deleting %s\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS') ,plane_fullfile);
+                    delete(plane_fullfile);
+                else
+                    fprintf("Not Implemented Error:\nSave_file %s already exists\nUser set overwrite = 0.\nReturning without extracting data.\nTo extract this dataset, change the save_path, partial overwrites are not implemented.", plane_fullfile);
+                    return
+                end
+            end
 
-            frameTemp = zeros(trimmed_y, trimmed_x * metadata.num_strips, num_frames_file, 'like', Aout);
             cnt = 1;
             offset_y = 0;
             offset_x = 0;
-
+            tic;
             for roi_idx = 1:metadata.num_strips
                 if cnt > 1
                     offset_y = offset_y + raw_y + metadata.num_lines_between_scanfields;
                     offset_x = offset_x + trimmed_x;
                 end
                 for frame_idx = 1:num_frames_total
-                    frameTemp(:, (offset_x + 1):(offset_x + trimmed_x), frame_idx) = ...
-                        Aout((offset_y + t_top + 1):(offset_y + raw_y - t_bottom), ...
-                        (t_left + 1):(raw_x - t_right), plane_idx, frame_idx);
+                    z_timeseries( ...
+                        :, ... % all Y
+                        (offset_x + 1):(offset_x + trimmed_x), ... % offset X
+                        frame_idx ...
+                        ) = Aout( ...
+                        (offset_y + t_top + 1):(offset_y + raw_y - t_bottom), ...
+                        (t_left + 1):(raw_x - t_right), plane_idx, ...
+                        frame_idx ...
+                        );
                 end
                 cnt = cnt + 1;
             end
 
+            if fix_scan_phase
+                offset = returnScanOffset(z_timeseries(:,:,2), 1, 'int16');
+                if offset ~= 0
+                    img_frame = z_timeseries(:,:,2);
+                    [r, c] = find(img_frame == max(img_frame(:)));
+                    [yind, xind] = get_central_indices(z_timeseries(:,:,2), r, c, 30);
 
-            write_chunk_h5(h5_fullfile, frameTemp, size(frameTemp,3), dataset_path);
+                    f = figure('Color', 'white', 'Visible', 'off', 'Position', [100, 100, 1400, 600]); % Adjust figure size as needed
+                    sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'k');
+                    tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact'); % Use 'compact' to minimize extra space
+
+                    nexttile; imagesc(z_timeseries(yind,xind,2));
+                    axis image; axis tight; axis off; colormap('gray');
+                    title(sprintf('Pre-%d pixel offset', abs(offset)), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
+
+                    z_timeseries = fixScanPhase(z_timeseries, offset, 1, 'int16');
+                    nexttile; imagesc(z_timeseries(yind,xind,2));
+                    axis image; axis tight; axis off; colormap('gray');
+                    title(sprintf('Post-%d pixel offset', abs(offset)), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
+                    saveas(f, fullfile(fig_save_path, sprintf('scan_correction_validation_plane_%d_offset_%d.png', plane_idx, abs(offset))));
+                    close(f);
+                end
+            end
+            write_chunk_h5(plane_fullfile, z_timeseries, size(z_timeseries,3), '/Y');
+            write_metadata_h5(metadata, plane_fullfile, '/Y');
+            fprintf(fid, "%s : Plane %d processed in %.2f seconds\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), plane_idx, toc(tplane));
         end
-        if i == 1
-            metadata.new_imagesize = size(frameTemp);
-            writeMetadataToAttribute(metadata, h5_fullfile, dataset_name);
-        end
-        fprintf(fid, "File %d of %d processed: %.2f seconds\n", i, length(files), toc(tplane));
     end
-    fprintf(fid, "Processing complete. Time: %.2f seconds\n", i, length(files), toc(tfile));
+    fprintf(fid, "%s : Processing complete. Time: %.3f minutes\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tfile)/60);
 catch ME
     if exist('log_full_path', 'var') && isfile(log_full_path)
         fprintf('Deleting errored logfile: %s\n', log_full_path);
@@ -233,6 +251,7 @@ elseif dim == 2
     end
 
 end
+dataOut = dataOut(:,abs(offset) + 1:end - abs(offset),:);
 end
 
 

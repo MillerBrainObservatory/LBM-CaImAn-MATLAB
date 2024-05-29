@@ -19,34 +19,28 @@ For background, theory and design of LBM technology, see the reference `publicat
 
 Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files.
 
-Requirements
-------------
+See the `README`_ for pipeline requirements and algorithms.
 
-- MATLAB (Tested on 2023a, 2023b, 2024b)
-- Toolboxes:
-    - Parallel Computing Toolbox
-    - Statistics and Machine Learning Toolbox
-    - Image Processing Toolbox
-
-Algorithms
-----------
-The following algorithms perform the main computations and are included by default in the pipeline:
-
-- `CNMF`_ segmentation and neuronal source extraction.
-- `NoRMCorre`_ piecewise rigid motion correction.
-- `constrained-foopsi`_ constrained deconvolution spike inference.
+Get Started
+**************
 
 .. toctree::
     :maxdepth: 2
-    :caption: Get started:
 
     get_started/index
+
+
+User Guide
+**************
 
 .. toctree::
     :maxdepth: 2
     :caption: User Guide
 
     user_guide/index
+
+API
+**************
 
 .. toctree::
     :maxdepth: 2

@@ -1,3 +1,4 @@
+
 Pre-Processing
 #######################################
 
@@ -9,8 +10,10 @@ See :ref:`troubleshooting` for common issues you may encounter along the way.
 Pre-processing LBM datasets consists of 2 main processing steps:
 
 1. Assemble our images
- - reshape vertically concatenated strips into horizontally concatenated strips.
- - reorder our images into 3D time-series.
+
+- reshape vertically concatenated strips into horizontally concatenated strips.
+- reorder our images into 3D time-series.
+
 2. Correcting for scan-phase alignment inconsistencies
 
 .. _assembly:
@@ -55,7 +58,7 @@ of a suffix appended to the filename: `_000N`, where n=number of files chosen by
 
 .. _scan_phase:
 
-`fix_scan_phasee` is a very important parameter: it attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
+:func:`fix_scan_phase` is a very important parameter: it attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
 
 .. thumbnail:: ../_static/_images/corr_nocorr_phase_example.png
    :width: 1080
@@ -81,11 +84,6 @@ First, we set up our directory paths. You can chain the output of one function t
     extract_path = [ parent_path 'extracted\'];
     mkdir(extract_path); mkdir(raw_path);
 
-.. note::
-
-    The term "parameter" throughout this guide refers to the inputs to each function.
-    For example, running "help convertScanImageTiffToVolume" in the command window will
-    show to you and describe the parameters of that function.
 
 This is all you need to start processing your data. Actually, it's quite more than you need.
 
@@ -152,4 +150,30 @@ We see that there are 30 datasets corresponding to each of our Z-planes, but no 
 
 - **Groups**: h5 files can be thought of like directories where a 3D time-series is self contained within its own folder (or group).
 - **Attributes**: Attributes are special "tags" attached to a group. This is where we store metadata associated with each group and dataset. The result of calling `get_metadata(raw_path)` (see :ref:`scanimage metadata` for more information about the magic behind the scenes here).
+
+Evaluate output
+======================
+
+You should do some checks to make sure data was written properly before continuing. There are a few convenience functions
+to view a movie provided in the pipeline. Below is an example:
+
+.. code-block:: MATLAB
+
+    %% View info about your newly extracted dataset
+    h5files = dir([extraction_path '*.h5']);
+    h5name = fullfile(extraction_path, h5files(1).name);
+    dataset_path = sprintf('/extraction/plane_%d', plane);
+    has_mc(h5name)
+    data = h5read( ...
+        h5name, ... % filename
+        dataset_path, ... % dataset location
+        [1, 1, frame_start], ... % start index for each dimension [X,Y,T]
+        [Inf, Inf,  frame_end - frame_start + 1] ... % count for each dimension [X,Y,T]
+        );
+
+     figure;
+     for x = 1:size(data, 3)
+         imshow(data(236:408, 210:377, x), []);
+         title(sprintf('Frame %d', start_frame + x - 1));
+     end
 

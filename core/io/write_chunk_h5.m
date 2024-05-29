@@ -1,5 +1,5 @@
-function write_chunk_h5(file,Y_in, chunk, dataset_name)
-if ~exist('dataset_name','var') || isempty(dataset_name)dataset_name = '/extracted';end
+function write_chunk_h5(file, Y_in, chunk, dataset_name)
+if ~exist('dataset_name','var') || isempty(dataset_name);dataset_name = '/mov';end
 if ~exist('chunk','var') || isempty(chunk) chunk = 2000; end
 keep_reading = true;
 cl = class(Y_in);
@@ -16,8 +16,8 @@ else
     end
     sizY(end) = sizY(end)-1;
 end
-[pathstr, name, ~] = fileparts(file);
-h5_filename = [pathstr,'/',name,'.h5'];
+
+h5_filename = file;
 h5create(h5_filename,dataset_name,[sizY(1:nd),Inf],'Chunksize',[sizY(1:nd),min(chunk,sizY(end))],'Datatype',cl);
 h5write(h5_filename,dataset_name,Y_in,[ones(1,nd),1],sizY);
 cnt = sizY(end);

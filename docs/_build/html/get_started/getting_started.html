@@ -30,6 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+    <link rel="stylesheet" type="text/css" href="../_static/caiman_matlab.css?v=8c8b7c0d" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
@@ -447,7 +448,6 @@ MATLAB path. If an error is encountered, such as:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">parentpath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;C:\Users\RBO\Documents\data\bi_hemisphere\&#39;</span><span class="p">;</span><span class="w"> </span><span class="c">% outer directory</span>
 <span class="n">raw_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;raw\&#39;</span><span class="p">];</span><span class="w"> </span><span class="c">% raw .tiff files live here</span>
 <span class="n">extract_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">parentpath</span><span class="w"> </span><span class="s">&#39;extracted\&#39;</span><span class="p">];</span><span class="w"> </span><span class="c">% re-assembled 4D volumetric time-series live here</span>
-<span class="nb">mkdir</span><span class="p">(</span><span class="n">extract_path</span><span class="p">);</span><span class="w"> </span><span class="nb">mkdir</span><span class="p">(</span><span class="n">raw_path</span><span class="p">);</span><span class="w">  </span><span class="c">% create these paths</span>
 </pre></div>
 </div>
 <p>This produces a nicely organized output structure:</p>

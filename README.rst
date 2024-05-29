@@ -14,6 +14,22 @@ Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files. Howev
 first step of this pipeline which converts the multi-ROI .tiff into a 4D volumetric time-series
 requires scanimage .tiff files.
 
+=============
+Quickstart
+=============
+
+The easiest way to get started with the pipeline is to follow the LBM_demo_pipeline script.
+
+Pipeline Steps
+*****************
+
+There are 4 core steps in this pipeline:
+
+:func:`convertScanImageTiffToVolume()`
+:func:`motionCorrectPlane()`
+:func:`segmentPlane()`
+:func:`collatePlane()`
+
 Requirements
 =============
 

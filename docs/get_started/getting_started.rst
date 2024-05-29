@@ -98,7 +98,6 @@ It is helpful to first set-up directories where youd like your results to go. Ea
     parentpath = 'C:\Users\RBO\Documents\data\bi_hemisphere\'; % outer directory
     raw_path = [ parentpath 'raw\']; % raw .tiff files live here
     extract_path = [ parentpath 'extracted\']; % re-assembled 4D volumetric time-series live here
-    mkdir(extract_path); mkdir(raw_path);  % create these paths
 
 This produces a nicely organized output structure:
 

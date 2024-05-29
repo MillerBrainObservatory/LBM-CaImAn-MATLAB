@@ -30,6 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+    <link rel="stylesheet" type="text/css" href="../_static/caiman_matlab.css?v=8c8b7c0d" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
@@ -368,12 +369,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="core-functions">
-<h1>Core Functions<a class="headerlink" href="#core-functions" title="Link to this heading">#</a></h1>
-<dl class="mat function">
-<dt class="sig sig-object mat" id="assembleCorrectedROITiff">
-<span class="sig-name descname"><span class="pre">assembleCorrectedROITiff</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#assembleCorrectedROITiff" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
+<span id="core"></span><h1>Core Functions<a class="headerlink" href="#core-functions" title="Link to this heading">#</a></h1>
 <dl class="mat function">
 <dt class="sig sig-object mat" id="convertScanImageTiffToVolume">
 <span class="sig-name descname"><span class="pre">convertScanImageTiffToVolume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data_path</span></em>, <em class="sig-param"><span class="pre">save_path</span></em>, <em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convertScanImageTiffToVolume" title="Link to this definition">#</a></dt>
@@ -501,6 +497,9 @@ of 24 cores.</p>
 </dd>
 <dt><strong>end_plane</strong><span class="classifier">double, integer, positive</span></dt><dd><p>The ending plane index for processing. Must be greater than or equal to
 start_plane.</p>
+</dd>
+<dt><strong>cnmf_options</strong><span class="classifier">dictionary, mapping</span></dt><dd><p>key:value pairs of all of your CNMF parameters.
+See the example parameters in the LBM_demo_pipeline.</p>
 </dd>
 </dl>
 </dd>
