@@ -375,6 +375,7 @@ document.write(`
                   
   <section id="segmentation-and-deconvolution">
 <span id="segmentation-deconvolution"></span><h1>Segmentation and Deconvolution<a class="headerlink" href="#segmentation-and-deconvolution" title="Link to this heading">#</a></h1>
+<p>Function for this step: <a class="reference internal" href="../api/core.html#segmentPlane" title="segmentPlane"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">segmentPlane()</span></code></a></p>
 <p>The flourescence of the proteins in our neurons is <strong>correlated</strong> with how active the neuron is.
 Turning this flourescence into “spikes” relies on several mathmatical operations to:</p>
 <ul class="simple">
@@ -533,8 +534,9 @@ of the <em>number of frames</em>.</p>
 <li><p>Normal Cumulative Distribution function, input = -min_SNR.</p></li>
 <li><p>Evaluate the likelihood of observing traces given the distribution of noise.</p></li>
 </ul>
+</section>
 <section id="output">
-<h3>Output<a class="headerlink" href="#output" title="Link to this heading">#</a></h3>
+<h2>Output<a class="headerlink" href="#output" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p>The CNMF output yields “raw” traces (“y”). These raw traces are noisy and jagged and must be denoised/deconvolved.</p></li>
 <li><p>Another term for this is “detrending”, removing non-stationary variability from the signal</p></li>
@@ -545,7 +547,6 @@ of the <em>number of frames</em>.</p>
 <p class="admonition-title">Important</p>
 <p>The optional output YrA is equal to Y-C, representing the original raw trace.</p>
 </div>
-</section>
 </section>
 <section id="deconvolution">
 <h2>Deconvolution<a class="headerlink" href="#deconvolution" title="Link to this heading">#</a></h2>
@@ -566,6 +567,8 @@ of the <em>number of frames</em>.</p>
 <section id="results">
 <h2>Results<a class="headerlink" href="#results" title="Link to this heading">#</a></h2>
 <p>The output of the analysis includes several key variables that describe the segmented neuronal components and their corresponding activities. Below is a description of each output variable, along with an example of how to use them and what they represent.</p>
+<section id="output-variables">
+<h3>Output Variables<a class="headerlink" href="#output-variables" title="Link to this heading">#</a></h3>
 <ol class="arabic">
 <li><dl>
 <dt><strong>T_all</strong>: Neuronal time-series</dt><dd><ul class="simple">
@@ -687,6 +690,7 @@ of the <em>number of frames</em>.</p>
 </div>
 </section>
 </section>
+</section>
 
 
                 </article>
@@ -744,12 +748,13 @@ of the <em>number of frames</em>.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example">Example</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#atoac">AtoAc</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#component-validation">Component Validation</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#output">Output</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#component-validation">Component Validation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#output">Output</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deconvolution">Deconvolution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#results">Results</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#output-variables">Output Variables</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deconvolution">Deconvolution</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#results">Results</a></li>
 </ul>
   </nav></div>
 

@@ -374,6 +374,11 @@ document.write(`
                   
   <section id="pre-processing">
 <h1>Pre-Processing<a class="headerlink" href="#pre-processing" title="Link to this heading">#</a></h1>
+<p>Function for this step: <a class="reference internal" href="../api/core.html#convertScanImageTiffToVolume" title="convertScanImageTiffToVolume"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">convertScanImageTiffToVolume()</span></code></a></p>
+<p>Utility functions for this step:</p>
+<p><span class="xref std std-ref">planeToH5</span>: Quickly view a movie of any plane.
+<span class="xref std std-ref">read_H5_metadata</span>: View metadata associated with an extracted file.
+<span class="xref std std-ref">get_center_indices</span>: Get the Y,X index of a box of size <cite>pixels</cite> created around the center point of an image.</p>
 <p>Before beginning pre-processing, follow setup steps in <a class="reference internal" href="../get_started/getting_started.html#getting-started"><span class="std std-ref">Getting Started</span></a> to make sure the pipeline and dependencies are installed properly.
 After that, review <a class="reference internal" href="parameters.html#parameters"><span class="std std-ref">Parameters</span></a> to understand the general usage of each function going foreward.</p>
 <p>See <a class="reference internal" href="troubleshooting.html#troubleshooting"><span class="std std-ref">Troubleshooting</span></a> for common issues you may encounter along the way.</p>
@@ -515,7 +520,47 @@ After successfully running <a class="reference internal" href="../api/core.html#
 </section>
 <section id="evaluate-output">
 <h2>Evaluate output<a class="headerlink" href="#evaluate-output" title="Link to this heading">#</a></h2>
-<p>You should do some checks to make sure data was written properly before continuing. There are a few convenience functions
+<p>In your <cite>save_path</cite>, you will see a newly created <cite>figures</cite> folder.</p>
+<p>In this folder is a close-up of the brightest image in every plane for a random frame. Each
+image shoes the neuron before and after scan-correction. This lets you compare planes, validate the correct
+scan-phase offset value (usually 1, 2 or 3 pixels).</p>
+<p>Lets see the first z-plane:</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/plane_11.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/plane_11.png"
+                     class=""
+                     width="1440"
+                     height="auto"
+                     alt=""/>
+                </a><p>Lets see the tenth z-plane:</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/plane_101.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/plane_101.png"
+                     class=""
+                     width="1440"
+                     height="auto"
+                     alt=""/>
+                </a><p>So far so good, but as we approach the end-plane (by order, not by depth):</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/plane_301.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/plane_301.png"
+                     class=""
+                     width="1440"
+                     height="auto"
+                     alt=""/>
+                </a><p>You should do some checks to make sure data was written properly before continuing. There are a few convenience functions
 to view a movie provided in the pipeline. Below is an example:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="c">%% View info about your newly extracted dataset</span>
 <span class="n">h5files</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">dir</span><span class="p">([</span><span class="n">extraction_path</span><span class="w"> </span><span class="s">&#39;*.h5&#39;</span><span class="p">]);</span>

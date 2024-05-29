@@ -47,6 +47,8 @@ The funcion :func:`get_metadata` takes as input a path to any `ScanImage`_ tiff 
 
 
 
+.. thumbnail:: ../_static/_images/objective_resolution.png
+   :width: 1440
 
 .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
 .. _BigTiffSpec: _https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification

@@ -2,6 +2,15 @@
 Pre-Processing
 #######################################
 
+Function for this step: :func:`convertScanImageTiffToVolume`
+
+Utility functions for this step:
+
+:ref:`planeToH5`: Quickly view a movie of any plane.
+:ref:`read_H5_metadata`: View metadata associated with an extracted file.
+:ref:`get_center_indices`: Get the Y,X index of a box of size `pixels` created around the center point of an image.
+
+
 Before beginning pre-processing, follow setup steps in :ref:`getting started` to make sure the pipeline and dependencies are installed properly.
 After that, review :ref:`parameters` to understand the general usage of each function going foreward.
 
@@ -153,6 +162,27 @@ We see that there are 30 datasets corresponding to each of our Z-planes, but no 
 
 Evaluate output
 ======================
+
+In your `save_path`, you will see a newly created `figures` folder.
+
+In this folder is a close-up of the brightest image in every plane for a random frame. Each
+image shoes the neuron before and after scan-correction. This lets you compare planes, validate the correct
+scan-phase offset value (usually 1, 2 or 3 pixels).
+
+Lets see the first z-plane:
+
+.. thumbnail:: ../_static/_images/offset/plane_1.png
+   :width: 1440
+
+Lets see the tenth z-plane:
+
+.. thumbnail:: ../_static/_images/offset/plane_10.png
+   :width: 1440
+
+So far so good, but as we approach the end-plane (by order, not by depth):
+
+.. thumbnail:: ../_static/_images/offset/plane_30.png
+   :width: 1440
 
 You should do some checks to make sure data was written properly before continuing. There are a few convenience functions
 to view a movie provided in the pipeline. Below is an example:

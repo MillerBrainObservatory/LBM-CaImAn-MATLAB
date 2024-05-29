@@ -3,6 +3,8 @@
 Segmentation and Deconvolution
 ###########################################
 
+Function for this step: :func:`segmentPlane`
+
 The flourescence of the proteins in our neurons is **correlated** with how active the neuron is.
 Turning this flourescence into "spikes" relies on several mathmatical operations to:
 
@@ -28,7 +30,7 @@ Before running segmentation, make sure you:
 
 
 Source Extraction
-==================
+=====================
 
 :func:`segmentPlane` contains the bulk of the computational complexity in this pipeline and will take significantly longer than the previous steps.
 
@@ -163,7 +165,8 @@ And thus the general process of validating neuronal components is as follows:
 - Evaluate the likelihood of observing traces given the distribution of noise.
 
 Output
-************************************
+==============
+
 - The CNMF output yields "raw" traces ("y"). These raw traces are noisy and jagged and must be denoised/deconvolved.
 - Another term for this is "detrending", removing non-stationary variability from the signal
 - Each raw trace is deconvolved via "constrained foopsi," which yields the decay (and for p=2, rise) coefficients ("g") and the vector of "spiking" activity ("S") that best explain the raw trace. S should ideally be ~90% zeros.
@@ -200,7 +203,7 @@ Results
 The output of the analysis includes several key variables that describe the segmented neuronal components and their corresponding activities. Below is a description of each output variable, along with an example of how to use them and what they represent.
 
 Output Variables
-----------------
+*************************
 
 1. **T_all**: Neuronal time-series
     - **Description**: `T_all` contains the fluorescence time-series data for each detected neuronal component. Each row corresponds to a different neuron, and each column corresponds to a different time point.

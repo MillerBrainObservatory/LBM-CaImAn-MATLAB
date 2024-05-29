@@ -1,5 +1,8 @@
 Piecewise-Rigid Motion-Correction
 ================================================================
+
+Function for this step: :func:`motionCorrectPlane`
+
 For a quick demo on how to run motion correction, see the demo_registration.m script.
 
 .. note::
@@ -12,7 +15,6 @@ Natural movement by the animal during experimental tasks can cause our images sp
 on the type of task the animal is performing.
 
 For this reason, it is *very* important for the researcher to verify that any motion artifacts in the movie are removed before moving onto any subsequent computations.
-
 
 Rigid vs Non-Rigid
 *******************
