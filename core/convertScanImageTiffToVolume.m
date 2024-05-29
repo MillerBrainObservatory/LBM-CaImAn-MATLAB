@@ -116,7 +116,7 @@ num_frames_total = metadata.num_frames_total;
 metadata.dataset_name = dataset_name;
 
 try
-    fprintf(fid, 'Processing %d files.\n', length(files));
+    fprintf(fid, '%s : Processing %d file(s) with %d planes.\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), length(files), num_planes);
     for i = 1:length(files)
         tfile = tic;
         hTif = scanimage.util.ScanImageTiffReader(fullfile(data_path, files(i).name));
@@ -135,7 +135,7 @@ try
         % start_y_indices = (0:metadata.num_strips-1) * (raw_y + metadata.num_lines_between_scanfields) + t_top + 1;
         % end_y_indices = start_y_indices + raw_y - t_top - t_bottom - 1;
         % t = squeeze(Aout(start_y_indices:end_y_indices,:,2,:));
-        
+
         z_timeseries = zeros(trimmed_y, trimmed_x * metadata.num_strips, num_planes, 'like', Aout);
         for plane_idx = 1:num_planes
             tplane = tic;
@@ -143,14 +143,14 @@ try
             plane_fullfile = sprintf("%s/extracted_%s.h5", save_path, p_str);
             if isfile(plane_fullfile)
                 if overwrite
-                    fprintf(fid, "Deleting file: %s\n", plane_fullfile);
+                    fprintf(fid, "%s : Deleting %s\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS') ,plane_fullfile);
                     delete(plane_fullfile);
                 else
                     fprintf("Not Implemented Error:\nSave_file %s already exists\nUser set overwrite = 0.\nReturning without extracting data.\nTo extract this dataset, change the save_path, partial overwrites are not implemented.", plane_fullfile);
                     return
                 end
             end
-            
+
             cnt = 1;
             offset_y = 0;
             offset_x = 0;
@@ -180,7 +180,7 @@ try
                     img_frame = z_timeseries(:,:,2);
                     [r, c] = find(img_frame == max(img_frame(:)));
                     [yind, xind] = get_central_indices(z_timeseries(:,:,2), r, c, 30);
-                    
+
                     f = figure('Color', 'white', 'Visible', 'off', 'Position', [100, 100, 1400, 600]); % Adjust figure size as needed
                     sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'k');
                     tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact'); % Use 'compact' to minimize extra space
@@ -198,11 +198,11 @@ try
                 end
             end
             write_chunk_h5(plane_fullfile, z_timeseries, size(z_timeseries,3), '/Y');
-            writeMetadataToAttribute(metadata, plane_fullfile, '/Y');
-            fprintf(fid, "Plane %d of %d processed: %.2f seconds\n", i, length(files), toc(tplane));
-        end  
+            write_metadata_h5(metadata, plane_fullfile, '/Y');
+            fprintf(fid, "%s : Plane %d processed in %.2f seconds\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), plane_idx, toc(tplane));
+        end
     end
-    fprintf(fid, "Processing complete. Time: %.2f seconds\n", i, length(files), toc(tfile));
+    fprintf(fid, "%s : Processing complete. Time: %.3f minutes\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tfile)/60);
 catch ME
     if exist('log_full_path', 'var') && isfile(log_full_path)
         fprintf('Deleting errored logfile: %s\n', log_full_path);

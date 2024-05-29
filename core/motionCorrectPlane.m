@@ -72,7 +72,7 @@ if isempty(files)
     error('No suitable data files found in: \n  %s', data_path);
 end
 
-log_file_name = sprintf("%s_extraction", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
+log_file_name = sprintf("%s_extraction", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 log_full_path = fullfile(save_path, log_file_name);
 fid = fopen(log_full_path, 'w');
 if fid == -1
@@ -80,20 +80,22 @@ if fid == -1
 else
     fprintf('Log file created: %s\n', log_full_path);
 end
-closeCleanupObj = onCleanup(@() fclose(fid));
+% closeCleanupObj = onCleanup(@() fclose(fid));
 
 %% Pull metadata from attributes attached to this group
 num_cores = max(num_cores, 23);
-fprintf(fid, '%s Beginning processing routine with %d cores...\n', datetime, num_cores);
+fprintf(fid, '%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); tall=tic;
 for plane_idx = start_plane:end_plane
-
-    fprintf(fid,'%s : BEGINNING PLANE %u\n', datetime("now"), plane_idx);
+    fprintf(fid, '%s : Beginning plane %d\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_idx);
 
     z_str = sprintf('plane_%d', plane_idx);
     plane_name = sprintf("%s/extracted_%s.h5", data_path, z_str);
-    if isfile(plane_name)
+    plane_name_save = sprintf("%s/motion_corrected_%s.h5", save_path, z_str);
+    if isfile(plane_name_save)
+        fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
         if overwrite
-            delete(plane_name)
+            fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+            delete(plane_name_save)
         end
     end
 
@@ -105,6 +107,10 @@ for plane_idx = start_plane:end_plane
         metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
     end
 
+    if isempty(gcp('nocreate')) && num_cores > 1
+        parpool(num_cores);
+    end
+
     pixel_resolution = metadata.pixel_resolution;
     max_shift = round(20/pixel_resolution);
 
@@ -112,18 +118,11 @@ for plane_idx = start_plane:end_plane
         error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
     end
 
-    fprintf(fid, 'Loading plane  %d with %d workers/cores.\n', plane_idx, num_cores);
-
     Y = h5read(plane_name, dataset_name);
     Y = Y - min(Y(:));
     volume_size = size(Y);
     d1 = volume_size(1);
     d2 = volume_size(2);
-
-    fprintf(fid, '%s Beginning processing for plane %d with %d matlab workers.\n', datetime, plane_idx, num_cores);
-    if isempty(gcp('nocreate')) && num_cores > 1
-        parpool(num_cores);
-    end
 
     %% Motion correction: Create Template
     options_rigid = NoRMCorreSetParms(...
@@ -136,15 +135,16 @@ for plane_idx = start_plane:end_plane
         'correct_bidir',false... % Correct bidirectional scanning
         );
 
-    [M1,shifts1,~,~] = normcorre_batch(Y, options_rigid);
-    date = datetime("now");
-    format_spec = '%s Rigid MC Complete, beginning non-rigid MC...\n';
-    fprintf(fid, format_spec, date);
+    % start timer for registration after parpool to avoid inconsistent
+    % pool startup times.
+    t_rigid=tic;
+    [M1,shifts_template,~,~] = normcorre_batch(Y, options_rigid);
+    fprintf(fid, "%s : Rigid registration complete. Elapsed time: %.3f minutes\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_rigid)/60);
 
     % create the template using X/Y shift displacements
-    shifts_r = squeeze(cat(3,shifts1(:).shifts));
-    shifts_v = movvar(shifts_r, 24, 1);
-    [srt, minv_idx] = sort(shifts_v, 120);
+    shifts_template = squeeze(cat(3,shifts_template(:).shifts));
+    shifts_v = movvar(shifts_template, 24, 1);
+    [~, minv_idx] = sort(shifts_v, 120);
     best_idx = unique(reshape(minv_idx, 1, []));
     template_good = mean(M1(:,:,best_idx), 3);
 
@@ -160,44 +160,24 @@ for plane_idx = start_plane:end_plane
         );
 
     % DFT subpixel registration - results used in CNMF
-    [M2, shifts2, ~, ~] = normcorre_batch(Y, options_nonrigid, template_good);
-    shifts2 = squeeze(cat(3,shifts2(:).shifts));
-    shifts_template = squeeze(cat(3,shifts1(:).shifts));
+    t_nonrigid=tic;
+    fprintf(fid, "%s : Non-rigid registration complete. Elapsed time: %.3f minutes\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_nonrigid)/60);
+    [M2, shifts_nr, ~, ~] = normcorre_batch(Y, options_nonrigid, template_good);
+    shifts_nr = squeeze(cat(3,shifts_nr(:).shifts));
+    t_save=tic;
 
-    write_chunk_h5(plane_name, M2, size(z_timeseries,3), '/mov');
-    write_chunk_h5(plane_name, shifts2, size(shifts2,2), '/shifts');
-    write_chunk_h5(plane_name, shifts_template, size(shifts_template, 2), '/template');
+    write_chunk_h5(plane_name_save, M2, size(M2,3), '/mov');
+    write_chunk_h5(plane_name_save, shifts_nr, size(shifts_nr,2), '/shifts');
+    write_chunk_h5(plane_name_save, shifts_template, size(shifts_template,2), '/template');
+    write_metadata_h5(metadata, plane_name_save, '/mov');
+    fprintf(fid, "%s : Data saved. Elapsed time: %.2f seconds\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_save)/60);
 
-    clear M* c* shifts* template*;
-
-    disp('Data saved, beginning next plane...');
-    date = datetime("now");
-    format_spec = '%s Motion Correction Complete. Beginning next plane...\n';
-    fprintf(fid, format_spec, date);
-end
-
-disp('All planes processed...');
-t = toc;
-disp(['Routine complete. Total run time ' num2str(t./3600) ' hours.']);
-date = datetime("now");
-format_spec = '%s Routine complete.\n';
-fprintf(fid, format_spec, date);
-end
-
-function write_dataset(filename, location, data, fid)
-try
-    h5create(filename, location, size(data), 'DatatypeS', 'single')
-catch ME
-    if strcmp(ME.identifier, 'MATLAB:imagesci:h5create:datasetAlreadyExists')
-        fprintf(fid, "%s : Skipping dataset creation.\n", location);
-    else
-        rethrow(ME);
+    clear M1 M2 shifts template;
+    try
+        fprintf(fid, "%s : Motion correction for plane %d complete. Time: %.2f minutes. Beginning next plane...\n", datestr(datetime('now'), 'yyyy_mm_dd HH:MM:SS'), plane_idx, toc(t_rigid)/60);
+    catch ME
+        warning("File ID, no longer valid: %d", fid);
+        return;
     end
-end
-try
-    h5write(filename, location, data);
-    fprintf(fid, "%s : Dataset written\n", location);
-catch ME
-    disp(ME)
-end
+fprintf(fid, "%s : Processing complete. Time: %.2f hours\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tall)/3600);
 end

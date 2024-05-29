@@ -1,4 +1,4 @@
-function [] = collatePlanes(dataPath, data, metadata, startDepth)
+function [] = collatePlanes(dataPath, metadata)
 % COLLATEPLANES Analyzes and processes imaging data by extracting and correcting features across multiple planes.
 %
 % This function analyzes imaging data from a specified directory, applying
@@ -57,8 +57,6 @@ min_snr = metadata.min_snr;
 frameRate = metadata.frame_rate;
 FOVx = metadata.fovx;
 FOVy = metadata.fovy;
-
-min_snr = metadata.min_snr;
 
 tau = ceil(7.5/pixel_resolution);
 

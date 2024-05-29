@@ -51,7 +51,7 @@ function [offsets] = calculateZOffset(datapath, metadata, startPlane, endPlane, 
 %
 % See also LOAD, MAX, IND2SUB, XCORR2, GINPUT, NANMEAN
 
-load([datapath 'pollen_sample_xy_calibration.mat'])
+load(fullfile(datapath, 'pollen_sample_xy_calibration.mat'));
 
 pixel_resolution = metadata.pixel_resolution;
 
@@ -63,7 +63,7 @@ ddy = diff(dx);
 scale_fact = 10;
 nsize = ceil(scale_fact/pixel_resolution);
 
-offsets = zeros(data.num_planes, 2);
+offsets = zeros(metadata.num_planes, 2);
 
 for curr_plane = startPlane:endPlane
 

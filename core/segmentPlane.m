@@ -6,17 +6,16 @@ function segmentPlane(data_path, save_path, varargin)
 % The processing is conducted for specified planes, and the results
 % are saved to disk.
 %
+% MOTIONCORRECTPLANE Perform rigid and non-rigid motion correction on imaging data.
+%
 % Parameters
 % ----------
 % data_path : char
 %     Path to the directory containing the files extracted via convertScanImageTiffToVolume.
 % save_path : char
 %     Path to the directory to save the motion vectors.
-% data_input_group : string, optional
+% dataset_name : string, optional
 %     Group path within the hdf5 file that contains raw data.
-%     Default is 'registration'.
-% data_output_group : string, optional
-%     Group path within the hdf5 file to save the registered data.
 %     Default is 'registration'.
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
@@ -31,52 +30,25 @@ function segmentPlane(data_path, save_path, varargin)
 % end_plane : double, integer, positive
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
-%
-% Returns
-% -------
-% None
-%
-% Notes
-% -----
-% - Outputs are saved to disk, including:
-% - T_keep: neuronal time series [Km, T] (single)
-% - Ac_keep: neuronal footprints [2*tau+1, 2*tau+1, Km] (single)
-% - C_keep: denoised time series [Km, T] (single)
-% - Km: number of neurons found (single)
-% - Cn: correlation image [x, y] (single)
-% - b: background spatial components [x*y, 3] (single)
-% - f: background temporal components [3, T] (single)
-% - acx: centroid in x direction for each neuron [1, Km] (single)
-% - acy: centroid in y direction for each neuron [1, Km] (single)
-% - acm: sum of component pixels for each neuron [1, Km] (single)
-% - The function handles large datasets by processing each plane serially.
-% - The segmentation settings are based on the assumption of 9.2e4 neurons/mm^3
-%   density in the imaged volume.
-%
-% See also ADDPATH, FULLFILE, DIR, LOAD, SAVEFAST
-
 p = inputParser;
 addRequired(p, 'data_path', @ischar);
 addRequired(p, 'save_path', @ischar);
-addParameter(p, 'data_input_group', "/extraction", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
-addParameter(p, 'data_output_group', "/segmentation", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addParameter(p, 'dataset_name', "/mov", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
-addParameter(p, 'num_cores', 1, @(x) isnumeric(x) && x > 0 && x <= 24);
+addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
 addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
 parse(p, data_path, save_path, varargin{:});
 
 data_path = p.Results.data_path;
 save_path = p.Results.save_path;
-data_input_group = p.Results.data_input_group;
-data_output_group = p.Results.data_output_group;
-
+dataset_name = p.Results.dataset_name;
 debug_flag = p.Results.debug_flag;
+overwrite = p.Results.overwrite;
 num_cores = p.Results.num_cores;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
-overwrite = p.Results.overwrite;
 
 % give access to CaImAn files
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
@@ -84,88 +56,72 @@ addpath(genpath(fullfile(currpath, '../packages/CaImAn_Utilities/CaImAn-MATLAB-m
 addpath(genpath(fullfile(currpath, './utils')));
 addpath(genpath(fullfile(currpath, './io')));
 
+if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", data_path); end
+if debug_flag == 1; dir([data_path, '*.tif']); return; end
+
 if isempty(save_path)
+    warning("No save_path given. Saving data in data_path: %s\n", data_path);
     save_path = data_path;
 end
 
-data_path = fullfile(data_path);
-if ~isfolder(data_path)
-    error("Filepath %s does not exist", data_path);
-end
+fig_save_path = fullfile(save_path, "figures");
+if ~isfolder(fig_save_path); mkdir(fig_save_path); end
 
-if debug_flag == 1
-    dir([data_path, '*.tif']);
-    return;
-end
-
-if ~isfolder(save_path)
-    fprintf('Given savepath %s does not exist. Creating this directory...\n', save_path);
-    mkdir(save_path);
-end
-
-fig_save_path = fullfile(save_path, 'figures');
-if ~isfolder(fig_save_path)
-    mkdir(fig_save_path);
-end
-
-files = dir(fullfile(data_path, '*.h5'));
+files = dir([fullfile(data_path, '*.h*')]);
 if isempty(files)
-    error('No suitable h5 files found in: \n  %s', data_path);
+    error('No suitable data files found in: \n  %s', data_path);
 end
 
-h5_fullfile = fullfile(files(1).folder, files(1).name);
-h5_savefile = fullfile(save_path, 'segmentation.h5');
-
-%% TODO!! Fix this
-metadata = read_h5_metadata(h5_fullfile, '/extraction');
-
-num_planes_to_process = end_plane-start_plane+1;
-assert(num_planes_to_process <= metadata.num_planes);
-
-if start_plane == 0 || size(start_plane, 1) == 0
-    start_plane = 1;
-end
-if ~(metadata.num_planes >= end_plane)
-    error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
-end
-
-if num_cores == 0 || size(num_cores,1) == 0
-    num_cores = 16;
-end
-
-log_file_name = sprintf("%s_segmentation", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
-log_full_path = fullfile(data_path, log_file_name);
+log_file_name = sprintf("%s_segmentation", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+log_full_path = fullfile(save_path, log_file_name);
 fid = fopen(log_full_path, 'w');
-fprintf(fid, "Beginning processing with %d cores on %d planes: %d - %d\n...", num_planes_to_process, start_plane, end_plane);
+if fid == -1
+    error('Cannot create or open log file: %s', log_full_path);
+else
+    fprintf('Log file created: %s\n', log_full_path);
+end
+% closeCleanupObj = onCleanup(@() fclose(fid));
 
-dataset_paths = {'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm'};
-plane_map = dictionary; tic;
+%% Pull metadata from attributes attached to this group
+num_cores = max(num_cores, 23);
+fprintf(fid, '%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); tall=tic;
+t_all=tic;
 for plane_idx = start_plane:end_plane
-    fprintf(fid,'%s : BEGINNING PLANE %u\n', datetime("now"),plane_idx);
-
-    pst = sprintf('plane_%d', plane_idx);
-    input_path = sprintf('%s/%s', data_input_group, pst);
-    output_path = sprintf('%s/%s', data_output_group, pst);
-
-    fprintf(fid, '%s : Reading in data / metadata...\n',datetime("now"));
-    
-    poolobj = gcp('nocreate'); % create a parallel pool
-    if isempty(poolobj)
-        poolobj = parpool('local',num_cores);
-        tmpDir = tempname();
-        mkdir(tmpDir);
-        poolobj.Cluster.JobStorageLocation = tmpDir;
-    else
-        numworkers = poolobj.NumWorkers;
-        disp(['Continuing with existing pool of ' num2str(numworkers) '.'])
+    fprintf(fid, '%s : Beginning plane %d\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_idx);
+    z_str = sprintf('plane_%d', plane_idx);
+    plane_name = sprintf("%s/motion_corrected_%s.h5", data_path, z_str);
+    plane_name_save = sprintf("%s/segmented_%s.h5", save_path, z_str);
+    if isfile(plane_name_save)
+        fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_save_name);
+        if overwrite
+            fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_save_name);
+            delete(plane_name_save)
+        else
+            fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_save_name);
+        end
+    end
+    h5_data = h5info(plane_name, dataset_name);
+    metadata = struct();
+    for k = 1:numel(h5_data.Attributes)
+        attr_name = h5_data.Attributes(k).Name;
+        attr_value = h5readatt(plane_name, sprintf("/%s",h5_data.Name), attr_name);
+        metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
     end
 
+    % if isempty(gcp('nocreate')) && num_cores > 1
+    %     parpool(num_cores);
+    % end
+
+    pixel_resolution = metadata.pixel_resolution;
+    if ~(metadata.num_planes >= end_plane)
+        error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
+    end
+
+    data = h5read(plane_name, dataset_name);
+    data = data - min(data(:));
+    
     %% CaImAn segmentation
     td_start = tic;
-
-    data = h5read(h5_fullfile, sprintf("%s/Y", input_path));
-    data = data - min(data(:));
-
     pixel_resolution = metadata.pixel_resolution;
     volume_rate = metadata.frame_rate;
     [d1,d2,T] = size(data);
@@ -237,7 +193,7 @@ for plane_idx = start_plane:end_plane
     %% F.O. 05.16.24: BREAKING - remove parallel eval on memmapped file
     [A,b,C,f,S,P,~,YrA] = run_CNMF_patches(data,K,patches,tau,p,options);
     fprintf(fid, '%s : Initialized CNMF patches complete.  Process took: %.2f seconds\Classifying components ...',datetime("now"), toc(t_cnmf));
-    
+
     t_class = tic;
     [rval_space,rval_time,max_pr,sizeA,keep0,~,traces] = classify_components_jeff(data,A,C,b,f,YrA,options);
     fprintf(fid, '%s : Classification complete. Process took: %.2f seconds\Running spatial/temporal acceptance tests ... to dF/F ...', datetime("now"), toc(t_class));
@@ -274,7 +230,7 @@ for plane_idx = start_plane:end_plane
         [T_keep,F0] = detrend_df_f(A_keep,[b,ones(d1*d2,1)],C_keep,[f;-min(min(min(data)))*ones(1,T)],R_keep,options);
     end
     fprintf(fid, '%s : Traces detrended. Process took: %.2f seconds\nConverting to sparse matrix ...', datetime("now"), toc(t_detrend));
-    
+
     % Convert sparse A matrix to full 3D matrix
     t_ac = tic;
     [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2);  % Ac_keep has dims. [2*tau+1,2*tau+1,K] where each element Ki is a 2D map centered on centroid of component acx(Ki),axy(Ki), and acm(Ki) = sum(sum(Ac_keep(:,:,Ki))
@@ -290,24 +246,28 @@ for plane_idx = start_plane:end_plane
     % Save data
     t_save = tic;
 
-    write_dataset(h5_savefile, sprintf('%s/T_keep', output_path), T_keep, fid);
-    write_dataset(h5_savefile, sprintf('%s/Ac_keep', output_path), Ac_keep, fid);
-    write_dataset(h5_savefile, sprintf('%s/C_keep', output_path), C_keep, fid);
-    write_dataset(h5_savefile, sprintf('%s/Km', output_path), Km, fid);
-    write_dataset(h5_savefile, sprintf('%s/rVals', output_path), rVals, fid);
-    write_dataset(h5_savefile, sprintf('%s/Ym', output_path), Ym, fid);
-    write_dataset(h5_savefile, sprintf('%s/Cn', output_path), Cn, fid);
-    write_dataset(h5_savefile, sprintf('%s/b', output_path), b, fid);
-    write_dataset(h5_savefile, sprintf('%s/f', output_path), f, fid);
-    write_dataset(h5_savefile, sprintf('%s/acx', output_path), acx, fid);
-    write_dataset(h5_savefile, sprintf('%s/acy', output_path), acy, fid);
-    write_dataset(h5_savefile, sprintf('%s/acm', output_path), acm, fid);
+    write_chunk_h5(plane_name_save, T_keep, 2000, '/T_keep');
+    write_chunk_h5(plane_name_save, Ac_keep, 2000, '/Ac_keep');
+    write_chunk_h5(plane_name_save, C_keep, 2000, '/C_keep');
+    write_chunk_h5(plane_name_save, Km, 2000, '/Km');
+    write_chunk_h5(plane_name_save, rVals, 2000, '/rVals');
+    write_chunk_h5(plane_name_save, Ym, 2000, '/Ym');
+    write_chunk_h5(plane_name_save, Cn, 2000, '/Cn');
+    write_chunk_h5(plane_name_save, b, 2000, '/b');
+    write_chunk_h5(plane_name_save, f, 2000, '/f');
+    write_chunk_h5(plane_name_save, acx, 2000, '/acx');
+    write_chunk_h5(plane_name_save, acy, 2000, '/acy');
+    write_chunk_h5(plane_name_save, acm, 2000, '/acm');
+
+    write_metadata_h5(metadata, plane_name_save, '/');
+    fprintf(fid, "%s : Data saved. Elapsed time: %.2f seconds\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_save)/60);
+
     % savefast(fullfile(save_path, ['caiman_output_plane_' num2str(plane_idx) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')
     fprintf(fid, '%s : Data saved. Process took: %.2f seconds\n', datetime("now"), toc(t_save));
     fprintf(fid, '%s : Plane complete. Process took: %.2f seconds\nBeginning next plane ...', datetime("now"), toc(td_start));
 end
 
-fprintf(fid, '%s : Routine complete. Total Completion time: %.2f hours\n', datetime("now"), toc(t_ac)./3600);
+fprintf(fid, '%s : Routine complete. Total Completion time: %.2f hours\n', datetime("now"), toc(t_all)./3600);
 end
 
 function [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2)
@@ -342,30 +302,3 @@ parfor ijk = 1:size(A_keep,2)
     Ac_keep(:,:,ijk) = single(AOIc);
 end
 end
-
-function write_dataset(filename, location, data, fid)
-%% TODO: test / clean / expand this
-try
-    h5create(filename, location, size(data), 'Datatype', 'single')
-catch ME
-    if strcmp(ME.identifier, 'MATLAB:imagesci:h5create:datasetAlreadyExists')
-        fprintf(fid, "%s : Skipping dataset creation.\n", location);
-    else
-        rethrow(ME);
-    end
-end
-try
-    h5write(filename, location, data);
-    fprintf(fid, "%s : Dataset written\n", location);
-catch ME
-    if strcmp(ME.identifier, 'MATLAB:imagesci:h5write:fullDatasetDataMismatch')
-        new_loc = [location '_1'];
-        fprintf(fid, "%s : Corrupt data, size mismatch, attempting to create new dataset at %s.\n", location, new_loc);
-        h5create(filename, new_loc, size(data), 'Datatype', 'single');
-        h5write(filename, new_loc, data);
-    else
-        rethrow(ME);
-    end
-end
-end
-
