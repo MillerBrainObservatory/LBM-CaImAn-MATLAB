@@ -15,9 +15,9 @@ A pipeline for processing light beads microscopy (LBM) datasets.
 
 For background, theory and design of LBM technology, see the reference `publication`_.
 
-
 Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files.
 
+See the `README`_ for pipeline requirements and algorithms.
 
 Requirements
 ------------

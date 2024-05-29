@@ -10,6 +10,7 @@ This section covers each step in the pipeline in more detail.
     :caption: User Guide:
 
     Pre_processing <pre_processing>
+    Registration <registration>
     Segmentation <segmentation>
     Axial Alignment <offset_correction>
     Metadata <metadata>
