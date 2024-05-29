@@ -1,10 +1,10 @@
+.. _metadata:
 
-##################
 ScanImage Metadata
 ##################
 
-As discussed in :ref:`pipeline step 1`, reconstructing an image from the ScanImage `.tiff` file is handled internally by the pipeline. This describes
-the metadata that hold all of the values used for that process.
+As discussed in :ref:`pre-processing`, reconstructing an image from the ScanImage `.tiff` file is handled internally by the pipeline.
+This describes the metadata that hold all of the values used for that process.
 
 The funcion :func:`get_metadata` takes as input a path to any `ScanImage`_ tiff file and returns the metadata.
 

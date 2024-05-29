@@ -16,7 +16,6 @@ function segmentPlane(data_path, save_path, varargin)
 %     Path to the directory to save the motion vectors.
 % dataset_name : string, optional
 %     Group path within the hdf5 file that contains raw data.
-%     Default is 'registration'.
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
@@ -30,6 +29,33 @@ function segmentPlane(data_path, save_path, varargin)
 % end_plane : double, integer, positive
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
+% cnmf_options : dictionary, mapping
+%     key:value pairs of all of your CNMF parameters.
+%     See the example parameters in the LBM_demo_pipeline.
+%
+% Returns
+% -------
+% None
+%
+% Notes
+% -----
+% - Outputs are saved to disk, including:
+% - T_keep: neuronal time series [Km, T] (single)
+% - Ac_keep: neuronal footprints [2*tau+1, 2*tau+1, Km] (single)
+% - C_keep: denoised time series [Km, T] (single)
+% - Km: number of neurons found (single)
+% - Cn: correlation image [x, y] (single)
+% - b: background spatial components [x*y, 3] (single)
+% - f: background temporal components [3, T] (single)
+% - acx: centroid in x direction for each neuron [1, Km] (single)
+% - acy: centroid in y direction for each neuron [1, Km] (single)
+% - acm: sum of component pixels for each neuron [1, Km] (single)
+% - The function handles large datasets by processing each plane serially.
+% - The segmentation settings are based on the assumption of 9.2e4 neurons/mm^3
+%   density in the imaged volume.
+%
+% See also ADDPATH, FULLFILE, DIR, LOAD, SAVEFAST
+
 p = inputParser;
 addRequired(p, 'data_path', @ischar);
 addRequired(p, 'save_path', @ischar);
@@ -119,7 +145,7 @@ for plane_idx = start_plane:end_plane
 
     data = h5read(plane_name, dataset_name);
     data = data - min(data(:));
-    
+
     %% CaImAn segmentation
     td_start = tic;
     pixel_resolution = metadata.pixel_resolution;

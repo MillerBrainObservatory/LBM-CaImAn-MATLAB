@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Core Functions &#8212; caiman_matlab  documentation</title>
   
@@ -19,31 +18,30 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+    <link rel="stylesheet" type="text/css" href="../_static/caiman_matlab.css?v=8c8b7c0d" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js"></script>
-    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js"></script>
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/core';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -58,10 +56,9 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -102,7 +99,7 @@
 </form></div>
   </div>
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -140,12 +137,6 @@
       
         <div class="navbar-item">
 <nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -236,10 +227,13 @@ document.write(`
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -252,12 +246,6 @@ document.write(`
         
           <div class="navbar-item">
 <nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -378,53 +366,13 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="core-functions">
-<h1>Core Functions<a class="headerlink" href="#core-functions" title="Permalink to this heading">#</a></h1>
-<dl class="mat function">
-<dt class="sig sig-object mat" id="assembleCorrectedROITiff">
-<span class="sig-name descname"><span class="pre">assembleCorrectedROITiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filename</span></em>, <em class="sig-param"><span class="pre">metadata</span></em>, <em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#assembleCorrectedROITiff" title="Permalink to this definition">#</a></dt>
-<dd><p>assembleCorrectedROITiff Assembles a corrected ROI TIFF file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>filename</strong><span class="classifier">string</span></dt><dd><p>The name of the TIFF file to be read.</p>
-</dd>
-<dt><strong>dataset</strong><span class="classifier">string, optional</span></dt><dd><p>Dataset path within the file (default is “/Y”).</p>
-</dd>
-<dt><strong>group_path</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the file (default is “/data”).</p>
-</dd>
-<dt><strong>fileMode</strong><span class="classifier">string, optional</span></dt><dd><p>Mode for the file handling (default is “separate”).</p>
-</dd>
-<dt><strong>chunksize</strong><span class="classifier">array, optional</span></dt><dd><p>Chunk size for the file.</p>
-</dd>
-<dt><strong>compression</strong><span class="classifier">double, optional</span></dt><dd><p>Compression level for the file (default is 0).</p>
-</dd>
-<dt><strong>overwrite</strong><span class="classifier">logical, optional</span></dt><dd><p>Whether to overwrite existing files (default is true).</p>
-</dd>
-<dt><strong>fix_scan_phase</strong><span class="classifier">logical, optional</span></dt><dd><p>Whether to fix scan phase (default is true).</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>metadata</strong><span class="classifier">struct</span></dt><dd><p>Updated metadata after processing the TIFF file. This will be the
-same metadata attached to the h5 attributes and can be used in
-subsequent steps of the pipeline.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>This function requires the ScanImage utilities package.</p>
-<p class="rubric">Examples</p>
-<p>metadata = assembleCorrectedROITiff(‘file.tif’, metadata);</p>
-</dd></dl>
-
+<span id="core"></span><h1>Core Functions<a class="headerlink" href="#core-functions" title="Link to this heading">#</a></h1>
 <dl class="mat function">
 <dt class="sig sig-object mat" id="convertScanImageTiffToVolume">
-<span class="sig-name descname"><span class="pre">convertScanImageTiffToVolume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data_path</span></em>, <em class="sig-param"><span class="pre">save_path</span></em>, <em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convertScanImageTiffToVolume" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">convertScanImageTiffToVolume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data_path</span></em>, <em class="sig-param"><span class="pre">save_path</span></em>, <em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#convertScanImageTiffToVolume" title="Link to this definition">#</a></dt>
 <dd><p>convertScanImageTiffToVolume Convert ScanImage .tif files into a 4D volume.</p>
 <p>Convert raw <a class="reference external" href="https://www.mbfbioscience.com/products/scanimage/">ScanImage</a> multi-roi .tif files from a single session
 into a single 4D volumetric time-series (x, y, z, t). It’s designed to process files for the
@@ -436,16 +384,21 @@ ScanImage Version: 2016 software.</p>
 session should be in the directory.</p>
 </dd>
 <dt><strong>save_path</strong><span class="classifier">char, optional</span></dt><dd><p>The directory where processed files will be saved. It is created if it does
-not exist. Defaults to the filePath if not provided.</p>
+not exist. Defaults to the data_path directory.</p>
 </dd>
-<dt><strong>group_path</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the file (default is “/raw”).</p>
+<dt><strong>group_path</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the hdf5 file to save the extracted data. Default is
+‘/extraction’.</p>
 </dd>
 <dt><strong>debug_flag</strong><span class="classifier">double, logical, optional</span></dt><dd><p>If set to 1, the function displays the files in the command window and does
 not continue processing. Defaults to 0.</p>
 </dd>
+<dt><strong>overwrite</strong><span class="classifier">logical, optional</span></dt><dd><p>Whether to overwrite existing files (default is 1).</p>
+</dd>
 <dt><strong>fix_scan_phase</strong><span class="classifier">logical, optional</span></dt><dd><p>Whether to correct for bi-directional scan artifacts. (default is true).</p>
 </dd>
-<dt><strong>overwrite</strong><span class="classifier">logical, optional</span></dt><dd><p>Whether to overwrite existing files (default is 1).</p>
+<dt><strong>trim_pixels</strong><span class="classifier">double, optional</span></dt><dd><p>Pixels to trim from left, right,top, bottom of each scanfield before
+horizontally concatenating the scanfields within an image. Default is
+[0 0 0 0].</p>
 </dd>
 <dt><strong>compression</strong><span class="classifier">double, optional</span></dt><dd><p>Compression level for the file (default is 0).</p>
 </dd>
@@ -466,14 +419,23 @@ processing.</p>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="motionCorrectPlane">
-<span class="sig-name descname"><span class="pre">motionCorrectPlane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data_path</span></em>, <em class="sig-param"><span class="pre">save_path</span></em>, <em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#motionCorrectPlane" title="Permalink to this definition">#</a></dt>
-<dd><p>motion_correct_plane Perform rigid and non-rigid motion correction on imaging data.</p>
+<span class="sig-name descname"><span class="pre">motionCorrectPlane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data_path</span></em>, <em class="sig-param"><span class="pre">save_path</span></em>, <em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#motionCorrectPlane" title="Link to this definition">#</a></dt>
+<dd><p>MOTIONCORRECTPLANE Perform rigid and non-rigid motion correction on imaging data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>data_path</strong><span class="classifier">char</span></dt><dd><p>Path to the directory containing the files extracted via convertScanImageTiffToVolume.</p>
 </dd>
 <dt><strong>save_path</strong><span class="classifier">char</span></dt><dd><p>Path to the directory to save the motion vectors.</p>
+</dd>
+<dt><strong>data_input_group</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the hdf5 file that contains raw data.
+Default is ‘registration’.</p>
+</dd>
+<dt><strong>data_output_group</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the hdf5 file to save the registered data.
+Default is ‘registration’.</p>
+</dd>
+<dt><strong>debug_flag</strong><span class="classifier">double, logical, optional</span></dt><dd><p>If set to 1, the function displays the files in the command window and does
+not continue processing. Defaults to 0.</p>
 </dd>
 <dt><strong>overwrite</strong><span class="classifier">logical, optional</span></dt><dd><p>Whether to overwrite existing files (default is 1).</p>
 </dd>
@@ -489,7 +451,6 @@ start_plane.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>Each motion-corrected plane is saved as a .mat file containing the following:</dt><dd></dd>
 <dt><strong>shifts</strong><span class="classifier">array</span></dt><dd><p>2D motion vectors as single precision.</p>
 </dd>
 </dl>
@@ -497,15 +458,15 @@ start_plane.</p>
 </dl>
 <p class="rubric">Notes</p>
 <ul class="simple">
+<li><p>Each motion-corrected plane is saved as a .hdf5 group containing the 2D
+shift vectors in x and y</p></li>
 <li><p>Only .h5 files containing processed volumes should be in the file_path.</p></li>
-<li><p>Any .h5 files with “plane” in the filename will be skipped to avoid
-re-processing a previously motion-corrected plane.</p></li>
 </ul>
 </dd></dl>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="segmentPlane">
-<span class="sig-name descname"><span class="pre">segmentPlane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">path</span></em>, <em class="sig-param"><span class="pre">savepath</span></em>, <em class="sig-param"><span class="pre">metadata</span></em>, <em class="sig-param"><span class="pre">diagnosticFlag</span></em>, <em class="sig-param"><span class="pre">startPlane</span></em>, <em class="sig-param"><span class="pre">endPlane</span></em>, <em class="sig-param"><span class="pre">numCores</span></em><span class="sig-paren">)</span><a class="headerlink" href="#segmentPlane" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">segmentPlane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data_path</span></em>, <em class="sig-param"><span class="pre">save_path</span></em>, <em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#segmentPlane" title="Link to this definition">#</a></dt>
 <dd><p>SEGMENTPLANE Segment imaging data using CaImAn for motion-corrected data.</p>
 <p>This function applies the CaImAn algorithm to segment neurons from
 motion-corrected, pre-processed and ROI re-assembled MAxiMuM data.
@@ -514,24 +475,31 @@ are saved to disk.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>path</strong><span class="classifier">char</span></dt><dd><p>The path to the folder containing the motion-corrected data.</p>
+<dt><strong>data_path</strong><span class="classifier">char</span></dt><dd><p>Path to the directory containing the files extracted via convertScanImageTiffToVolume.</p>
 </dd>
-<dt><strong>savepath</strong><span class="classifier">char</span></dt><dd><p>The path where the neuronal footprints are saved.</p>
+<dt><strong>save_path</strong><span class="classifier">char</span></dt><dd><p>Path to the directory to save the motion vectors.</p>
 </dd>
-<dt><strong>metadata: struct</strong></dt><dd><p>Struct of ScanImage metadata containing image width, height, and
-scanfield information relating to each ROI.</p>
+<dt><strong>data_input_group</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the hdf5 file that contains raw data.
+Default is ‘registration’.</p>
 </dd>
-<dt><strong>diagnosticFlag</strong><span class="classifier">char</span></dt><dd><p>When set to ‘1’, the function reports all .mat files in the directory
-specified by ‘path’. Otherwise, it processes files for neuron segmentation.</p>
+<dt><strong>data_output_group</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the hdf5 file to save the registered data.
+Default is ‘registration’.</p>
 </dd>
-<dt><strong>startPlane</strong><span class="classifier">char</span></dt><dd><p>The starting plane index for processing. A non-numeric input or ‘0’ sets
-it to default (1).</p>
+<dt><strong>debug_flag</strong><span class="classifier">double, logical, optional</span></dt><dd><p>If set to 1, the function displays the files in the command window and does
+not continue processing. Defaults to 0.</p>
 </dd>
-<dt><strong>endPlane</strong><span class="classifier">char</span></dt><dd><p>The ending plane index for processing. A non-numeric input or ‘0’ sets
-it to default (maximum available planes).</p>
+<dt><strong>overwrite</strong><span class="classifier">logical, optional</span></dt><dd><p>Whether to overwrite existing files (default is 1).</p>
 </dd>
-<dt><strong>numCores</strong><span class="classifier">char</span></dt><dd><p>The number of cores to use for parallel processing. A non-numeric input
-or ‘0’ sets it to the default value (12).</p>
+<dt><strong>num_cores</strong><span class="classifier">double, integer, positive</span></dt><dd><p>Number of cores to use for computation. The value is limited to a maximum
+of 24 cores.</p>
+</dd>
+<dt><strong>start_plane</strong><span class="classifier">double, integer, positive</span></dt><dd><p>The starting plane index for processing.</p>
+</dd>
+<dt><strong>end_plane</strong><span class="classifier">double, integer, positive</span></dt><dd><p>The ending plane index for processing. Must be greater than or equal to
+start_plane.</p>
+</dd>
+<dt><strong>cnmf_options</strong><span class="classifier">dictionary, mapping</span></dt><dd><p>key:value pairs of all of your CNMF parameters.
+See the example parameters in the LBM_demo_pipeline.</p>
 </dd>
 </dl>
 </dd>
@@ -563,7 +531,7 @@ density in the imaged volume.</p></li>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="collatePlanes">
-<span class="sig-name descname"><span class="pre">collatePlanes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dataPath</span></em>, <em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">metadata</span></em>, <em class="sig-param"><span class="pre">startDepth</span></em><span class="sig-paren">)</span><a class="headerlink" href="#collatePlanes" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">collatePlanes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dataPath</span></em>, <em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">metadata</span></em>, <em class="sig-param"><span class="pre">startDepth</span></em><span class="sig-paren">)</span><a class="headerlink" href="#collatePlanes" title="Link to this definition">#</a></dt>
 <dd><p>COLLATEPLANES Analyzes and processes imaging data by extracting and correcting features across multiple planes.</p>
 <p>This function analyzes imaging data from a specified directory, applying
 various thresholds and corrections based on metadata. It processes neuron
@@ -614,7 +582,7 @@ with specified metadata parameters.</p>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="calculateZOffset">
-<span class="sig-name descname"><span class="pre">calculateZOffset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">datapath</span></em>, <em class="sig-param"><span class="pre">metadata</span></em>, <em class="sig-param"><span class="pre">startPlane</span></em>, <em class="sig-param"><span class="pre">endPlane</span></em>, <em class="sig-param"><span class="pre">numFeatures</span></em><span class="sig-paren">)</span><a class="headerlink" href="#calculateZOffset" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">calculateZOffset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">datapath</span></em>, <em class="sig-param"><span class="pre">metadata</span></em>, <em class="sig-param"><span class="pre">startPlane</span></em>, <em class="sig-param"><span class="pre">endPlane</span></em>, <em class="sig-param"><span class="pre">numFeatures</span></em><span class="sig-paren">)</span><a class="headerlink" href="#calculateZOffset" title="Link to this definition">#</a></dt>
 <dd><p>CALCULATEZOFFSET Calculates Z-axis offsets between consecutive image planes by cross-correlation.</p>
 <p>This function loads image data from specified planes, identifies features
 in each plane, and calculates the offset in pixels between these features
@@ -700,6 +668,7 @@ and that features will be manually identifiable and trackable across planes.</p>
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
@@ -722,8 +691,8 @@ and that features will be manually identifiable and trackable across planes.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -743,7 +712,7 @@ and that features will be manually identifiable and trackable across planes.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     <br/>
   </p>
 </div>
@@ -756,7 +725,7 @@ and that features will be manually identifiable and trackable across planes.</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>

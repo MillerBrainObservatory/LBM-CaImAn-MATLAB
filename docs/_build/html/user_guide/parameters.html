@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>API &#8212; caiman_matlab  documentation</title>
+    <title>Parameters &#8212; caiman_matlab  documentation</title>
   
   
   
@@ -42,11 +42,11 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
     <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/index';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/parameters';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Core Functions" href="core.html" />
-    <link rel="prev" title="Troubleshooting" href="../user_guide/troubleshooting.html" />
+    <link rel="next" title="ScanImage Metadata" href="metadata.html" />
+    <link rel="prev" title="User Guide" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -146,15 +146,15 @@
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
                         API
                       </a>
                     </li>
@@ -255,15 +255,15 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../user_guide/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
                         API
                       </a>
                     </li>
@@ -305,12 +305,16 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Core Functions:</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="core.html">Core Functions</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="utils.html">Utils</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="simple">
-</ul>
-</li>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre_processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registration.html">Registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips_tricks.html">Tips and Tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
 </ul>
 </div>
 </nav></div>
@@ -348,7 +352,10 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">API</li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Parameters</li>
   </ul>
 </nav>
 </div>
@@ -365,18 +372,41 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="api">
-<h1>API<a class="headerlink" href="#api" title="Link to this heading">#</a></h1>
-<p>Documentation for each function from docstrings.</p>
-<div class="toctree-wrapper compound">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Core Functions:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="core.html">Core Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a><ul class="simple">
-</ul>
-</li>
-</ul>
+  <section id="parameters">
+<h1>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h1>
+<p>For the <a class="reference internal" href="../api/core.html#core"><span class="std std-ref">Core Functions</span></a> functions** in this pipeline, the initial parameters are always the same.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The term “parameter” throughout this guide refers to the inputs to each function.
+For example, running “help convertScanImageTiffToVolume” in the command window will
+show to you and describe the parameters of that function.</p>
 </div>
+<p>These parameters primarily pertain to saving files, which the primary storage format for this
+pipeline is HDF5. Note you can save HDF5 files as <cite>.h5</cite> or <cite>.hdf5</cite>.</p>
+<p>You can choose to save your data in a few different ways:</p>
+<ul class="simple">
+<li><p>All in the same file, as different groups ‘/raw’, ‘/extracted’. !!NOT RECOMMENDED!!</p></li>
+<li><p>Each step is saved to a different file.</p></li>
+<li><p>Any combination of the two (first two steps in the same file, second step in a separate file).</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Deleting or overwriting data with a different size are not operations permitted in the h5 standard. Overwriting a file
+will consist of deleting the entire group and starting fresh.</p>
+</div>
+<section id="definitions">
+<h2>Definitions<a class="headerlink" href="#definitions" title="Link to this heading">#</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">data_path</span></code> : A filepath leading to the directory that contains your .tiff files.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">save_path</span></code> : A filepath leading to the directory where results are saved.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">data_input_group</span></code> : If the input path is h5, this is the group containing the data.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">data_output_group</span></code> : If the output file is h5, this is the group name where the data will be saved.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">debug_flag</span></code> : Set to 1 to print all files / datasets that would be processed, then stop before any processing occurs.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">overwrite</span></code> : Set to 1 to overwrite pre-existing data. Setting to 0 will simply return without processing that file.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">num_cores</span></code> : Set to the number of CPU cores to use for parallel computing. Note that even though this is an option in pre-processing, there is actually no parallel computations during this step so the value will be ignored.</p>
+<p>The recommended method for saving data is to save each step in a separate HDF5 file and name the group after the step being executed.
+This is demonstrated in the <code class="xref mat mat-scpt docutils literal notranslate"><span class="pre">demo_LBM_pipeline</span></code> at the root of this repository.</p>
+<p>For information about the parameters unique to each function, see the <a class="reference internal" href="../api/index.html#api"><span class="std std-ref">API</span></a> or the help documentation for that individual function.</p>
+</section>
 </section>
 
 
@@ -390,20 +420,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../user_guide/troubleshooting.html"
+       href="index.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Troubleshooting</p>
+        <p class="prev-next-title">User Guide</p>
       </div>
     </a>
     <a class="right-next"
-       href="core.html"
+       href="metadata.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Core Functions</p>
+        <p class="prev-next-title">ScanImage Metadata</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -418,9 +448,21 @@ document.write(`
 
 
   <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions">Definitions</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/api/index.rst.txt">
+    <a href="../_sources/user_guide/parameters.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
