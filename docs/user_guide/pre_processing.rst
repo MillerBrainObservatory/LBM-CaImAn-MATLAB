@@ -18,7 +18,7 @@ Pre-processing LBM datasets consists of 2 main processing steps:
 
 .. _assembly:
 
-1. Re-Assemble Volumetric Time-Series
+1. Assemble Volumetric Time-Series
 ================================================================
 
 Before processing starts, the raw scanimage output needs to be reconstructed to form a correctly-ordered time-series.
