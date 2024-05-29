@@ -386,8 +386,8 @@ session should be in the directory.</p>
 <dt><strong>save_path</strong><span class="classifier">char, optional</span></dt><dd><p>The directory where processed files will be saved. It is created if it does
 not exist. Defaults to the data_path directory.</p>
 </dd>
-<dt><strong>group_path</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the hdf5 file to save the extracted data. Default is
-‘/extraction’.</p>
+<dt><strong>dataset_name</strong><span class="classifier">string, optional</span></dt><dd><p>Name of the group (h5 dataset) to save the extracted data. Default is
+‘/Y’. Must contain a leading slash.</p>
 </dd>
 <dt><strong>debug_flag</strong><span class="classifier">double, logical, optional</span></dt><dd><p>If set to 1, the function displays the files in the command window and does
 not continue processing. Defaults to 0.</p>
@@ -399,8 +399,6 @@ not continue processing. Defaults to 0.</p>
 <dt><strong>trim_pixels</strong><span class="classifier">double, optional</span></dt><dd><p>Pixels to trim from left, right,top, bottom of each scanfield before
 horizontally concatenating the scanfields within an image. Default is
 [0 0 0 0].</p>
-</dd>
-<dt><strong>compression</strong><span class="classifier">double, optional</span></dt><dd><p>Compression level for the file (default is 0).</p>
 </dd>
 </dl>
 </dd>
@@ -428,10 +426,7 @@ processing.</p>
 </dd>
 <dt><strong>save_path</strong><span class="classifier">char</span></dt><dd><p>Path to the directory to save the motion vectors.</p>
 </dd>
-<dt><strong>data_input_group</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the hdf5 file that contains raw data.
-Default is ‘registration’.</p>
-</dd>
-<dt><strong>data_output_group</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the hdf5 file to save the registered data.
+<dt><strong>dataset_name</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the hdf5 file that contains raw data.
 Default is ‘registration’.</p>
 </dd>
 <dt><strong>debug_flag</strong><span class="classifier">double, logical, optional</span></dt><dd><p>If set to 1, the function displays the files in the command window and does
@@ -458,7 +453,7 @@ start_plane.</p>
 </dl>
 <p class="rubric">Notes</p>
 <ul class="simple">
-<li><p>Each motion-corrected plane is saved as a .hdf5 group containing the 2D
+<li><p>Each motion-corrected plane is saved as a .h5 group containing the 2D
 shift vectors in x and y</p></li>
 <li><p>Only .h5 files containing processed volumes should be in the file_path.</p></li>
 </ul>
@@ -472,6 +467,7 @@ shift vectors in x and y</p></li>
 motion-corrected, pre-processed and ROI re-assembled MAxiMuM data.
 The processing is conducted for specified planes, and the results
 are saved to disk.</p>
+<p>MOTIONCORRECTPLANE Perform rigid and non-rigid motion correction on imaging data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -479,11 +475,7 @@ are saved to disk.</p>
 </dd>
 <dt><strong>save_path</strong><span class="classifier">char</span></dt><dd><p>Path to the directory to save the motion vectors.</p>
 </dd>
-<dt><strong>data_input_group</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the hdf5 file that contains raw data.
-Default is ‘registration’.</p>
-</dd>
-<dt><strong>data_output_group</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the hdf5 file to save the registered data.
-Default is ‘registration’.</p>
+<dt><strong>dataset_name</strong><span class="classifier">string, optional</span></dt><dd><p>Group path within the hdf5 file that contains raw data.</p>
 </dd>
 <dt><strong>debug_flag</strong><span class="classifier">double, logical, optional</span></dt><dd><p>If set to 1, the function displays the files in the command window and does
 not continue processing. Defaults to 0.</p>
@@ -531,7 +523,7 @@ density in the imaged volume.</p></li>
 
 <dl class="mat function">
 <dt class="sig sig-object mat" id="collatePlanes">
-<span class="sig-name descname"><span class="pre">collatePlanes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dataPath</span></em>, <em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">metadata</span></em>, <em class="sig-param"><span class="pre">startDepth</span></em><span class="sig-paren">)</span><a class="headerlink" href="#collatePlanes" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">collatePlanes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dataPath</span></em>, <em class="sig-param"><span class="pre">metadata</span></em><span class="sig-paren">)</span><a class="headerlink" href="#collatePlanes" title="Link to this definition">#</a></dt>
 <dd><p>COLLATEPLANES Analyzes and processes imaging data by extracting and correcting features across multiple planes.</p>
 <p>This function analyzes imaging data from a specified directory, applying
 various thresholds and corrections based on metadata. It processes neuron

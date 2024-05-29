@@ -341,41 +341,10 @@ document.write(`
                 </a><p>A pipeline for processing light beads microscopy (LBM) datasets.</p>
 <p>For background, theory and design of LBM technology, see the reference <a class="reference external" href="https://www.nature.com/articles/s41592-021-01239-8/">publication</a>.</p>
 <p>Currently, inputs to this pipeline are limited to <a class="reference external" href="https://www.mbfbioscience.com/products/scanimage/">ScanImage</a> tiff files.</p>
-<section id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p>MATLAB (Tested on 2023a, 2023b, 2024b)</p></li>
-<li><dl class="simple">
-<dt>Toolboxes:</dt><dd><ul>
-<li><p>Parallel Computing Toolbox</p></li>
-<li><p>Statistics and Machine Learning Toolbox</p></li>
-<li><p>Image Processing Toolbox</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</section>
-<section id="algorithms">
-<h2>Algorithms<a class="headerlink" href="#algorithms" title="Link to this heading">#</a></h2>
-<p>The following algorithms perform the main computations and are included by default in the pipeline:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://github.com/simonsfoundation/NoRMCorre">CNMF</a> segmentation and neuronal source extraction.</p></li>
-<li><p><a class="reference external" href="https://github.com/flatironinstitute/NoRMCorre/">NoRMCorre</a> piecewise rigid motion correction.</p></li>
-<li><p><a class="reference external" href="https://github.com/epnev/constrained-foopsi/">constrained-foopsi</a> constrained deconvolution spike inference.</p></li>
-</ul>
-</section>
-<section id="quickstart">
-<h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading">#</a></h2>
-<p>There are 4 steps that require user input:</p>
-<ol class="arabic simple">
-<li><p>Convert ScanImage .Tiff to 4D [Y, X, Z, T] array.</p></li>
-<li><p>Piecewise-rigid motion correction.</p></li>
-<li><p>Plane-by-plane 2D neuronal segmentation and deconvolution.</p></li>
-<li><p>Axial (Z) offset correction.</p></li>
-</ol>
+<p>See the <a href="#id1"><span class="problematic" id="id2">`README`_</span></a> for pipeline requirements and algorithms.</p>
+<section id="get-started">
+<h2>Get Started<a class="headerlink" href="#get-started" title="Link to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Get started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="get_started/index.html">First Steps</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="get_started/install.html">Installation</a></li>
@@ -385,6 +354,9 @@ document.write(`
 </li>
 </ul>
 </div>
+</section>
+<section id="user-guide">
+<h2>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
@@ -401,6 +373,9 @@ document.write(`
 </li>
 </ul>
 </div>
+</section>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API:</span></p>
 <ul>
@@ -459,9 +434,9 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements">Requirements</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithms">Algorithms</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quickstart">Quickstart</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-started">Get Started</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#user-guide">User Guide</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#api">API</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </li>

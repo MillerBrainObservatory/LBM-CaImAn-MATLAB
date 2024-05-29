@@ -444,6 +444,7 @@ only a single plane is ever loaded into memory due to large LBM filesizes (&gt;3
                      height="auto"
                      alt=""/>
                 </a><p>This image is your “ground truth” per-se, it is the image you want to most accurately represent the movement in your video.</p>
+<p>Compared with the below frame:</p>
 <a class=""
                data-lightbox="group-ck"
                href="../_images/quickview_blue1.png"
@@ -455,8 +456,21 @@ only a single plane is ever loaded into memory due to large LBM filesizes (&gt;3
                      width="100%"
                      height="auto"
                      alt=""/>
-                </a><p>The above represents a general overview for how we want to handle data. We want to minimize the amount of storage space,
-so rather than saving 2 versions of a video that differ by simply shifting some pixels, we can instead save only the shift vectors
+                </a></section>
+<section id="id1">
+<h2>Storage<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/storage_rec1.png"
+               title="Recommended Data Storage Paradigm"
+               data-title="Recommended Data Storage Paradigm"
+               
+               ><img src="../_images/storage_rec1.png"
+                     class=""
+                     width="100%"
+                     height="auto"
+                     alt=""/>
+                </a><p>We want to minimize the amount of storage space, so rather than saving 2 versions of a video that differ by simply shifting some pixels, we can instead save only the shift vectors
 and reconstruct the video afterwards. <a class="reference internal" href="../api/utils.html#translateFrames" title="translateFrames"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">translateFrames()</span></code></a> will accomplish this:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="n">translateFrames</span>
 
@@ -475,18 +489,7 @@ and reconstruct the video afterwards. <a class="reference internal" href="../api
 <span class="w">     </span><span class="n">translatedFrames</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">A</span><span class="w"> </span>3<span class="n">D</span><span class="w"> </span><span class="n">array</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">translated</span><span class="w"> </span><span class="nb">image</span><span class="w"> </span><span class="n">frames</span><span class="p">,</span><span class="w"> </span><span class="n">same</span><span class="w"> </span><span class="nb">size</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="nb">type</span><span class="w"> </span><span class="n">as</span><span class="w"> </span><span class="n">Y</span><span class="p">.</span>
 </pre></div>
 </div>
-<a class=""
-               data-lightbox="group-default"
-               href="../_images/storage_rec1.png"
-               title="Recommended Data Storage Paradigm"
-               data-title="Recommended Data Storage Paradigm"
-               
-               ><img src="../_images/storage_rec1.png"
-                     class=""
-                     width="100%"
-                     height="auto"
-                     alt=""/>
-                </a></section>
+</section>
 <section id="metrics">
 <h2>Metrics<a class="headerlink" href="#metrics" title="Link to this heading">#</a></h2>
 <p>CaImAn provides some useful metrics to determine the effectiveness of registration.
@@ -568,6 +571,7 @@ Underneath you see the rigid shifts for X and Y, respectively.</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rigid-vs-non-rigid">Rigid vs Non-Rigid</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#registration-output">Registration Output</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Storage</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metrics">Metrics</a></li>
 </ul>
   </nav></div>
