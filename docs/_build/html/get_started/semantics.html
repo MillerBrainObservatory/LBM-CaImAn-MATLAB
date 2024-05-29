@@ -373,7 +373,6 @@ document.write(`
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ROI</span> <span class="n">STRIP</span> <span class="n">FRAME</span> <span class="n">IMAGE</span> <span class="n">PLANE</span> <span class="n">VOLUME</span> <span class="n">TIME</span><span class="o">-</span><span class="n">SERIES</span> <span class="n">Z</span><span class="o">-</span><span class="n">STACK</span> <span class="n">T</span><span class="o">-</span><span class="n">STACK</span>
 </pre></div>
 </div>
-<p>This section aims to define these terms with respect to the LBM Data Processing Pipeline.</p>
 <table class="table" id="id1">
 <caption><span class="caption-text">LBM Semantics</span><a class="headerlink" href="#id1" title="Link to this table">#</a></caption>
 <thead>
@@ -396,7 +395,8 @@ document.write(`
 </tr>
 </tbody>
 </table>
-<p><em>Strip</em> and ROI are used interchangably in the ScanImage documentation. We will be referring to the individual sections of a ScanImage <cite>.tiff</cite> recording as <cite>strips</cite> and refrain from using <cite>ROI</cite>.</p>
+<p>Within an image, we are dealing with ScanImage <a class="reference external" href="https://docs.scanimage.org/Premium%2BFeatures/Multiple%2BRegion%2Bof%2BInterest%2B%28MROI%29.html#multiple-region-of-interest-mroi-imaging/">multi-ROI</a> scans. During aquisition, the user choses the “number of pixels in X/Y (see <a class="reference internal" href="../user_guide/metadata.html#image-size"><span class="std std-ref">Image Size</span></a> in <a class="reference internal" href="../user_guide/metadata.html#metadata"><span class="std std-ref">ScanImage Metadata</span></a>)</p>
+<p>Each ROI can be trimmed and smoothed to blend with adjacent ROI’s.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>We use the word ‘frames’ as in video frames, i.e., number of timesteps the scan

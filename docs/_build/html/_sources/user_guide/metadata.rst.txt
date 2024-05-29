@@ -45,10 +45,27 @@ The funcion :func:`get_metadata` takes as input a path to any `ScanImage`_ tiff 
                        base_filename: "MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001"
                        base_filepath: "C:/<username>/Documents/data/raw/"
 
+Image Size
+************
 
+ScanImage `multi-ROI`_ images are made up of `ROIs`.
+These are rectangles (rectangles are forced as of scanimage 2019) that comprise the area that will be scanned.
+These rectangles are called `ScanImage scanfields`. ScanField is just a custom matlab class with some information about the pixel sizes.
+
+ScanImage builds these rectanglular ROI's 2D plane with a size and location being imaged relative to the objective lens.
+This is essentially a scale factor, converting the size / location from units of degrees to microns.
+
+`num_pixel_xy` are the number of pixels in each `ROI`. With there being 9 ROIs, we know our image is :math:`144x8=1296` pixels wide.
+
+So that explains why is our `image_length` is so high compared to our `image_width`. However, you'll notice :math:`1200x9=10800` is significanly less than our `image_height`.
+This is because the scanner is actually moving to the next ROI, so we stop collecting data for that period of time.
+`num_lines_between_scanfields` is calculated using this amount of time and is stripped during the horizontal concatenation.
 
 .. thumbnail:: ../_static/_images/objective_resolution.png
    :width: 1440
 
+:func:`get_metadata` extracts all of the critical information used for calculations.
+
 .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
 .. _BigTiffSpec: _https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification
+.. _MROI: https://docs.scanimage.org/Premium%2BFeatures/Multiple%2BRegion%2Bof%2BInterest%2B%28MROI%29.html#multiple-region-of-interest-mroi-imaging/
