@@ -40,73 +40,99 @@ clc; clear;
 start = 1;
 stop = 1;
 frame = 1;
-plane = 1;
-h5file = sprintf('C:/Users/RBO/Documents/data/high_res/extracted_2/extracted_plane_%d.h5', plane);
-full_ds_path = "/Y";
-info = h5info(h5file, full_ds_path);
-metadata = read_h5_metadata(h5file, full_ds_path);
-ds_size = info.Dataspace.Size;
+for plane_idx = 1:30
+    h5file = sprintf('C:/Users/RBO/Documents/data/high_res/extracted_raw/extracted_plane_%d.h5', plane_idx);
+    h5savefile = sprintf('C:/Users/RBO/Documents/data/high_res/extracted_gt/extracted_plane_%d.h5', plane_idx);
 
-mys = (1:ds_size(1));
-mxs = (1:ds_size(2));
-mts = (1:ds_size(3));
-
-xs = mxs;
-ys = mys;
-ts = mts;
-
-data = h5read( ...
-    h5file, ... % filename
-    full_ds_path, ... % dataset location
-    [ys(1), xs(1), ts(1)], ... % start index for each dimension [X,Y,T]
-    [length(ys), length(xs), length(ts)] ... % count for each dimension [X,Y,T]
-);
-
-cnt = 1;
-offset_x = 0;
-offset_y = 0;
-
-val = 0.03*metadata.strip_height;
-y_size = length(val:metadata.strip_height);
-z_timeseries = zeros(length(val:metadata.strip_height), ...
-    132 * metadata.num_strips, ...
-    metadata.num_frames_total, ...
-    'int16' ...
-);
-
-for roi_idx = 1:length(metadata.offsets)
-    roi_str = sprintf("roi_%d", roi_idx);
-    if cnt > 1
-        % offset_y = offset_y + metadata.strip_height + metadata.num_lines_between_scanfields;
-        offset_x = offset_x + metadata.strip_width;
-    end
-
-    arr = data( ...
-        :, ... % (offset_y + t_top + 1):(offset_y + raw_y - t_bottom), ...
-        (offset_x + 1):(offset_x + metadata.strip_width), ... 
-        : ...
+    full_ds_path = "/Y";
+    info = h5info(h5file, full_ds_path);
+    metadata = read_h5_metadata(h5file, full_ds_path);
+    ds_size = info.Dataspace.Size;
+    
+    mys = (1:ds_size(1));
+    mxs = (1:ds_size(2));
+    mts = (1:ds_size(3));
+    
+    xs = mxs;
+    ys = mys;
+    ts = mts;
+    
+    data = h5read( ...
+        h5file, ... % filename
+        full_ds_path, ... % dataset location
+        [ys(1), xs(1), ts(1)], ... % start index for each dimension [X,Y,T]
+        [length(ys), length(xs), length(ts)] ... % count for each dimension [X,Y,T]
     );
-    new_arr = fixScanPhase(arr, metadata.offsets(roi_idx), 1, 'int16');
-
-    z_timeseries(:, ...
-        (offset_x + 1):(offset_x + 132), ...
-        :) = new_arr(val:end, 7:138, :);
-    % savename = fullfile("C:\Users\RBO\Documents\data\high_res\extracted_2\figures\", roi_str);
-    % savename = sprintf("%s_gt.png",savename);
-    % 
-    % f = figure('Color', 'black',"Visible","off", 'Position', [100, 100, 1400, 600]);
-    % tiledlayout("horizontal", 'TileSpacing', 'compact', 'Padding', 'compact');
-    % nexttile;
-    % imagesc(new_arr(:,:,2)); colormap('gray'); axis image; axis tight; axis off;
-    % subtitle(sprintf('Roi %d | Offset %d', roi_idx, metadata.offsets(roi_idx)), 'FontSize', 10, 'FontWeight', 'bold', 'Color', 'w');
-    % exportgraphics(f, savename, "Resolution",300,"ContentType","image","Colorspace","gray","BackgroundColor","black");
-
-    cnt = cnt+1;
+    
+    cnt = 1;
+    offset_x = 0;
+    offset_y = 0;
+    
+    val = 0.03*metadata.strip_height;
+    y_size = length(val:metadata.strip_height);
+    z_timeseries = zeros(length(val:metadata.strip_height), ...
+        132 * metadata.num_strips, ...
+        metadata.num_frames_total, ...
+        'int16' ...
+    );
+    
+    for roi_idx = 1:length(metadata.offsets)
+        roi_str = sprintf("roi_%d", roi_idx);
+        if cnt > 1
+            % offset_y = offset_y + metadata.strip_height + metadata.num_lines_between_scanfields;
+            offset_x = offset_x + metadata.strip_width;
+        end
+    
+        arr = data( ...
+            :, ... % (offset_y + t_top + 1):(offset_y + raw_y - t_bottom), ...
+            (offset_x + 1):(offset_x + metadata.strip_width), ... 
+            : ...
+        );
+        new_arr = fixScanPhase(arr, metadata.offsets(roi_idx), 1, 'int16');
+    
+        z_timeseries( ...
+            :, ...
+            (offset_x + 1):(offset_x + 132), ...
+            : ...
+            ) = new_arr( ...
+            val:end, ... % Y
+            7:138, ... % X
+            : ... x T
+            );
+        % savename = fullfile("C:\Users\RBO\Documents\data\high_res\extracted_2\figures\", roi_str);
+        % savename = sprintf("%s_gt.png",savename);
+        % 
+        % f = figure('Color', 'black',"Visible","off", 'Position', [100, 100, 1400, 600]);
+        % tiledlayout("horizontal", 'TileSpacing', 'compact', 'Padding', 'compact');
+        % nexttile;
+        % imagesc(new_arr(:,:,2)); colormap('gray'); axis image; axis tight; axis off;
+        % subtitle(sprintf('Roi %d | Offset %d', roi_idx, metadata.offsets(roi_idx)), 'FontSize', 10, 'FontWeight', 'bold', 'Color', 'w');
+        % exportgraphics(f, savename, "Resolution",300,"ContentType","image","Colorspace","gray","BackgroundColor","black");
+        cnt = cnt+1;
+    end
+    % close(f);
+    write_chunk_h5(h5savefile, z_timeseries, size(z_timeseries,3), '/Y_gt');
+    write_metadata_h5(metadata, h5savefile, '/Y_gt');
 end
-close(f);
-write_chunk_h5(h5file, z_timeseries, size(z_timeseries,3), '/Y_gt');
-write_metadata_h5(metadata, h5file, '/Y_gt');
 
+%%
+
+mc_path = fullfile(parent_path, 'corrected_gt');
+if ~isfolder(mc_path); mkdir(mc_path); end
+
+compute = 1;
+if compute
+    motionCorrectPlane( ...
+        fullfile(parent_path, 'extracted_gt'), ... % we used this to save extracted data
+        mc_path, ... % save registered data here
+        'dataset_name', '/Y_gt', ... % where we saved the last step in h5
+        'debug_flag', 0, ...
+        'overwrite', 1, ...
+        'num_cores', 23, ...
+        'start_plane', 1, ...
+        'end_plane', 2  ...
+    );
+end
 %%
 save_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
 img_frame = data(:,:,200);
