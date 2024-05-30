@@ -2,7 +2,7 @@ Troubleshooting
 ===============
 
 Memory
-####################
+***************************************
 
 - Number of Workers/Cores > 100: There a a known bug in MATLAB R2023a for cases when the number of workers is more than 100.
   Refer to the following `bug report`_ for a workaround to resolve the issue. Additionally, steps taken in :ref:`matlab server issues` can help to solve this problem.
@@ -17,7 +17,7 @@ Memory
 
 
 Missing Compiled Binary (Windows)
-#################################
+***************************************
 
 - Typically seen as: `run_CNMF_patches` function errors out on Windows.
 
@@ -37,8 +37,7 @@ Missing Compiled Binary (Windows)
    Newest version 0.2.0+ include both precompiled binaries.
 
 Matlab Server Issues
-#################################
-
+***********************
 .. _server_issues:
 
 These come in many flavors and are mostly `windows` issues due to their background serrvice.
@@ -60,4 +59,25 @@ Here is the general fix for all of them:
 - Run `which -all pathdef.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\pathdef.m`.
 - Run `which -all matlabrc.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\matlabrc.m`.
 
+
+Windows Filepaths
+***********************
+
+Sometimes Windows filepaths, with the \ backslash, is taken as an escape character rather than a file-path separator:
+
+.. code-block:: MATLAB
+
+    Warning: Escaped character '\U' is not valid. See 'doc sprintf' for supported special characters.
+    Error using h5infoc
+    Unable to open 'C:'. File or folder not found.
+
+To resolve this, replace `\` with `/`, or use :code:`fullfile()` to build the path:
+
+
+.. code-block:: MATLAB
+
+    data_path = fullfile("C:\Users\");
+
+
  .. _bug report: https://www.mathworks.com/support/bugreports/details/2968710.html`
+
