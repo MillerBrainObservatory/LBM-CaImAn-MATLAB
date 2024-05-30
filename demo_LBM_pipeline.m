@@ -5,7 +5,7 @@
 % --| extraction
 % ----| basename_shifts.h5
 % --| registration
-% ----| shift_vectors_plane_N.h5
+% ----| shifts_vectors_plane_N.h5
 % --| segmentation
 % ----| caiman_output_plane_N.h5
 % ----| caiman_output_collated_min1.4snr.h5
@@ -48,7 +48,7 @@ if compute
         save_path, ...
         'dataset_name', '/Y', ... % default
         'debug_flag', 0, ... % default, if 1 will display files and return
-        'fix_scan_phase', 1, ... % default, keep to 1
+        'fix_scan_phase', 0, ... % default, keep to 1
         'trim_pixels', [6 6 17 0], ... % default, num pixels to trim for each roi
         'overwrite', 1 ...
         );
@@ -67,9 +67,9 @@ if compute
         'debug_flag', 0, ...
         'overwrite', 1, ...
         'num_cores', 23, ...
-        'start_plane', 17, ...
+        'start_plane', 1, ...
         'end_plane', 30  ...
-        );
+    );
 end
 
 %% 3) CNMF Plane-by-plane SegmentationS
