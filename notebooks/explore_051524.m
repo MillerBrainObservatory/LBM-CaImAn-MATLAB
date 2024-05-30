@@ -31,10 +31,6 @@ v2_extracted = fullfile("../../Documents/data/bi_hemisphere/extracted/MH184_both
 % num_frames_total = metadata.num_frames_total;
 % 
 
-tic; [Y, metadata] = combinePlanes(v2_extracted, 1); toc
-Y = Y(:,:, 2:600);
-%% 
-
 T = size(Y,ndims(Y));
 %Y = Y - min(Y(:));
 
