@@ -6,9 +6,11 @@ Function for this step: :func:`convertScanImageTiffToVolume`
 
 Utility functions for this step:
 
-:ref:`planeToH5`: Quickly view a movie of any plane.
-:ref:`read_H5_metadata`: View metadata associated with an extracted file.
-:ref:`get_center_indices`: Get the Y,X index of a box of size `pixels` created around the center point of an image.
+:func:`planeToH5`: Quickly view a movie of any plane.
+:func:`read_H5_metadata`: View metadata associated with an extracted file.
+:func:`get_center_indices`: Get the Y,X index of a box of size `pixels` created around the center point of an image.
+
+.. video:: _static/_videos/video_1.mp4
 
 
 Before beginning pre-processing, follow setup steps in :ref:`getting started` to make sure the pipeline and dependencies are installed properly.

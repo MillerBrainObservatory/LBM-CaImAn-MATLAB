@@ -134,11 +134,17 @@ if compute
     );
 end
 %%
-save_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
-img_frame = data(:,:,200);
+
+h5_corrected = sprintf('C:/Users/RBO/Documents/data/high_res/corrected_gt/motion_corrected_plane_%d.h5', 1);
+h5_extracted = sprintf('C:/Users/RBO/Documents/data/high_res/extracted_gt/extracted_plane_%d.h5', 1);
+data_corr = h5read(h5_corrected, '/mov');
+data_extr = h5read(h5_extracted, '/Y_gt');
+
+img_frame = data_corr(:,:,200);
 [r, c] = find(img_frame == max(img_frame(:)));
 [slicey, slicex] = get_central_indices(img_frame,r,c,200);
-planeToMovie(data(:,:,2:402), save_path, metadata.frame_rate);
+new = [data_corr(slicey, slicex, 2:402) data_extr(slicey, slicex, 2:402)];
+planeToMovie(new, save_path, 10);
 
 %%
 % imagesc(groundt.Iin); axis image; axis off; xlim([69.2 88.2]); ylim([510.4 589.4]);

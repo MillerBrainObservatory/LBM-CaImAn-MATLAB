@@ -25,7 +25,7 @@ Additionally, you can create a `startup.m`_ file located in this same `userpath`
 
 You can tell if the pipeline is added successfully to the path by looking at the file window:
 
-.. _matlab file explorer:
+.. _manual_path:
 
 .. image:: ../_static/_images/matlab_path_explorer.png
    :width: 200
@@ -119,7 +119,7 @@ You can add the path programmatically from within matlab:
    >> addpath(genpath("path/to/caiman_matlab"))
 
 Otherwise, you can simply navigate to that directory within the matlab GUI or add the path to this repository as
-shown in the installation recommendation via the :ref:`matlab path explorer`.
+shown in the :ref:`install recommendation`
 
 Post-Install
 =================

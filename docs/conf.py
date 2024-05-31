@@ -20,7 +20,8 @@ source_suffix = {
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'exclude']
-extensions = ["sphinx.ext.autodoc","sphinxcontrib.images" ,"sphinxcontrib.matlab", "numpydoc", "sphinx.ext.intersphinx", "sphinx.ext.napoleon", "sphinx.ext.autosectionlabel"]
+
+extensions = ["sphinx.ext.autodoc","sphinxcontrib.images", "sphinxcontrib.video" ,"sphinxcontrib.matlab", "numpydoc", "sphinx.ext.intersphinx", "sphinx.ext.napoleon", "sphinx.ext.autosectionlabel"]
 
 images_config = dict(backend='LightBox2',
                      default_image_width='100%',
@@ -30,7 +31,7 @@ images_config = dict(backend='LightBox2',
 
 templates_path = ["_templates"]
 html_theme = "pydata_sphinx_theme"
-html_short_title="LBM"
+html_short_title="LBM-CaImAn-MATLAB"
 html_static_path = ["_static"]
 
 html_css_files = ['caiman_matlab.css']

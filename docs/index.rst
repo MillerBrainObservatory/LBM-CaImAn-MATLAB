@@ -3,11 +3,11 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. import: ../../README.rst
+.. include:: ../README.rst
 
-#################
-LBM Documentation
-#################
+.. #################
+.. LBM Documentation
+.. #################
 
 .. thumbnail:: ./_static/_images/overlays.png
    :download: true
@@ -21,8 +21,9 @@ Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files.
 
 See the `README`_ for pipeline requirements and algorithms.
 
-Get Started
-**************
+
+Documentation Glossary:
+=====================================
 
 .. toctree::
     :maxdepth: 2
@@ -30,17 +31,11 @@ Get Started
     get_started/index
 
 
-User Guide
-**************
-
 .. toctree::
     :maxdepth: 2
     :caption: User Guide
 
     user_guide/index
-
-API
-**************
 
 .. toctree::
     :maxdepth: 2
@@ -49,7 +44,7 @@ API
     api/index
 
 Indices and tables
-==================
+=====================================
 
 * :ref:`genindex`
 * :ref:`modindex`

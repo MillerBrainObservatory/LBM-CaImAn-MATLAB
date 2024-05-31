@@ -1,12 +1,13 @@
 
+
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="../" >
+<html lang="en" data-content_root="" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Segmentation and Deconvolution &#8212; caiman_matlab  documentation</title>
   
@@ -18,30 +19,32 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
-    <link rel="stylesheet" type="text/css" href="../_static/caiman_matlab.css?v=8c8b7c0d" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/caiman_matlab.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
 
-    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
-    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/segmentation';</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -57,9 +60,10 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
+
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -100,7 +104,7 @@
 </form></div>
   </div>
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -138,6 +142,12 @@
       
         <div class="navbar-item">
 <nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -228,13 +238,10 @@ document.write(`
   
 </div>
 
-    </header>
+    </nav>
   
-
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
-      
-      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -247,6 +254,12 @@ document.write(`
         
           <div class="navbar-item">
 <nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -371,10 +384,10 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article">
+                <article class="bd-article" role="main">
                   
   <section id="segmentation-and-deconvolution">
-<span id="segmentation-deconvolution"></span><h1>Segmentation and Deconvolution<a class="headerlink" href="#segmentation-and-deconvolution" title="Link to this heading">#</a></h1>
+<span id="segmentation-deconvolution"></span><h1>Segmentation and Deconvolution<a class="headerlink" href="#segmentation-and-deconvolution" title="Permalink to this heading">#</a></h1>
 <p>Function for this step: <a class="reference internal" href="../api/core.html#segmentPlane" title="segmentPlane"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">segmentPlane()</span></code></a></p>
 <p>The flourescence of the proteins in our neurons is <strong>correlated</strong> with how active the neuron is.
 Turning this flourescence into “spikes” relies on several mathmatical operations to:</p>
@@ -407,7 +420,7 @@ The term <cite>deconvolution</cite> is a separate step applied to the resulting 
                      height="auto"
                      alt=""/>
                 </a><section id="source-extraction">
-<h2>Source Extraction<a class="headerlink" href="#source-extraction" title="Link to this heading">#</a></h2>
+<h2>Source Extraction<a class="headerlink" href="#source-extraction" title="Permalink to this heading">#</a></h2>
 <p><a class="reference internal" href="../api/core.html#segmentPlane" title="segmentPlane"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">segmentPlane()</span></code></a> contains the bulk of the computational complexity in this pipeline and will take significantly longer than the previous steps.</p>
 <p>Inputs are covered in <a class="reference internal" href="parameters.html#parameters"><span class="std std-ref">Parameters</span></a>, with a few additional parameters. To understand these parameters, you have to understand a bit about what CNMF is trying to do.
 Much of work is about separating “good activity”, the flourescence changes that we can attribute to a single cell, vs “noise, which is everything else (including signal from other neurons).
@@ -415,7 +428,7 @@ To do this, we take advantage of the fact that the slow calcium signal is typica
 <p>The <em>speed of transients</em>, or the time it takes for the neuron to fully glow (rise time) and unglow (decay time), is a very important metric used to calculate several of the parameters for CNMF.</p>
 <p>In particular, speed of transients relative to the frame rate can be thought of in terms of “how many frames does it take my calcium indicator to undergo a complete transients cycle”.</p>
 <section id="cnmf-options">
-<h3><cite>cnmf_options</cite><a class="headerlink" href="#cnmf-options" title="Link to this heading">#</a></h3>
+<h3><cite>cnmf_options</cite><a class="headerlink" href="#cnmf-options" title="Permalink to this heading">#</a></h3>
 <p>This is a structured array containing key:value pairs of all of your CNMF parameters.
 See the example parameters in the LBM_demo_pipeline.</p>
 <ul class="simple">
@@ -426,7 +439,7 @@ See the example parameters in the LBM_demo_pipeline.</p>
 <p>There are several different thresholds, indicating correlation coefficients as barriers for whether to perform a process or not.</p>
 </section>
 <section id="merge-thresh">
-<h3>merge_thresh<a class="headerlink" href="#merge-thresh" title="Link to this heading">#</a></h3>
+<h3>merge_thresh<a class="headerlink" href="#merge-thresh" title="Permalink to this heading">#</a></h3>
 <p>A correlation coefficient determining the amount of correlation between pixels in time needed to consider two neurons the same neuron.</p>
 <ul class="simple">
 <li><p>The lower your resolution, the more “difficult” it is for CNMF to distinguish between two tight neurons, thus use a lower merge threshold.</p></li>
@@ -434,13 +447,13 @@ See the example parameters in the LBM_demo_pipeline.</p>
 </ul>
 </section>
 <section id="min-snr">
-<h3>min_SNR<a class="headerlink" href="#min-snr" title="Link to this heading">#</a></h3>
+<h3>min_SNR<a class="headerlink" href="#min-snr" title="Permalink to this heading">#</a></h3>
 <blockquote>
 <div><p>The minimum “shot noise” to calcium activity to accept a neurons initialization.</p>
 </div></blockquote>
 </section>
 <section id="tau">
-<h3>Tau<a class="headerlink" href="#tau" title="Link to this heading">#</a></h3>
+<h3>Tau<a class="headerlink" href="#tau" title="Permalink to this heading">#</a></h3>
 <p>Half-size of your neurons.</p>
 <ul class="simple">
 <li><p>Tau is the <cite>half-size</cite> of a neuron. If a neuron is 10 micron, tau will be a 5 micron.</p></li>
@@ -448,7 +461,7 @@ See the example parameters in the LBM_demo_pipeline.</p>
 </ul>
 </section>
 <section id="p">
-<h3>P<a class="headerlink" href="#p" title="Link to this heading">#</a></h3>
+<h3>P<a class="headerlink" href="#p" title="Permalink to this heading">#</a></h3>
 <p>The term autoregression indicates that it is a regression of the variable against itself. Thus, an autoregressive model of order p can be written as yt=c+ϕ1yt−1+ϕ2yt−2+⋯+ϕpyt−p+εt,</p>
 <ul class="simple">
 <li><p>I dont know what that means, but that’s wikipedia. P = 1 is used when you have a fast indicator, for the reasons mentioned above regarding decay time. Use p=2 for slow indicators where you only expect 1-3 frames.</p></li>
@@ -456,7 +469,7 @@ See the example parameters in the LBM_demo_pipeline.</p>
 </section>
 </section>
 <section id="example">
-<h2>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h2>
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">#</a></h2>
 <p>Here is a look at all of the parameters you can provide to CNMF:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">options</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CNMFSetParms</span><span class="p">(</span><span class="k">...</span>
 <span class="w">    </span><span class="s">&#39;d1&#39;</span><span class="p">,</span><span class="n">d1</span><span class="p">,</span><span class="s">&#39;d2&#39;</span><span class="p">,</span><span class="n">d2</span><span class="p">,</span><span class="k">...</span><span class="c">                         % dimensionality of the FOV</span>
@@ -496,7 +509,7 @@ See the example parameters in the LBM_demo_pipeline.</p>
 </div>
 </section>
 <section id="atoac">
-<h2>AtoAc<a class="headerlink" href="#atoac" title="Link to this heading">#</a></h2>
+<h2>AtoAc<a class="headerlink" href="#atoac" title="Permalink to this heading">#</a></h2>
 <p>Turn the CaImAn output A (sparse, spatial footprints for entire FOV) into Ac (sparse, spatial footprints localized around each neuron).
 - Standardizes the size of each neuron’s footprint to a uniform (4*tau+1, 4*tau+1) matrix, centered on the neuron’s centroid [acx x acy].</p>
 <a class=""
@@ -512,7 +525,7 @@ See the example parameters in the LBM_demo_pipeline.</p>
                      alt=""/>
                 </a></section>
 <section id="component-validation">
-<h2>Component Validation<a class="headerlink" href="#component-validation" title="Link to this heading">#</a></h2>
+<h2>Component Validation<a class="headerlink" href="#component-validation" title="Permalink to this heading">#</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Although it is important to understand the process governing validating neurons, this process is
@@ -536,7 +549,7 @@ of the <em>number of frames</em>.</p>
 </ul>
 </section>
 <section id="output">
-<h2>Output<a class="headerlink" href="#output" title="Link to this heading">#</a></h2>
+<h2>Output<a class="headerlink" href="#output" title="Permalink to this heading">#</a></h2>
 <ul class="simple">
 <li><p>The CNMF output yields “raw” traces (“y”). These raw traces are noisy and jagged and must be denoised/deconvolved.</p></li>
 <li><p>Another term for this is “detrending”, removing non-stationary variability from the signal</p></li>
@@ -549,7 +562,7 @@ of the <em>number of frames</em>.</p>
 </div>
 </section>
 <section id="deconvolution">
-<h2>Deconvolution<a class="headerlink" href="#deconvolution" title="Link to this heading">#</a></h2>
+<h2>Deconvolution<a class="headerlink" href="#deconvolution" title="Permalink to this heading">#</a></h2>
 <p>FOOPSI (Fast OOPSI) is originally from “Fast Nonnegative Deconvolution for Spike Train Inference From Population Calcium Imaging” by Vogelstein et al. (2010).
 - OASIS was introduced in “Fast Active Set Methods for Online Spike Inference from Calcium Imaging” by Friedrich &amp; Paninski (2016).
 - Most of the CAIMAN-MATLAB code uses OASIS, not FOOPSI, despite some functions being named “foopsi_oasis.”</p>
@@ -565,10 +578,10 @@ of the <em>number of frames</em>.</p>
 <strong>onnls</strong> branch: Used if method=”foopsi” or “thresholded” with model type=”exp2” or “kernel.” Based on OASIS.</p>
 </section>
 <section id="results">
-<h2>Results<a class="headerlink" href="#results" title="Link to this heading">#</a></h2>
+<h2>Results<a class="headerlink" href="#results" title="Permalink to this heading">#</a></h2>
 <p>The output of the analysis includes several key variables that describe the segmented neuronal components and their corresponding activities. Below is a description of each output variable, along with an example of how to use them and what they represent.</p>
 <section id="output-variables">
-<h3>Output Variables<a class="headerlink" href="#output-variables" title="Link to this heading">#</a></h3>
+<h3>Output Variables<a class="headerlink" href="#output-variables" title="Permalink to this heading">#</a></h3>
 <ol class="arabic">
 <li><dl>
 <dt><strong>T_all</strong>: Neuronal time-series</dt><dd><ul class="simple">
@@ -729,14 +742,12 @@ of the <em>number of frames</em>.</p>
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-
   <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
+
+  <div class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+  <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#source-extraction">Source Extraction</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cnmf-options"><cite>cnmf_options</cite></a></li>
@@ -780,8 +791,8 @@ of the <em>number of frames</em>.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -801,7 +812,7 @@ of the <em>number of frames</em>.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     <br/>
   </p>
 </div>
@@ -814,7 +825,7 @@ of the <em>number of frames</em>.</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
 </p></div>
       
     </div>
