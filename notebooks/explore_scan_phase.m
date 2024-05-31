@@ -91,6 +91,8 @@ if compute
         'end_plane', 2  ...
     );
 end
+
+
 %%
 save_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
 img_frame = data(:,:,200);
@@ -101,6 +103,31 @@ planeToMovie(data(:,:,2:402), save_path, metadata.frame_rate);
 %%
 % imagesc(groundt.Iin); axis image; axis off; xlim([69.2 88.2]); ylim([510.4 589.4]);
 imagesc(data); axis image; axis off; xlim([69.2 88.2]); ylim([510.4 589.4]);
+
+
+%%
+clc; clear;
+parent_path = fullfile('C:\Users\RBO\Documents\data\high_res');
+savep = fullfile(parent_path, 'motion_corrected_gt_plane_1_comparison-lbmtrimming_original.mp4');
+
+v2 = sprintf('C:/Users/RBO/Documents/data/high_res/corrected/motion_corrected_plane_1.h5');
+
+raw_fpath = 'C:/Users/RBO/Documents/data/ground_truth/high_res/imagedata.mat';
+ground_truth = squeeze(matfile(raw_fpath).imageData);
+image_series = h5read(v2, '/mov');
+
+img_frame = image_series(:,:,2);
+[r, c] = find(img_frame == max(img_frame(:)));
+[yind, xind] = get_central_indices(img_frame, r, c, 30);
+
+arr_lbm = image_series(yind, xind, :);
+arr_gt = ground_truth(yind, xind, :);
+arr_bt = zeros(size(arr_gt, 1), 3, size(ground_truth, 3));
+
+arr = [arr_lbm arr_bt arr_gt];
+
+planeToMovie(arr, savep, 30);
+
 %%
 function dataOut = fixScanPhase(dataIn,offset,dim, dtype)
 % Find the lateral shift that maximizes the correlation between
