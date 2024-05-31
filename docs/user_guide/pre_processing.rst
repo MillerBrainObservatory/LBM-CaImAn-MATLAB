@@ -44,12 +44,6 @@ Each page is one *image*, but it doesn't look like an image:
 .. thumbnail:: ../_static/_images/assembly_1.png
    :width: 800
 
-.. thumbnail:: ../_static/_images/High_res_diff_plane_1.png
-   :height: 400
-
-.. thumbnail:: ../_static/_images/scanimage_raw_strip_highres.png
-   :width: 800
-
 | A: In the above image, represents vertically concatenated **strip** of our image.
 | B: Strips are cut and horizontally concatenated.
 | C: After a scan-phase correction, lines between strips become unnoticable (ideally)
@@ -201,7 +195,7 @@ So far so good, but as we approach the end-plane (by order, not by depth):
 Tile Consistency
 *************************
 
-Lastly, examine `mean_tile_consistency` which runs an edge detection, resulting in the image shown in `mean_tile_consistency`.
+Lastly, examine :code:`mean_tile_consistency.png` which runs an edge detection, resulting in the image shown in `mean_tile_consistency`.
 
 .. thumbnail:: ../_static/_images/mean_tile_consistency.png
    :width: 1440
