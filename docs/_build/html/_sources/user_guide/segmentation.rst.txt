@@ -177,25 +177,6 @@ Output
    The optional output YrA is equal to Y-C, representing the original raw trace.
 
 
-Deconvolution
-============================
-
-FOOPSI (Fast OOPSI) is originally from "Fast Nonnegative Deconvolution for Spike Train Inference From Population Calcium Imaging" by Vogelstein et al. (2010).
-- OASIS was introduced in "Fast Active Set Methods for Online Spike Inference from Calcium Imaging" by Friedrich & Paninski (2016).
-- Most of the CAIMAN-MATLAB code uses OASIS, not FOOPSI, despite some functions being named "foopsi_oasis."
-
-Branches from the main "deconvolveCa" function in MATLAB_CAIMAN:
-
-**oasis** branches: Despite some being named "foopsi_oasis," they use OASIS math.
-- foopsi_oasisAR1
-- foopsi_oasisAR2
-- constrained_oasisAR1
-- thresholded_oasisAR1
-- thresholded_oasisAR2
-**constrained_foopsi** branch: Used if method="constrained" and model type is not "ar1" (e.g., ar2).
-- Optimization methods: CVX (external), SPGL1 (external), LARS, dual.
-**onnls** branch: Used if method="foopsi" or "thresholded" with model type="exp2" or "kernel." Based on OASIS.
-
 
 Results
 ===========================
@@ -205,10 +186,9 @@ The output of the analysis includes several key variables that describe the segm
 Output Variables
 *************************
 
-1. **T_all**: Neuronal time-series
-    - **Description**: `T_all` contains the fluorescence time-series data for each detected neuronal component. Each row corresponds to a different neuron, and each column corresponds to a different time point.
-    - **Usage**: This data can be used to analyze the temporal dynamics of neuronal activity, such as identifying patterns of activation over time.
-    - **Example**:
+1. :code:`T_all`: Neuronal time-series
+    - The fluorescence time-series data for each detected neuronal component. Each row corresponds to a different neuron, and each column corresponds to a different time point.
+    - This data can be used to analyze the temporal dynamics of neuronal activity, such as identifying patterns of activation over time.
 
     .. code-block:: matlab
 
@@ -216,10 +196,9 @@ Output Variables
         xlabel('Time (frames)');
         ylabel('Fluorescence (dF/F)');
 
-2. **C_all**: Deconvolved neuronal activity
-    - **Description**: `C_all` contains the deconvolved activity traces, which represent the estimated underlying neuronal firing rates. This data is derived from `T_all` through a deconvolution process that attempts to remove the effects of calcium dynamics.
-    - **Usage**: This data can be used to study the inferred spiking activity of neurons, which is often more directly related to neuronal communication than raw fluorescence data.
-    - **Example**:
+2. :code:`C_all`: Deconvolved neuronal activity
+    - The deconvolved activity traces, which represent the estimated underlying neuronal firing rates. This data is derived from `T_all` through a deconvolution process that attempts to remove the effects of calcium dynamics.
+    - This data can be used to study the inferred spiking activity of neurons, which is often more directly related to neuronal communication than raw fluorescence data.
 
     .. code-block:: matlab
 
@@ -227,10 +206,9 @@ Output Variables
         xlabel('Time (frames)');
         ylabel('Deconvolved activity');
 
-3. **N_all**: Neuronal spatial coordinates and other properties
-    - **Description**: `N_all` is a matrix where each row represents a neuron, and the columns contain properties such as the neuron's integrated fluorescence (`acm`), x-coordinate (`acx`), y-coordinate (`acy`), and z-coordinate (plane index).
-    - **Usage**: This data can be used to analyze the spatial distribution of neurons within the imaging field and correlate spatial properties with functional data.
-    - **Example**:
+3. :code:`N_all`: Neuronal spatial coordinates mapped to X/Y coordinates
+    - A matrix where each row represents a neuron, and the columns contain properties such as the neuron's integrated fluorescence (`acm`), x-coordinate (`acx`), y-coordinate (`acy`), and z-coordinate (plane index).
+    - This data can be used to analyze the spatial distribution of neurons within the imaging field and correlate spatial properties with functional data.
 
     .. code-block:: matlab
 
@@ -238,69 +216,66 @@ Output Variables
         xlabel('x-coordinate');
         ylabel('y-coordinate');
 
-4. **Ac_keep**: Neuronal footprints
-    - `Ac_keep` contains the spatial footprints of the detected neurons. Each neuron is represented by a 2D matrix showing its spatial extent and intensity within the imaging field.
+4. :code:`Ac_keep`: Neuronal footprints
+    - The spatial footprints of the detected neurons. Each neuron is represented by a 2D matrix showing its spatial extent and intensity within the imaging field.
     - This data can be used to visualize the spatial arrangement and morphology of neuronal components.
 
-.. code-block:: matlab
+.. code-block:: MATLAB
 
-    imagesc(Ac_keep(:, :, 1)); % Display the spatial footprint of the first neuron
-    title('Neuron 1 Footprint');
+    >> figure; imagesc(Ac_keep(:,:,1)); axis image; axis tight; axis off; colormap gray; title("Single Spatial Component");
+    >> size(Ac_keep)
 
-5. **Cn**: Correlation image
-    - **Description**: `Cn` is a 2D image showing the correlation of each pixel's time-series with its neighboring pixels, highlighting areas of correlated activity.
-    - **Usage**: This image can be used to identify regions of interest and assess the overall quality of the motion correction and segmentation process.
-    - **Example**:
+    ans =
 
-.. code-block:: matlab
+        33    33   447
 
-    imagesc(Cn);
-    title('Correlation Image');
+.. thumbnail:: ../_static/_images/segmentation/ac_keep.png
+   :width: 800
 
-6. **Ym**: Mean image
-    - `Ym` is a 2D image representing the average fluorescence intensity across all time points, providing a baseline view of the imaging field.
-    - This image can be used to visualize the general structure and intensity distribution within the imaging field.
+5. :code:`Cn`: Correlation image
+    - A 2D image showing the correlation of each pixel's time-series with its neighboring pixels, highlighting areas of correlated activity.
+    - This image can be used to identify regions of interest and assess the overall quality of the motion correction and segmentation process.
 
 .. code-block:: matlab
 
-    imagesc(Ym);
-    title('Mean Image');
+    >> figure; imagesc(Cn); axis image; axis tight; axis off; colormap gray; title("Single Spatial Component");
+    >> size(Cn) % [Y, X]
 
-With these variables, plot some images:
+    ans =
 
-.. code-block:: matlab
+        583 528
 
-    % Plot the time-series for the first neuron
-    figure;
-    plot(pm.T_keep(1, :));
-    title('Neuronal Time-series for Neuron 1');
-    xlabel('Time (frames)');
-    ylabel('Fluorescence (dF/F)');
 
-    % Display the spatial footprint of the first neuron
-    figure;
-    imagesc(pm.Ac_keep(:, :, 1));
-    title('Neuron 1 Footprint');
-    colorbar;
+.. thumbnail:: ../_static/_images/segmentation/cn.png
+   :width: 800
 
-    % Analyze spatial distribution of neurons
-    figure;
-    scatter(pm.acx, pm.acy);
-    title('Spatial Distribution of Neurons');
-    xlabel('x-coordinate');
-    ylabel('y-coordinate');
+.. _deconvolution:
 
-    % Show correlation image
-    figure;
-    imagesc(pm.Cn);
-    title('Correlation Image');
-    colorbar;
+Note on Deconvolution
+==============================
 
-    % Display mean image
-    figure;
-    imagesc(pm.Ym);
-    title('Mean Image');
-    colorbar;
+.. note::
+
+   This section is more of a developer note into the code used for deconvolution. General users can skip this section. TODO: Refactor to devs/.
+
+FOOPSI (Fast OOPSI) is originally from “Fast Nonnegative Deconvolution for Spike Train Inference From Population Calcium Imaging” by Vogelstein et al. (2010). OASIS was introduced in “Fast Active Set Methods for Online Spike Inference from Calcium Imaging” by Friedrich & Paninski (2016). Most of the CAIMAN-MATLAB code uses OASIS, not FOOPSI, despite some functions being named “foopsi_oasis.”
+
+Branches
+****************
+
+1. **oasis branches**: Despite some being named “foopsi_oasis,” they use OASIS math.
+
+- foopsi_oasisAR1
+- foopsi_oasisAR2
+- constrained_oasisAR1
+- thresholded_oasisAR1
+- thresholded_oasisAR2
+
+2. **constrained_foopsi branch**: Used if ``method="constrained"`` and model type is not “ar1” (e.g., ar2).
+
+- Optimization methods: CVX (external), SPGL1 (external), LARS, dual.
+
+3. **onnls branch**: Used if ``method="foopsi"`` or ``method="thresholded"`` with model type=”exp2” or “kernel.” Based on OASIS.
 
 .. _NoRMCorre: https://github.com/flatironinstitute/NoRMCorre/
 .. _constrained-foopsi: https://github.com/epnev/constrained-foopsi/

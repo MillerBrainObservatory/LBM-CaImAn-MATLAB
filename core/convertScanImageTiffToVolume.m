@@ -179,10 +179,10 @@ try
                 if offset ~= 0
                     img_frame = z_timeseries(:,:,2);
                     [r, c] = find(img_frame == max(img_frame(:)));
-                    [yind, xind] = get_central_indices(z_timeseries(:,:,2), r, c, 30);
+                    [yind, xind] = get_central_indices(z_timeseries(:,:,2), r, c, 20);
 
-                    f = figure('Color', 'white', 'Visible', 'off', 'Position', [100, 100, 1400, 600]); % Adjust figure size as needed
-                    sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'k');
+                    f = figure('Color', 'black', 'Visible', 'off', 'Position', [100, 100, 1400, 600]); % Adjust figure size as needed
+                    sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'w');
                     tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact'); % Use 'compact' to minimize extra space
 
                     nexttile; imagesc(z_timeseries(yind,xind,2));

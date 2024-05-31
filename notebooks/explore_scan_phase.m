@@ -1,17 +1,31 @@
-clc, clear;
-
-metadata = read_h5_metadata('C:\Users\RBO\Documents\data\high_res\extracted\extracted_plane_1.h5', '/Y');
-dataset_path = "/"; % where data is saved in the h5 file (this is default)
-num_px = metadata.num_pixel_xy;
+% clc, clear;
+% 
+% metadata = read_h5_metadata('C:\Users\RBO\Documents\data\high_res\extracted\extracted_plane_1.h5', '/Y');
+% dataset_path = "/"; % where data is saved in the h5 file (this is default)
+% num_px = metadata.num_pixel_xy;
 
 %% TEST SCAN PHASE FOR GROUND TRUTH VS PIPELINE
 
-clc;
+clc; clear;
 gt_mf = matfile("E:\ground_truth\high_res\offset_data.mat");
 gt_raw = single(gt_mf.Iin);
-
 gt_cut = gt_raw(18:end, 7:end-6);
-gt_square = get_centered_image(gt_raw, 31);
+
+[r, c] = find(gt_raw == max(gt_raw(:)));
+[yind, xind] = get_central_indices(gt_raw,r,c,50);
+
+f = figure('Color', 'black', 'Visible', 'on', 'Position', [100, 100, 1400, 600]); % Adjust figure size as needed
+% sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'w');
+tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact'); % Use 'compact' to minimize extra space
+
+nexttile; imagesc(gt_raw);
+axis image; axis tight; axis off; colormap('gray');
+title('Raw ROI', 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
+nexttile; imagesc(gt_raw(100:115,end-10:end));
+axis image; axis tight; axis off; colormap('gray');
+title('ROI 1: Cut', 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
+
+gt_square = gt_raw(yind, xind);
 
 scanphase = returnScanOffset(gt_raw, 1, 'single');
 scanphase_cut = returnScanOffset(gt_cut, 1, 'single');
@@ -25,13 +39,13 @@ sq_raw = get_central_indices(corrected, 40);
 sq_cut = get_central_indices(corrected_cut, 40);
 sq_square = get_central_indices(corrected_square, 40);
 
-figure;
-rows = 1;
-cols = 3;
-tiledlayout(rows, cols, "TileSpacing","tight","Padding","tight");
-nexttile;imagesc(sq_raw(3:end,3:end));axis image; axis off;colormap 'gray'; subtitle(sprintf("600x144 (raw) Input: offset=%d", scanphase));
-nexttile;imagesc(sq_square(3:end,3:end));axis image;axis off;colormap 'gray'; subtitle(sprintf("583x132 (trimmed) Input: offset=%d", scanphase_cut));
-nexttile;imagesc(sq_cut(3:end,3:end));axis image;axis off;colormap 'gray'; subtitle(sprintf("40x40 (square) Input: offset=%d", scanphase_square));
+% figure;
+% rows = 1;
+% cols = 3;
+% tiledlayout(rows, cols, "TileSpacing","tight","Padding","tight");
+% nexttile;imagesc(sq_raw(3:end,3:end));axis image; axis off;colormap 'gray'; subtitle(sprintf("600x144 (raw) Input: offset=%d", scanphase));
+% nexttile;imagesc(sq_square(3:end,3:end));axis image;axis off;colormap 'gray'; subtitle(sprintf("583x132 (trimmed) Input: offset=%d", scanphase_cut));
+% nexttile;imagesc(sq_cut(3:end,3:end));axis image;axis off;colormap 'gray'; subtitle(sprintf("40x40 (square) Input: offset=%d", scanphase_square));
 
 %% DATA LOADER
 % TODO: Function-ize this

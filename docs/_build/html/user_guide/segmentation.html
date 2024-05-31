@@ -393,7 +393,7 @@ document.write(`
 Turning this flourescence into “spikes” relies on several mathmatical operations to:</p>
 <ul class="simple">
 <li><p>isolate neuronal activity from background activity (<a class="reference internal" href="#source-extraction"><span class="std std-ref">Source Extraction</span></a>).</p></li>
-<li><p>infer the times of action potentials from the fluorescence traces (<a class="reference internal" href="#deconvolution"><span class="std std-ref">Deconvolution</span></a>).</p></li>
+<li><p>infer the times of action potentials from the fluorescence traces (<a class="reference internal" href="#deconvolution"><span class="std std-ref">Note on Deconvolution</span></a>).</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -561,22 +561,6 @@ of the <em>number of frames</em>.</p>
 <p>The optional output YrA is equal to Y-C, representing the original raw trace.</p>
 </div>
 </section>
-<section id="deconvolution">
-<h2>Deconvolution<a class="headerlink" href="#deconvolution" title="Permalink to this heading">#</a></h2>
-<p>FOOPSI (Fast OOPSI) is originally from “Fast Nonnegative Deconvolution for Spike Train Inference From Population Calcium Imaging” by Vogelstein et al. (2010).
-- OASIS was introduced in “Fast Active Set Methods for Online Spike Inference from Calcium Imaging” by Friedrich &amp; Paninski (2016).
-- Most of the CAIMAN-MATLAB code uses OASIS, not FOOPSI, despite some functions being named “foopsi_oasis.”</p>
-<p>Branches from the main “deconvolveCa” function in MATLAB_CAIMAN:</p>
-<p><strong>oasis</strong> branches: Despite some being named “foopsi_oasis,” they use OASIS math.
-- foopsi_oasisAR1
-- foopsi_oasisAR2
-- constrained_oasisAR1
-- thresholded_oasisAR1
-- thresholded_oasisAR2
-<strong>constrained_foopsi</strong> branch: Used if method=”constrained” and model type is not “ar1” (e.g., ar2).
-- Optimization methods: CVX (external), SPGL1 (external), LARS, dual.
-<strong>onnls</strong> branch: Used if method=”foopsi” or “thresholded” with model type=”exp2” or “kernel.” Based on OASIS.</p>
-</section>
 <section id="results">
 <h2>Results<a class="headerlink" href="#results" title="Permalink to this heading">#</a></h2>
 <p>The output of the analysis includes several key variables that describe the segmented neuronal components and their corresponding activities. Below is a description of each output variable, along with an example of how to use them and what they represent.</p>
@@ -584,10 +568,9 @@ of the <em>number of frames</em>.</p>
 <h3>Output Variables<a class="headerlink" href="#output-variables" title="Permalink to this heading">#</a></h3>
 <ol class="arabic">
 <li><dl>
-<dt><strong>T_all</strong>: Neuronal time-series</dt><dd><ul class="simple">
-<li><p><strong>Description</strong>: <cite>T_all</cite> contains the fluorescence time-series data for each detected neuronal component. Each row corresponds to a different neuron, and each column corresponds to a different time point.</p></li>
-<li><p><strong>Usage</strong>: This data can be used to analyze the temporal dynamics of neuronal activity, such as identifying patterns of activation over time.</p></li>
-<li><p><strong>Example</strong>:</p></li>
+<dt><code class="code docutils literal notranslate"><span class="pre">T_all</span></code>: Neuronal time-series</dt><dd><ul class="simple">
+<li><p>The fluorescence time-series data for each detected neuronal component. Each row corresponds to a different neuron, and each column corresponds to a different time point.</p></li>
+<li><p>This data can be used to analyze the temporal dynamics of neuronal activity, such as identifying patterns of activation over time.</p></li>
 </ul>
 <div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="nb">plot</span><span class="p">(</span><span class="n">T_all</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">:));</span><span class="w"> </span><span class="c">% Plot the time-series for the first neuron</span>
 <span class="nb">xlabel</span><span class="p">(</span><span class="s">&#39;Time (frames)&#39;</span><span class="p">);</span>
@@ -598,10 +581,9 @@ of the <em>number of frames</em>.</p>
 </dl>
 </li>
 <li><dl>
-<dt><strong>C_all</strong>: Deconvolved neuronal activity</dt><dd><ul class="simple">
-<li><p><strong>Description</strong>: <cite>C_all</cite> contains the deconvolved activity traces, which represent the estimated underlying neuronal firing rates. This data is derived from <cite>T_all</cite> through a deconvolution process that attempts to remove the effects of calcium dynamics.</p></li>
-<li><p><strong>Usage</strong>: This data can be used to study the inferred spiking activity of neurons, which is often more directly related to neuronal communication than raw fluorescence data.</p></li>
-<li><p><strong>Example</strong>:</p></li>
+<dt><code class="code docutils literal notranslate"><span class="pre">C_all</span></code>: Deconvolved neuronal activity</dt><dd><ul class="simple">
+<li><p>The deconvolved activity traces, which represent the estimated underlying neuronal firing rates. This data is derived from <cite>T_all</cite> through a deconvolution process that attempts to remove the effects of calcium dynamics.</p></li>
+<li><p>This data can be used to study the inferred spiking activity of neurons, which is often more directly related to neuronal communication than raw fluorescence data.</p></li>
 </ul>
 <div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="nb">plot</span><span class="p">(</span><span class="n">C_all</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">:));</span><span class="w"> </span><span class="c">% Plot the deconvolved activity for the first neuron</span>
 <span class="nb">xlabel</span><span class="p">(</span><span class="s">&#39;Time (frames)&#39;</span><span class="p">);</span>
@@ -612,10 +594,9 @@ of the <em>number of frames</em>.</p>
 </dl>
 </li>
 <li><dl>
-<dt><strong>N_all</strong>: Neuronal spatial coordinates and other properties</dt><dd><ul class="simple">
-<li><p><strong>Description</strong>: <cite>N_all</cite> is a matrix where each row represents a neuron, and the columns contain properties such as the neuron’s integrated fluorescence (<cite>acm</cite>), x-coordinate (<cite>acx</cite>), y-coordinate (<cite>acy</cite>), and z-coordinate (plane index).</p></li>
-<li><p><strong>Usage</strong>: This data can be used to analyze the spatial distribution of neurons within the imaging field and correlate spatial properties with functional data.</p></li>
-<li><p><strong>Example</strong>:</p></li>
+<dt><code class="code docutils literal notranslate"><span class="pre">N_all</span></code>: Neuronal spatial coordinates mapped to X/Y coordinates</dt><dd><ul class="simple">
+<li><p>A matrix where each row represents a neuron, and the columns contain properties such as the neuron’s integrated fluorescence (<cite>acm</cite>), x-coordinate (<cite>acx</cite>), y-coordinate (<cite>acy</cite>), and z-coordinate (plane index).</p></li>
+<li><p>This data can be used to analyze the spatial distribution of neurons within the imaging field and correlate spatial properties with functional data.</p></li>
 </ul>
 <div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="nb">scatter</span><span class="p">(</span><span class="n">N_all</span><span class="p">(:,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">N_all</span><span class="p">(:,</span><span class="w"> </span><span class="mi">3</span><span class="p">));</span><span class="w"> </span><span class="c">% Plot the spatial distribution of neurons in the xy-plane</span>
 <span class="nb">xlabel</span><span class="p">(</span><span class="s">&#39;x-coordinate&#39;</span><span class="p">);</span>
@@ -626,81 +607,92 @@ of the <em>number of frames</em>.</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Ac_keep</strong>: Neuronal footprints</dt><dd><ul class="simple">
-<li><p><cite>Ac_keep</cite> contains the spatial footprints of the detected neurons. Each neuron is represented by a 2D matrix showing its spatial extent and intensity within the imaging field.</p></li>
+<dt><code class="code docutils literal notranslate"><span class="pre">Ac_keep</span></code>: Neuronal footprints</dt><dd><ul class="simple">
+<li><p>The spatial footprints of the detected neurons. Each neuron is represented by a 2D matrix showing its spatial extent and intensity within the imaging field.</p></li>
 <li><p>This data can be used to visualize the spatial arrangement and morphology of neuronal components.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 </ol>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="nb">imagesc</span><span class="p">(</span><span class="n">Ac_keep</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="mi">1</span><span class="p">));</span><span class="w"> </span><span class="c">% Display the spatial footprint of the first neuron</span>
-<span class="nb">title</span><span class="p">(</span><span class="s">&#39;Neuron 1 Footprint&#39;</span><span class="p">);</span>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">figure</span><span class="p">;</span><span class="w"> </span><span class="nb">imagesc</span><span class="p">(</span><span class="n">Ac_keep</span><span class="p">(:,:,</span><span class="mi">1</span><span class="p">));</span><span class="w"> </span><span class="n">axis</span><span class="w"> </span><span class="s">image</span><span class="p">;</span><span class="w"> </span><span class="n">axis</span><span class="w"> </span><span class="s">tight</span><span class="p">;</span><span class="w"> </span><span class="n">axis</span><span class="w"> </span><span class="s">off</span><span class="p">;</span><span class="w"> </span><span class="n">colormap</span><span class="w"> </span><span class="s">gray</span><span class="p">;</span><span class="w"> </span><span class="nb">title</span><span class="p">(</span><span class="s">&quot;Single Spatial Component&quot;</span><span class="p">);</span>
+<span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">size</span><span class="p">(</span><span class="n">Ac_keep</span><span class="p">)</span>
+
+<span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
+
+<span class="w">    </span><span class="mi">33</span><span class="w">    </span><span class="mi">33</span><span class="w">   </span><span class="mi">447</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="5">
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/ac_keep1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/ac_keep1.png"
+                     class=""
+                     width="800"
+                     height="auto"
+                     alt=""/>
+                </a><ol class="arabic simple" start="5">
 <li><dl class="simple">
-<dt><strong>Cn</strong>: Correlation image</dt><dd><ul class="simple">
-<li><p><strong>Description</strong>: <cite>Cn</cite> is a 2D image showing the correlation of each pixel’s time-series with its neighboring pixels, highlighting areas of correlated activity.</p></li>
-<li><p><strong>Usage</strong>: This image can be used to identify regions of interest and assess the overall quality of the motion correction and segmentation process.</p></li>
-<li><p><strong>Example</strong>:</p></li>
+<dt><code class="code docutils literal notranslate"><span class="pre">Cn</span></code>: Correlation image</dt><dd><ul class="simple">
+<li><p>A 2D image showing the correlation of each pixel’s time-series with its neighboring pixels, highlighting areas of correlated activity.</p></li>
+<li><p>This image can be used to identify regions of interest and assess the overall quality of the motion correction and segmentation process.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 </ol>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="nb">imagesc</span><span class="p">(</span><span class="n">Cn</span><span class="p">);</span>
-<span class="nb">title</span><span class="p">(</span><span class="s">&#39;Correlation Image&#39;</span><span class="p">);</span>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">figure</span><span class="p">;</span><span class="w"> </span><span class="nb">imagesc</span><span class="p">(</span><span class="n">Cn</span><span class="p">);</span><span class="w"> </span><span class="n">axis</span><span class="w"> </span><span class="s">image</span><span class="p">;</span><span class="w"> </span><span class="n">axis</span><span class="w"> </span><span class="s">tight</span><span class="p">;</span><span class="w"> </span><span class="n">axis</span><span class="w"> </span><span class="s">off</span><span class="p">;</span><span class="w"> </span><span class="n">colormap</span><span class="w"> </span><span class="s">gray</span><span class="p">;</span><span class="w"> </span><span class="nb">title</span><span class="p">(</span><span class="s">&quot;Single Spatial Component&quot;</span><span class="p">);</span>
+<span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">size</span><span class="p">(</span><span class="n">Cn</span><span class="p">)</span><span class="w"> </span><span class="c">% [Y, X]</span>
+
+<span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
+
+<span class="w">    </span><span class="mi">583</span><span class="w"> </span><span class="mi">528</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="6">
-<li><dl class="simple">
-<dt><strong>Ym</strong>: Mean image</dt><dd><ul class="simple">
-<li><p><cite>Ym</cite> is a 2D image representing the average fluorescence intensity across all time points, providing a baseline view of the imaging field.</p></li>
-<li><p>This image can be used to visualize the general structure and intensity distribution within the imaging field.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/cn1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/cn1.png"
+                     class=""
+                     width="800"
+                     height="auto"
+                     alt=""/>
+                </a></section>
+</section>
+<section id="note-on-deconvolution">
+<span id="deconvolution"></span><h2>Note on Deconvolution<a class="headerlink" href="#note-on-deconvolution" title="Permalink to this heading">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This section is more of a developer note into the code used for deconvolution. General users can skip this section. TODO: Refactor to devs/.</p>
+</div>
+<p>FOOPSI (Fast OOPSI) is originally from “Fast Nonnegative Deconvolution for Spike Train Inference From Population Calcium Imaging” by Vogelstein et al. (2010). OASIS was introduced in “Fast Active Set Methods for Online Spike Inference from Calcium Imaging” by Friedrich &amp; Paninski (2016). Most of the CAIMAN-MATLAB code uses OASIS, not FOOPSI, despite some functions being named “foopsi_oasis.”</p>
+<section id="branches">
+<h3>Branches<a class="headerlink" href="#branches" title="Permalink to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p><strong>oasis branches</strong>: Despite some being named “foopsi_oasis,” they use OASIS math.</p></li>
 </ol>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="nb">imagesc</span><span class="p">(</span><span class="n">Ym</span><span class="p">);</span>
-<span class="nb">title</span><span class="p">(</span><span class="s">&#39;Mean Image&#39;</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>With these variables, plot some images:</p>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="c">% Plot the time-series for the first neuron</span>
-<span class="nb">figure</span><span class="p">;</span>
-<span class="nb">plot</span><span class="p">(</span><span class="n">pm</span><span class="p">.</span><span class="n">T_keep</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">:));</span>
-<span class="nb">title</span><span class="p">(</span><span class="s">&#39;Neuronal Time-series for Neuron 1&#39;</span><span class="p">);</span>
-<span class="nb">xlabel</span><span class="p">(</span><span class="s">&#39;Time (frames)&#39;</span><span class="p">);</span>
-<span class="nb">ylabel</span><span class="p">(</span><span class="s">&#39;Fluorescence (dF/F)&#39;</span><span class="p">);</span>
-
-<span class="c">% Display the spatial footprint of the first neuron</span>
-<span class="nb">figure</span><span class="p">;</span>
-<span class="nb">imagesc</span><span class="p">(</span><span class="n">pm</span><span class="p">.</span><span class="n">Ac_keep</span><span class="p">(:,</span><span class="w"> </span><span class="p">:,</span><span class="w"> </span><span class="mi">1</span><span class="p">));</span>
-<span class="nb">title</span><span class="p">(</span><span class="s">&#39;Neuron 1 Footprint&#39;</span><span class="p">);</span>
-<span class="nb">colorbar</span><span class="p">;</span>
-
-<span class="c">% Analyze spatial distribution of neurons</span>
-<span class="nb">figure</span><span class="p">;</span>
-<span class="nb">scatter</span><span class="p">(</span><span class="n">pm</span><span class="p">.</span><span class="n">acx</span><span class="p">,</span><span class="w"> </span><span class="n">pm</span><span class="p">.</span><span class="n">acy</span><span class="p">);</span>
-<span class="nb">title</span><span class="p">(</span><span class="s">&#39;Spatial Distribution of Neurons&#39;</span><span class="p">);</span>
-<span class="nb">xlabel</span><span class="p">(</span><span class="s">&#39;x-coordinate&#39;</span><span class="p">);</span>
-<span class="nb">ylabel</span><span class="p">(</span><span class="s">&#39;y-coordinate&#39;</span><span class="p">);</span>
-
-<span class="c">% Show correlation image</span>
-<span class="nb">figure</span><span class="p">;</span>
-<span class="nb">imagesc</span><span class="p">(</span><span class="n">pm</span><span class="p">.</span><span class="n">Cn</span><span class="p">);</span>
-<span class="nb">title</span><span class="p">(</span><span class="s">&#39;Correlation Image&#39;</span><span class="p">);</span>
-<span class="nb">colorbar</span><span class="p">;</span>
-
-<span class="c">% Display mean image</span>
-<span class="nb">figure</span><span class="p">;</span>
-<span class="nb">imagesc</span><span class="p">(</span><span class="n">pm</span><span class="p">.</span><span class="n">Ym</span><span class="p">);</span>
-<span class="nb">title</span><span class="p">(</span><span class="s">&#39;Mean Image&#39;</span><span class="p">);</span>
-<span class="nb">colorbar</span><span class="p">;</span>
-</pre></div>
-</div>
+<ul class="simple">
+<li><p>foopsi_oasisAR1</p></li>
+<li><p>foopsi_oasisAR2</p></li>
+<li><p>constrained_oasisAR1</p></li>
+<li><p>thresholded_oasisAR1</p></li>
+<li><p>thresholded_oasisAR2</p></li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p><strong>constrained_foopsi branch</strong>: Used if <code class="docutils literal notranslate"><span class="pre">method=&quot;constrained&quot;</span></code> and model type is not “ar1” (e.g., ar2).</p></li>
+</ol>
+<ul class="simple">
+<li><p>Optimization methods: CVX (external), SPGL1 (external), LARS, dual.</p></li>
+</ul>
+<ol class="arabic simple" start="3">
+<li><p><strong>onnls branch</strong>: Used if <code class="docutils literal notranslate"><span class="pre">method=&quot;foopsi&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">method=&quot;thresholded&quot;</span></code> with model type=”exp2” or “kernel.” Based on OASIS.</p></li>
+</ol>
 </section>
 </section>
 </section>
@@ -761,9 +753,12 @@ of the <em>number of frames</em>.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#atoac">AtoAc</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#component-validation">Component Validation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#output">Output</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deconvolution">Deconvolution</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#results">Results</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#output-variables">Output Variables</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#note-on-deconvolution">Note on Deconvolution</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#branches">Branches</a></li>
 </ul>
 </li>
 </ul>

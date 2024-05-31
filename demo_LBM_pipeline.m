@@ -35,9 +35,11 @@ else
     disp('Proceeding with execution...');
 end
 
-parent_path = fullfile('C:\Users\RBO\Documents\data\high_res');
+parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
 data_path = fullfile(parent_path, 'raw');
 save_path = fullfile(parent_path, 'extracted_2');
+mp4path =[parent_path, 'ffmpeg_output.mp4'];
+inpath = [parent_path, '321.mp4'];
 
 %% 1) Pre-Processing
 clc;
@@ -95,5 +97,4 @@ dpath="D:\Jeffs LBM paper data\Fig4a-c\20191121\MH70\MH70_0p6mm_FOV_50_550um_dep
 h5_fullfile="../../Documents/data/high_res/extracted/extracted_plane_1.h5";
 metadata = read_h5_metadata(h5_fullfile, '/Y');
 
-%%
 calculateZOffset(dpath, metadata);

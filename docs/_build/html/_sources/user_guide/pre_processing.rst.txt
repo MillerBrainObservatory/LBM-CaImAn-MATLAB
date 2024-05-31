@@ -195,7 +195,7 @@ So far so good, but as we approach the end-plane (by order, not by depth):
 Tile Consistency
 *************************
 
-Lastly, examine `mean_tile_consistency` which runs an edge detection, resulting in the image shown in `mean_tile_consistency`.
+Lastly, examine :code:`mean_tile_consistency.png` which runs an edge detection, resulting in the image shown in `mean_tile_consistency`.
 
 .. thumbnail:: ../_static/_images/mean_tile_consistency.png
    :width: 1440

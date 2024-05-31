@@ -21,7 +21,8 @@ img_frame = data_corr(:,:,200);
 [r, c] = find(img_frame == max(img_frame(:)));
 [slicey, slicex] = get_central_indices(img_frame,r,c,200);
 new = [data_corr(slicey, slicex, 2:402) data_extr(slicey, slicex, 2:402)];
-planeToMovie(new, save_path, 10);
+
+planeToMovie(vol(:,:,1,:), save_path, 10);
 
 %% TEST SCAN PHASE FOR GROUND TRUTH VS PIPELINE
 
@@ -29,8 +30,11 @@ clc;
 gt_mf = matfile("E:\ground_truth\high_res\offset_data.mat");
 gt_raw = single(gt_mf.Iin);
 
+[r, c] = 
+[yind, xind] = get_central_indices(gt_raw, 31);
+
 gt_cut = gt_raw(18:end, 7:end-6);
-gt_square = get_centered_image(gt_raw, 31);
+gt_square = get_central_indices(gt_raw, 31);
 
 scanphase = returnScanOffset(gt_raw, 1, 'single');
 scanphase_cut = returnScanOffset(gt_cut, 1, 'single');
