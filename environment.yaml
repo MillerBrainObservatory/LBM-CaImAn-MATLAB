@@ -48,3 +48,6 @@ dependencies:
 # needed to build docs
 - numpydoc
 - pydata-sphinx-theme
+- sphinxcontrib-video
+- sphinxcontrib-matlabdomain
+- sphinxcontrib-images
