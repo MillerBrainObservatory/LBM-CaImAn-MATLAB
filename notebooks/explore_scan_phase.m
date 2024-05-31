@@ -1,45 +1,14 @@
-clc, clear;
+%% Load ground truth dataset
+clc; clear;
+% raw_fpath = 'C:/Users/RBO/Documents/data/ground_truth/high_res/MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif';
+raw_fpath = 'C:/Users/RBO/Documents/data/ground_truth/high_res/strip.mat';
+ground_truth = matfile(raw_fpath).stripTemp;
 
-metadata = read_h5_metadata('C:\Users\RBO\Documents\data\high_res\extracted\extracted_plane_1.h5', '/Y');
-dataset_path = "/"; % where data is saved in the h5 file (this is default)
-num_px = metadata.num_pixel_xy;
+%% FIX SCAN PHASE
 
-%% TEST SCAN PHASE FOR GROUND TRUTH VS PIPELINE
-
-clc;
-gt_mf = matfile("E:\ground_truth\high_res\offset_data.mat");
-gt_raw = single(gt_mf.Iin);
-
-gt_cut = gt_raw(18:end, 7:end-6);
-gt_square = get_centered_image(gt_raw, 31);
-
-scanphase = returnScanOffset(gt_raw, 1, 'single');
-scanphase_cut = returnScanOffset(gt_cut, 1, 'single');
-scanphase_square = returnScanOffset(gt_square, 1, 'single');
-
-corrected = fixScanPhase(gt_raw, scanphase, 1, 'single');
-corrected_cut = fixScanPhase(gt_cut, scanphase_cut, 1, 'single');
-corrected_square = fixScanPhase(gt_square, scanphase_square, 1, 'single');
-
-sq_raw = get_central_indices(corrected, 40);
-sq_cut = get_central_indices(corrected_cut, 40);
-sq_square = get_central_indices(corrected_square, 40);
-
-figure;
-rows = 1;
-cols = 3;
-tiledlayout(rows, cols, "TileSpacing","tight","Padding","tight");
-nexttile;imagesc(sq_raw(3:end,3:end));axis image; axis off;colormap 'gray'; subtitle(sprintf("600x144 (raw) Input: offset=%d", scanphase));
-nexttile;imagesc(sq_square(3:end,3:end));axis image;axis off;colormap 'gray'; subtitle(sprintf("583x132 (trimmed) Input: offset=%d", scanphase_cut));
-nexttile;imagesc(sq_cut(3:end,3:end));axis image;axis off;colormap 'gray'; subtitle(sprintf("40x40 (square) Input: offset=%d", scanphase_square));
-
-%% DATA LOADER
 % TODO: Function-ize this
 
 clc; clear;
-start = 1;
-stop = 1;
-frame = 1;
 for plane_idx = 1:30
     h5file = sprintf('C:/Users/RBO/Documents/data/high_res/extracted_raw/extracted_plane_%d.h5', plane_idx);
     h5savefile = sprintf('C:/Users/RBO/Documents/data/high_res/extracted_gt/extracted_plane_%d.h5', plane_idx);
@@ -59,13 +28,12 @@ for plane_idx = 1:30
     
     data = h5read( ...
         h5file, ... % filename
-        full_ds_path, ... % dataset location
-        [ys(1), xs(1), ts(1)], ... % start index for each dimension [X,Y,T]
-        [length(ys), length(xs), length(ts)] ... % count for each dimension [X,Y,T]
+        full_ds_path ... % dataset location
     );
     
     cnt = 1;
     offset_x = 0;
+    offset_x_og = 0;
     offset_y = 0;
     
     val = 0.03*metadata.strip_height;
@@ -80,38 +48,28 @@ for plane_idx = 1:30
         roi_str = sprintf("roi_%d", roi_idx);
         if cnt > 1
             % offset_y = offset_y + metadata.strip_height + metadata.num_lines_between_scanfields;
-            offset_x = offset_x + metadata.strip_width;
+            offset_x = offset_x + 132;
+            offset_x_og = offset_x_og + 144;
         end
     
         arr = data( ...
             :, ... % (offset_y + t_top + 1):(offset_y + raw_y - t_bottom), ...
-            (offset_x + 1):(offset_x + metadata.strip_width), ... 
+            (offset_x_og + 1):(offset_x_og + 144), ... 
             : ...
         );
-        new_arr = fixScanPhase(arr, metadata.offsets(roi_idx), 1, 'int16');
-    
-        z_timeseries( ...
-            :, ...
-            (offset_x + 1):(offset_x + 132), ...
-            : ...
-            ) = new_arr( ...
-            val:end, ... % Y
-            7:138, ... % X
-            : ... x T
-            );
-        % savename = fullfile("C:\Users\RBO\Documents\data\high_res\extracted_2\figures\", roi_str);
-        % savename = sprintf("%s_gt.png",savename);
-        % 
-        % f = figure('Color', 'black',"Visible","off", 'Position', [100, 100, 1400, 600]);
-        % tiledlayout("horizontal", 'TileSpacing', 'compact', 'Padding', 'compact');
-        % nexttile;
-        % imagesc(new_arr(:,:,2)); colormap('gray'); axis image; axis tight; axis off;
-        % subtitle(sprintf('Roi %d | Offset %d', roi_idx, metadata.offsets(roi_idx)), 'FontSize', 10, 'FontWeight', 'bold', 'Color', 'w');
-        % exportgraphics(f, savename, "Resolution",300,"ContentType","image","Colorspace","gray","BackgroundColor","black");
+        corr = returnScanOffset(arr,1, 'int16');
+        new_arr = fixScanPhase(arr,corr, 1, 'int16');
+        trimmed_arr = new_arr(val:end, 7:138, :);
+        z_timeseries(:, (offset_x + 1):(offset_x + 132),:) = trimmed_arr;
+        
         cnt = cnt+1;
     end
-    % close(f);
-    write_chunk_h5(h5savefile, z_timeseries, size(z_timeseries,3), '/Y_gt');
+    try
+        write_chunk_h5(h5savefile, z_timeseries, size(z_timeseries,3), '/Y_gt');
+    catch ME
+        delete(h5savefile);
+        write_chunk_h5(h5savefile, z_timeseries, size(z_timeseries,3), '/Y_gt');
+    end
     write_metadata_h5(metadata, h5savefile, '/Y_gt');
 end
 

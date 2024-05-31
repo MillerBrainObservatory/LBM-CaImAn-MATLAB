@@ -37,11 +37,11 @@ end
 
 parent_path = fullfile('C:\Users\RBO\Documents\data\high_res');
 data_path = fullfile(parent_path, 'raw');
-save_path = fullfile(parent_path, 'extracted_2');
+save_path = fullfile(parent_path, 'extracted_raw');
 
 %% 1) Pre-Processing
 clc;
-compute = 1;
+compute = 0;
 if compute
     convertScanImageTiffToVolume( ...
         data_path, ...
@@ -55,23 +55,25 @@ if compute
 end
 
 %% 2) Motion Correction
-mc_path = fullfile(parent_path, 'corrected');
-if ~isfolder(mc_path); mkdir(mc_path); end
+parent_path = fullfile('C:\Users\RBO\Documents\data\high_res');
 
+mc_path = fullfile(parent_path, 'corrected_gt');
+if ~isfolder(mc_path); mkdir(mc_path); end
+tic;
 compute = 1;
 if compute
     motionCorrectPlane( ...
-        save_path, ... % we used this to save extracted data
+        fullfile(parent_path, 'extracted_gt'), ... % we used this to save extracted data
         mc_path, ... % save registered data here
-        'dataset_name', '/Y', ... % where we saved the last step in h5
+        'dataset_name', '/Y_gt', ... % where we saved the last step in h5
         'debug_flag', 0, ...
         'overwrite', 1, ...
         'num_cores', 23, ...
         'start_plane', 1, ...
-        'end_plane', 30  ...
+        'end_plane', 2  ...
     );
 end
-
+toc;
 %% 3) CNMF Plane-by-plane SegmentationS
 segment_path = fullfile(parent_path, 'segmented');
 if ~isfolder(segment_path); mkdir(segment_path); end
@@ -85,8 +87,8 @@ if compute
         'debug_flag', 0, ...
         'overwrite', 1, ...
         'num_cores', 23, ...
-        'start_plane', 7, ...
-        'end_plane', 13  ...
+        'start_plane', 1, ...
+        'end_plane', 2  ...
         );
 end
 

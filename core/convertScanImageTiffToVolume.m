@@ -136,7 +136,7 @@ try
         % end_y_indices = start_y_indices + raw_y - t_top - t_bottom - 1;
         % t = squeeze(Aout(start_y_indices:end_y_indices,:,2,:));
 
-        z_timeseries = zeros(trimmed_y, trimmed_x * metadata.num_strips, num_planes, 'like', Aout);
+        z_timeseries = zeros(raw_y, raw_x * metadata.num_strips, num_frames_total, 'like', Aout);
         for plane_idx = 1:num_planes
             tplane = tic;
             p_str = sprintf("plane_%d", plane_idx);
@@ -146,7 +146,7 @@ try
                     fprintf(fid, "%s : Deleting %s\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS') ,plane_fullfile);
                     delete(plane_fullfile);
                 else
-                    fprintf("Not Implemented Error:\nSave_file %s already exists\nUser set overwrite = 0.\nReturning without extracting data.\nTo extract this dataset, change the save_path, partial overwrites are not implemented.", plane_fullfile);
+                    fprintf(fid, "Not Implemented Error:\nSave_file %s already exists\nUser set overwrite = 0.\nReturning without extracting data.\nTo extract this dataset, change the save_path, partial overwrites are not implemented.", plane_fullfile);
                     return
                 end
             end
@@ -155,23 +155,28 @@ try
             offset_y = 0;
             offset_x = 0;
             tic;
+            roi_offsets = zeros([1 metadata.num_strips], 'uint8');
             for roi_idx = 1:metadata.num_strips
+                roi_str = sprintf("roi_%s", roi_idx);
                 if cnt > 1
                     offset_y = offset_y + raw_y + metadata.num_lines_between_scanfields;
-                    offset_x = offset_x + trimmed_x;
+                    offset_x = offset_x + raw_x;
                 end
                 for frame_idx = 1:num_frames_total
-                    z_timeseries( ...
-                        :, ... % all Y
-                        (offset_x + 1):(offset_x + trimmed_x), ... % offset X
-                        frame_idx ...
-                        ) = Aout( ...
-                        (offset_y + t_top + 1):(offset_y + raw_y - t_bottom), ...
-                        (t_left + 1):(raw_x - t_right), plane_idx, ...
+                    arr = Aout( ...
+                        (offset_y + 1):(offset_y + raw_y), ..., ... %(offset_y + t_top + 1):(offset_y + raw_y - t_bottom), ...
+                        1:raw_x, ...
+                        plane_idx, ... % (t_left + 1):(raw_x - t_right), plane_idx, ...
                         frame_idx ...
                         );
+                    z_timeseries(:, ... % all Y
+                        (offset_x + 1):(offset_x + raw_x), ... % (offset_x + 1):(offset_x + trimmed_x), ... % offset X
+                        frame_idx ...
+                        ) = arr;
                 end
-                cnt = cnt + 1;
+                roi_offsets(roi_idx) = returnScanOffset(z_timeseries, 1, 'int16');
+                cnt = cnt+1;
+                fprintf(fid, "Plane %d roi %d offset: \n", plane_idx, roi_idx);
             end
 
             if fix_scan_phase
@@ -179,7 +184,7 @@ try
                 if offset ~= 0
                     img_frame = z_timeseries(:,:,2);
                     [r, c] = find(img_frame == max(img_frame(:)));
-                    [yind, xind] = get_central_indices(z_timeseries(:,:,2), r, c, 30);
+                    [yind, xind] = get_central_indices(img_frame, r, c, 30);
 
                     f = figure('Color', 'white', 'Visible', 'off', 'Position', [100, 100, 1400, 600]); % Adjust figure size as needed
                     sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'k');
@@ -199,6 +204,7 @@ try
             end
             write_chunk_h5(plane_fullfile, z_timeseries, size(z_timeseries,3), '/Y');
             write_metadata_h5(metadata, plane_fullfile, '/Y');
+            h5writeatt(plane_fullfile, '/Y', 'offsets', roi_offsets);
             fprintf(fid, "%s : Plane %d processed in %.2f seconds\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), plane_idx, toc(tplane));
         end
     end
@@ -227,7 +233,6 @@ if dim == 1
     if offset>0
         dataOut(1:2:sy,1:sx,:,:) = dataIn(1:2:sy,:,:,:);
         dataOut(2:2:sy,1+offset:(offset+sx),:) = dataIn(2:2:sy,:,:);
-
     elseif offset<0
         offset = abs(offset);
         dataOut(1:2:sy,1+offset:(offset+sx),:,:) = dataIn(1:2:sy,:,:,:);
