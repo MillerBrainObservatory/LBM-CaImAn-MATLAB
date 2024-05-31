@@ -57,9 +57,9 @@ used for the demo.
     ├── extraction
     │   └── basename.h5
     ├── registration
-    │   └── registered_plane_1.h5
-    │   └── registered_plane_2.h5
-    │   └── registered_plane_NN.h5
+    │   └── motion_corrected_plane_1.h5
+    │   └── motion_corrected_plane_2.h5
+    │   └── motion_corrected_plane_N.h5
     └── segmentation
         └── caiman_output_plane_.h5
 

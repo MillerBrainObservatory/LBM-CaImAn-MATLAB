@@ -402,13 +402,13 @@ This is accomplished through the use of <a class="reference internal" href="../a
 <p>Each page is one <em>image</em>, but it doesn’t look like an image:</p>
 <a class=""
                data-lightbox="group-default"
-               href="../_images/assembly1.pdf"
+               href="../_images/assembly_11.png"
                title=""
                data-title=""
                
-               ><img src="../_images/assembly1.pdf"
+               ><img src="../_images/assembly_11.png"
                      class=""
-                     width="100%"
+                     width="800"
                      height="auto"
                      alt=""/>
                 </a><a class=""
@@ -420,7 +420,7 @@ This is accomplished through the use of <a class="reference internal" href="../a
                ><img src="../_images/High_res_diff_plane_11.png"
                      class=""
                      width="100%"
-                     height="auto"
+                     height="400"
                      alt=""/>
                 </a><a class=""
                data-lightbox="group-default"
@@ -430,40 +430,7 @@ This is accomplished through the use of <a class="reference internal" href="../a
                
                ><img src="../_images/scanimage_raw_strip_highres1.png"
                      class=""
-                     width="100%"
-                     height="auto"
-                     alt=""/>
-                </a><a class=""
-               data-lightbox="group-default"
-               href="../_images/matlab_path_explorer.png"
-               title=""
-               data-title=""
-               
-               ><img src="../_images/matlab_path_explorer.png"
-                     class=""
-                     width="1440"
-                     height="auto"
-                     alt=""/>
-                </a><a class=""
-               data-lightbox="group-default"
-               href="../_images/matlab_preferences1.png"
-               title=""
-               data-title=""
-               
-               ><img src="../_images/matlab_preferences1.png"
-                     class=""
-                     width="1440"
-                     height="auto"
-                     alt=""/>
-                </a><a class=""
-               data-lightbox="group-default"
-               href="../_images/motion_metrics1.png"
-               title=""
-               data-title=""
-               
-               ><img src="../_images/motion_metrics1.png"
-                     class=""
-                     width="1440"
+                     width="800"
                      height="auto"
                      alt=""/>
                 </a><div class="line-block">
@@ -501,7 +468,18 @@ No other .tiff files should be in this directory. If this happens, an error will
                      height="auto"
                      alt=""/>
                 </a><p>This example shows that shifting every <em>other</em> row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.</p>
-<p>Newer versions (2019+) of ScanImage do this correction for you, but it won’t hurt. Before any image manipulations, the routine first checks if any lateral (x) shift
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/offset_11.svg"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/offset_11.svg"
+                     class=""
+                     width="800"
+                     height="auto"
+                     alt=""/>
+                </a><p>Newer versions (2019+) of ScanImage do this correction for you, but it won’t hurt. Before any image manipulations, the routine first checks if any lateral (x) shift
 will improve the correlation between adjacent rows and if not, will do nothing.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
@@ -575,7 +553,9 @@ After successfully running <a class="reference internal" href="../api/core.html#
 </section>
 <section id="evaluate-output">
 <h2>Evaluate output<a class="headerlink" href="#evaluate-output" title="Link to this heading">#</a></h2>
-<p>In your <cite>save_path</cite>, you will see a newly created <cite>figures</cite> folder.</p>
+<p>In your <cite>save_path</cite>, you will see a newly created <cite>figures</cite> folder. This contains an image for each [X,Y,T] plane and checks for proper tiling.</p>
+<section id="offset-and-z-plane-quality">
+<h3>Offset and Z Plane Quality<a class="headerlink" href="#offset-and-z-plane-quality" title="Link to this heading">#</a></h3>
 <p>In this folder is a close-up of the brightest image in every plane for a random frame. Each
 image shoes the neuron before and after scan-correction. This lets you compare planes, validate the correct
 scan-phase offset value (usually 1, 2 or 3 pixels).</p>
@@ -615,6 +595,33 @@ scan-phase offset value (usually 1, 2 or 3 pixels).</p>
                      width="1440"
                      height="auto"
                      alt=""/>
+                </a></section>
+<section id="tile-consistency">
+<h3>Tile Consistency<a class="headerlink" href="#tile-consistency" title="Link to this heading">#</a></h3>
+<p>Lastly, examine <cite>mean_tile_consistency</cite> which runs an edge detection, resulting in the image shown in <cite>mean_tile_consistency</cite>.</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/mean_tile_consistency1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/mean_tile_consistency1.png"
+                     class=""
+                     width="1440"
+                     height="auto"
+                     alt=""/>
+                </a><p>This will show you which frames result in horizontal or vertical edge inconsistencies over time.</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/mean_tile_consistency_edges1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/mean_tile_consistency_edges1.png"
+                     class=""
+                     width="1440"
+                     height="auto"
+                     alt=""/>
                 </a><p>You should do some checks to make sure data was written properly before continuing. There are a few convenience functions
 to view a movie provided in the pipeline. Below is an example:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="c">%% View info about your newly extracted dataset</span>
@@ -625,8 +632,6 @@ to view a movie provided in the pipeline. Below is an example:</p>
 <span class="n">data</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">h5read</span><span class="p">(</span><span class="w"> </span><span class="k">...</span>
 <span class="w">    </span><span class="n">h5name</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c"> % filename</span>
 <span class="w">    </span><span class="n">dataset_path</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c"> % dataset location</span>
-<span class="w">    </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">frame_start</span><span class="p">],</span><span class="w"> </span><span class="k">...</span><span class="c"> % start index for each dimension [X,Y,T]</span>
-<span class="w">    </span><span class="p">[</span><span class="nb">Inf</span><span class="p">,</span><span class="w"> </span><span class="nb">Inf</span><span class="p">,</span><span class="w">  </span><span class="n">frame_end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">frame_start</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="k">...</span><span class="c"> % count for each dimension [X,Y,T]</span>
 <span class="w">    </span><span class="p">);</span>
 
 <span class="w"> </span><span class="nb">figure</span><span class="p">;</span>
@@ -636,6 +641,7 @@ to view a movie provided in the pipeline. Below is an example:</p>
 <span class="w"> </span><span class="k">end</span>
 </pre></div>
 </div>
+</section>
 </section>
 </section>
 
@@ -690,7 +696,11 @@ to view a movie provided in the pipeline. Below is an example:</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extraction-output">Extraction Output</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluate-output">Evaluate output</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluate-output">Evaluate output</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#offset-and-z-plane-quality">Offset and Z Plane Quality</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tile-consistency">Tile Consistency</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

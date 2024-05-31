@@ -386,7 +386,7 @@ document.write(`
 </pre></div>
 </div>
 <p>You can tell if the pipeline is added successfully to the path by looking at the file window:</p>
-<a class="reference internal image-reference" href="../_images/matlab_path_explorer.png"><img alt="../_images/matlab_path_explorer.png" src="../_images/matlab_path_explorer.png" style="width: 200px;" />
+<a class="reference internal image-reference" href="../_images/matlab_path_explorer.png" id="matlab-file-explorer"><img alt="../_images/matlab_path_explorer.png" id="matlab-file-explorer" src="../_images/matlab_path_explorer.png" style="width: 200px;" />
 </a>
 <p>Notice <cite>/core</cite> and <cite>/packages</cite> are both bright in the files window, this indicates those folders are properly in the MATLAB path but does <strong>not</strong> mean that within that directory, all subdirectories are also on the path. These two folders contain all of the code the pipeline needs to run and are the only two foldrs that <strong>must</strong> be on the path.</p>
 </section>
@@ -452,11 +452,34 @@ If you put the root directory elsewhere, you will need to navigate to that direc
 <span class="w">    </span><span class="s">&#39;C:\Users\RBO\Documents\MATLAB&#39;</span>
 </pre></div>
 </div>
-<p>Otherwise, you will need to navigate to that directory within the matlab GUI or add the path to this repository:</p>
+<p>You can add the path programmatically from within matlab:</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">addpath</span><span class="p">(</span><span class="nb">genpath</span><span class="p">(</span><span class="s">&quot;path/to/caiman_matlab&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
+<p>Otherwise, you can simply navigate to that directory within the matlab GUI or add the path to this repository as
+shown in the installation recommendation via the <span class="xref std std-ref">matlab path explorer</span>.</p>
 </section>
+<section id="post-install">
+<h3>Post-Install<a class="headerlink" href="#post-install" title="Link to this heading">#</a></h3>
+<p>After installation, there a few helpful things you can do.</p>
+<ol class="arabic simple">
+<li><p>Preferences</p></li>
+</ol>
+<ul class="simple">
+<li><p>Prevent <cite>.asv</cite> files, which are essentially copies of the scripts you run. I just find these annoying.</p></li>
+</ul>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/matlab_preferences1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/matlab_preferences1.png"
+                     class=""
+                     width="1440"
+                     height="auto"
+                     alt=""/>
+                </a></section>
 </section>
 </section>
 
@@ -514,6 +537,7 @@ If you put the root directory elsewhere, you will need to navigate to that direc
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#wsl2-windows-subsystem-for-linux">WSL2 (Windows Subsystem for Linux)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#for-unix-linux-macos">For unix (Linux/MacOS):</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#find-matlab-install-location">Find MATLAB Install Location:</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#post-install">Post-Install</a></li>
 </ul>
 </li>
 </ul>

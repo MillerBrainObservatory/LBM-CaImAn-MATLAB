@@ -39,21 +39,14 @@ In its raw form (see A in the below figure), ScanImage tiff files are multipage 
 
 Each page is one *image*, but it doesn't look like an image:
 
-.. thumbnail:: ../_static/_images/assembly.pdf
+.. thumbnail:: ../_static/_images/assembly_1.png
+   :width: 800
 
 .. thumbnail:: ../_static/_images/High_res_diff_plane_1.png
+   :height: 400
 
 .. thumbnail:: ../_static/_images/scanimage_raw_strip_highres.png
-
-.. thumbnail:: ../_static/_images/matlab_path_explorer.png
-   :width: 1440
-
-.. thumbnail:: ../_static/_images/matlab_preferences.png
-   :width: 1440
-
-.. thumbnail:: ../_static/_images/motion_metrics.png
-   :width: 1440
-
+   :width: 800
 
 | A: In the above image, represents vertically concatenated **strip** of our image.
 | B: Strips are cut and horizontally concatenated.
@@ -86,6 +79,9 @@ of a suffix appended to the filename: `_000N`, where n=number of files chosen by
    :width: 1080
 
 This example shows that shifting every *other* row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.
+
+.. thumbnail:: ../_static/_images/offset_1.svg
+   :width: 800
 
 Newer versions (2019+) of ScanImage do this correction for you, but it won't hurt. Before any image manipulations, the routine first checks if any lateral (x) shift
 will improve the correlation between adjacent rows and if not, will do nothing.
@@ -176,7 +172,10 @@ We see that there are 30 datasets corresponding to each of our Z-planes, but no 
 Evaluate output
 ======================
 
-In your `save_path`, you will see a newly created `figures` folder.
+In your `save_path`, you will see a newly created `figures` folder. This contains an image for each [X,Y,T] plane and checks for proper tiling.
+
+Offset and Z Plane Quality
+***********************************
 
 In this folder is a close-up of the brightest image in every plane for a random frame. Each
 image shoes the neuron before and after scan-correction. This lets you compare planes, validate the correct
@@ -197,6 +196,19 @@ So far so good, but as we approach the end-plane (by order, not by depth):
 .. thumbnail:: ../_static/_images/offset/plane_30.png
    :width: 1440
 
+Tile Consistency
+*************************
+
+Lastly, examine `mean_tile_consistency` which runs an edge detection, resulting in the image shown in `mean_tile_consistency`.
+
+.. thumbnail:: ../_static/_images/mean_tile_consistency.png
+   :width: 1440
+
+This will show you which frames result in horizontal or vertical edge inconsistencies over time.
+
+.. thumbnail:: ../_static/_images/mean_tile_consistency_edges.png
+   :width: 1440
+
 You should do some checks to make sure data was written properly before continuing. There are a few convenience functions
 to view a movie provided in the pipeline. Below is an example:
 
@@ -210,8 +222,6 @@ to view a movie provided in the pipeline. Below is an example:
     data = h5read( ...
         h5name, ... % filename
         dataset_path, ... % dataset location
-        [1, 1, frame_start], ... % start index for each dimension [X,Y,T]
-        [Inf, Inf,  frame_end - frame_start + 1] ... % count for each dimension [X,Y,T]
         );
 
      figure;

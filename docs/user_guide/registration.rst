@@ -16,6 +16,7 @@ on the type of task the animal is performing.
 
 For this reason, it is *very* important for the researcher to verify that any motion artifacts in the movie are removed before moving onto any subsequent computations.
 
+
 Rigid vs Non-Rigid
 *******************
 
