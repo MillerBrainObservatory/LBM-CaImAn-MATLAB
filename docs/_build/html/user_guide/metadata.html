@@ -414,8 +414,8 @@ It doesn’t matter which .tiff file is used for this function, the metadata use
 </div>
 <section id="image-size">
 <h2>Image Size<a class="headerlink" href="#image-size" title="Link to this heading">#</a></h2>
-<p>ScanImage <a href="#id1"><span class="problematic" id="id2">`multi-ROI`_</span></a> images are made up of <cite>ROIs</cite>.
-These are rectangles (rectangles are forced as of scanimage 2019) that comprise the area that will be scanned.
+<p>ScanImage <a href="#id1"><span class="problematic" id="id2">`multi-ROI`_</span></a> .tiff outputs are made up of individual sections called that ScanImage calls <cite>ROIs</cite>.</p>
+<p>These are rectangles (rectangles are forced as of scanimage 2019) that comprise the area that will be scanned.
 These rectangles are called <cite>ScanImage scanfields</cite>. ScanField is just a custom matlab class with some information about the pixel sizes.</p>
 <p>ScanImage builds these rectanglular ROI’s 2D plane with a size and location being imaged relative to the objective lens.
 This is essentially a scale factor, converting the size / location from units of degrees to microns.</p>

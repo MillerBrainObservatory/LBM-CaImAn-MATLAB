@@ -39,8 +39,21 @@ In its raw form (see A in the below figure), ScanImage tiff files are multipage 
 
 Each page is one *image*, but it doesn't look like an image:
 
-.. thumbnail:: ../_static/_images/abc_strip.png
+.. thumbnail:: ../_static/_images/assembly.pdf
+
+.. thumbnail:: ../_static/_images/High_res_diff_plane_1.png
+
+.. thumbnail:: ../_static/_images/scanimage_raw_strip_highres.png
+
+.. thumbnail:: ../_static/_images/matlab_path_explorer.png
    :width: 1440
+
+.. thumbnail:: ../_static/_images/matlab_preferences.png
+   :width: 1440
+
+.. thumbnail:: ../_static/_images/motion_metrics.png
+   :width: 1440
+
 
 | A: In the above image, represents vertically concatenated **strip** of our image.
 | B: Strips are cut and horizontally concatenated.
