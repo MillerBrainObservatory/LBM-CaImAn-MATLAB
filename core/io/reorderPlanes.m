@@ -20,25 +20,18 @@ function reorderPlanes(h5path, loc, order)
         error('The number of groups (%d) does not match the number of elements in order (%d).', num_groups, numel(order));
     end
 
-     % Store the original order as an attribute
-    original_order = 1:num_groups;
-    h5writeatt(h5path, loc, 'original_order', original_order);
-    h5writeatt(h5path, loc, 'reordered', true);
-    h5writeatt(h5path, loc, 'new_order', order);
-
-    % Use a temporary name to avoid conflicts
+    % Use a temp name to avoid conflicts
     temp_name_prefix = 'temp_plane_';
 
     fid = H5F.open(h5path, 'H5F_ACC_RDWR', 'H5P_DEFAULT');
 
-    % First, rename all groups to temporary names
+    % Rename all groups to temporary names
     for i = 1:numel(order)
         original_plane_name = sprintf('%s/plane_%d', loc, order(i));
         temp_plane_name = sprintf('%s/%s%d', loc, temp_name_prefix, i);
         H5L.move(fid, original_plane_name, fid, temp_plane_name, 'H5P_DEFAULT', 'H5P_DEFAULT');
     end
 
-    % Then, rename temporary names to final names
     for i = 1:numel(order)
         temp_plane_name = sprintf('%s/%s%d', loc, temp_name_prefix, i);
         new_plane_name = sprintf('%s/plane_%d', loc, i);
@@ -51,6 +44,13 @@ function reorderPlanes(h5path, loc, order)
             h5writeatt(h5path, new_plane_name, attr_name, attr_value);
         end
     end
+
+    % Store the original order as an attribute so we know if this
+    % dataset was altered and can re-instantiate the original order.
+    original_order = 1:num_groups;
+    h5writeatt(h5path, loc, 'original_order', original_order);
+    h5writeatt(h5path, loc, 'reordered', true);
+    h5writeatt(h5path, loc, 'new_order', order);
 
     H5F.close(fid);
 end
