@@ -10,8 +10,6 @@ function reorderPlanes(h5path, loc, order)
     %     Location within the HDF5 file where the planes are stored (e.g., '/registration').
     % order : array
     %     Array specifying the new order of the planes.
-
-    %% TODO ADD ORIGINAL ORDER AND CHECK FOR PREVIOUS ORDERING GROUPS/ATTR
     
     % Validate the order
     info = h5info(h5path, loc);

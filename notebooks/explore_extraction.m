@@ -1,11 +1,4 @@
-% clc, clear;
-% 
-% metadata = read_h5_metadata('C:\Users\RBO\Documents\data\high_res\extracted\extracted_plane_1.h5', '/Y');
-% dataset_path = "/"; % where data is saved in the h5 file (this is default)
-% num_px = metadata.num_pixel_xy;
-
 %% TEST SCAN PHASE FOR GROUND TRUTH VS PIPELINE
-
 clc; clear;
 gt_mf = matfile("E:\ground_truth\high_res\offset_data.mat");
 gt_raw = single(gt_mf.Iin);
@@ -38,14 +31,6 @@ corrected_square = fixScanPhase(gt_square, scanphase_square, 1, 'single');
 sq_raw = get_central_indices(corrected, 40);
 sq_cut = get_central_indices(corrected_cut, 40);
 sq_square = get_central_indices(corrected_square, 40);
-
-% figure;
-% rows = 1;
-% cols = 3;
-% tiledlayout(rows, cols, "TileSpacing","tight","Padding","tight");
-% nexttile;imagesc(sq_raw(3:end,3:end));axis image; axis off;colormap 'gray'; subtitle(sprintf("600x144 (raw) Input: offset=%d", scanphase));
-% nexttile;imagesc(sq_square(3:end,3:end));axis image;axis off;colormap 'gray'; subtitle(sprintf("583x132 (trimmed) Input: offset=%d", scanphase_cut));
-% nexttile;imagesc(sq_cut(3:end,3:end));axis image;axis off;colormap 'gray'; subtitle(sprintf("40x40 (square) Input: offset=%d", scanphase_square));
 
 %% DATA LOADER
 % TODO: Function-ize this
