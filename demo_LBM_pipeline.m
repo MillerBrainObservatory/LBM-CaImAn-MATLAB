@@ -28,6 +28,7 @@ addpath(genpath(fullfile(fpath, 'core', 'io')));
 
 %% Here you can validate that all dependencies are on the path and accessible from within this pipeline.
 %% This does not check for package access on your path.
+
 result = validateRequirements();
 if ischar(result)
     error(result);
@@ -38,8 +39,6 @@ end
 parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
 data_path = fullfile(parent_path, 'raw');
 save_path = fullfile(parent_path, 'extracted_2');
-mp4path =[parent_path, 'ffmpeg_output.mp4'];
-inpath = [parent_path, '321.mp4'];
 
 %% 1) Pre-Processing
 clc;
@@ -75,7 +74,9 @@ if compute
 end
 
 %% 3) CNMF Plane-by-plane SegmentationS
-segment_path = fullfile(parent_path, 'segmented');
+mc_path = fullfile(parent_path, 'corrected');
+if ~isfolder(mc_path); mkdir(mc_path); end
+segment_path = fullfile(parent_path, 'segmented_comp');
 if ~isfolder(segment_path); mkdir(segment_path); end
 
 compute = 1;
@@ -87,8 +88,8 @@ if compute
         'debug_flag', 0, ...
         'overwrite', 1, ...
         'num_cores', 23, ...
-        'start_plane', 7, ...
-        'end_plane', 13  ...
+        'start_plane', 20, ...
+        'end_plane', 21  ...
         );
 end
 
