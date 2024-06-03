@@ -1,36 +1,49 @@
-
 %%
 
-clc; clear;
+order = [1 5:10 2 11:17 3 18:23 4 24:30];
+order = fliplr(order);
+%%
+
+[currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
+addpath(genpath(fullfile(currpath, '../packages/CaImAn_Utilities/CaImAn-MATLAB-master/CaImAn-MATLAB-master/')));
+addpath(genpath(fullfile(currpath, './utils')));
+addpath(genpath(fullfile(currpath, './io')));
+
 parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
 raw_path = fullfile(parent_path, 'raw');
+
 extracted = fullfile(parent_path, 'extracted');
 corrected = fullfile(parent_path, 'corrected_gt');
 segmented = fullfile(parent_path, 'segmented');
 save_path = fullfile(parent_path, 'results');
 
 % metadata = read_h5_metadata('C:\Users\RBO\Documents\data\high_res\segmented\segmented_plane_5.h5', '/mov');
-data_filename = fullfile(corrected, "motion_corrected_plane_1.h5");
-data = h5read(data_filename, '/mov');
 
+% %%
+% data_filename = fullfile(corrected, "motion_corrected_plane_1.h5");
+% data = h5read(data_filename, '/mov');
+% info = h5info(h5_segmented, '/');
+% Ac_keep = h5read(h5_segmented, '/Ac_keep');
+% Cn = h5read(h5_segmented, '/Cn');
+% C_keep = h5read(h5_segmented, '/C_keep');
+% Km = h5read(h5_segmented, '/Km');
+% acm = h5read(h5_segmented, '/acm');
+% acx = h5read(h5_segmented, '/acx');
+% acy = h5read(h5_segmented, '/acy');
+% f = h5read(h5_segmented, '/f');
+% b = h5read(h5_segmented, '/b');
+% rVals = h5read(h5_segmented, '/rVals');
 %%
 
-info = h5info(h5_segmented, '/');
-Ac_keep = h5read(h5_segmented, '/Ac_keep');
-Cn = h5read(h5_segmented, '/Cn');
-C_keep = h5read(h5_segmented, '/C_keep');
-Km = h5read(h5_segmented, '/Km');
-acm = h5read(h5_segmented, '/acm');
-acx = h5read(h5_segmented, '/acx');
-acy = h5read(h5_segmented, '/acy');
-f = h5read(h5_segmented, '/f');
-b = h5read(h5_segmented, '/b');
-rVals = h5read(h5_segmented, '/rVals');
+sizY = size(data);
+Yr = reshape(data,[],sizY(end));
+F_dark = min(Yr(:));
 
 %%
-
 [d1,d2,T] = size(data);     % dimensions of dataset
 d = d1*d2;                  % total number of pixels
+F_dark = inf;
+F_dark = min(min(data(:)),F_dark);
 
 FrameRate = 9.6;
 tau = 7.5;
@@ -71,21 +84,31 @@ options = CNMFSetParms(...
 'decay_time',0.5,...
 'size_thr', sz, ...
 'search_method',srch_method,...
-'min_size', round(tau), ...           % minimum size of ellipse axis (default: 3)
-'max_size', 2*round(tau), ...             % maximum size of ellipse axis (default: 8)
-'dist', dist, ...                              % expansion factor of ellipse (default: 3)
+'min_size', round(tau), ...                 % minimum size of ellipse axis (default: 3)
+'max_size', 2*round(tau), ...               % maximum size of ellipse axis (default: 8)
+'dist', dist, ...                           % expansion factor of ellipse (default: 3)
 'max_size_thr',mx,...                       % maximum size of each component in pixels (default: 300)
 'time_thresh',time_thresh,...
 'min_size_thr',mn,...                       % minimum size of each component in pixels (default: 9)
 'refine_flag',0,...
-'fr', FrameRate);
+'fr', FrameRate ...
+);
+%%
+segmentPlane( ...
+        corrected, ... % we used this to save extracted data
+        save_path, ... % save registered data here
+        'dataset_name', '/mov', ... % where we saved the last step in h5
+        'debug_flag', 0, ...
+        'overwrite', 1, ...
+        'num_cores', 23, ...
+        'start_plane', 1, ...
+        'end_plane', 1  ...
+        );
 
 %%
 
 disp('Beginning patched, volumetric CNMF...')
 [A,b,C,f,S,P,~,YrA] = run_CNMF_patches(data,K,patches,tau,p,options);
-
-plot(A(1:5, :)); axis image;
 
 disp('Beginning component classification...')
 [rval_space,rval_time,max_pr,sizeA,keep0,~,traces] = classify_components_jeff(data,A,C,b,f,YrA,options);
@@ -117,35 +140,18 @@ options.nb = options.gnb;
 [C_keep,f,~,~,R_keep] = update_temporal_components_fast(data,A_keep,b,C_keep,f,P,options);
 
 disp('Reordering components...')
-F_dark = inf;
-F_dark = min(min(data(:)),F_dark);
-
-try
-    [A_keep,C_keep,S,P] = order_ROIs(A_keep, C_keep, S, P); % order components
-catch
-    disp('Reordering failed.')
-end
+[A_keep,C_keep,S,P] = order_ROIs(A_keep, C_keep, S, P); % order components
 
 [T_keep,F0] = detrend_df_f( ...
     A_keep, ...
     [b,ones(d1*d2,1)], ...
     C_keep, ...
-    [f_full;-double(F_dark)*ones(1,T)], ...
+    [f;-double(F_dark)*ones(1,T)], ...
     R_keep, ...
     options ...
 );
 
-[F_dff,F0] = detrend_df_f( ...
-    A_keep, ...
-    [b,ones(prod(FOV),1)], ...
-    C_full, ...
-    % [f_full;-double(F_dark)*ones(1,T)], ...
-    R_full, ...
-    options ...
-);
-
 %%
-
 AK = reshape(full(A_keep),d1,d2,[]);
 
 % Correlation maps
@@ -165,16 +171,14 @@ AKC(:,:,1) = AKm;
 im = imagesc(AKC);
 im.AlphaData = 0.3;
 
-save('caiman_output_plane_26.mat','A_keep','T_keep','Cn')
+% save('caiman_output_plane_26.mat','A_keep','T_keep','Cn')
 
 %%
-h5_corrected = sprintf('C:/Users/RBO/Documents/data/high_res/corrected_gt/motion_corrected_plane_%d.h5', 1);
-h5_extracted = sprintf('C:/Users/RBO/Documents/data/high_res/extracted_gt/extracted_plane_%d.h5', 1);
-data_corr = h5read(h5_corrected, '/mov');
-data_extr = h5read(h5_extracted, '/Y_gt');
-
-img_frame = data_corr(:,:,200);
-[r, c] = find(img_frame == max(img_frame(:)));
-[slicey, slicex] = get_central_indices(img_frame,r,c,200);
-new = [data_corr(slicey, slicex, 2:402) data_extr(slicey, slicex, 2:402)];
-planeToMovie(new, save_path, 10);
+Cn = correlation_image_max(data);  % background image for plotting
+run_GUI = false;
+if run_GUI
+    Coor = plot_contours(A,Cn,options,1); close;
+    GUIout = ROI_GUI(A,options,Cn,Coor,keep,ROIvars);   
+    options = GUIout{2};
+    keep = GUIout{3};    
+end
