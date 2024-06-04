@@ -2,6 +2,7 @@
 
 order = [1 5:10 2 11:17 3 18:23 4 24:30];
 order = fliplr(order);
+
 %%
 
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
@@ -118,13 +119,12 @@ Cn =  correlation_image(data);
 %%
 
 rVal = 0.2;
-
 ind_corr = (rval_space > rVal);% & (sizeA >= options.min_size_thr) & (sizeA <= options.max_size_thr);                     
 
 % Event exceptionality:
 fitness = compute_event_exceptionality(C+YrA,options.N_samples_exc,options.robust_std);
 ind_exc = (fitness < options.min_fitness);
- 
+
 % Select components:
 keep = ind_corr & ind_exc;
 
@@ -173,7 +173,7 @@ im.AlphaData = 0.3;
 
 % save('caiman_output_plane_26.mat','A_keep','T_keep','Cn')
 
-%%
+%% Correlation of Contours
 Cn = correlation_image_max(data);  % background image for plotting
 run_GUI = false;
 if run_GUI
@@ -182,3 +182,21 @@ if run_GUI
     options = GUIout{2};
     keep = GUIout{3};    
 end
+
+%% Load new dataset 
+
+data = matfile("D:\Jeffs LBM paper data\Fig5\Fig5_dataset_plane_30.mat")
+h5_segmented = fullfile("C:\Users\RBO\Documents\data\high_res\results\segmented_plane_1.h5")
+
+Ac_keep_n = h5read(h5_segmented, '/Ac_keep');
+Cn_n = h5read(h5_segmented, '/Cn');
+C_keep_n = h5read(h5_segmented, '/C_keep');
+Km_n = h5read(h5_segmented, '/Km');
+acm_n = h5read(h5_segmented, '/acm');
+acx_n = h5read(h5_segmented, '/acx');
+acy_n = h5read(h5_segmented, '/acy');
+f_n = h5read(h5_segmented, '/f');
+b_n = h5read(h5_segmented, '/b');
+rVals_n = h5read(h5_segmented, '/rVals');
+
+%%

@@ -4,8 +4,7 @@ gt_mf = matfile("E:\ground_truth\high_res\offset_data.mat");
 gt_raw = single(gt_mf.Iin);
 gt_cut = gt_raw(18:end, 7:end-6);
 
-[r, c] = find(gt_raw == max(gt_raw(:)));
-[yind, xind] = get_central_indices(gt_raw,r,c,50);
+[yind, xind] = get_central_indices(gt_raw,50);
 
 f = figure('Color', 'black', 'Visible', 'on', 'Position', [100, 100, 1400, 600]); % Adjust figure size as needed
 % sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'w');
@@ -28,9 +27,11 @@ corrected = fixScanPhase(gt_raw, scanphase, 1, 'single');
 corrected_cut = fixScanPhase(gt_cut, scanphase_cut, 1, 'single');
 corrected_square = fixScanPhase(gt_square, scanphase_square, 1, 'single');
 
-sq_raw = get_central_indices(corrected, 40);
-sq_cut = get_central_indices(corrected_cut, 40);
-sq_square = get_central_indices(corrected_square, 40);
+[xr, yr] = get_central_indices(corrected, 50);
+[xc, yc] = get_central_indices(corrected_cut, 50);
+[xs, ys] = get_central_indices(corrected_square, 50);
+
+imagesc([corrected(xr, yr) corrected_cut(xc, yc) corrected_square(xs, ys)]);
 
 %% DATA LOADER
 % TODO: Function-ize this
