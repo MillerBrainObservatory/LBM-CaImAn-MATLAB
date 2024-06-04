@@ -78,6 +78,7 @@ for k = 1:numFrames
     frame = getframe;
     I = frame.cdata(buffer+1:sizY+buffer,buffer+1:sizX+buffer,:);
     writeVideo(writerObj,I);
+    pause(0.001);
     clf(h)
 end
 
