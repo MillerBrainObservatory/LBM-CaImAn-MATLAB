@@ -50,10 +50,12 @@ if compute
         'dataset_name', '/Y', ... % default
         'debug_flag', 0, ... % default, if 1 will display files and return
         'fix_scan_phase', 0, ... % default, keep to 1
-        'trim_pixels', [6 6 17 0], ... % default, num pixels to trim for each roi
+        'trim_pixels', [8 8 17 0], ... % default, num pixels to trim for each roi
         'overwrite', 1 ...
         );
 end
+
+% reorder planes
 
 %% 2) Motion Correction
 mc_path = fullfile(parent_path, 'corrected');
@@ -76,7 +78,7 @@ end
 %% 3) CNMF Plane-by-plane SegmentationS
 mc_path = fullfile(parent_path, 'corrected');
 if ~isfolder(mc_path); mkdir(mc_path); end
-segment_path = fullfile(parent_path, 'segmented_comp');
+segment_path = fullfile(parent_path, 'results');
 if ~isfolder(segment_path); mkdir(segment_path); end
 
 compute = 1;
@@ -88,8 +90,8 @@ if compute
         'debug_flag', 0, ...
         'overwrite', 1, ...
         'num_cores', 23, ...
-        'start_plane', 20, ...
-        'end_plane', 21  ...
+        'start_plane', 2, ...
+        'end_plane', 30  ...
         );
 end
 

@@ -1,4 +1,5 @@
-function [y_ind, x_ind] = get_central_indices(img, r, c, pixels)
+function [y_ind, x_ind] = get_central_indices(img, pixels)
+    [r, c] = find(img == max(img(:)));
     half_pix = floor(pixels / 2);
     r_start = max(r - half_pix, 1);
     r_end = min(r + half_pix, size(img, 1));
