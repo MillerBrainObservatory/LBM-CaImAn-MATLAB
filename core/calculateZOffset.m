@@ -1,31 +1,31 @@
-function [offsets] = calculateZOffset(datapath, metadata, startPlane, endPlane, numFeatures)
-% CALCULATEZOFFSET Calculates Z-axis offsets between consecutive image planes by cross-correlation.
-%
-% This function loads image data from specified planes, identifies features
-% in each plane, and calculates the offset in pixels between these features
-% across consecutive planes. The function maximizes cross-correlation on regions
-% around identified features to determine the best match and thus the offset.
-%
+function [offsets] = calculateZOffset(data_path, save_path, varargin)
 % Parameters
 % ----------
-% datapath : string
+% data_path : string
 %     Path to the directory containing the image data and calibration files.
 %     The function expects to find 'pollen_sample_xy_calibration.mat' in this directory along with each caiman_output_plane_N.
-%
-% metadata : struct
-%     Structure containing metadata for the image data. Expected to have at
-%     least the 'pixel_resolution' field which is used to scale distances.
-%
-% startPlane : int
-%     The starting plane index from which to begin processing.
-%
-% endPlane : int
-%     The ending plane index at which to stop processing. The function
-%     calculates offsets from startPlane to endPlane, inclusive.
-%
-% numFeatures : int
+% save_path : char
+%     Path to the directory to save the motion vectors.
+% dataset_name : string, optional
+%     Group path within the hdf5 file that contains raw data.
+%     Default is 'registration'.
+% debug_flag : double, logical, optional
+%     If set to 1, the function displays the files in the command window and does
+%     not continue processing. Defaults to 0.
+% overwrite : logical, optional
+%     Whether to overwrite existing files (default is 1).
+% num_cores : double, integer, positive
+%     Number of cores to use for computation. The value is limited to a maximum
+%     of 24 cores.
+% start_plane : double, integer, positive
+%     The starting plane index for processing.
+% end_plane : double, integer, positive
+%     The ending plane index for processing. Must be greater than or equal to
+%     start_plane.
+% num_features : double, integer, positive
 %     The number of features to identify and use in each plane for
-%     calculating offsets.
+%     calculating offsets. Default is 3 features/neurons compared across
+%     z-plane/z-plane+1.
 %
 % Returns
 % -------
@@ -51,32 +51,128 @@ function [offsets] = calculateZOffset(datapath, metadata, startPlane, endPlane, 
 %
 % See also LOAD, MAX, IND2SUB, XCORR2, GINPUT, NANMEAN
 
-load(fullfile(datapath, 'pollen_sample_xy_calibration.mat'));
+p = inputParser;
+addRequired(p, 'data_path');
+addRequired(p, 'save_path');
+addParameter(p, 'dataset_name', "/extraction", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addOptional(p, 'debug_flag', 0, @(x) isnumeric(x));
+addParameter(p, 'overwrite', 1, @(x) isnumeric(x));
+addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
+addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
+addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
+addParameter(p, 'num_features', 3, @(x) isnumeric(x) && isPositiveIntegerValuedNumeric(x));
+parse(p, data_path, save_path, varargin{:});
 
-pixel_resolution = metadata.pixel_resolution;
+data_path = p.Results.data_path;
+save_path = p.Results.save_path;
+dataset_name = p.Results.dataset_name; % here for param consistency but ignored
+debug_flag = p.Results.debug_flag;
+overwrite = p.Results.overwrite;
+num_cores = p.Results.num_cores;
+start_plane = p.Results.start_plane;
+end_plane = p.Results.end_plane;
+num_features = p.Results.num_features;
 
-dy = round(diffy/pixel_resolution);
-dx = round(diffx/pixel_resolution);
+if ~isfolder(data_path)
+    error("Data path:\n %s\n ..does not exist", data_path);
+end
 
-ddx = diff(dy);
-ddy = diff(dx);
-scale_fact = 10;
-nsize = ceil(scale_fact/pixel_resolution);
+if debug_flag == 1; dir([data_path, '*.tif']); return; end
+if isempty(save_path)
+    warning("No save_path given. Saving data in data_path: %s\n", data_path);
+    save_path = data_path;
+end
 
-offsets = zeros(metadata.num_planes, 2);
+fig_save_path = fullfile(save_path, "figures");
+if ~isfolder(fig_save_path); mkdir(fig_save_path); end
 
-for curr_plane = startPlane:endPlane
+files = dir(fullfile(data_path, '*.h*'));
+if isempty(files)
+    error('No suitable data files found in: \n  %s', data_path);
+end
 
-    p1 = load([path 'caiman_output_plane_' num2str(curr_plane) '.mat'],'Ym'); p1 = p1.Ym;
-    p2 = load([path 'caiman_output_plane_' num2str(curr_plane+1) '.mat'],'Ym'); p2 = p2.Ym;
+log_file_name = sprintf("%s_axial_offset_correction", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+log_full_path = fullfile(save_path, log_file_name);
+fid = fopen(log_full_path, 'w');
+if fid == -1
+    error('Cannot create or open log file: %s', log_full_path);
+else
+    fprintf('Log file created: %s\n', log_full_path);
+end
+% closeCleanupObj = onCleanup(@() fclose(fid));
+
+calib_files = fullfile(data_path, 'pollen*');
+calib_files = dir(calib_files);
+if length(calib_files) < 2
+    error("Missing pollen calibration files in folder:\n%s\n.", data_path);
+else
+    for i=length(calib_files)
+        calib = fullfile(calib_files(i).folder, calib_files(i).name);
+        if calib_files(i).name == "pollen_sample_xy_calibration.mat"
+            load(calib);
+        end
+        fprintf("Loaded calibration file:\n");
+        fprintf("%s\n",fullfile(calib_files(i).folder, calib_files(i).name));
+    end
+end
+
+if ~exist("diffx", "var")
+    error("Missing or incorrect pollen calibration file supplied.");
+end
+
+%% Pull metadata from attributes attached to this group
+num_cores = max(num_cores, 23);
+fprintf(fid, '%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); tall=tic;
+for curr_plane = start_plane:end_plane
+    if curr_plane+1 > end_plane
+        fprintf("Current plane (%d) > Last Plane (%d)", curr_plane, end_plane)
+        continue;
+    end
+    plane_name = sprintf("%s/segmented_plane_%d.h5", data_path, curr_plane);
+    plane_name_next = sprintf("%s/segmented_plane_%d.h5", data_path, curr_plane+1);
+
+    plane_name_save = sprintf("%s/axial_corrected_plane_%d.h5", save_path, curr_plane);
+    if isfile(plane_name_save)
+        fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+        if overwrite
+            fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+            delete(plane_name_save)
+        end
+    end
+
+    h5_data = h5info(plane_name, '/');
+    metadata = struct();
+    for k = 1:numel(h5_data.Attributes)
+        attr_name = h5_data.Attributes(k).Name;
+        attr_value = h5readatt(plane_name, sprintf("/%s",h5_data.Name), attr_name);
+        metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
+    end
+
+    pixel_resolution = metadata.pixel_resolution;
+
+    if ~(metadata.num_planes >= end_plane)
+        error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
+    end
+
+    dy = round(diffy/pixel_resolution);
+    dx = round(diffx/pixel_resolution);
+
+    ddx = diff(dy);
+    ddy = diff(dx);
+    scale_fact = 10;
+    nsize = ceil(scale_fact/pixel_resolution);
+
+    offsets = zeros(metadata.num_planes, 2);
+    p1 = h5read(plane_name, '/Ym');
+    p2 = h5read(plane_name_next, '/Ym');
 
     gix = nan(1,3);
     giy = gix;
 
     %% search through the brightest features
-    for feature_idx = 1:numFeatures
+    for feature_idx = 1:num_features
         try
-            buffer = 5*nsize;
+            buffer = 10*nsize;
             p1m = p1;
             p1m(1:buffer,:) = 0;
             p1m(end-buffer:end,:) = 0;
@@ -92,14 +188,14 @@ for curr_plane = startPlane:endPlane
             xlim([xi-scale_fact*nsize xi+scale_fact*nsize])
             ylim([yi-scale_fact*nsize yi+scale_fact*nsize])
 
+            figure(h1)
+            [x1,y1] = ginput(1);
+
             h2 = figure;
             set(h2,'position',[700 400 560 420])
             imagesc(p2); axis image
             xlim([xi-scale_fact*nsize+ddx(curr_plane) xi+scale_fact*nsize+ddx(curr_plane)])
             ylim([yi-scale_fact*nsize+ddy(curr_plane) yi+scale_fact*nsize+ddy(curr_plane)])
-
-            figure(h1)
-            [x1,y1] = ginput(1);
 
             y1 = round(y1);
             x1 = round(x1);
@@ -141,14 +237,14 @@ for curr_plane = startPlane:endPlane
                 p2(y2-nsize:y2+nsize,x2-nsize:x2+nsize) = 0;
 
             end
-        catch
-            disp('Current mapping failed.')
+        catch ME
+            disp('Current mapping failed');
         end
     end
     offsets(curr_plane+1,:) = [round(nanmean(giy)) round(nanmean(gix))];
 end
 
 offsets = round(offsets);
-save([path 'three_neuron_mean_offsets.mat'],'offsets')
+save(fullfile(data_path, 'three_neuron_mean_offsets.mat'),'offsets')
 
 end
