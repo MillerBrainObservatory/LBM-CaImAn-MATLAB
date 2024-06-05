@@ -1,4 +1,6 @@
-# MAxiMuM CaImAn pipeline
+# MAxiMuM CaImAn pipeline 
+
+BRANCH - original pipeline
 
 This is a copy of the original MAxiMuM processing pipeline (small updates since the paper by Jason), including some older/extra pieces of code. The core software is in: https://github.com/jmmanley/MAxiMuM_processing_tools
 
