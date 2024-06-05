@@ -1,4 +1,4 @@
-function reorderPlaneFiles(h5path, order)
+function rename_planes(h5path, order)
 % REORDERPLANEFILES Reorder z-plane filenames.
 %
 % Parameters
@@ -26,7 +26,6 @@ num_files = length(files);
 temp_files = cell(num_files, 1);
 for i = 1:num_files
     [folder, name, ext] = fileparts(files(i).name);
-    % metadata = read_h5_metadata(files(i).name, '/Y');
     temp_files{i} = fullfile(files(i).folder, [name '_temp' ext]);
     movefile(fullfile(files(i).folder, files(i).name), temp_files{i});
 end
@@ -40,7 +39,7 @@ for i = 1:num_files
         error('Filename %s does not match expected pattern: _plane_.', name);
     end
     base_name = tokens{1}{1};
-    new_name = fullfile(files(i).folder, sprintf('%s_plane_%d_reordered_plane_%d%s', base_name, i, order(i), ext));
+    new_name = fullfile(files(i).folder, sprintf('%s_plane_%d%s', base_name, order(i), ext));
     h5writeatt(original_name, '/', 'original_plane', i);
     movefile(original_name, new_name);
 end
