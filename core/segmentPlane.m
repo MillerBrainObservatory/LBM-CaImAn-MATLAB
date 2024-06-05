@@ -65,6 +65,7 @@ addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
 addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
+addParameter(p, 'options', 1, @(x) isstruct(x));
 parse(p, data_path, save_path, varargin{:});
 
 data_path = p.Results.data_path;
@@ -75,6 +76,7 @@ overwrite = p.Results.overwrite;
 num_cores = p.Results.num_cores;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
+options = p.Results.options;
 
 % give access to CaImAn files
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
@@ -149,8 +151,9 @@ for plane_idx = start_plane:end_plane
     end
 
     %% Load in data
-    data = h5read(plane_name, dataset_name);
-    data = data - min(data(:));
+    data = double(h5read(plane_name, dataset_name));
+    % data = data - min(data(:));
+
     t_start = tic;
     pixel_resolution = metadata.pixel_resolution;
     frame_rate = metadata.frame_rate;
@@ -175,13 +178,11 @@ for plane_idx = start_plane:end_plane
     mn = floor(pi.*(tau.*0.5).^2); % SHRINK IF FOOTPRINTS ARE TOO SMALL
     p = 2; % order of dynamics
 
-    % patch set up; basing it on the ~600 um strips of the 2pRAM, +50 um overlap between patches
     sizY = size(data);
-    patch_size = round(650/pixel_resolution).*[1,1];
-    overlap = [1,1].*ceil(50./pixel_resolution);
+    patch_size = [600,600];
+    overlap = [30,30];
     patches = construct_patches(sizY(1:end-1),patch_size,overlap);
-
-    K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2); % number of components based on assumption of 9.2e4 neurons/mm^3
+    K = ceil(600/numel(patches));  % number of components (neurons) to be found
 
     % Set caiman parameters
     options = CNMFSetParms(...
@@ -210,11 +211,11 @@ for plane_idx = start_plane:end_plane
         'refine_flag',0,...
         'rolling_length',ceil(frame_rate*5),...
         'fr', frame_rate ...
-        );
+    );
+
     fprintf(fid, "%s : Data loaded in. This process took: %0.2f seconds.\nBeginning CNMF.\n\n",datetime("now"), toc(t_start));
     t_cnmf = tic;
 
-    %% F.O. 05.16.24: BREAKING - remove parallel eval on memmapped file
     [A,b,C,f,S,P,~,YrA] = run_CNMF_patches(data,K,patches,tau,p,options);
     fprintf(fid, '%s : Initialized CNMF patches complete.  Process took: %.2f seconds\Classifying components ...',datetime("now"), toc(t_cnmf));
 
@@ -224,6 +225,7 @@ for plane_idx = start_plane:end_plane
 
     t_test = tic;
     Cn =  correlation_image(data);
+
     % Spatial acceptance test:
     ind_corr = (rval_space > space_thresh) & (sizeA >= options.min_size_thr) & (sizeA <= options.max_size_thr);
 
@@ -236,14 +238,10 @@ for plane_idx = start_plane:end_plane
 
     A_keep = A(:,keep);
     C_keep = C(keep,:);
-    Km = size(C_keep,1);  % total number of components
+    Km = size(C_keep,1); % total number of components
+
     rVals = rval_space(keep);
     fprintf(fid, '%s : First CNMF iteration complete. Process took: %.2f seconds\nUpdating tamporal components... ...', datetime("now"), toc(t_test));
-
-    %% Convert sparse A matrix to full 3D matrix
-    t_sparse = tic;
-    [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2);  % Ac_keep has dims. [2*tau+1,2*tau+1,K] where each element Ki is a 2D map centered on centroid of component acx(Ki),axy(Ki), and acm(Ki) = sum(sum(Ac_keep(:,:,Ki))
-    fprintf(fid, '%s : Created sparse component matrix. Process took: %.2f seconds\nSaving data ...', datetime("now"), toc(t_sparse));
 
     %% Update temporal components
     P.p = 0;
@@ -254,14 +252,30 @@ for plane_idx = start_plane:end_plane
     fprintf(fid, '%s : Temporal components updates. Process took: %.2f seconds\nDetrending from raw traces ...', datetime("now"), toc(t_update));
 
     %% Detrend
-    % t_detrend = tic;
-    % if size(A_keep,2) < 2 % Calculate "raw" traces in terms of delta F/F0
-    %     [T_keep,F0] = detrend_df_f([A_keep,ones(d1*d2,1)],[b,ones(d1*d2,1)],[C_keep;ones(1,T)],[f;-min(min(min(data)))*ones(1,T)],[R_keep; ones(1,T)],options);
-    % else
-    %     [T_keep,F0] = detrend_df_f(A_keep,[b,ones(d1*d2,1)],C_keep,[f;-min(min(min(data)))*ones(1,T)],R_keep,options);
-    % end
-    % fprintf(fid, '%s : Traces detrended. Process took: %.2f seconds\nConverting to sparse matrix ...', datetime("now"), toc(t_detrend));
+    t_detrend = tic;
+    if size(A_keep,2) < 2 % Calculate "raw" traces in terms of delta F/F0
+        [T_keep,F0] = detrend_df_f([A_keep,ones(d1*d2,1)],[b,ones(d1*d2,1)],[C_keep;ones(1,T)],[f;-min(min(min(data)))*ones(1,T)],[R_keep; ones(1,T)],options);
+    else                    % total number of pixels
+        % handle min(data) = 0
+        F_dark = min(min(data(:)),eps);
+        if F_dark == 0;
+            F_dark = eps;
+        end
+        [T_keep,F0] = detrend_df_f( ...
+            A_keep, ...
+            [b,ones(d1*d2,1)], ...
+            C_keep, ...
+            [f;F_dark*ones(1,T)], ...
+            R_keep, ...
+            options ...
+        );
+    end
 
+    fprintf(fid, '%s : Traces detrended. Process took: %.2f seconds\nConverting to sparse matrix ...', datetime("now"), toc(t_detrend));
+    %% Convert sparse A matrix to full 3D matrix
+    t_sparse = tic;
+    [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2);  % Ac_keep has dims. [2*tau+1,2*tau+1,K] where each element Ki is a 2D map centered on centroid of component acx(Ki),axy(Ki), and acm(Ki) = sum(sum(Ac_keep(:,:,Ki))
+    fprintf(fid, '%s : Created sparse component matrix. Process took: %.2f seconds\nSaving data ...', datetime("now"), toc(t_sparse));
 
     % Convert ouputs to single to reduce memory consumption
     Cn = single(Cn);
@@ -272,11 +286,12 @@ for plane_idx = start_plane:end_plane
     % Save data
     t_save = tic;
     fprintf(fid, "%s : Writing data.\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'));
-    % write_chunk_h5(plane_name_save, T_keep, 2000, '/T_keep');
+    write_chunk_h5(plane_name_save, T_keep, 2000, '/T_keep');
     write_chunk_h5(plane_name_save, Ac_keep, 2000, '/Ac_keep');
     write_chunk_h5(plane_name_save, C_keep, 2000, '/C_keep');
     write_chunk_h5(plane_name_save, Km, 2000, '/Km');
     write_chunk_h5(plane_name_save, rVals, 2000, '/rVals');
+    write_chunk_h5(plane_name_save, single(mean(data,3)), 2000, '/Ym');
     write_chunk_h5(plane_name_save, Cn, 2000, '/Cn');
     write_chunk_h5(plane_name_save, b, 2000, '/b');
     write_chunk_h5(plane_name_save, f, 2000, '/f');
