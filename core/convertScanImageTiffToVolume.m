@@ -98,6 +98,7 @@ end
 closeCleanupObj = onCleanup(@() fclose(fid));
 
 firstFileFullPath = fullfile(files(1).folder, files(1).name);
+
 % We add some values to the metadata to attach to H5 attributes and
 % make file access / parameter access easier down the pipeline.
 metadata = get_metadata(firstFileFullPath);
@@ -112,7 +113,6 @@ trimmed_x = raw_x - t_left - t_right;
 trimmed_y = raw_y - t_top - t_bottom;
 
 num_planes = metadata.num_planes;
-num_frames_total = metadata.num_frames_total;
 metadata.dataset_name = dataset_name;
 
 try
@@ -134,7 +134,7 @@ try
 
         % start_y_indices = (0:metadata.num_strips-1) * (raw_y + metadata.num_lines_between_scanfields) + t_top + 1;
         % end_y_indices = start_y_indices + raw_y - t_top - t_bottom - 1;
-        % t = squeeze(Aout(start_y_indices:end_y_indices,:,2,:));
+        % t = squeeze('Aout(start_y_indices:end_y_indices,:,2,:));
 
         z_timeseries = zeros(trimmed_y, trimmed_x * metadata.num_strips, num_planes, 'like', Aout);
         for plane_idx = 1:num_planes
@@ -160,7 +160,7 @@ try
                     offset_y = offset_y + raw_y + metadata.num_lines_between_scanfields;
                     offset_x = offset_x + trimmed_x;
                 end
-                for frame_idx = 1:num_frames_total
+                for frame_idx = 1:num_frames_file
                     z_timeseries( ...
                         :, ... % all Y
                         (offset_x + 1):(offset_x + trimmed_x), ... % offset X
@@ -175,7 +175,7 @@ try
             end
 
             if fix_scan_phase
-                offset = returnScanOffset(z_timeseries(:,:,2), 1, 'int16');
+                offset = returnScanOffset(z_timeseries, 1, 'int16');
                 if offset ~= 0
                     img_frame = z_timeseries(:,:,2);
                     [r, c] = find(img_frame == max(img_frame(:)));
