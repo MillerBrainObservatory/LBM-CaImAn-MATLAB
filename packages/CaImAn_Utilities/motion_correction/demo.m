@@ -1,10 +1,10 @@
 clear
 % gcp;
 
-data = fullfile("C:\Users\RBO\Documents\data\bi_hemisphere\extracted\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5");
-M1 = load("../../Documents/data/M1.mat");
-Y = combinePlanes(data, 1);
-
+filepath = fullfile("../../Documents/data/bi_hemisphere/extraction_final/");
+files = dir([filepath '*.h5']);
+full_filepath = fullfile(files(1).folder, files(1).name);  
+loc = "/registration/plane_1/";
 %%
 Y = single(Y);                 % convert to single precision 
 T = size(Y,ndims(Y));

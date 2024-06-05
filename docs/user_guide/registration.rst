@@ -1,5 +1,8 @@
 Piecewise-Rigid Motion-Correction
 ================================================================
+
+Function for this step: :func:`motionCorrectPlane`
+
 For a quick demo on how to run motion correction, see the demo_registration.m script.
 
 .. note::

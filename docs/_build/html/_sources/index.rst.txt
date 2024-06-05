@@ -3,9 +3,11 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-#################
-LBM Documentation
-#################
+.. include:: ../README.rst
+
+.. #################
+.. LBM Documentation
+.. #################
 
 .. thumbnail:: ./_static/_images/overlays.png
    :download: true
@@ -15,44 +17,19 @@ A pipeline for processing light beads microscopy (LBM) datasets.
 
 For background, theory and design of LBM technology, see the reference `publication`_.
 
-
 Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files.
 
-
-Requirements
-------------
-
-- MATLAB (Tested on 2023a, 2023b, 2024b)
-- Toolboxes:
-    - Parallel Computing Toolbox
-    - Statistics and Machine Learning Toolbox
-    - Image Processing Toolbox
-
-Algorithms
-----------
-The following algorithms perform the main computations and are included by default in the pipeline:
-
-- `CNMF`_ segmentation and neuronal source extraction.
-- `NoRMCorre`_ piecewise rigid motion correction.
-- `constrained-foopsi`_ constrained deconvolution spike inference.
+See the `README`_ for pipeline requirements and algorithms.
 
 
-Quickstart
-----------
-
-There are 4 steps that require user input:
-
-1. Convert ScanImage .Tiff to 4D [Y, X, Z, T] array.
-2. Piecewise-rigid motion correction.
-3. Plane-by-plane 2D neuronal segmentation and deconvolution.
-4. Axial (Z) offset correction.
-
+Documentation Glossary:
+=====================================
 
 .. toctree::
     :maxdepth: 2
-    :caption: Get started:
 
     get_started/index
+
 
 .. toctree::
     :maxdepth: 2
@@ -67,7 +44,7 @@ There are 4 steps that require user input:
     api/index
 
 Indices and tables
-==================
+=====================================
 
 * :ref:`genindex`
 * :ref:`modindex`

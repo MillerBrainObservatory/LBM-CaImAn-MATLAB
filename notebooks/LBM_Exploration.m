@@ -33,33 +33,43 @@ metadata = get_metadata(filename);
 % imshow(vol(:,:,floor(size(vol,3)/2)),[]);
 
 %% extract data for the 4 datasets before any scanimage manipulations
-base = "C:\Users\RBO\Documents\MATLAB\benchmarks\";
+% base = "C:\Users\RBO\Documents\MATLAB\benchmarks\";
 
-filepaths = {
-    % fullfile('C:\Users\RBO\Documents\MATLAB\benchmarks\test\mh89_hemisphere_FOV_50_550um_depth_250mW_dual_stimuli_30min_00001_00001.tif');
-    'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\mh89_hemisphere_FOV_50_550um_depth_250mW_dual_stimuli_30min_00001_00001.tif'; %singlehemi
-    'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif'; % highres
-    'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\MH70_0p9mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif'; % highspeed
-    'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.tif'; % bihemi
-    };
+% filepaths = {
+%     % fullfile('C:\Users\RBO\Documents\MATLAB\benchmarks\test\mh89_hemisphere_FOV_50_550um_depth_250mW_dual_stimuli_30min_00001_00001.tif');
+%     'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\mh89_hemisphere_FOV_50_550um_depth_250mW_dual_stimuli_30min_00001_00001.tif'; %singlehemi
+%     'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif'; % highres
+%     'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\MH70_0p9mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif'; % highspeed
+%     'C:\Users\RBO\Documents\MATLAB\benchmarks\exploration\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.tif'; % bihemi
+%     };
+
+%% Pipeline Setup
+
+plane = 1;
+h5path = fullfile('C:\Users\RBO\Documents\data\bi_hemisphere\extracted_final\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5');
+reg_str = '/registration';
+ds_str = sprintf('%s/plane_%d/Y', reg_str, plane);
+data = h5read(h5path, ds_str);
+
+%% ground truth setup
+
+data_gt = matfile(fullfile("../../Documents/data/ground_truth/MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_plane_30.mat")).Y;
+
+data_diff = (mean(data_gt, 3) - mean(data, 3));
+imagesc(data_diff); axis image; % confirm all 0s
+%% reorder
+
+clc
+order = [1 5:10 2 11:17 3 18:23 4 24:30];
+
+% reorderPlanes(h5path, loc, fliplr(order));
+%%
 
 lbm_data = cell(size(filepaths));
 for i = 1:length(filepaths)
-    lbm_data{i} = extract_roi_data(filepaths{i});
-    lbm_data{i}.path = filepaths{i};
-    [~,name,~] = fileparts(filepaths{i});
-    switch true
-        case contains(name, "hemisphere")
-            lbm_data{i}.name = "single_hemisphere";
-        case contains(name, "both")
-            lbm_data{i}.name = "bi_hemisphere";
-        case contains(name, "0p6mm")
-            lbm_data{i}.name = "high_resolution";
-        case contains(name, "0p9mm")
-            lbm_data{i}.name = "high_speed";
-        otherwise
-            lbm_data{i}.name = "unknown";
-    end
+    lbm_data{i} = struct;
+    lbm_data{i}.name = filepaths{i, 1};
+    lbm_data{i}.data = filepaths{i, 2};
 end
 
 %% Interactive Widget
@@ -78,45 +88,28 @@ for d=1:length(lbm_data)
     end
 end
 
-
 %% Edge Detection
-figure(4);
-plane = 1;
+figure(1);
+% plane = 1;
 frame = 2;
-t1 = tiledlayout(2, 2);
+t1 = tiledlayout(1, 2);
 nexttile;
 
-num_datasets = length(lbm_data);
-for nd = 1:2
+num_roi = 9;
+sy = size(new, 1);
+roi_data = new(:, :, frame);
+imagesc([old(:, :, frame) new(:, :, frame) imshowpair(old(:, :, frame), new(:, :, frame),"diff")]); axis image;
+set(gca,'xtick',[1, size(roi_data, 2)]);
 
-    dataset = lbm_data{nd};
-    num_roi = dataset.numROI;
-    roi_px_y = dataset.numPixXY(2);
-    sy = size(dataset.data, 1);
-    extra = sy - (roi_px_y * num_roi);
+%%
+nexttile;
+num_roi = 9;
+sy = size(new, 1);
+roi_datao = old(:, :, frame);
+imagesc(roi_data); axis image;
+set(gca,'xtick',[1, size(roi_data, 2)]);
 
-    end_idx = round(extra);
-    roi_data = dataset.data(1:extra, :, plane, frame);
-    imagesc(roi_data); 
-    axis image;
-    colormap('gray');
-    if nd == 1
-        yline(dataset.numLinesBetweenScanfields, '--', 'number of pixels between ROI', ...
-        'FontSize', 8, ...
-        'LabelHorizontalAlignment', 'center');
-    else
-         yline(dataset.numLinesBetweenScanfields, '--');
-    end
-    set(gca,'xtick',[1, size(roi_data, 2)])
-
-    nexttile;
-    bw1 = edge(roi_data,'sobel');
-    imagesc(bw1); axis image; title('sobel filter'); colormap('gray');
-    title(t1, "Strips and Edges")
-    
-end
-
-
+d = imshowpair(roi_data, roi_datao,"diff");
 %% Functions
 
 function exploreImageFrames(dataset)
@@ -127,8 +120,13 @@ function exploreImageFrames(dataset)
     y_start = 1;
     y_end = 100;
     num_datasets = length(dataset);
-    maxPlane = size(dataset{1}.data, 3);
-    maxFrame = size(dataset{1}.data, 4);
+    if length(size(dataset)) == 3
+        maxFrame = size(dataset{1}.data, 3);
+        maxPlane = 1;
+    elseif length(size(dataset)) == 4
+        maxPlane = size(dataset{1}.data, 3);
+        maxFrame = size(dataset{1}.data, 4);
+    end
     maxY = size(dataset{1}.data, 1);  % Maximum y value
 
     % Initialize figure

@@ -1,12 +1,13 @@
 
+
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="../" >
+<html lang="en" data-content_root="" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Axial-Offset Correction &#8212; caiman_matlab  documentation</title>
   
@@ -18,30 +19,32 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
-    <link rel="stylesheet" type="text/css" href="../_static/caiman_matlab.css?v=8c8b7c0d" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/caiman_matlab.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
 
-    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
-    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/offset_correction';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -56,9 +59,10 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
+
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -99,7 +103,7 @@
 </form></div>
   </div>
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -137,6 +141,12 @@
       
         <div class="navbar-item">
 <nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -227,13 +237,10 @@ document.write(`
   
 </div>
 
-    </header>
+    </nav>
   
-
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
-      
-      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -246,6 +253,12 @@ document.write(`
         
           <div class="navbar-item">
 <nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -370,30 +383,52 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article">
+                <article class="bd-article" role="main">
                   
   <section id="axial-offset-correction">
-<span id="offset-correction"></span><h1>Axial-Offset Correction<a class="headerlink" href="#axial-offset-correction" title="Link to this heading">#</a></h1>
-<p>Before proceeding:</p>
-<ul class="simple">
-<li><p>You will need to be in a GUI environment for this step. Calculate offset will show you two images, click the feature that matches in both images.</p></li>
-</ul>
+<span id="offset-correction"></span><h1>Axial-Offset Correction<a class="headerlink" href="#axial-offset-correction" title="Permalink to this heading">#</a></h1>
+<p>Core function: <a class="reference internal" href="../api/core.html#collatePlanes" title="collatePlanes"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">collatePlanes()</span></code></a></p>
+<p>Light beads traveling to our sample need to be temporally distinct relative to our sensor
+so that the aquisition system knows the origin and subsequent depth of each bead.</p>
+<p>The current LBM design incoorperates 2 cavities, hereby named <cite>Cavity A</cite> and <cite>Cavity B</cite>.
+These two cavities are non-overlapping areas where light beads travel. If we plot
+a sample pollen grain through each z-depth, we can see these cavities manifest:</p>
 <a class=""
                data-lightbox="group-default"
-               href="../_images/compare_planes1.png"
+               href="../_images/pollen_depth1.svg"
                title=""
                data-title=""
                
-               ><img src="../_images/compare_planes1.png"
+               ><img src="../_images/pollen_depth1.svg"
                      class=""
                      width="600"
                      height="auto"
                      alt=""/>
-                </a><p>You will need the following calibration files:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pollen_calibration_Z_vs_N</span><span class="o">.</span><span class="n">mat</span>
-<span class="n">pollen_calibration_x_y_offsets</span><span class="o">.</span><span class="n">fig</span>
-</pre></div>
-</div>
+                </a><p>We see a bi-modal distribution of Signal (Y) vs z-depth.</p>
+<p>This pollen grain is sampled just like a brain would be sampled. We can
+preview the time-series resulting from this pollen to get a preliminary
+look at our recording quality:</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/pollen_frame1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/pollen_frame1.png"
+                     class=""
+                     width="600"
+                     height="auto"
+                     alt=""/>
+                </a><p>Before proceeding:</p>
+<ul class="simple">
+<li><p>You will need to be in a GUI environment for this step. Calculate offset will show you two images, click the feature that matches in both images.</p></li>
+<li><p>You will need access to the following calibration files:</p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">pollen_calibration_Z_vs_N.mat</span></code>
+<code class="code docutils literal notranslate"><span class="pre">pollen_calibration_x_y_offsets.fig</span></code></p>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this heading">#</a></h2>
+<p>These files hold data used to align each z-plane depth around the same [Y, X] coordinates.</p>
 <p>Place these files in the same directory as your <cite>caiman_output_plane_N</cite> files.</p>
 <div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="n">collatePlanes</span>
 
@@ -411,47 +446,55 @@ document.write(`
 <span class="n">z</span><span class="o">-</span><span class="n">plane</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">field</span><span class="w"> </span><span class="n">curvature</span><span class="w"> </span><span class="n">corrections</span><span class="p">.</span>
 </pre></div>
 </div>
-<section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
-<dl class="simple">
-<dt>dataPath<span class="classifier">string</span></dt><dd><p>Path to the directory containing the data files for analysis.</p>
-</dd>
-<dt>data<span class="classifier">string (unused, placeholder for future use)</span></dt><dd><p>Placeholder parameter for passing data directly if needed.</p>
-</dd>
-<dt>metadata<span class="classifier">struct</span></dt><dd><p>Structure containing metadata for processing. Must include fields:
-r_thr, pixel_resolution, min_snr, frame_rate, fovx, and fovy.</p>
-</dd>
-<dt>startDepth<span class="classifier">double</span></dt><dd><p>The starting depth (z0) from which processing should begin; if not
-provided, a dialog will prompt for input.</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">#</a></h2>
-<p>None</p>
+<p>First, the [Y, X] offsets (in micron) are used for an initial, dirty axial alignment:</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/pollen_shifts1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/pollen_shifts1.png"
+                     class=""
+                     width="600"
+                     height="auto"
+                     alt=""/>
+                </a><p>This alignment should improve the spatial consistency between z-planes, but there is a
+further refinement step which prompts a graphical interface for z-plane(n) and z-plane(n+1).</p>
+<p>Depending on your axial field-of-view, there is likely neuronal contamination between z-planes.
+We can use this to select a feature, and the same feature in n+1.</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/compare_planes1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/compare_planes1.png"
+                     class=""
+                     width="600"
+                     height="auto"
+                     alt=""/>
+                </a><section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading">#</a></h3>
+<p>There are no additional parameters outside of the defaults described in <a class="reference internal" href="parameters.html#parameters"><span class="std std-ref">Parameters</span></a>.</p>
 </section>
 <section id="outputs">
-<h2>Outputs<a class="headerlink" href="#outputs" title="Link to this heading">#</a></h2>
+<h3>Outputs<a class="headerlink" href="#outputs" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>.fig files showing neuron distributions in z and radial directions.</p></li>
-<li><p>A .mat file with collated and processed imaging data.</p></li>
-</ul>
-</section>
-<section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p>Expects ‘three_neuron_mean_offsets.mat’ and ‘pollen_calibration_Z_vs_N.fig’ within the dataPath for processing.</p></li>
-<li><p>The function uses parallel processing for some calculations to improve performance.</p></li>
+<li><p>A <code class="code docutils literal notranslate"><span class="pre">.mat</span></code> file: <a href="#id1"><span class="problematic" id="id2">`</span></a>caiman_collated_output_plane_N with collated and processed imaging data.</p></li>
 </ul>
 </section>
 <section id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">#</a></h3>
 <p>collatePlanes(‘C:/data/images/’, ‘’, struct(‘r_thr’:0.4, ‘pixel_resolution’:2, ‘min_snr’:1.5, ‘frame_rate’:9.61, ‘fovx’:1200, ‘fovy’:1164), 100);
 This example processes data from ‘C:/data/images/’, starting at a depth of 100 microns,
 with specified metadata parameters.</p>
 <p>See also load, inputdlg, struct, fullfile, exist</p>
 <p>The user will be prompted to select the same <strong>feature</strong> / <strong>region-of-interest</strong> / <strong>neuron</strong>:</p>
 <p>After selecting 3 neurons for each plane, you are done with the LBM pipeline.</p>
+<p>In the resulting filename you will see the collated <code class="code docutils literal notranslate"><span class="pre">minSNR</span></code> value. This new file
+holds a concatenated, centered and thresholded master copy of all neurons, footprints and traces.</p>
+</section>
 </section>
 </section>
 
@@ -492,20 +535,19 @@ with specified metadata parameters.</p>
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-
   <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
+
+  <div class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+  <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#returns">Returns</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs">Outputs</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes">Notes</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs">Outputs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -531,8 +573,8 @@ with specified metadata parameters.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -552,7 +594,7 @@ with specified metadata parameters.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     <br/>
   </p>
 </div>
@@ -565,7 +607,7 @@ with specified metadata parameters.</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
 </p></div>
       
     </div>

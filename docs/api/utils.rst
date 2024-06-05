@@ -12,5 +12,4 @@ Utils
 .. autofunction:: planeToMovie
 .. autofunction:: planeToH5
 .. autofunction:: planeToTiff
-.. autofunction:: writeMatToTiffStack
 .. autofunction:: translateFrames

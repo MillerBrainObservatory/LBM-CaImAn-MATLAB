@@ -1,5 +1,8 @@
 Piecewise-Rigid Motion-Correction
 ================================================================
+
+Function for this step: :func:`motionCorrectPlane`
+
 For a quick demo on how to run motion correction, see the demo_registration.m script.
 
 .. note::
@@ -67,14 +70,22 @@ only a single plane is ever loaded into memory due to large LBM filesizes (>35GB
 
 This image is your "ground truth" per-se, it is the image you want to most accurately represent the movement in your video.
 
+Compared with the below frame:
+
 .. _storage:
 
 .. thumbnail:: ../_static/_images/quickview_blue.png
    :group: ck
    :align: center
 
-The above represents a general overview for how we want to handle data. We want to minimize the amount of storage space,
-so rather than saving 2 versions of a video that differ by simply shifting some pixels, we can instead save only the shift vectors
+Storage
+******************
+
+.. thumbnail:: ../_static/_images/storage_rec.png
+    :title: Recommended Data Storage Paradigm
+    :download: true
+
+We want to minimize the amount of storage space, so rather than saving 2 versions of a video that differ by simply shifting some pixels, we can instead save only the shift vectors
 and reconstruct the video afterwards. :func:`translateFrames` will accomplish this:
 
 .. code-block:: MATLAB
@@ -95,9 +106,6 @@ and reconstruct the video afterwards. :func:`translateFrames` will accomplish th
       Output:
         translatedFrames - A 3D array of translated image frames, same size and type as Y.
 
-.. thumbnail:: ../_static/_images/storage_rec.png
-    :title: Recommended Data Storage Paradigm
-    :download: true
 
 Metrics
 *************************

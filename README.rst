@@ -3,9 +3,6 @@
 Light Beads Microscopy (LBM) Pipeline
 ########################################
 
-.. image:: docs/_static/_images/overlays.png
-   :width: 600
-
 A pipeline for processing light beads microscopy (LBM) datasets.
 
 For background, theory and design of LBM technology, see the reference `publication`_.
@@ -14,6 +11,7 @@ Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files. Howev
 first step of this pipeline which converts the multi-ROI .tiff into a 4D volumetric time-series
 requires scanimage .tiff files.
 
+=============
 Quickstart
 =============
 
@@ -46,8 +44,6 @@ The following algorithms perform the main computations and are included by defau
 - `CNMF`_ segmentation and neuronal source extraction.
 - `NoRMCorre`_ piecewise rigid motion correction.
 - `constrained-foopsi`_ constrained deconvolution spike inference.
-
-
 
 See the (WIP) Documentation for more information.
 
