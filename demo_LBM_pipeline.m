@@ -27,7 +27,6 @@ end
 parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
 data_path = fullfile(parent_path, 'raw');
 save_path = fullfile(parent_path, 'extracted_trimmed_corr');
-save_path2 = fullfile(parent_path, "extracted_trimmed_corr");
 
 %% 1) Pre-Processing
 clc;
