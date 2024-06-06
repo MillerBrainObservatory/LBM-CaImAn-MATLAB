@@ -1,0 +1,4 @@
+cnn_model.h5
+./exclude/*
+.vscode/
+

@@ -1,6 +1,0 @@
-targetSpace = 'API'
-codeVersion = 'ScanImage 2016 API'
-path2AtlassianCLI = 'C:\bitbucket\ScanImage\atlassian-cli-5.0.0-distribution\atlassian-cli-5.0.0\atlassian'
-webRoot4SIDocs = 'http://scanimage.vidriotechnologies.com/display/SI2016/'
-repoLocal = 'C:\bitbucket\ScanImage\'
-docDir = 'C:\bitbucket\ScanImage\docs'
