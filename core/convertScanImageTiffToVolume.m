@@ -113,34 +113,96 @@ trimmed_x = raw_x - t_left - t_right;
 trimmed_y = raw_y - t_top - t_bottom;
 
 num_planes = metadata.num_planes;
+num_rois = metadata.num_rois;
 metadata.dataset_name = dataset_name;
+
+offsets_plane = zeros(num_planes, 1);
+offsets_roi = zeros(num_planes, num_rois);
 
 try
     fprintf(fid, '%s : Processing %d file(s) with %d planes.\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), length(files), num_planes);
+    fprintf("Metadata:\n\n")
+    disp(metadata)
     for i = 1:length(files)
         tfile = tic;
-        hTif = scanimage.util.ScanImageTiffReader(fullfile(data_path, files(i).name));
-        Aout = hTif.data();
+        full_filename = fullfile(data_path, files(i).name);
+        try
+            hTif = scanimage.util.ScanImageTiffReader(full_filename);
+            Aout = hTif.data();
+            Aout = most.memfunctions.inPlaceTranspose(Aout);
+            num_frames_file = size(Aout, 3) / num_planes;
 
-        % high_res dataset, metadata.num_frames_file gives 1750, should
-        % give 1730. Get frames from the actual dataset instead.
-        num_frames_file = size(Aout, 3) / num_planes;
-        if num_frames_file ~= metadata.num_frames_file
-            warning("Frames inconsistent: metadata frames per file: %d\nCalculated from Aout: %d", metadata.num_frames_file, num_frames_file)
+            Aout = reshape(Aout, [size(Aout, 1), size(Aout, 2), num_planes, num_frames_file]);
+        catch ME
+            [~, Aout] = scanimage_backup.util.opentif(full_filename);
         end
 
-        Aout = most.memfunctions.inPlaceTranspose(Aout);
-        Aout = reshape(Aout, [size(Aout, 1), size(Aout, 2), num_planes, num_frames_file]);
-
-        % start_y_indices = (0:metadata.num_strips-1) * (raw_y + metadata.num_lines_between_scanfields) + t_top + 1;
-        % end_y_indices = start_y_indices + raw_y - t_top - t_bottom - 1;
-        % t = squeeze('Aout(start_y_indices:end_y_indices,:,2,:));
-
-        z_timeseries = zeros(trimmed_y, trimmed_x * metadata.num_strips, num_planes, 'like', Aout);
+        z_timeseries = zeros(trimmed_y, trimmed_x * metadata.num_rois, num_frames_file, 'like', Aout);
         for plane_idx = 1:num_planes
             tplane = tic;
             p_str = sprintf("plane_%d", plane_idx);
             plane_fullfile = sprintf("%s/extracted_%s.h5", save_path, p_str);
+
+            cnt = 1;
+            offset_y = 0;
+            offset_x = 0;
+            tic;
+
+            scan_offset = returnScanOffset(Aout(:,:,plane_idx,:), 1, 'int16');
+            offsets_plane(plane_idx) = scan_offset;
+            for roi_idx = 1:metadata.num_rois
+                if cnt > 1
+                    offset_y = offset_y + raw_y + metadata.num_lines_between_scanfields;
+                    offset_x = offset_x + trimmed_x;
+                end
+                slicey = (offset_y + 1):(offset_y + raw_y);
+                offsets_roi(plane_idx,roi_idx) = returnScanOffset(Aout(slicey,:,plane_idx,:), 1, 'int16');
+
+                roi_arr = fixScanPhase(Aout( ...
+                    (offset_y + 1):(offset_y + raw_y), ...
+                    1:raw_x, ...
+                    plane_idx, ...
+                    : ...
+                    ), offsets_roi(plane_idx,roi_idx), 1, 'int16');
+
+                roi_arr = squeeze(roi_arr);
+                z_timeseries( ...
+                    1:size(roi_arr,1), ...
+                    (offset_x + 1):(offset_x + size(roi_arr,2)), ...
+                    : ...
+                    ) = roi_arr;
+                cnt = cnt + 1;
+            end
+
+            pixel_resolution = metadata.pixel_resolution;
+            scale_fact = 10; % Length of the scale bar in microns
+            scale_length_pixels = scale_fact / pixel_resolution;
+
+            img_frame = z_timeseries(:,:,2);
+            [yind, xind] = get_central_indices(img_frame, 30); % 30 pixels around the center of the brightest part of an image frame
+
+            f = figure('Color', 'black');
+            sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'w');
+            tiledlayout(1, 1, 'TileSpacing', 'compact', 'Padding', 'compact');
+
+            % Post-correction image
+            nexttile;
+            imagesc(z_timeseries(yind, xind, 2));
+            axis image; axis tight; axis off; colormap('gray');
+            title(sprintf('Post-%d pixel offset | Plane %d', abs(scan_offset), plane_idx), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
+            hold on;
+
+            % Scale bar coordinates relative to the cropped image
+            scale_bar_x = [size(xind, 2) - scale_length_pixels - 10, size(xind, 2) - 10]; % 10 pixels padding from the right
+            scale_bar_y = [size(yind, 2) - 20, size(yind, 2) - 20]; % 20 pixels padding from the bottom
+            line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 5);
+            text(mean(scale_bar_x), scale_bar_y(1) - 10, sprintf('%d µm', scale_fact), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
+            hold off;
+
+            saveas(f, fullfile(fig_save_path, sprintf('scan_correction_validation_plane_%d_offset_%d.png', plane_idx, abs(scan_offset))));
+            close(f);
+
+
             if isfile(plane_fullfile)
                 if overwrite
                     fprintf(fid, "%s : Deleting %s\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS') ,plane_fullfile);
@@ -151,53 +213,17 @@ try
                 end
             end
 
-            cnt = 1;
-            offset_y = 0;
-            offset_x = 0;
-            tic;
-            for roi_idx = 1:metadata.num_strips
-                if cnt > 1
-                    offset_y = offset_y + raw_y + metadata.num_lines_between_scanfields;
-                    offset_x = offset_x + trimmed_x;
-                end
-                for frame_idx = 1:num_frames_file
-                    z_timeseries( ...
-                        :, ... % all Y
-                        (offset_x + 1):(offset_x + trimmed_x), ... % offset X
-                        frame_idx ...
-                        ) = Aout( ...
-                        (offset_y + t_top + 1):(offset_y + raw_y - t_bottom), ...
-                        (t_left + 1):(raw_x - t_right), plane_idx, ...
-                        frame_idx ...
-                        );
-                end
-                cnt = cnt + 1;
-            end
+            metadata.scan_offset = offsets_plane(plane_idx);
+            metadata.offsets_roi = offsets_roi(plane_idx,:);
 
-            if fix_scan_phase
-                offset = returnScanOffset(z_timeseries, 1, 'int16');
-                if offset ~= 0
-                    img_frame = z_timeseries(:,:,2);
-                    [r, c] = find(img_frame == max(img_frame(:)));
-                    [yind, xind] = get_central_indices(z_timeseries(:,:,2), r, c, 20);
-
-                    f = figure('Color', 'black', 'Visible', 'off', 'Position', [100, 100, 1400, 600]); % Adjust figure size as needed
-                    sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'w');
-                    tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact'); % Use 'compact' to minimize extra space
-
-                    nexttile; imagesc(z_timeseries(yind,xind,2));
-                    axis image; axis tight; axis off; colormap('gray');
-                    title(sprintf('Pre-%d pixel offset', abs(offset)), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
-
-                    z_timeseries = fixScanPhase(z_timeseries, offset, 1, 'int16');
-                    nexttile; imagesc(z_timeseries(yind,xind,2));
-                    axis image; axis tight; axis off; colormap('gray');
-                    title(sprintf('Post-%d pixel offset', abs(offset)), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
-                    saveas(f, fullfile(fig_save_path, sprintf('scan_correction_validation_plane_%d_offset_%d.png', plane_idx, abs(offset))));
-                    close(f);
-                end
-            end
             write_chunk_h5(plane_fullfile, z_timeseries, size(z_timeseries,3), '/Y');
+
+            h5create(plane_fullfile,'/offsets_plane', size(offsets_plane(plane_idx)), 'Datatype', class(offsets_plane(plane_idx)));
+            h5write(plane_fullfile,'/offsets_plane',offsets_plane(plane_idx));
+
+            h5create(plane_fullfile,'/offsets_roi', size( offsets_roi(plane_idx,:)), 'Datatype', class( offsets_roi(plane_idx,:)));
+            h5write(plane_fullfile,'/offsets_roi', offsets_roi(plane_idx,:));
+
             write_metadata_h5(metadata, plane_fullfile, '/Y');
             fprintf(fid, "%s : Plane %d processed in %.2f seconds\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), plane_idx, toc(tplane));
         end
