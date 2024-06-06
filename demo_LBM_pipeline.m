@@ -38,7 +38,8 @@ end
 
 parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
 data_path = fullfile(parent_path, 'raw');
-save_path = fullfile(parent_path, 'extracted_2');
+save_path = fullfile(parent_path, 'extracted_trimmed_corr');
+save_path2 = fullfile(parent_path, "extracted_trimmed_corr");
 
 %% 1) Pre-Processing
 clc;
@@ -49,10 +50,10 @@ if compute
         save_path, ...
         'dataset_name', '/Y', ... % default
         'debug_flag', 0, ... % default, if 1 will display files and return
-        'fix_scan_phase', 0, ... % default, keep to 1
-        'trim_pixels', [8 8 17 0], ... % default, num pixels to trim for each roi
+        'fix_scan_phase', 1, ... % default, keep to 1
+        'trim_pixels', [6 6 17 0], ... % default, num pixels to trim for each roi
         'overwrite', 1 ...
-        );
+    );
 end
 
 % reorder planes
