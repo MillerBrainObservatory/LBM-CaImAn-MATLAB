@@ -1,15 +1,3 @@
-% folder heirarchy
-% -| Parent
-% --| raw  <--scanimage .tiff files live here
-% ----| basename.h5
-% --| extraction
-% ----| basename_shifts.h5
-% --| registration
-% ----| shifts_vectors_plane_N.h5
-% --| segmentation
-% ----| caiman_output_plane_N.h5
-% ----| caiman_output_collated_min1.4snr.h5
-
 %% Example script that will run the full pipeline.
 % This code block adds all modules inside the "core" directory to the
 % matlab path.

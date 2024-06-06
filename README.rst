@@ -15,17 +15,18 @@ requires scanimage .tiff files.
 Quickstart
 =============
 
-The easiest way to get started with the pipeline is to follow the LBM_demo_pipeline script.
+The easiest way to get started with the pipeline is to follow the demo_LBM_pipeline script, which contains sections
+for the pipeline setup, each step in the pipeline, and intermediate analysis along the way.
 
 Pipeline Steps
 *****************
 
 There are 4 core steps in this pipeline:
 
-:func:`convertScanImageTiffToVolume()`
-:func:`motionCorrectPlane()`
-:func:`segmentPlane()`
-:func:`collatePlane()`
+1. `convertScanImageTiffToVolume()`
+2. `motionCorrectPlane()`
+3. `segmentPlane()`
+4. `collatePlane()`
 
 Requirements
 =============
