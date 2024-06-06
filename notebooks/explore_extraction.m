@@ -147,8 +147,39 @@ new = [data_corr(slicey, slicex, 2:402) data_extr(slicey, slicex, 2:402)];
 planeToMovie(new, save_path, 10);
 
 %%
-% imagesc(groundt.Iin); axis image; axis off; xlim([69.2 88.2]); ylim([510.4 589.4]);
-imagesc(data); axis image; axis off; xlim([69.2 88.2]); ylim([510.4 589.4]);
+save_path = 'C:/Users/RBO/Documents/data/high_res/extracted_phase/';
+filename = fullfile(save_path, "extracted_plane_1.h5");
+
+files = dir([save_path '*.h5']);
+info = h5info(filename, '/Y');
+h = zeros([1 length(files)]);
+h2 = zeros([4 length(files)]);
+for i=1:length(files)
+    filename = fullfile(save_path, sprintf("extracted_plane_%d.h5", i));
+    h(i) = h5read(filename, '/offsets_plane');
+    metadata = read_h5_metadata(filename, '/Y');
+    h2(:, i) = metadata.offsets_roi;
+end
+
+%%
+
+clc;
+for ii=1:length(h2(1,:))
+    roi_vals = h2(:,ii); % size 4 double, 
+    p_val = h(i);
+    if any(diff(roi_vals))
+        % filename = fullfile(save_path, sprintf("extracted_plane_%d.h5", i));
+        % data = h5read(filename, '/Y');
+        % figure; imagesc(data(:, :, 2)); axis image; axis tight; axis off; colormap gray; title("Plane %d", ii);
+        % disp(roi_vals)
+    elseif roi_vals(1) ~= p_val
+        % figure; imagesc(data(:, :, 2)); axis image; axis tight; axis off; colormap gray; title("Plane %d", ii);
+    else
+        disp(p_val);
+    end
+
+end
+
 %%
 function dataOut = fixScanPhase(dataIn,offset,dim, dtype)
 % Find the lateral shift that maximizes the correlation between
