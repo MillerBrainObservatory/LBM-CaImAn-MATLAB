@@ -185,20 +185,23 @@ try
             sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'w');
             tiledlayout(1, 1, 'TileSpacing', 'compact', 'Padding', 'compact');
 
+            % Post-correction image
             nexttile;
             imagesc(z_timeseries(yind, xind, 2));
             axis image; axis tight; axis off; colormap('gray');
             title(sprintf('Post-%d pixel offset | Plane %d', abs(scan_offset), plane_idx), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
             hold on;
 
+            % Scale bar coordinates relative to the cropped image
             scale_bar_x = [size(xind, 2) - scale_length_pixels - 10, size(xind, 2) - 10]; % 10 pixels padding from the right
             scale_bar_y = [size(yind, 2) - 20, size(yind, 2) - 20]; % 20 pixels padding from the bottom
-            line(scale_bar_x, scale_bar_y, 'Color', 'w', 'LineWidth', 3);
-            text(mean(scale_bar_x), scale_bar_y(1) - 10, sprintf('%d µm', scale_fact), 'Color', 'w', 'FontSize', 12, 'HorizontalAlignment', 'center');
+            line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 5);
+            text(mean(scale_bar_x), scale_bar_y(1) - 10, sprintf('%d µm', scale_fact), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
             hold off;
 
             saveas(f, fullfile(fig_save_path, sprintf('scan_correction_validation_plane_%d_offset_%d.png', plane_idx, abs(scan_offset))));
             close(f);
+
 
             if isfile(plane_fullfile)
                 if overwrite
