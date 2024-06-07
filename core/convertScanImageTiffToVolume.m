@@ -155,26 +155,29 @@ try
                     offset_y = offset_y + raw_y + metadata.num_lines_between_scanfields;
                     offset_x = offset_x + trimmed_x;
                 end
-                slicey = (offset_y + 1):(offset_y + raw_y);
-                offsets_roi(plane_idx,roi_idx) = returnScanOffset(Aout(slicey,:,plane_idx,:), 1, 'int16');
+                % use the untrimmed roi in the phase offset correction
+                raw_yslice = (offset_y + 1):(offset_y + raw_y);
+                
+                trimmed_xslice = t_left+1:t_right+trimmed_x;
+                trimmed_yslice = t_top+1:t_bottom+trimmed_y;
 
                 roi_arr = fixScanPhase(Aout( ...
-                    (offset_y + 1):(offset_y + raw_y), ...
+                    raw_yslice, ...
                     1:raw_x, ...
                     plane_idx, ...
                     : ...
                     ), offsets_roi(plane_idx,roi_idx), 1, 'int16');
 
-                roi_arr = squeeze(roi_arr);
+                roi_arr = squeeze(roi_arr(trimmed_yslice, trimmed_xslice, :)); %pre-trim this roi
                 z_timeseries( ...
-                    1:size(roi_arr,1), ...
+                    1: size(roi_arr,1), ...
                     (offset_x + 1):(offset_x + size(roi_arr,2)), ...
                     : ...
                     ) = roi_arr;
                 cnt = cnt + 1;
             end
 
-            pixel_resolution = metadata.pixel_resolution;
+                       pixel_resolution = metadata.pixel_resolution;
             scale_fact = 10; % Length of the scale bar in microns
             scale_length_pixels = scale_fact / pixel_resolution;
 
@@ -189,19 +192,18 @@ try
             nexttile;
             imagesc(z_timeseries(yind, xind, 2));
             axis image; axis tight; axis off; colormap('gray');
-            title(sprintf('Post-%d pixel offset | Plane %d', abs(scan_offset), plane_idx), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
+            sgtitle(sprintf('Plane %d @ %.2f Hz | %.2f µm/px \nFOV: %.0fmm x %.0fmm', plane_idx, metadata.frame_rate, metadata.pixel_resolution, metadata.fov(1), metadata.fov(2)), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
             hold on;
 
             % Scale bar coordinates relative to the cropped image
-            scale_bar_x = [size(xind, 2) - scale_length_pixels - 10, size(xind, 2) - 10]; % 10 pixels padding from the right
-            scale_bar_y = [size(yind, 2) - 20, size(yind, 2) - 20]; % 20 pixels padding from the bottom
+            scale_bar_x = [size(xind, 2) - scale_length_pixels - 3, size(xind, 2) - 3]; % 10 pixels padding from the right
+            scale_bar_y = [size(yind, 2) - 3, size(yind, 2) - 3]; % 20 pixels padding from the bottom
             line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 5);
-            text(mean(scale_bar_x), scale_bar_y(1) - 10, sprintf('%d µm', scale_fact), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
+            text(mean(scale_bar_x), scale_bar_y(1), sprintf('%d µm', scale_fact), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
             hold off;
 
             saveas(f, fullfile(fig_save_path, sprintf('scan_correction_validation_plane_%d_offset_%d.png', plane_idx, abs(scan_offset))));
             close(f);
-
 
             if isfile(plane_fullfile)
                 if overwrite
@@ -214,16 +216,8 @@ try
             end
 
             metadata.scan_offset = offsets_plane(plane_idx);
-            metadata.offsets_roi = offsets_roi(plane_idx,:);
 
             write_chunk_h5(plane_fullfile, z_timeseries, size(z_timeseries,3), '/Y');
-
-            h5create(plane_fullfile,'/offsets_plane', size(offsets_plane(plane_idx)), 'Datatype', class(offsets_plane(plane_idx)));
-            h5write(plane_fullfile,'/offsets_plane',offsets_plane(plane_idx));
-
-            h5create(plane_fullfile,'/offsets_roi', size( offsets_roi(plane_idx,:)), 'Datatype', class( offsets_roi(plane_idx,:)));
-            h5write(plane_fullfile,'/offsets_roi', offsets_roi(plane_idx,:));
-
             write_metadata_h5(metadata, plane_fullfile, '/Y');
             fprintf(fid, "%s : Plane %d processed in %.2f seconds\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), plane_idx, toc(tplane));
         end
