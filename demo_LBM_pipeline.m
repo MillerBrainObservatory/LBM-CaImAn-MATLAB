@@ -26,7 +26,7 @@ end
 
 parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
 data_path = fullfile(parent_path, 'raw');
-save_path = fullfile(parent_path, 'extracted_trimmed_corr');
+save_path = fullfile(parent_path, 'extracted_trimmed_right_corr');
 
 %% 1) Pre-Processing
 clc;
@@ -42,12 +42,35 @@ if compute
         'overwrite', 1 ...
     );
 end
+order = [1 2 4 3];
+rename_planes(order); % reorder the planes if needed
 
-% reorder planes
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 2. Motion Correction %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% 2) Motion Correction
-mc_path = fullfile(parent_path, 'corrected');
+mc_path = fullfile(parent_path, 'corrected_grid_128_128');
 if ~isfolder(mc_path); mkdir(mc_path); end
+
+% 'h5_groupname       ' % name for hdf5 dataset (default: 'mov')
+% 'h5_filename        ' % name for hdf5 saved file (default: 'motion_corrected.h5')
+% 'tiff_filename      ' % name for saved tiff stack (default: 'motion_corrected.tif')
+filename = fullfile(save_path, "extracted_plane_1.h5");
+metadata = read_h5_metadata(filename, '/Y');
+info = h5info(filename, '/Y');
+data_size = info.Dataspace.Size;
+
+options_nonrigid = NoRMCorreSetParms(...
+            'd1', data_size(1),... 
+            'd2', data_size(2),...
+            'd3', data_size(3), ...
+            'grid_size', [128,128], ...
+            'bin_width', 24,... % number of frames to avg when updating template
+            'max_shift', round(20/metadata.pixel_resolution),... % 20 microns
+            'us_fac', 20,...
+            'init_batch', 120,...
+            'correct_bidir', false...
+        );
 
 compute = 1;
 if compute
@@ -59,7 +82,8 @@ if compute
         'overwrite', 1, ...
         'num_cores', 23, ...
         'start_plane', 1, ...
-        'end_plane', 30  ...
+        'end_plane', 30,  ...
+        'options_nonrigid', options_nonrigid ... 
     );
 end
 
