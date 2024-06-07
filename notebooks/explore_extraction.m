@@ -76,14 +76,34 @@ for iplane=1:length(h2(1,:))
     p_val = h(iplane);
     filename = fullfile(save_path, sprintf("extracted_plane_%d.h5", iplane));
     if any(diff(roi_vals))
-        
         data = h5read(filename, '/Y');
-        figure; imagesc(data(:, :, 2)); axis image; axis tight; axis off; colormap gray; title("Variable between-ROI Scan Offset Correction\nPlane %d", iplane);
-    elseif roi_vals(1) ~= p_val
+        figure; 
+        imagesc(data(:, :, 2)); 
+        axis image; 
+        axis tight; 
+        axis off; 
+        colormap gray; 
+        title("Variable Scan Offset");
         
-        figure; imagesc(data(:, :, 2)); axis image; axis tight; axis off; colormap gray; title("Between-ROI Offsets different from Plane Offset\nPlane %d", iplane);
+        % Display roi_vals at the top of the image
+        hold on;
+        num_vals = length(roi_vals);
+        img_width = size(data, 2);
+        positions = linspace(1, img_width, num_vals);
+        for i = 1:num_vals
+            text(positions(i), 10, num2str(roi_vals(i), '%.2f'), 'Color', 'white', 'FontSize', 12, 'HorizontalAlignment', 'center');
+        end
+        hold off;
+    elseif roi_vals(1) ~= p_val    
+        data = h5read(filename, '/Y'); % Add this line to load data if not already loaded
+        figure; 
+        imagesc(data(:, :, 2)); 
+        axis image; 
+        axis tight; 
+        axis off; 
+        colormap gray; 
+        title("Between-ROI Offsets different from Plane Offset");
     else
-        disp(p_val);
     end
 end
 
