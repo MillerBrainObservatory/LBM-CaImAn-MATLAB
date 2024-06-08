@@ -15,7 +15,7 @@ addpath(genpath(fullfile(fpath, 'core', 'utils')));
 addpath(genpath(fullfile(fpath, 'core', 'io')));
 
 %% Here you can validate that all dependencies are on the path and accessible from within this pipeline.
-%% This does not check for package access on your path.
+% This does not check for package access on your path.
 
 result = validateRequirements();
 if ischar(result)
@@ -26,31 +26,53 @@ end
 
 parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
 data_path = fullfile(parent_path, 'raw');
-save_path = fullfile(parent_path, 'extracted_trimmed_corr');
+save_path = fullfile(parent_path, 'extracted');
 
-%% 1) Pre-Processing
-clc;
-compute = 1;
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% Extraction %%%%%%%%
+
+clc; compute = 1;
 if compute
-    convertScanImageTiffToVolume( ...
-        data_path, ...
-        save_path, ...
-        'dataset_name', '/Y', ... % default
-        'debug_flag', 0, ... % default, if 1 will display files and return
-        'fix_scan_phase', 1, ... % default, keep to 1
-        'trim_pixels', [6 6 17 0], ... % default, num pixels to trim for each roi
-        'overwrite', 1 ...
-    );
+    for i=1:6
+        save_path = fullfile(parent_path, sprintf('extracted_%d', i));
+        convertScanImageTiffToVolume( ...
+            data_path, ...
+            save_path, ...
+            'dataset_name', '/Y', ... % default
+            'debug_flag', 0, ... % default, if 1 will display files and return
+            'fix_scan_phase', 1, ... % default, keep to 1
+            'trim_pixels', [0 i 17 0], ... % default, num pixels to trim for each roi
+            'overwrite', 1 ...
+            );
+    end
 end
 
-% reorder planes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% Motion Correction %%%
 
-%% 2) Motion Correction
-mc_path = fullfile(parent_path, 'corrected');
-if ~isfolder(mc_path); mkdir(mc_path); end
-
-compute = 1;
+clc; compute = 0;
 if compute
+
+    mc_path = fullfile(parent_path, 'corrected_trimmed_grid');
+    if ~isfolder(mc_path); mkdir(mc_path); end
+
+    filename = fullfile(save_path, "extracted_plane_1.h5");
+    metadata = read_h5_metadata(filename, '/Y');
+    info = h5info(filename, '/Y');
+    data_size = info.Dataspace.Size;
+
+    options_nonrigid = NoRMCorreSetParms(...
+        'd1', data_size(1),...
+        'd2', data_size(2),...
+        'grid_size', [128,128], ...
+        'bin_width', 24,... % number of frames to avg when updating template
+        'max_shift', round(20/metadata.pixel_resolution),... % 20 microns
+        'us_fac', 20,...
+        'init_batch', 120,...
+        'correct_bidir', false...
+        );
+
+
     motionCorrectPlane( ...
         save_path, ... % we used this to save extracted data
         mc_path, ... % save registered data here
@@ -59,18 +81,21 @@ if compute
         'overwrite', 1, ...
         'num_cores', 23, ...
         'start_plane', 1, ...
-        'end_plane', 30  ...
-    );
+        'end_plane', 2,  ...
+        'options_nonrigid', options_nonrigid ...
+        );
 end
 
 %% 3) CNMF Plane-by-plane SegmentationS
-mc_path = fullfile(parent_path, 'corrected');
-if ~isfolder(mc_path); mkdir(mc_path); end
-segment_path = fullfile(parent_path, 'results');
-if ~isfolder(segment_path); mkdir(segment_path); end
 
-compute = 1;
+clc; compute = 0;
 if compute
+    mc_path = fullfile(parent_path, 'corrected');
+    if ~isfolder(mc_path); mkdir(mc_path); end
+    segment_path = fullfile(parent_path, 'results');
+    if ~isfolder(segment_path); mkdir(segment_path); end
+
+
     segmentPlane( ...
         mc_path, ... % we used this to save extracted data
         segment_path, ... % save registered data here
@@ -84,8 +109,12 @@ if compute
 end
 
 %% 4) Axial Offset Correction
-dpath="D:\Jeffs LBM paper data\Fig4a-c\20191121\MH70\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001\output";
-h5_fullfile="../../Documents/data/high_res/extracted/extracted_plane_1.h5";
-metadata = read_h5_metadata(h5_fullfile, '/Y');
+clc; compute = 0;
+if compute
+    dpath="D:\Jeffs LBM paper data\Fig4a-c\20191121\MH70\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001\output";
+    h5_fullfile="C:/Users/RBO/Documents/data/high_res/corrected_trimmed_grid/motion_corrected_plane_1.h5";
+    metadata = read_h5_metadata(h5_fullfile, '/Y');
+    data = h5read(h5_fullfile, '/Y');
 
-calculateZOffset(dpath, metadata);
+    calculateZOffset(dpath, metadata);
+end

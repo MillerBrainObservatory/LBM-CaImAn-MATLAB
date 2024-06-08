@@ -1,5 +1,11 @@
 %% TEST SCAN PHASE FOR GROUND TRUTH VS PIPELINE
+
+
+%% Analysis for what inputs to the scan phase algorithm lead to 
+%% what offsets.
+
 clc; clear;
+
 gt_mf = matfile("E:\ground_truth\high_res\offset_data.mat");
 gt_raw = single(gt_mf.Iin);
 gt_cut = gt_raw(18:end, 7:end-6);
@@ -7,8 +13,8 @@ gt_cut = gt_raw(18:end, 7:end-6);
 [yind, xind] = get_central_indices(gt_raw,50);
 
 f = figure('Color', 'black', 'Visible', 'on', 'Position', [100, 100, 1400, 600]); % Adjust figure size as needed
-% sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'w');
-tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact'); % Use 'compact' to minimize extra space
+sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'w');
+tiledlayout(1, 2, 'TileSpacing', 'compact', 'Padding', 'compact'); 
 
 nexttile; imagesc(gt_raw);
 axis image; axis tight; axis off; colormap('gray');
@@ -33,106 +39,6 @@ corrected_square = fixScanPhase(gt_square, scanphase_square, 1, 'single');
 
 imagesc([corrected(xr, yr) corrected_cut(xc, yc) corrected_square(xs, ys)]);
 
-%% DATA LOADER
-% TODO: Function-ize this
-
-clc; clear;
-start = 1;
-stop = 1;
-frame = 1;
-for plane_idx = 1:30
-    h5file = sprintf('C:/Users/RBO/Documents/data/high_res/extracted_raw/extracted_plane_%d.h5', plane_idx);
-    h5savefile = sprintf('C:/Users/RBO/Documents/data/high_res/extracted_gt/extracted_plane_%d.h5', plane_idx);
-
-    full_ds_path = "/Y";
-    info = h5info(h5file, full_ds_path);
-    metadata = read_h5_metadata(h5file, full_ds_path);
-    ds_size = info.Dataspace.Size;
-    
-    mys = (1:ds_size(1));
-    mxs = (1:ds_size(2));
-    mts = (1:ds_size(3));
-    
-    xs = mxs;
-    ys = mys;
-    ts = mts;
-    
-    data = h5read( ...
-        h5file, ... % filename
-        full_ds_path, ... % dataset location
-        [ys(1), xs(1), ts(1)], ... % start index for each dimension [X,Y,T]
-        [length(ys), length(xs), length(ts)] ... % count for each dimension [X,Y,T]
-    );
-    
-    cnt = 1;
-    offset_x = 0;
-    offset_y = 0;
-    
-    val = 0.03*metadata.strip_height;
-    y_size = length(val:metadata.strip_height);
-    z_timeseries = zeros(length(val:metadata.strip_height), ...
-        132 * metadata.num_strips, ...
-        metadata.num_frames_total, ...
-        'int16' ...
-    );
-    
-    for roi_idx = 1:length(metadata.offsets)
-        roi_str = sprintf("roi_%d", roi_idx);
-        if cnt > 1
-            % offset_y = offset_y + metadata.strip_height + metadata.num_lines_between_scanfields;
-            offset_x = offset_x + metadata.strip_width;
-        end
-    
-        arr = data( ...
-            :, ... % (offset_y + t_top + 1):(offset_y + raw_y - t_bottom), ...
-            (offset_x + 1):(offset_x + metadata.strip_width), ... 
-            : ...
-        );
-        new_arr = fixScanPhase(arr, metadata.offsets(roi_idx), 1, 'int16');
-    
-        z_timeseries( ...
-            :, ...
-            (offset_x + 1):(offset_x + 132), ...
-            : ...
-            ) = new_arr( ...
-            val:end, ... % Y
-            7:138, ... % X
-            : ... x T
-            );
-        % savename = fullfile("C:\Users\RBO\Documents\data\high_res\extracted_2\figures\", roi_str);
-        % savename = sprintf("%s_gt.png",savename);
-        % 
-        % f = figure('Color', 'black',"Visible","off", 'Position', [100, 100, 1400, 600]);
-        % tiledlayout("horizontal", 'TileSpacing', 'compact', 'Padding', 'compact');
-        % nexttile;
-        % imagesc(new_arr(:,:,2)); colormap('gray'); axis image; axis tight; axis off;
-        % subtitle(sprintf('Roi %d | Offset %d', roi_idx, metadata.offsets(roi_idx)), 'FontSize', 10, 'FontWeight', 'bold', 'Color', 'w');
-        % exportgraphics(f, savename, "Resolution",300,"ContentType","image","Colorspace","gray","BackgroundColor","black");
-        cnt = cnt+1;
-    end
-    % close(f);
-    write_chunk_h5(h5savefile, z_timeseries, size(z_timeseries,3), '/Y_gt');
-    write_metadata_h5(metadata, h5savefile, '/Y_gt');
-end
-
-%%
-
-mc_path = fullfile(parent_path, 'corrected_gt');
-if ~isfolder(mc_path); mkdir(mc_path); end
-
-compute = 1;
-if compute
-    motionCorrectPlane( ...
-        fullfile(parent_path, 'extracted_gt'), ... % we used this to save extracted data
-        mc_path, ... % save registered data here
-        'dataset_name', '/Y_gt', ... % where we saved the last step in h5
-        'debug_flag', 0, ...
-        'overwrite', 1, ...
-        'num_cores', 23, ...
-        'start_plane', 1, ...
-        'end_plane', 2  ...
-    );
-end
 %%
 
 h5_corrected = sprintf('C:/Users/RBO/Documents/data/high_res/corrected_gt/motion_corrected_plane_%d.h5', 1);
@@ -161,23 +67,44 @@ for i=1:length(files)
     h2(:, i) = metadata.offsets_roi;
 end
 
-%%
-
+%% Analysis matching offsets taken for the entire plane, vs offsets 
+% taken for individual ROI's
 clc;
-for ii=1:length(h2(1,:))
-    roi_vals = h2(:,ii); % size 4 double, 
-    p_val = h(i);
-    if any(diff(roi_vals))
-        % filename = fullfile(save_path, sprintf("extracted_plane_%d.h5", i));
-        % data = h5read(filename, '/Y');
-        % figure; imagesc(data(:, :, 2)); axis image; axis tight; axis off; colormap gray; title("Plane %d", ii);
-        % disp(roi_vals)
-    elseif roi_vals(1) ~= p_val
-        % figure; imagesc(data(:, :, 2)); axis image; axis tight; axis off; colormap gray; title("Plane %d", ii);
-    else
-        disp(p_val);
-    end
 
+for iplane=1:length(h2(1,:))
+    roi_vals = h2(:,iplane); % size 4 double, 
+    p_val = h(iplane);
+    filename = fullfile(save_path, sprintf("extracted_plane_%d.h5", iplane));
+    if any(diff(roi_vals))
+        data = h5read(filename, '/Y');
+        figure; 
+        imagesc(data(:, :, 2)); 
+        axis image; 
+        axis tight; 
+        axis off; 
+        colormap gray; 
+        title("Variable Scan Offset");
+        
+        % Display roi_vals at the top of the image
+        hold on;
+        num_vals = length(roi_vals);
+        img_width = size(data, 2);
+        positions = linspace(1, img_width, num_vals);
+        for i = 1:num_vals
+            text(positions(i), 10, num2str(roi_vals(i), '%.2f'), 'Color', 'white', 'FontSize', 12, 'HorizontalAlignment', 'center');
+        end
+        hold off;
+    elseif roi_vals(1) ~= p_val    
+        data = h5read(filename, '/Y'); % Add this line to load data if not already loaded
+        figure; 
+        imagesc(data(:, :, 2)); 
+        axis image; 
+        axis tight; 
+        axis off; 
+        colormap gray; 
+        title("Between-ROI Offsets different from Plane Offset");
+    else
+    end
 end
 
 %%

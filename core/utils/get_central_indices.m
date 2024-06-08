@@ -1,10 +1,23 @@
-function [y_ind, x_ind] = get_central_indices(img, pixels)
-    [r, c] = find(img == max(img(:)));
-    half_pix = floor(pixels / 2);
-    r_start = max(r - half_pix, 1);
-    r_end = min(r + half_pix, size(img, 1));
-    c_start = max(c - half_pix, 1);
-    c_end = min(c + half_pix, size(img, 2));
-    y_ind = (r_start:r_end);
-    x_ind = (c_start:c_end);
+function [yind, xind] = get_central_indices(img, margin)
+% GET_CENTRAL_INDICES Returns the central indices of the image with a given margin.
+%
+% Parameters
+% ----------
+% img : 2D array
+%     The input image.
+% margin : int
+%     The margin around the central part.
+%
+% Returns
+% -------
+% yind : array
+%     Indices for the y-dimension.
+% xind : array
+%     Indices for the x-dimension.
+
+[~, max_idx] = max(img(:));
+[max_y, max_x] = ind2sub(size(img), max_idx);
+
+yind = max(max_y - margin, 1):min(max_y + margin, size(img, 1));
+xind = max(max_x - margin, 1):min(max_x + margin, size(img, 2));
 end

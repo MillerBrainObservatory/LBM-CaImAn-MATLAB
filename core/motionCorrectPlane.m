@@ -1,6 +1,5 @@
-
 function motionCorrectPlane(data_path, save_path, varargin)
-% MOTIONCORRECTPLANE Perform rigid and non-rigid motion correction on imaging data.
+% MOTIONCORRECTPLANE Perform piecewise-rigid motion correction on imaging data.
 %
 % Parameters
 % ----------
@@ -24,6 +23,8 @@ function motionCorrectPlane(data_path, save_path, varargin)
 % end_plane : double, integer, positive
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
+% options : struct
+%     NormCorre Params Object, 
 %
 % Returns
 % -------
@@ -45,6 +46,8 @@ addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
 addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
+addParameter(p, 'options_rigid', {}, @(x) isstruct(x));
+addParameter(p, 'options_nonrigid', {}, @(x) isstruct(x));
 parse(p, data_path, save_path, varargin{:});
 
 data_path = p.Results.data_path;
@@ -55,6 +58,8 @@ overwrite = p.Results.overwrite;
 num_cores = p.Results.num_cores;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
+options_rigid = p.Results.options_rigid;
+options_nonrigid = p.Results.options_nonrigid;
 
 if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", data_path); end
 if debug_flag == 1; dir([data_path, '*.tif']); return; end
@@ -125,15 +130,17 @@ for plane_idx = start_plane:end_plane
     d2 = volume_size(2);
 
     %% Motion correction: Create Template
-    options_rigid = NoRMCorreSetParms(...
-        'd1',d1,...
-        'd2',d2,...
-        'bin_width',200,...       % Bin width for motion correction
-        'max_shift', max_shift,...        % Max shift in px
-        'us_fac',20,...
-        'init_batch',200,...     % Initial batch size
-        'correct_bidir',false... % Correct bidirectional scanning
-        );
+    if numel(options_rigid) < 3
+        options_rigid = NoRMCorreSetParms(...
+            'd1',d1,...
+            'd2',d2,...
+            'bin_width',200,...       
+            'max_shift', round(20/pixel_resolution),...        % Max shift in px
+            'us_fac',20,...                   % upsample factor
+            'init_batch',200,...              % #frames used to create template
+            'correct_bidir', false... % DONT Correct bidirectional scanning
+            );
+    end
 
     % start timer for registration after parpool to avoid inconsistent
     % pool startup times.
@@ -149,15 +156,17 @@ for plane_idx = start_plane:end_plane
     template_good = mean(M1(:,:,best_idx), 3);
 
     % % Non-rigid motion correction using the good template from the rigid
-    options_nonrigid = NoRMCorreSetParms(...
-        'd1', d1,...
-        'd2', d2,...
-        'bin_width', 24,...
-        'max_shift', max_shift,...
-        'us_fac', 20,...
-        'init_batch', 120,...
-        'correct_bidir', false...
+    if numel(options_rigid) < 3
+        options_nonrigid = NoRMCorreSetParms(...
+            'd1', d1,...
+            'd2', d2,...
+            'bin_width', 24,...
+            'max_shift', round(20/pixel_resolution),...
+            'us_fac', 20,...
+            'init_batch', 120,...
+            'correct_bidir', false...
         );
+    end
 
     % DFT subpixel registration - results used in CNMF
     t_nonrigid=tic;
