@@ -26,25 +26,23 @@ end
 
 parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
 data_path = fullfile(parent_path, 'raw');
-save_path = fullfile(parent_path, 'extracted');
+save_path = fullfile(parent_path, 'extracted_test');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Extraction %%%%%%%%
 
 clc; compute = 1;
 if compute
-    for i=1:6
-        save_path = fullfile(parent_path, sprintf('extracted_%d', i));
-        convertScanImageTiffToVolume( ...
-            data_path, ...
-            save_path, ...
-            'dataset_name', '/Y', ... % default
-            'debug_flag', 0, ... % default, if 1 will display files and return
-            'fix_scan_phase', 1, ... % default, keep to 1
-            'trim_pixels', [0 i 17 0], ... % default, num pixels to trim for each roi
-            'overwrite', 1 ...
-            );
-    end
+    save_path = fullfile(parent_path, sprintf('extracted_3px_3px_17px_0px'));
+    convertScanImageTiffToVolume( ...
+        data_path, ...
+        save_path, ...
+        'dataset_name', '/Y', ... % default
+        'debug_flag', 0, ... % default, if 1 will display files and return
+        'fix_scan_phase', 1, ... % default, keep to 1
+        'trim_pixels', [3 3 17 0], ... % default, num pixels to trim for each roi
+        'overwrite', 1 ...
+        );
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
