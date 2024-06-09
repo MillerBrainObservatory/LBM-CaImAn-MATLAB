@@ -1,35 +1,16 @@
-clc; clear;
+% Load correction movie 
+h5_corrected = sprintf('C:/Users/RBO/Documents/data/high_res/corrected_gt/motion_corrected_plane_%d.h5', 1);
+h5_extracted = sprintf('C:/Users/RBO/Documents/data/high_res/extracted_gt/extracted_plane_%d.h5', 1);
+data_corr = h5read(h5_corrected, '/mov');
+data_extr = h5read(h5_extracted, '/Y_gt');
 
-% gt_extracted = matfile("D:\Jeffs LBM paper data\Fig5\20200910\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_plane_30.mat");
-v2_extracted = fullfile("../../Documents/data/bi_hemisphere/extracted/MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5");
+img_frame = data_corr(:,:,200);
+[r, c] = find(img_frame == max(img_frame(:)));
+[slicey, slicex] = get_central_indices(img_frame,r,c,200);
+new = [data_corr(slicey, slicex, 2:402) data_extr(slicey, slicex, 2:402)];
+planeToMovie(new, save_path, 10);
 
-% plane_idx = 1;
-% 
-% h5path = v2_extracted;
-% h5data = readH5Metadata(v2_extracted);
-% groups = h5data.Groups;
-% num_files = length(groups);    
-% for file_idx=1:num_files        
-%     file_info = groups(file_idx);
-%     planes = file_info.Datasets;
-%     for j=1:length(planes)
-%         loc_plane = sprintf("/plane_%d", j);
-%         full_path = sprintf("%s%s", file_info.Name, loc_plane);
-%         datasetInfo = h5info(h5path, full_path);
-%         metadata = struct();
-%         for k = 1:length(datasetInfo.Attributes)
-%             attrName = datasetInfo.Attributes(k).Name;
-%             attrValue = h5readatt(h5path, full_path, attrName);
-%             metadata.(matlab.lang.makeValidName(attrName)) = attrValue;
-%         end
-%     end
-% end
-% 
-% pixel_resolution = metadata.pixel_resolution;
-% num_planes = metadata.num_planes;
-% num_frames_file = metadata.num_frames_file;
-% num_frames_total = metadata.num_frames_total;
-% 
+%%
 
 T = size(Y,ndims(Y));
 %Y = Y - min(Y(:));
