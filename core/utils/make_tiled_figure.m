@@ -21,7 +21,7 @@ function [f] = make_tiled_figure(images, metadata, varargin)
 p = inputParser;
 addRequired(p, 'images', @iscell);
 addRequired(p, 'metadata', @isstruct);
-addParameter(p, 'fig_title', '', @ischar);
+addParameter(p, 'fig_title', '');
 addParameter(p, 'tile_titles', {}, @iscell);
 addParameter(p, 'scale_size', 10, @isnumeric);
 addParameter(p, 'save_name', '');
