@@ -2,7 +2,7 @@
 Light Beads Microscopy (LBM) Pipeline
 ########################################
 
-version
+version `v1.0.0`
 
 A pipeline for processing light beads microscopy (LBM) datasets.
 
@@ -37,6 +37,7 @@ Requirements
     - Parallel Computing Toolbox
     - Statistics and Machine Learning Toolbox
     - Image Processing Toolbox
+    - Signal Processing Toolbox
 
 Algorithms
 =============

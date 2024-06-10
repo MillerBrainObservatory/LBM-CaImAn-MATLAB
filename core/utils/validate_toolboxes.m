@@ -1,8 +1,8 @@
-function [output] = validateRequirements()
+function [output] = validate_toolboxes()
     %% Report missing toolboxes
     v = ver;
     installed = {v.Name};
-    required = {'Parallel Computing Toolbox', 'Statistics and Machine Learning Toolbox', 'Image Processing Toolbox'};
+    required = {'Parallel Computing Toolbox', 'Statistics and Machine Learning Toolbox', 'Image Processing Toolbox', 'Signal Processing Toolbox};
     missing = {};
 
     for i = 1:length(required)
@@ -10,7 +10,7 @@ function [output] = validateRequirements()
             missing{end+1} = required{i};
         end
     end
-    
+
     if isempty(missing)
         output = 1;
         fprintf('All required toolboxes are installed.\n');
