@@ -30,7 +30,7 @@ save_path = fullfile(parent_path, sprintf('extracted_3px_3px_17px_0px'));
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Extraction %%%%%%%%
 
-clc; compute = 1;
+clc; compute = 0;
 if compute
     convertScanImageTiffToVolume( ...
         data_path, ...
