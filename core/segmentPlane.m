@@ -138,14 +138,11 @@ for plane_idx = start_plane:end_plane
         attr_value = h5readatt(plane_name, sprintf("/%s",h5_data.Name), attr_name);
         metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
     end
+   
     if first % log metadata once
-        meta_str=formattedDisplayText(metadata);
-        writelines(meta_str, log_full_path);
+        log_metadata(metadata, log_full_path,fid);
         first = false;
     end
-    % if isempty(gcp('nocreate')) && num_cores > 1
-    %     parpool(num_cores);
-    % end
     if ~(metadata.num_planes >= end_plane)
         error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
     end
@@ -255,7 +252,7 @@ for plane_idx = start_plane:end_plane
     t_detrend = tic;
     if size(A_keep,2) < 2 % Calculate "raw" traces in terms of delta F/F0
         [T_keep,F0] = detrend_df_f([A_keep,ones(d1*d2,1)],[b,ones(d1*d2,1)],[C_keep;ones(1,T)],[f;-min(min(min(data)))*ones(1,T)],[R_keep; ones(1,T)],options);
-    else                    % total number of pixels
+    else % total number of pixels
         % handle min(data) = 0
         F_dark = min(min(data(:)),eps);
         if F_dark == 0;
