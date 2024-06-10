@@ -17,7 +17,7 @@ addpath(genpath(fullfile(fpath, 'core', 'io')));
 %% Here you can validate that all dependencies are on the path and accessible from within this pipeline.
 % This does not check for package access on your path.
 
-result = validateRequirements();
+result = validate_toolboxes();
 if ischar(result)
     error(result);
 else
@@ -68,7 +68,6 @@ if compute
         'correct_bidir', false...
         );
 
-
     motionCorrectPlane( ...
         save_path, ... % we used this to save extracted data
         mc_path, ... % save registered data here
@@ -90,7 +89,6 @@ if compute
     if ~isfolder(mc_path); mkdir(mc_path); end
     segment_path = fullfile(parent_path, 'results');
     if ~isfolder(segment_path); mkdir(segment_path); end
-
 
     segmentPlane( ...
         mc_path, ... % we used this to save extracted data
