@@ -117,7 +117,6 @@ for plane_idx = start_plane:end_plane
     end
 
     pixel_resolution = metadata.pixel_resolution;
-    max_shift = round(20/pixel_resolution);
 
     if ~(metadata.num_planes >= end_plane)
         error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
