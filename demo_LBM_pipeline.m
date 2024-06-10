@@ -17,7 +17,7 @@ addpath(genpath(fullfile(fpath, 'core', 'io')));
 %% Here you can validate that all dependencies are on the path and accessible from within this pipeline.
 % This does not check for package access on your path.
 
-result = validateRequirements();
+result = validate_toolboxes();
 if ischar(result)
     error(result);
 else
@@ -31,7 +31,7 @@ save_path = fullfile(parent_path, 'extracted_test');
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Extraction %%%%%%%%
 
-clc; compute = 1;
+clc; compute = 0;
 if compute
     save_path = fullfile(parent_path, sprintf('extracted_3px_3px_17px_0px'));
     convertScanImageTiffToVolume( ...
@@ -70,7 +70,6 @@ if compute
         'correct_bidir', false...
         );
 
-
     motionCorrectPlane( ...
         save_path, ... % we used this to save extracted data
         mc_path, ... % save registered data here
@@ -86,13 +85,12 @@ end
 
 %% 3) CNMF Plane-by-plane SegmentationS
 
-clc; compute = 0;
+clc; compute = 1;
 if compute
-    mc_path = fullfile(parent_path, 'corrected');
+    mc_path = fullfile(parent_path, 'corrected_trimmed_grid');
     if ~isfolder(mc_path); mkdir(mc_path); end
     segment_path = fullfile(parent_path, 'results');
     if ~isfolder(segment_path); mkdir(segment_path); end
-
 
     segmentPlane( ...
         mc_path, ... % we used this to save extracted data
