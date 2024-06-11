@@ -2,7 +2,7 @@
 Light Beads Microscopy (LBM) Pipeline
 ########################################
 
-|docs| |Issues| |release|
+|docs|
 
 A pipeline for processing light beads microscopy (LBM) datasets.
 
