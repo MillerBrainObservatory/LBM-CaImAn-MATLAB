@@ -2,23 +2,28 @@
 Light Beads Microscopy (LBM) Pipeline
 ########################################
 
-![Documentation](https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/actions/workflows/documentation.yml/badge.svg)
+|Documentation|
 
-|GitHub issues|
+.. |Documentation| image:: https://img.shields.io/github/issues/Naereen/StrapDown.js.svg
+      :target: https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/index.html
 
-.. |GitHub issues| image:: https://img.shields.io/github/issues/Naereen/StrapDown.js.svg
+|issues|
+
+.. |issues| image:: https://img.shields.io/github/issues/Naereen/StrapDown.js.svg
       :target: https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/
 
-|GitHub release|
+|release|
 
-.. |GitHub release| image:: https://img.shields.io/github/release/Naereen/StrapDown.js.svg
+.. |release| image:: https://img.shields.io/github/release/Naereen/StrapDown.js.svg
       :target: https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/releases/
 
 version `v1.0.0`
 
 A pipeline for processing light beads microscopy (LBM) datasets.
 
-For background, theory and design of LBM technology, see the reference `publication`_. |DOI|
+For background, theory and design of LBM technology, see the reference `publication`_.
+
+|Publication|
 
 Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files. However, only the
 first step of this pipeline which converts the multi-ROI .tiff into a 4D volumetric time-series
@@ -76,5 +81,5 @@ See the (WIP) Documentation for more information.
 .. _startup: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html
 .. _BigTiffSpec: _https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification
 
-.. |DOI| image:: https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg
-      :target: https://doi.org/10.1007/978-3-319-76207-4_15
+.. |Publication| image:: https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg
+      :target: https://doi.org/10.1038/s41592-021-01239-8
