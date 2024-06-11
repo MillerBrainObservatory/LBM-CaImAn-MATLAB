@@ -11,26 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v2
+      - name: Build html
+        uses: ammaraskar/sphinx-action@master
+
+      - name: Uplaod artifacts
+        uses: actions/upload-artifacts@v3
         with:
-          auto-update-conda: true
-          auto-activate-base: false
-
-      - name: Conda env from environment.yml
-        run: |
-          conda env create -f environment.yml
-          conda activate mbo-caiman
-
-      - name: Install sphinx deps
-        run: |
-          conda activate lbm-caiman-matlab-env
-          pip install sphinx sphinx_rtd_theme myst_parser
-
-      - name: Sphinx build
-        run: |
-          conda activate mbo-caiman
-          make html
+          name: html-docs
+          path: docs/build/html/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -38,6 +26,6 @@ jobs:
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/_build/html
+          publish_dir: docs/build/html
           force_orphan: true
-          
+
