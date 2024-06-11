@@ -140,7 +140,7 @@ try
         catch ME
             [~, Aout] = scanimage_backup.util.opentif(full_filename);
         end
-        
+
         % make our final array a little bigger than it needs to be
         % just encase our offset makes our image bigger
         z_timeseries = zeros(raw_y, raw_x * metadata.num_rois, num_frames_file, 'like', Aout);
@@ -150,12 +150,12 @@ try
             p_str = sprintf("plane_%d", plane_idx);
             plane_fullfile = sprintf("%s/extracted_%s.h5", save_path, p_str);
 
-            %% SCAN PHASE CORRECTION METHOD 1: 
-            % Our planar timeseries returned from Aout can be used 
+            %% SCAN PHASE CORRECTION METHOD 1:
+            % Our planar timeseries returned from Aout can be used
             % while it's still vertically tiled
             scan_offset = returnScanOffset(Aout(:,:,plane_idx,:), 1, 'int16');
 
-            % We use the entire timeseries 
+            % We use the entire timeseries
             % [~] = fixScanPhase(Aout(:,:,plane_idx,:), scan_offset, 1, 'int16');
             % disp(toc);
 
@@ -175,9 +175,9 @@ try
                 % use the **untrimmed** roi in the phase offset correction
                 raw_yslice = (raw_offset_y + 1):(raw_offset_y + raw_y);
                 raw_timeseries = Aout(raw_yslice, 1:raw_x, plane_idx, :);
-                
-                %% SCAN PHASE CORRECTION METHOD 2: 
-                % Because the offsets could be different in each ROI depending 
+
+                %% SCAN PHASE CORRECTION METHOD 2:
+                % Because the offsets could be different in each ROI depending
                 % on the flourescence/contrast, so we can also evaluate get
                 % an offset for each individual strip.
                 offsets_roi(plane_idx, roi_idx) = returnScanOffset(Aout(raw_yslice,:,plane_idx,:), 1, 'int16');
@@ -196,7 +196,7 @@ try
                 if cnt > 1 % wait until the new array size is calculated
                     offset_x = offset_x + size(roi_arr, 2);
                 end
-                
+
                 z_timeseries( ...
                     1: size(roi_arr,1), ...
                     (offset_x + 1):(offset_x + size(roi_arr,2)), ...
@@ -205,10 +205,10 @@ try
 
                 [yind, xind] = get_central_indices(raw_timeseries(:,:,2), 40);
                 [yindr, xindr] = get_central_indices(roi_arr(:,:,2), 40);
-                
+
                 images = {raw_timeseries(yind,xind,2), roi_arr(yindr, xindr, 2)};
                 labels = {'Raw\nUntrimmed', 'Scan-Corrected\nTrimmed'};
-                
+
                 roi_savename = fullfile(roi_savepath, sprintf('roi_%d.png', roi_idx));
                 make_tiled_figure( ...
                     images, ...
@@ -228,14 +228,42 @@ try
                 :);
 
             mean_img = mean(z_timeseries, 3);
-            
+
             scale_fact = 10; % Length of the scale bar in microns
-            
+
             img_frame = z_timeseries(:,:,2);
             [yind, xind] = get_central_indices(img_frame, 40); % 30 pixels around the center of the brightest part of an image frame
 
             images = {mean(z_timeseries(yind, xind, 3),3)};
             labels = {sprintf('Plane %d Mean Image', plane_idx)};
+            %
+            % pixel_resolution = metadata.pixel_resolution;
+            % scale_fact = 10; % Length of the scale bar in microns
+            % scale_length_pixels = scale_fact / pixel_resolution;
+            %
+            % img_frame = z_timeseries(:,:,2);
+            % [yind, xind] = get_central_indices(img_frame, 30); % 30 pixels around the center of the brightest part of an image frame
+            %
+            % f = figure('Color', 'black');
+            % sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'w');
+            % tiledlayout(1, 1, 'TileSpacing', 'compact', 'Padding', 'compact');
+            %
+            % % Post-correction image
+            % nexttile;
+            % imagesc(z_timeseries(yind, xind, 2));
+            % axis image; axis tight; axis off; colormap('gray');
+            % sgtitle(sprintf('Plane %d @ %.2f Hz | %.2f µm/px \nFOV: %.0fmm x %.0fmm', plane_idx, metadata.frame_rate, metadata.pixel_resolution, metadata.fov(1), metadata.fov(2)), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
+            % hold on;
+            %
+            % % Scale bar coordinates relative to the cropped image
+            % scale_bar_x = [size(xind, 2) - scale_length_pixels - 3, size(xind, 2) - 3]; % 10 pixels padding from the right
+            % scale_bar_y = [size(yind, 2) - 3, size(yind, 2) - 3]; % 20 pixels padding from the bottom
+            % line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 5);
+            % text(mean(scale_bar_x), scale_bar_y(1), sprintf('%d µm', scale_fact), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
+            % hold off;
+            %
+            % saveas(f, fullfile(fig_save_path, sprintf('scan_correction_validation_plane_%d_offset_%d.png', plane_idx, abs(scan_offset))));
+            % close(f);
 
             plane_save_path = fullfile(fig_save_path, sprintf('Extraction_validation_plane_%d.png', plane_idx));
             make_tiled_figure(images, metadata,'fig_title', labels,'scale_size', scale_fact,'save_name', plane_save_path);
