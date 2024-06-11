@@ -4,4 +4,5 @@ sphinx_gallery
 pydata_sphinx_theme
 sphinxcontrib-matlabdomain
 sphinxcontrib-images
+sphinxcontrib-video
 numpydoc
