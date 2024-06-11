@@ -50,20 +50,40 @@ used for the demo.
 .. code-block:: text
 
     Parent
-    ├── raw
+    ├── raw/
     │   └── basename_00001_0001.tiff
     │   └── basename_00001_0002.tiff
     │   └── basename_00001_00NN.tiff
-    ├── extraction
-    │   └── basename.h5
-    ├── registration
+    ├── extraction/
+    │   └── basename_plane_1.h5
+    │   └── basename_plane_2.h5
+    │   └── basename_plane_NN.h5
+    │   └── figures/
+    │       └── scan_offset_validation.png
+    │       └── roi_1_offset_validation.png
+    │       └── roi_2_offset_validation.png
+    │       └── roi_N_offset_validation.png
+    ├── registration/
     │   └── motion_corrected_plane_1.h5
     │   └── motion_corrected_plane_2.h5
-    │   └── motion_corrected_plane_N.h5
-    └── segmentation
-        └── caiman_output_plane_.h5
+    │   └── motion_corrected_plane_NN.h5
+    │   └── figures/
+    │       └── motion_corrected_metrics_plane_1.png
+    │       └── motion_corrected_metrics_plane_2.png
+    │       └── motion_corrected_metrics_plane_RR.png
+    └── segmentation/
+    │   └── segmented_plane_1.h5
+    │   └── segmented_plane_2.h5
+    │   └── segmented_plane_NN.h5
+    └── axial_correction/
+    │   └── segmented_plane_1.h5
+    │   └── segmented_plane_2.h5
+    │   └── segmented_plane_NN.h5
+    └── figures/
+        └── WIP/
 
-where `N` = the number of `[Y, X, T]` planar time-series.
+- `N` = the number of `[Y, X, T]` planar time-series.
+- `R` = the number of `[Y, X, T]` ROI's per scanfield.
 
 Following the recommendation described in :ref:`install recommendation` all necessary functions should already be on your
 MATLAB path. If an error is encountered, such as:
@@ -84,7 +104,7 @@ You can make sure all of the requirements for the package are in the path with t
 
  .. code-block:: MATLAB
 
-    result = validateRequirements(); % make sure we have dependencies in accessible places
+    result = validate_toolboxes(); % make sure we have dependencies in accessible places
     if ischar(result)
         error(result);
     else
@@ -93,16 +113,7 @@ You can make sure all of the requirements for the package are in the path with t
 
 It is helpful to first set-up directories where youd like your results to go. Each core function in this pipeline takes a "data" path and a "save" path as arguments. Following the :ref:`Directory Structure`:
 
-.. code-block:: MATLAB
-
-    parentpath = 'C:\Users\RBO\Documents\data\bi_hemisphere\'; % outer directory
-    raw_path = [ parentpath 'raw\']; % raw .tiff files live here
-    extract_path = [ parentpath 'extracted\']; % re-assembled 4D volumetric time-series live here
-
-This produces a nicely organized output structure:
-
 .. thumbnail:: ../_static/_images/output_paths.png
    :download: true
    :align: center
-
 

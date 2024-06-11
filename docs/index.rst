@@ -3,33 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+#################
+LBM Documentation
+#################
+
 .. include:: ../README.rst
 
-.. #################
-.. LBM Documentation
-.. #################
+Contents
+=================
 
-.. thumbnail:: ./_static/_images/overlays.png
-   :download: true
-   :align: center
-
-A pipeline for processing light beads microscopy (LBM) datasets.
-
-For background, theory and design of LBM technology, see the reference `publication`_.
-
-Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files.
-
-See the `README`_ for pipeline requirements and algorithms.
-
-
-Documentation Glossary:
-=====================================
 
 .. toctree::
     :maxdepth: 2
 
     get_started/index
-
 
 .. toctree::
     :maxdepth: 2
@@ -42,6 +29,11 @@ Documentation Glossary:
     :caption: API:
 
     api/index
+
+
+.. thumbnail:: ./_static/_images/overlays.png
+   :download: true
+   :align: center
 
 Indices and tables
 =====================================
