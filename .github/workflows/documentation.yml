@@ -20,7 +20,7 @@ permissions:
         - name: Create conda environment
           run: |
             conda env create -f environment.yml
-            conda activate lbm-caiman-matlab-env
+            conda activate lbm-caiman-matlab-env # Ensure this matches the name in environment.yml
 
         - name: Install additional dependencies
           run: |
