@@ -1,0 +1,7 @@
+furo==2021.11.16
+nbsphinx
+sphinx_gallery
+pydata_sphinx_theme
+sphinxcontrib-matlabdomain
+sphinxcontrib-images
+numpydoc

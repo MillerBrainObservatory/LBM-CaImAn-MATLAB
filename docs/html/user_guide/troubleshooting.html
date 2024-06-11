@@ -1,0 +1,561 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Troubleshooting &#8212; caiman_matlab  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+    <link rel="stylesheet" type="text/css" href="../_static/caiman_matlab.css?v=8c8b7c0d" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/troubleshooting';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API" href="../api/index.html" />
+    <link rel="prev" title="Tips and Tricks" href="tips_tricks.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/favicon.ico" class="logo__image only-light" alt="caiman_matlab  documentation - Home"/>
+    <script>document.write(`<img src="../_static/favicon.ico" class="logo__image only-dark" alt="caiman_matlab  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../get_started/index.html">
+                        First Steps
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://mbo.rockefeller.edu">
+                    MBO
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../get_started/index.html">
+                        First Steps
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://mbo.rockefeller.edu">
+                    MBO
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre_processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registration.html">Registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="offset_correction.html">Axial Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips_tricks.html">Tips and Tricks</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Troubleshooting</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Troubleshooting</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="troubleshooting">
+<h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h1>
+<section id="memory">
+<h2>Memory<a class="headerlink" href="#memory" title="Link to this heading">#</a></h2>
+<ul>
+<li><p>Number of Workers/Cores &gt; 100: There a a known bug in MATLAB R2023a for cases when the number of workers is more than 100.
+Refer to the following <a class="reference external" href="https://www.mathworks.com/support/bugreports/details/2968710.html">bug report</a> for a workaround to resolve the issue. Additionally, steps taken in <a class="reference internal" href="#matlab-server-issues"><span class="std std-ref">Matlab Server Issues</span></a> can help to solve this problem.</p></li>
+<li><p>Out of Memory during deserialization</p>
+<p>Sometimes during motion-correction, NormCorre will use more memory than it is supposed to. See &lt;Issue Link&gt;.
+If you’re using all of the cores your computing environment has available, that is almost certainly the cause. Decrease
+the number of cores as the third input of <a class="reference internal" href="../api/core.html#motionCorrectPlane" title="motionCorrectPlane"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">motionCorrectPlane()</span></code></a>. If this doesn’t correct the issue, it is likely due to
+a single 3D-planar time-series being too large to fit in memory, in which case you can prevent caiman from processing the image patches
+in parallel. Keep in mind this will be noticably slower than the parallel counterpart.</p>
+</li>
+</ul>
+</section>
+<section id="missing-compiled-binary-windows">
+<h2>Missing Compiled Binary (Windows)<a class="headerlink" href="#missing-compiled-binary-windows" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Typically seen as: <cite>run_CNMF_patches</cite> function errors out on Windows.</p></li>
+</ul>
+<p><strong>Cause:</strong> Likely caused by missing compiled binary for <cite>graph_conn_comp_mex.mexw64 (win)</cite>/ <cite>graph_conn_comp_mex.mexa64 (unix)</cite></p>
+<p><strong>Solution:</strong>
+1. Compile the binary in MATLAB via the command window:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">mex</span><span class="w"> </span><span class="o">.\</span><span class="n">CaImAn_Utilities</span><span class="o">\</span><span class="n">CaImAn</span><span class="o">-</span><span class="n">MATLAB</span><span class="o">-</span><span class="n">master</span><span class="o">\</span><span class="n">CaImAn</span><span class="o">-</span><span class="n">MATLAB</span><span class="o">-</span><span class="n">master</span><span class="o">\</span><span class="n">utilities</span><span class="o">\</span><span class="n">graph_conn_comp_mex</span><span class="p">.</span><span class="n">cpp</span>
+<span class="n">Building</span><span class="w"> </span><span class="s">with</span><span class="w"> </span><span class="s">&#39;MinGW64 Compiler (C++)&#39;.</span>
+<span class="n">MEX</span><span class="w"> </span><span class="s">completed</span><span class="w"> </span><span class="s">successfully.</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Newest version 0.2.0+ include both precompiled binaries.</p>
+</div>
+</section>
+<section id="matlab-server-issues">
+<h2>Matlab Server Issues<a class="headerlink" href="#matlab-server-issues" title="Link to this heading">#</a></h2>
+<p id="server-issues">These come in many flavors and are mostly <cite>windows</cite> issues due to their background serrvice.</p>
+<p>Here is the general fix for all of them:</p>
+<p>1. Task Manager:
+- End all MATLAB-related tasks.
+2. Check MATLAB License:
+- Run <cite>license checkout Distrib_Computing_Toolbox</cite>.
+- If <cite>Ans=1</cite>, the license is valid.
+3. Revert Local Profile:
+- Create a new profile in the cluster manager, set it as default, and delete ‘Processes’.
+4. Replace Local Cluster Storage:
+- Find <cite>prefdir</cite> using <cite>&gt;&gt; prefdir</cite> (e.g., <cite>C:Users%username%AppDataRoamingMathWorksMATLABR202x</cite>).
+- Delete the <cite>MATLABlocal_cluster_jobs</cite> directory one level up.
+5. Check for Potentially Conflicting Files:
+- Run <cite>which -all startup.m</cite>. If not found, it’s not the issue.
+- Run <cite>which -all pathdef.m</cite>. Ensure it’s located in <cite>C:Program FilesMATLABR2023btoolboxlocalpathdef.m</cite>.
+- Run <cite>which -all matlabrc.m</cite>. Ensure it’s located in <cite>C:Program FilesMATLABR2023btoolboxlocalmatlabrc.m</cite>.</p>
+</section>
+<section id="windows-filepaths">
+<h2>Windows Filepaths<a class="headerlink" href="#windows-filepaths" title="Link to this heading">#</a></h2>
+<p>Sometimes Windows filepaths, with the backslash, is taken as an escape character rather than a file-path separator:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">Warning</span><span class="p">:</span><span class="w"> </span><span class="n">Escaped</span><span class="w"> </span><span class="n">character</span><span class="w"> </span><span class="s">&#39;\U&#39;</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">not</span><span class="w"> </span><span class="n">valid</span><span class="p">.</span><span class="w"> </span><span class="n">See</span><span class="w"> </span><span class="s">&#39;doc sprintf&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">supported</span><span class="w"> </span><span class="n">special</span><span class="w"> </span><span class="n">characters</span><span class="p">.</span>
+<span class="n">Error</span><span class="w"> </span><span class="s">using</span><span class="w"> </span><span class="s">h5infoc</span>
+<span class="n">Unable</span><span class="w"> </span><span class="s">to</span><span class="w"> </span><span class="s">open</span><span class="w"> </span><span class="s">&#39;C:&#39;.</span><span class="w"> </span><span class="s">File</span><span class="w"> </span><span class="s">or</span><span class="w"> </span><span class="s">folder</span><span class="w"> </span><span class="s">not</span><span class="w"> </span><span class="s">found.</span>
+</pre></div>
+</div>
+<p>To resolve this, replace <cite>` with `/</cite>, or use <code class="code docutils literal notranslate"><span class="pre">fullfile()</span></code> to build the path:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">data_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">fullfile</span><span class="p">(</span><span class="s">&quot;C:\Users\&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tips_tricks.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Tips and Tricks</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../api/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">API</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#memory">Memory</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#missing-compiled-binary-windows">Missing Compiled Binary (Windows)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matlab-server-issues">Matlab Server Issues</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#windows-filepaths">Windows Filepaths</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/user_guide/troubleshooting.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Elizabeth R. Miller Brain Observatory (MBO) | The Rockefeller University. All Rights Reserved..
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
