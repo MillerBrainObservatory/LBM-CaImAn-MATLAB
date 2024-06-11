@@ -1,0 +1,43 @@
+name: build and deploy docs
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: write
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          auto-activate-base: false
+
+      - name: Conda env from environment.yml
+        run: |
+          conda env create -f environment.yml
+          conda activate mbo-caiman
+
+      - name: Install sphinx deps
+        run: |
+          conda activate lbm-caiman-matlab-env
+          pip install sphinx sphinx_rtd_theme myst_parser
+
+      - name: Sphinx build
+        run: |
+          conda activate mbo-caiman
+          make html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build/html
+          force_orphan: true
+          
