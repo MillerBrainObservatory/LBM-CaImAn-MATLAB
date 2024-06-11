@@ -2,15 +2,17 @@
 Light Beads Microscopy (LBM) Pipeline
 ########################################
 
-version `v1.0.0`
+|docs|
 
 A pipeline for processing light beads microscopy (LBM) datasets.
-
-For background, theory and design of LBM technology, see the reference `publication`_.
 
 Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files. However, only the
 first step of this pipeline which converts the multi-ROI .tiff into a 4D volumetric time-series
 requires scanimage .tiff files.
+
+For background, theory and design of LBM technology, see the reference `publication`_.
+
+|Publication|
 
 =============
 Quickstart
@@ -48,8 +50,6 @@ The following algorithms perform the main computations and are included by defau
 - `NoRMCorre`_ piecewise rigid motion correction.
 - `constrained-foopsi`_ constrained deconvolution spike inference.
 
-See the (WIP) Documentation for more information.
-
 .. _CNMF: https://github.com/simonsfoundation/NoRMCorre
 .. _CaImAn: https://github.com/flatironinstitute/CaImAn-MATLAB/
 .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
@@ -63,3 +63,18 @@ See the (WIP) Documentation for more information.
 .. _startup.m: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html
 .. _startup: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html
 .. _BigTiffSpec: _https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification
+
+.. |Publication| image:: https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg
+      :target: https://doi.org/10.1038/s41592-021-01239-8
+
+.. |issues| image:: https://img.shields.io/github/issues/Naereen/StrapDown.js.svg
+      :target: https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/
+
+.. |release| image:: https://img.shields.io/github/release/Naereen/StrapDown.js.svg
+      :target: https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/releases/
+
+.. |docs| image:: https://img.shields.io/badge/LBM%20Documentation-1f425f.svg
+   :target: https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/
+
+.. |DOI| image:: https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg
+      :target: https://doi.org/10.1038/s41592-021-01239-8

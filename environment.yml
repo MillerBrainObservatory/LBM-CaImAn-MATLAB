@@ -10,16 +10,9 @@ channels:
 - defaults
 dependencies:
 - pip
-- pip:
-  - -e git+https://github.com/ru-rbo/scanreader.git#egg=argh
-  - scanreader
-  - sphinxcontrib-matlabdomain
-  - sphinxcontrib-images
-
 - python <=3.9
 - bokeh >=3.1.1
 - cython
-- h5py
 - holoviews >=1.16.2
 - ipykernel
 - ipython
@@ -30,6 +23,9 @@ dependencies:
 - moviepy
 - nose
 - numpy <2.0.0
+- scikit-image >=0.19.0
+- scikit-learn >=1.2
+- scipy >= 1.10.1
 - opencv
 - panel >=1.0.2
 - peakutils
@@ -37,17 +33,19 @@ dependencies:
 - psutil
 - pynwb
 - pyqtgraph
-- scikit-image >=0.19.0
-- scikit-learn >=1.2
-- scipy >= 1.10.1
-- tifffile
 - tk
 - tqdm
 - yapf
+- tifffile
 - zarr
-# needed to build docs
-- numpydoc
-- pydata-sphinx-theme
-- sphinxcontrib-video
-- sphinxcontrib-matlabdomain
-- sphinxcontrib-images
+- h5py
+- sphinx>=6.0
+- docutils<0.18,>=0.14
+- pip:
+  - -e git+https://github.com/ru-rbo/scanreader.git#egg=argh
+  - scanreader
+  - sphinxcontrib-matlabdomain
+  - sphinxcontrib-images
+  - sphinxcontrib-video
+  - numpydoc
+  - pydata-sphinx-theme

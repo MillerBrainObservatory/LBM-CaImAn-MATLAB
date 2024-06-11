@@ -1,0 +1,608 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Axial-Offset Correction &#8212; caiman_matlab  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+    <link rel="stylesheet" type="text/css" href="../_static/caiman_matlab.css?v=8c8b7c0d" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/offset_correction';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tips and Tricks" href="tips_tricks.html" />
+    <link rel="prev" title="Segmentation and Deconvolution" href="segmentation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/favicon.ico" class="logo__image only-light" alt="caiman_matlab  documentation - Home"/>
+    <script>document.write(`<img src="../_static/favicon.ico" class="logo__image only-dark" alt="caiman_matlab  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../get_started/index.html">
+                        First Steps
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://mbo.rockefeller.edu">
+                    MBO
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../get_started/index.html">
+                        First Steps
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://mbo.rockefeller.edu">
+                    MBO
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre_processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registration.html">Registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="segmentation.html">Segmentation</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Axial Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tips_tricks.html">Tips and Tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Axial-Offset...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="axial-offset-correction">
+<span id="offset-correction"></span><h1>Axial-Offset Correction<a class="headerlink" href="#axial-offset-correction" title="Link to this heading">#</a></h1>
+<p>Core function: <a class="reference internal" href="../api/core.html#collatePlanes" title="collatePlanes"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">collatePlanes()</span></code></a></p>
+<p>Light beads traveling to our sample need to be temporally distinct relative to our sensor
+so that the aquisition system knows the origin and subsequent depth of each bead.</p>
+<p>The current LBM design incoorperates 2 cavities, hereby named <cite>Cavity A</cite> and <cite>Cavity B</cite>.
+These two cavities are non-overlapping areas where light beads travel. If we plot
+a sample pollen grain through each z-depth, we can see these cavities manifest:</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/pollen_depth1.svg"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/pollen_depth1.svg"
+                     class=""
+                     width="600"
+                     height="auto"
+                     alt=""/>
+                </a><p>We see a bi-modal distribution of Signal (Y) vs z-depth.</p>
+<p>This pollen grain is sampled just like a brain would be sampled. We can
+preview the time-series resulting from this pollen to get a preliminary
+look at our recording quality:</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/pollen_frame1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/pollen_frame1.png"
+                     class=""
+                     width="600"
+                     height="auto"
+                     alt=""/>
+                </a><p>Before proceeding:</p>
+<ul class="simple">
+<li><p>You will need to be in a GUI environment for this step. Calculate offset will show you two images, click the feature that matches in both images.</p></li>
+<li><p>You will need access to the following calibration files:</p></li>
+</ul>
+<p><code class="code docutils literal notranslate"><span class="pre">pollen_calibration_Z_vs_N.mat</span></code>
+<code class="code docutils literal notranslate"><span class="pre">pollen_calibration_x_y_offsets.fig</span></code></p>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<p>These files hold data used to align each z-plane depth around the same [Y, X] coordinates.</p>
+<p>Place these files in the same directory as your <cite>caiman_output_plane_N</cite> files.</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="n">collatePlanes</span>
+
+<span class="n">collatePlanes</span><span class="w"> </span><span class="s">Analyzes</span><span class="w"> </span><span class="s">and</span><span class="w"> </span><span class="s">processes</span><span class="w"> </span><span class="s">imaging</span><span class="w"> </span><span class="s">data</span><span class="w"> </span><span class="s">by</span><span class="w"> </span><span class="s">extracting</span><span class="w"> </span><span class="s">and</span><span class="w"> </span><span class="s">correcting</span><span class="w"> </span><span class="s">features</span><span class="w"> </span><span class="s">across</span><span class="w"> </span><span class="s">multiple</span><span class="w"> </span><span class="s">planes.</span>
+
+<span class="n">This</span><span class="w"> </span><span class="s">function</span><span class="w"> </span><span class="s">analyzes</span><span class="w"> </span><span class="s">imaging</span><span class="w"> </span><span class="s">data</span><span class="w"> </span><span class="s">from</span><span class="w"> </span><span class="s">a</span><span class="w"> </span><span class="s">specified</span><span class="w"> </span><span class="s">directory,</span><span class="w"> </span><span class="s">applying</span>
+<span class="n">various</span><span class="w"> </span><span class="s">thresholds</span><span class="w"> </span><span class="s">and</span><span class="w"> </span><span class="s">corrections</span><span class="w"> </span><span class="s">based</span><span class="w"> </span><span class="s">on</span><span class="w"> </span><span class="s">metadata.</span><span class="w"> </span><span class="s">It</span><span class="w"> </span><span class="s">processes</span><span class="w"> </span><span class="s">neuron</span>
+<span class="n">activity</span><span class="w"> </span><span class="s">data,</span><span class="w"> </span><span class="s">handles</span><span class="w"> </span><span class="s">z-plane</span><span class="w"> </span><span class="s">corrections,</span><span class="w"> </span><span class="s">and</span><span class="w"> </span><span class="s">outputs</span><span class="w"> </span><span class="s">figures</span><span class="w"> </span><span class="s">representing</span>
+<span class="n">neuron</span><span class="w"> </span><span class="s">distributions</span><span class="w"> </span><span class="s">along</span><span class="w"> </span><span class="s">with</span><span class="w"> </span><span class="s">collated</span><span class="w"> </span><span class="s">data</span><span class="w"> </span><span class="s">files.</span>
+
+<span class="n">The</span><span class="w"> </span><span class="s">function</span><span class="w"> </span><span class="s">expects</span><span class="w"> </span><span class="s">the</span><span class="w"> </span><span class="s">directory</span><span class="w"> </span><span class="s">to</span><span class="w"> </span><span class="s">contain</span><span class="w"> </span><span class="s">&#39;caiman_output_plane_*.mat&#39;</span><span class="w"> </span><span class="s">files</span>
+<span class="n">with</span><span class="w"> </span><span class="s">variables</span><span class="w"> </span><span class="s">related</span><span class="w"> </span><span class="s">to</span><span class="w"> </span><span class="s">neuronal</span><span class="w"> </span><span class="s">activity,</span><span class="w"> </span><span class="s">and</span><span class="w"> </span><span class="s">uses</span><span class="w"> </span><span class="s">provided</span><span class="w"> </span><span class="s">metadata</span><span class="w"> </span><span class="s">for</span>
+<span class="n">processing</span><span class="w"> </span><span class="s">parameters.</span><span class="w"> </span><span class="s">It</span><span class="w"> </span><span class="s">adjusts</span><span class="w"> </span><span class="s">parameters</span><span class="w"> </span><span class="s">dynamically</span><span class="w"> </span><span class="s">based</span><span class="w"> </span><span class="s">on</span><span class="w"> </span><span class="s">the</span><span class="w"> </span><span class="s">content</span>
+<span class="n">of</span><span class="w"> </span><span class="s">metadata</span><span class="w"> </span><span class="s">and</span><span class="w"> </span><span class="s">filters,</span><span class="w"> </span><span class="s">merges</span><span class="w"> </span><span class="s">data</span><span class="w"> </span><span class="s">across</span><span class="w"> </span><span class="s">imaging</span><span class="w"> </span><span class="s">planes,</span><span class="w"> </span><span class="s">and</span><span class="w"> </span><span class="s">performs</span>
+<span class="n">z</span><span class="o">-</span><span class="n">plane</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">field</span><span class="w"> </span><span class="n">curvature</span><span class="w"> </span><span class="n">corrections</span><span class="p">.</span>
+</pre></div>
+</div>
+<p>First, the [Y, X] offsets (in micron) are used for an initial, dirty axial alignment:</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/pollen_shifts1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/pollen_shifts1.png"
+                     class=""
+                     width="600"
+                     height="auto"
+                     alt=""/>
+                </a><p>This alignment should improve the spatial consistency between z-planes, but there is a
+further refinement step which prompts a graphical interface for z-plane(n) and z-plane(n+1).</p>
+<p>Depending on your axial field-of-view, there is likely neuronal contamination between z-planes.
+We can use this to select a feature, and the same feature in n+1.</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/compare_planes1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/compare_planes1.png"
+                     class=""
+                     width="600"
+                     height="auto"
+                     alt=""/>
+                </a><section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h3>
+<p>There are no additional parameters outside of the defaults described in <a class="reference internal" href="parameters.html#parameters"><span class="std std-ref">Parameters</span></a>.</p>
+</section>
+<section id="outputs">
+<h3>Outputs<a class="headerlink" href="#outputs" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>.fig files showing neuron distributions in z and radial directions.</p></li>
+<li><p>A <code class="code docutils literal notranslate"><span class="pre">.mat</span></code> file: <a href="#id1"><span class="problematic" id="id2">`</span></a>caiman_collated_output_plane_N with collated and processed imaging data.</p></li>
+</ul>
+</section>
+<section id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h3>
+<p>collatePlanes(‘C:/data/images/’, ‘’, struct(‘r_thr’:0.4, ‘pixel_resolution’:2, ‘min_snr’:1.5, ‘frame_rate’:9.61, ‘fovx’:1200, ‘fovy’:1164), 100);
+This example processes data from ‘C:/data/images/’, starting at a depth of 100 microns,
+with specified metadata parameters.</p>
+<p>See also load, inputdlg, struct, fullfile, exist</p>
+<p>The user will be prompted to select the same <strong>feature</strong> / <strong>region-of-interest</strong> / <strong>neuron</strong>:</p>
+<p>After selecting 3 neurons for each plane, you are done with the LBM pipeline.</p>
+<p>In the resulting filename you will see the collated <code class="code docutils literal notranslate"><span class="pre">minSNR</span></code> value. This new file
+holds a concatenated, centered and thresholded master copy of all neurons, footprints and traces.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="segmentation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Segmentation and Deconvolution</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="tips_tricks.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tips and Tricks</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs">Outputs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/user_guide/offset_correction.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Elizabeth R. Miller Brain Observatory (MBO) | The Rockefeller University. All Rights Reserved..
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
