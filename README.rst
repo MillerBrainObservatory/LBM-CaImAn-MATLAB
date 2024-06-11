@@ -2,11 +2,23 @@
 Light Beads Microscopy (LBM) Pipeline
 ########################################
 
+![Documentation](https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/actions/workflows/documentation.yml/badge.svg)
+
+|GitHub issues|
+
+.. |GitHub issues| image:: https://img.shields.io/github/issues/Naereen/StrapDown.js.svg
+      :target: https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/
+
+|GitHub release|
+
+.. |GitHub release| image:: https://img.shields.io/github/release/Naereen/StrapDown.js.svg
+      :target: https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/releases/
+
 version `v1.0.0`
 
 A pipeline for processing light beads microscopy (LBM) datasets.
 
-For background, theory and design of LBM technology, see the reference `publication`_.
+For background, theory and design of LBM technology, see the reference `publication`_. |DOI|
 
 Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files. However, only the
 first step of this pipeline which converts the multi-ROI .tiff into a 4D volumetric time-series
@@ -63,3 +75,6 @@ See the (WIP) Documentation for more information.
 .. _startup.m: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html
 .. _startup: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html
 .. _BigTiffSpec: _https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification
+
+.. |DOI| image:: https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg
+      :target: https://doi.org/10.1007/978-3-319-76207-4_15
