@@ -2,7 +2,22 @@
 Light Beads Microscopy (LBM) Pipeline
 ########################################
 
+<<<<<<< HEAD
 |docs| |Issues| |release|
+=======
+
+|GitHub issues|
+
+.. |GitHub issues| image:: https://img.shields.io/github/issues/Naereen/StrapDown.js.svg
+      :target: https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/
+
+|GitHub release|
+
+.. |GitHub release| image:: https://img.shields.io/github/release/Naereen/StrapDown.js.svg
+      :target: https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/releases/
+
+version `v1.0.0`
+>>>>>>> dc2cfe2 (docs: fix doi link)
 
 A pipeline for processing light beads microscopy (LBM) datasets.
 
@@ -64,6 +79,7 @@ The following algorithms perform the main computations and are included by defau
 .. _startup: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html
 .. _BigTiffSpec: _https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification
 
+<<<<<<< HEAD
 .. |Publication| image:: https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg
       :target: https://doi.org/10.1038/s41592-021-01239-8
 
@@ -75,3 +91,7 @@ The following algorithms perform the main computations and are included by defau
 
 .. |docs| image:: https://img.shields.io/badge/LBM%20Documentation-1f425f.svg
    :target: https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/
+=======
+.. |DOI| image:: https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg
+      :target: https://doi.org/10.1038/s41592-021-01239-8
+>>>>>>> dc2cfe2 (docs: fix doi link)
