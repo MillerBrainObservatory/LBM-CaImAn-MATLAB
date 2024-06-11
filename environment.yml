@@ -15,7 +15,6 @@ dependencies:
   - scanreader
   - sphinxcontrib-matlabdomain
   - sphinxcontrib-images
-
 - python <=3.9
 - bokeh >=3.1.1
 - cython
@@ -49,5 +48,3 @@ dependencies:
 - numpydoc
 - pydata-sphinx-theme
 - sphinxcontrib-video
-- sphinxcontrib-matlabdomain
-- sphinxcontrib-images
