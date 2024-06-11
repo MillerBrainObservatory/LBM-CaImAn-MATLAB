@@ -1,11 +1,11 @@
 %%
-import ScanImageTiffReader.ScanImageTiffReader;
+import scanimage.util.ScanImageTiffReader;
 
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
 addpath(genpath(fullfile(currpath, '../core/')));
-addpath(genpath(fullfile(currpath, '../packages/ScanImage_Utilities/SI2016bR1_2017-09-28-140040_defde478ed/')));
-% reader=ScanImageTiffReader.ScanImageTiffReader(full_filepath);
-% vol=reader.data();
+full_filepath = fullfile("C:/Users/RBO/Documents/data/high_res/raw/MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif");
+reader=ScanImageTiffReader(full_filepath);
+vol=reader.data();
 
 %% FILEPATHS
 
