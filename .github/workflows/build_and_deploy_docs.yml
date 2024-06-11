@@ -8,6 +8,8 @@ permissions:
 jobs:
   docs:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
 
@@ -15,17 +17,16 @@ jobs:
         uses: ammaraskar/sphinx-action@master
 
       - name: Uplaod artifacts
-        uses: actions/upload-artifacts@v3
+        uses: actions/upload-artifact@v4
         with:
           name: html-docs
-          path: docs/build/html/
+          path: docs/_build/html/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/build/html
+          publish_dir: docs/_build/html
           force_orphan: true
 
