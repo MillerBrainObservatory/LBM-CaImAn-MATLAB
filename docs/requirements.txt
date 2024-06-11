@@ -1,8 +1,10 @@
 furo==2021.11.16
 nbsphinx
+sphinx>=6
 sphinx_gallery
 pydata_sphinx_theme
 sphinxcontrib-matlabdomain
 sphinxcontrib-images
 sphinxcontrib-video
 numpydoc
+docutils<0.18,>=0.14

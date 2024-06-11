@@ -39,6 +39,8 @@ dependencies:
 - tifffile
 - zarr
 - h5py
+- sphinx>=6.0
+- docutils<0.18,>=0.14
 - pip:
   - -e git+https://github.com/ru-rbo/scanreader.git#egg=argh
   - scanreader
