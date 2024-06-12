@@ -1,17 +1,14 @@
 #To use:
 #    $ conda install -n base -c conda-forge mamba
-#    $ mamba create -n mbo-caiman -c conda-forge caiman  # match package name
+#    $ conda env create -n mbo-caiman --file /path/to/repo/environment.yml
 #    $ conda activate mbo-caiman
-#    $ conda install -f /path/to/repo/environment.yml
-#
 name: mbo-caiman
 channels:
 - conda-forge
-- defaults
 dependencies:
 - pip
-- python <=3.9
-- bokeh >=3.1.1
+- python<=3.9
+- bokeh>=3.1.1
 - cython
 - holoviews >=1.16.2
 - ipykernel
@@ -40,7 +37,6 @@ dependencies:
 - zarr
 - h5py
 - sphinx>=6.0
-- docutils<0.18,>=0.14
 - pip:
   - sphinxcontrib-matlabdomain
   - sphinxcontrib-images
