@@ -4,7 +4,7 @@
 #    $ conda activate mbo-caiman
 #    $ conda install -f /path/to/repo/environment.yml
 #
-name: mbo-caiman  # changing this will mean changing `conda activate <my-package-name>
+name: mbo-caiman
 channels:
 - conda-forge
 - defaults
@@ -42,10 +42,9 @@ dependencies:
 - sphinx>=6.0
 - docutils<0.18,>=0.14
 - pip:
-  - -e git+https://github.com/ru-rbo/scanreader.git#egg=argh
-  - scanreader
   - sphinxcontrib-matlabdomain
   - sphinxcontrib-images
   - sphinxcontrib-video
   - numpydoc
   - pydata-sphinx-theme
+  - sphinx-book-theme
