@@ -4,43 +4,17 @@
 #    $ conda activate mbo-caiman
 name: mbo-caiman
 channels:
+- defaults
 - conda-forge
 dependencies:
 - pip
-- python<=3.9
-- bokeh>=3.1.1
-- cython
-- holoviews >=1.16.2
-- ipykernel
+- python
 - ipython
-- ipyparallel
-- jupyter
-- jupyter_bokeh
-- matplotlib
-- moviepy
-- nose
-- numpy <2.0.0
-- scikit-image >=0.19.0
-- scikit-learn >=1.2
-- scipy >= 1.10.1
-- opencv
-- panel >=1.0.2
-- peakutils
-- pims
-- psutil
-- pynwb
-- pyqtgraph
-- tk
-- tqdm
-- yapf
-- tifffile
-- zarr
-- h5py
 - sphinx>=6.0
+- sphinxcontrib-video
+- numpydoc
+- pydata-sphinx-theme
+- sphinx-book-theme
 - pip:
   - sphinxcontrib-matlabdomain
   - sphinxcontrib-images
-  - sphinxcontrib-video
-  - numpydoc
-  - pydata-sphinx-theme
-  - sphinx-book-theme
