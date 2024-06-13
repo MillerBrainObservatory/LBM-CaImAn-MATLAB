@@ -2,9 +2,9 @@
 Semantics
 #########
 
-Throughout the pipeline, image-processing terms will be used such as::
+Throughout the pipeline, several image-processing terms will be used such as::
 
-    ROI STRIP FRAME IMAGE PLANE VOLUME TIME-SERIES Z-STACK T-STACK
+    ROI STRIP FRAME IMAGE PLANE VOLUME TIMESERIES Z-STACK T-STACK
 
 .. list-table:: LBM Semantics
    :header-rows: 1
@@ -20,7 +20,9 @@ Throughout the pipeline, image-processing terms will be used such as::
    * - [X, Y, T]
      - Time-Series of a 2D Plane
 
-Within an image, we are dealing with ScanImage `multi-ROI`_ scans. During aquisition, the user choses the "number of pixels in X/Y (see :ref:`image size` in :ref:`metadata`)
+Within an image, we are dealing with ScanImage `multi-ROI`_ scans.
+
+During aquisition, the user choses the "number of pixels in X/Y (see :ref:`image size` in :ref:`metadata`)
 
 Each ROI can be trimmed and smoothed to blend with adjacent ROI's.
 
