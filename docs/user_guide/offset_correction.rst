@@ -74,7 +74,7 @@ Axial Correction Outputs
 ----------------------------
 
 - .fig files showing neuron distributions in z and radial directions.
-- A :code:`.mat` file: `caiman_collated_output_plane_N with collated and processed imaging data.
+- A :code:`.mat` file: `caiman_collated_output_plane_N` with collated and processed imaging data.
 
 Axial Correction Examples
 ------------------------------
