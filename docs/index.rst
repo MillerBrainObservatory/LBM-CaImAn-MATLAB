@@ -1,7 +1,7 @@
 
-#############################################
-Light Beads Microscopy (LBM) Documentation
-#############################################
+################################
+LBM-CaImAn-MATLAB Documentation
+################################
 
 |docs|
 
@@ -9,12 +9,11 @@ Light Beads Microscopy (LBM) Documentation
 
 A pipeline for processing light beads microscopy (LBM) datasets.
 
-Currently, inputs to this pipeline are limited to `ScanImage`_ tiff files. However, only the
+Currently, inputs to this pipeline are limited to `ScanImage`_ `tiff` files. However, only the
 first step of this pipeline which converts the multi-ROI .tiff into a 4D volumetric time-series
-requires scanimage .tiff files.
+requires scanimage `.tiff` files.
 
 For background, theory and design of LBM technology, see the reference `publication`_.
-
 |Publication|
 
 =============
