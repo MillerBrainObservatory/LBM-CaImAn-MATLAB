@@ -24,6 +24,10 @@ for the pipeline setup, each step in the pipeline, and intermediate analysis alo
 Pipeline Steps
 *****************
 
+.. raw:: html
+
+   <div style="width: 640px; height: 480px; margin: 10px; position: relative;"><iframe allowfullscreen frameborder="0" style="width:640px; height:480px" src="https://lucid.app/documents/embedded/dfe6e111-eb65-435c-bf1c-208e2237236e" id="M_MK5TcbuWUt"></iframe></div>
+
 There are 4 core steps in this pipeline:
 
 1. `convertScanImageTiffToVolume()`
