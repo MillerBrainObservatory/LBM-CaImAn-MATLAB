@@ -24,7 +24,7 @@ function motionCorrectPlane(data_path, save_path, varargin)
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
 % options : struct
-%     NormCorre Params Object, 
+%     NormCorre Params Object,
 %
 % Returns
 % -------
@@ -119,10 +119,6 @@ for plane_idx = start_plane:end_plane
 
     pixel_resolution = metadata.pixel_resolution;
 
-    if ~(metadata.num_planes >= end_plane)
-        error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
-    end
-
     Y = h5read(plane_name, dataset_name);
     Y = Y - min(Y(:));
     volume_size = size(Y);
@@ -134,7 +130,7 @@ for plane_idx = start_plane:end_plane
         options_rigid = NoRMCorreSetParms(...
             'd1',d1,...
             'd2',d2,...
-            'bin_width',200,...       
+            'bin_width',200,...
             'max_shift', round(20/pixel_resolution),...        % Max shift in px
             'us_fac',20,...                   % upsample factor
             'init_batch',200,...              % #frames used to create template
@@ -188,5 +184,5 @@ for plane_idx = start_plane:end_plane
         warning("File ID, no longer valid: %d", fid);
         return;
     end
-fprintf(fid, "%s : Processing complete. Time: %.2f hours\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tall)/3600);
+    fprintf(fid, "%s : Processing complete. Time: %.2f hours\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tall)/3600);
 end
