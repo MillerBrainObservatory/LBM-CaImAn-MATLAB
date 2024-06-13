@@ -25,8 +25,6 @@ for the pipeline setup, each step in the pipeline, and intermediate analysis alo
 Pipeline Steps
 *****************
 
-.. image:: https://lucid.app/publicSegments/view/e2f354a2-ba08-45a2-9770-9b6ea612ed87/image.png
-
 .. thumbnail:: https://lucid.app/publicSegments/view/e2f354a2-ba08-45a2-9770-9b6ea612ed87/image.png   :width: 800
 
 There are 4 core steps in this pipeline:
@@ -35,6 +33,11 @@ There are 4 core steps in this pipeline:
 2. `motionCorrectPlane()`
 3. `segmentPlane()`
 4. `collatePlane()`
+
+.. thumbnail:: https://lucid.app/publicSegments/view/e2f354a2-ba08-45a2-9770-9b6ea612ed87/image.png   :width: 800
+
+.. thumbnail:: ../_static/_images/extraction_diagram.svg
+   :width: 800
 
 Requirements
 =============
