@@ -3,9 +3,9 @@
 LBM-CaImAn-MATLAB Documentation
 ################################
 
-|docs|
+|Docs|
 
-|repo|
+|Repository|
 
 A pipeline for processing light beads microscopy (LBM) datasets.
 
@@ -14,7 +14,10 @@ first step of this pipeline which converts the multi-ROI .tiff into a 4D volumet
 requires scanimage `.tiff` files.
 
 For background, theory and design of LBM technology, see the reference `publication`_.
+
 |Publication|
+|Release|
+|Issues|
 
 =============
 Quickstart
@@ -33,7 +36,7 @@ There are 4 core steps in this pipeline:
 3. `segmentPlane()`
 4. `collatePlane()`
 
-.. thumbnail:: _static/_images/extractin/extraction_diagram.png
+.. thumbnail:: _static/_images/extraction/extraction_diagram.png
    :width: 800
 
 Requirements
@@ -70,18 +73,23 @@ The following algorithms perform the main computations and are included by defau
 .. _BigTiffSpec: _https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification
 
 .. |Publication| image:: https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg
-      :target: https://doi.org/10.1038/s41592-021-01239-8
+    :alt: Publication Link
+    :target: https://doi.org/10.1038/s41592-021-01239-8
 
 .. |issues| image:: https://img.shields.io/github/issues/Naereen/StrapDown.js.svg
-      :target: https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/
+    :alt: Issues badge
+    :target: https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/
 
 .. |release| image:: https://img.shields.io/github/release/Naereen/StrapDown.js.svg
-      :target: https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/releases/
+    :alt: Release badge
+    :target: https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/releases/
 
 .. |Docs| image:: https://img.shields.io/badge/Documentation-black?style=for-the-badge&logo=readthedocs&logoColor=white&link=https%3A%2F%2Fmillerbrainobservatory.github.io%2FLBM-CaImAn-MATLAB%2F
-   :alt: Documentation Link
+    :alt: Docs badge
+    :target: https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/index.html#
 
 .. |DOI| image:: https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg
+    :alt: Doi badge
     :target: https://doi.org/10.1038/s41592-021-01239-8
 
 .. |Repository| image:: https://img.shields.io/badge/Repository-black?style=flat-square&logo=github&logoColor=white&link=https%3A%2F%2Fmillerbrainobservatory.github.io%2FLBM-CaImAn-MATLAB%2F
