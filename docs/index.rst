@@ -3,9 +3,7 @@
 LBM-CaImAn-MATLAB Documentation
 ################################
 
-|Docs|
-
-|Repository|
+|Repository| |Release| |Issues|
 
 A pipeline for processing light beads microscopy (LBM) datasets.
 
@@ -16,8 +14,6 @@ requires scanimage `.tiff` files.
 For background, theory and design of LBM technology, see the reference `publication`_.
 
 |Publication|
-|Release|
-|Issues|
 
 =============
 Quickstart
