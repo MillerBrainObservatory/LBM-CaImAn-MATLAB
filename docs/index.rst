@@ -1,6 +1,6 @@
 
 ################################
-LBM-CaImAn-MATLAB Documentation
+LBM Documentation
 ################################
 
 |Repository| |Release| |Issues|
@@ -111,7 +111,6 @@ Contents
     :caption: API:
 
     api/index
-
 
 Indices and tables
 =====================================
