@@ -1,6 +1,6 @@
-name: build and deploy docs
+name: Build and Deploy Documentation
 
-on: [push, pull_request, workflow_dispatch]
+on: pull_request
 
 
 jobs:

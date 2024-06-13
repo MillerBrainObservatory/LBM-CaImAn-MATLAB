@@ -32,8 +32,8 @@ Before proceeding:
 :code:`pollen_calibration_Z_vs_N.mat`
 :code:`pollen_calibration_x_y_offsets.fig`
 
-Setup
-*********************
+Axial Correction Setup
+---------------------------
 
 These files hold data used to align each z-plane depth around the same [Y, X] coordinates.
 
@@ -56,7 +56,7 @@ Place these files in the same directory as your `caiman_output_plane_N` files.
     of metadata and filters, merges data across imaging planes, and performs
     z-plane and field curvature corrections.
 
-First, the [Y, X] offsets (in micron) are used for an initial, dirty axial alignment:
+First, the [Y, X] offsets (in microns) are used for an initial, dirty axial alignment:
 
 .. thumbnail:: ../_static/_images/pollen/pollen_shifts.png
    :width: 600
@@ -70,18 +70,14 @@ We can use this to select a feature, and the same feature in n+1.
 .. thumbnail:: ../_static/_images/compare_planes.png
    :width: 600
 
-Parameters
-----------
+Axial Correction Outputs
+----------------------------
 
-There are no additional parameters outside of the defaults described in :ref:`parameters`.
-
-Outputs
--------
 - .fig files showing neuron distributions in z and radial directions.
-- A :code:`.mat` file: `caiman_collated_output_plane_N with collated and processed imaging data.
+- A :code:`.mat` file: `caiman_collated_output_plane_N` with collated and processed imaging data.
 
-Examples
---------
+Axial Correction Examples
+------------------------------
 
 collatePlanes('C:/data/images/', '', struct('r_thr':0.4, 'pixel_resolution':2, 'min_snr':1.5, 'frame_rate':9.61, 'fovx':1200, 'fovy':1164), 100);
 This example processes data from 'C:/data/images/', starting at a depth of 100 microns,

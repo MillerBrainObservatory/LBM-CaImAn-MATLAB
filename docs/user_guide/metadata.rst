@@ -48,7 +48,7 @@ The funcion :func:`get_metadata` takes as input a path to any `ScanImage`_ tiff 
 Image Size
 ************
 
-ScanImage `multi-ROI`_ .tiff outputs are made up of individual sections called that ScanImage calls `ROIs`.
+ScanImage BigTiffSpec_ outputs are made up of individual sections called that ScanImage calls `ROIs`.
 
 These are rectangles (rectangles are forced as of scanimage 2019) that comprise the area that will be scanned.
 These rectangles are called `ScanImage scanfields`. ScanField is just a custom matlab class with some information about the pixel sizes.
