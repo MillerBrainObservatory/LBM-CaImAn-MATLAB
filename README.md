@@ -1,7 +1,7 @@
 # Light Beads Microscopy (LBM) Pipeline
 
 [![Documentation](https://img.shields.io/badge/Documentation-1f425f.svg)](https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/)
-![Extraction Diagram]( _static/_images/extractin/extraction_diagram.png)
+![Extraction Diagram]( _static/_images/extraction/extraction_diagram.png)
 [![Publication](https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg)](https://doi.org/10.1038/s41592-021-01239-8)
 
 ## Requirements
