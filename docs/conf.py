@@ -35,8 +35,8 @@ html_theme = "pydata_sphinx_theme"
 html_short_title="LBM-CaImAn-MATLAB"
 html_static_path = ["_static"]
 
-html_css_files = ['caiman_matlab.css']
-html_logo = "_static/favicon.ico"
+html_css_files = ['LBM_docs.css']
+html_logo = "_static/LBM_icon.ico"
 
 html_theme_options = {
   "external_links": [
