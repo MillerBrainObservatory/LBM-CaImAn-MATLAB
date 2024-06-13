@@ -1,9 +1,9 @@
-function translatedFrames = translateFrames(Y, shifts_2D)
-%TRANSLATEFRAMES Translate image frames based on provided translation vectors.
+function translate_frames = translate_frames(Y, shifts_2D)
+%TRANSLATE_FRAMES Translate image frames based on provided translation vectors.
 %
 % This function applies 2D translations to an image time series based on
 % a series of translation vectors, one per frame. Each frame is translated
-% independently, and the result is returned as a 3D stack of 
+% independently, and the result is returned as a 3D stack of
 % (Height x Width x num_frames) translated frames.
 %
 % Parameters:
@@ -18,10 +18,10 @@ function translatedFrames = translateFrames(Y, shifts_2D)
         Y double {mustBeNumeric, mustBeNonempty}
         shifts_2D (:,2) double {mustBeNumeric, mustBeNonempty} % should match size as well
     end
-    
+
     % Initialize the output array with the same size and type as Y
     translatedFrames = zeros(size(Y), 'like', Y);
-    
+
     % Process each frame
     for k = 1:size(Y, 3)
         current_frame = Y(:, :, k);  % Extract the k-th frame
