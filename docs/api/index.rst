@@ -11,3 +11,4 @@ Documentation for each function from docstrings.
 
     core
     utils
+    io

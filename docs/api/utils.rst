@@ -5,11 +5,11 @@ Utils
 
 .. toctree::
     :maxdepth: 1
-    :caption: Utility Functions:
+    :caption: Utilities:
 
 .. autofunction:: get_metadata
-.. autofunction:: combinePlanes
-.. autofunction:: planeToMovie
-.. autofunction:: planeToH5
-.. autofunction:: planeToTiff
-.. autofunction:: translateFrames
+.. autofunction:: get_segmentation_metrics
+.. autofunction:: get_central_indices
+.. autofunction:: make_tiled_figure
+.. autofunction:: translate_frames
+.. autofunction:: validate_toolboxes
