@@ -1,15 +1,11 @@
 ## Light Beads Microscopy (LBM) Pipeline
 
-
-![Documentation](https://img.shields.io/badge/Documentation-black?style=for-the-badge&logo=readthedocs&logoColor=white)(https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/)
+[![Documentation](https://img.shields.io/badge/Documentation-black?style=for-the-badge&logo=readthedocs&logoColor=white)](https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/)
 [![Issues](https://img.shields.io/github/issues/Naereen/StrapDown.js.svg)](https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/)
 [![Release](https://img.shields.io/github/release/Naereen/StrapDown.js.svg)](https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/releases/)
-
-![Extraction Diagram]( docs/_static/_images/extraction/extraction_diagram.png)
-
-
 [![DOI](https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg)](https://doi.org/10.1038/s41592-021-01239-8)
 
+![Extraction Diagram]( docs/_static/_images/extraction/extraction_diagram.png)
 ## Requirements
 
 - MATLAB (Tested on 2023a, 2023b, 2024b)
