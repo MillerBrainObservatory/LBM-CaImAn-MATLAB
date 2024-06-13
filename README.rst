@@ -14,6 +14,7 @@ For background, theory and design of LBM technology, see the reference `publicat
 
 |Publication|
 
+
 =============
 Quickstart
 =============
@@ -24,9 +25,9 @@ for the pipeline setup, each step in the pipeline, and intermediate analysis alo
 Pipeline Steps
 *****************
 
-.. raw:: html
+.. image:: https://lucid.app/publicSegments/view/e2f354a2-ba08-45a2-9770-9b6ea612ed87/image.png
 
-   <div style="width: 640px; height: 480px; margin: 10px; position: relative;"><iframe allowfullscreen frameborder="0" style="width:640px; height:480px" src="https://lucid.app/documents/embedded/dfe6e111-eb65-435c-bf1c-208e2237236e" id="M_MK5TcbuWUt"></iframe></div>
+.. thumbnail:: https://lucid.app/publicSegments/view/e2f354a2-ba08-45a2-9770-9b6ea612ed87/image.png   :width: 800
 
 There are 4 core steps in this pipeline:
 
