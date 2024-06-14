@@ -207,7 +207,7 @@ try
                 [yindr, xindr] = get_central_indices(roi_arr(:,:,2), 40);
 
                 images = {raw_timeseries(yind,xind,2), roi_arr(yindr, xindr, 2)};
-                labels = {'Raw\nUntrimmed', 'Scan-Corrected\nTrimmed'};
+                labels = {'Raw-Untrimmed', 'Scan-Corrected-Trimmed'};
 
                 roi_savename = fullfile(roi_savepath, sprintf('roi_%d.png', roi_idx));
                 make_tiled_figure( ...
