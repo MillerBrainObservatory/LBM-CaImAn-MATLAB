@@ -36,10 +36,3 @@ The following algorithms perform the main computations and are included by defau
 - [NoRMCorre](https://github.com/flatironinstitute/NoRMCorre) piecewise rigid motion correction.
 - [constrained-foopsi](https://github.com/epnev/constrained-foopsi) constrained deconvolution spike inference.
 
-## References
-
-- [Nature Publication](https://www.nature.com/articles/s41592-021-01239-8/)
-- [ScanImage-MROI Docs](https://docs.scanimage.org/Premium%2BFeatures/Multiple%2BRegion%2Bof%2BInterest%2B%28MROI%29.html#multiple-region-of-interest-mroi-imaging/)
-- [MBO Homepage](https://mbo.rockefeller.edu/)
-- [startup matlab files](https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html)
-- [![Publication](https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg)](https://doi.org/10.1038/s41592-021-01239-8)
