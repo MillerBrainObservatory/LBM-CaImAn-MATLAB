@@ -138,7 +138,8 @@ try
 
             Aout = reshape(Aout, [size(Aout, 1), size(Aout, 2), num_planes, num_frames_file]);
         catch ME
-            [~, Aout] = scanimage_backup.util.opentif(full_filename);
+            %% Likely missing binaries, see if scanimage.util package has access to the binaries
+            [~, Aout] = scanimage.util.opentif(full_filename);
         end
 
         % make our final array a little bigger than it needs to be
