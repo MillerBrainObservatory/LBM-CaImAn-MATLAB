@@ -1,6 +1,6 @@
 
 ################################
-LBM Documentation
+LBM-CaImAn-MATLAB Documentation
 ################################
 
 |Repository| |Release| |Issues|
