@@ -1,11 +1,7 @@
-.. caiman_matlab documentation master file, created by
-   sphinx-quickstart on Mon Apr 22 14:19:35 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
-#################
-LBM Documentation
-#################
+################################
+LBM-CaImAn-MATLAB Documentation
+################################
 
 |Repository| |Release| |Issues|
 
@@ -101,7 +97,6 @@ The following algorithms perform the main computations and are included by defau
 Contents
 =================
 
-
 .. toctree::
     :maxdepth: 2
 
@@ -118,11 +113,6 @@ Contents
     :caption: API:
 
     api/index
-
-
-.. thumbnail:: ./_static/_images/overlays.png
-   :download: true
-   :align: center
 
 Indices and tables
 =====================================

@@ -3,11 +3,44 @@
 API
 ###
 
-Documentation for each function from docstrings.
+To keep code and documentation as *in-sync* as possible, many (if not most) of the most helpful comments are in the functions docstring (directly under where the function is defined).
+
+.. currentmodule:: .
+
+Core Functions
+==============
+
+.. autofunction:: convertScanImageTiffToVolume
+.. autofunction:: motionCorrectPlane
+.. autofunction:: segmentPlane
+.. autofunction:: collatePlanes
+.. autofunction:: calculateZOffset
+
+
+.. currentmodule:: io
+
+IO Functions
+==============
+
+.. autofunction:: read_plane
+.. autofunction:: read_h5_metadata
+.. autofunction:: rename_planes
+.. autofunction:: log_metadata
+.. autofunction:: make_zoomed_movie
+.. autofunction:: write_chunk_h5
+.. autofunction:: write_metadata_h5
+
+.. currentmodule:: utils
+
+Utilities
+=============
 
 .. toctree::
-    :maxdepth: 2
-    :caption: Core Functions:
+    :maxdepth: 1
 
-    core
-    utils
+.. autofunction:: get_metadata
+.. autofunction:: get_segmentation_metrics
+.. autofunction:: get_central_indices
+.. autofunction:: make_tiled_figure
+.. autofunction:: translate_frames
+.. autofunction:: validate_toolboxes

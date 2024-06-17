@@ -19,14 +19,11 @@ function write_metadata_h5(metadata, h5_fullfile, group_path)
 %
 % Examples
 % --------
-% metadata = struct('name', 'example', 'value', 42);
-% h5_fullfile = 'example.h5';
-% group_path = '/metadata';
-% writeMetadataToAttribute(metadata, h5_fullfile, group_path);
-%
-% See Also
-% --------
-% h5writeatt, fieldnames, ischar, isnumeric, isstruct, mat2str
+% metadata = struct('name', 'LBM_guru', 'age', 'young_enough');
+% h5_fullfile = 'guru.h5';
+% group_path = '/young_guru';
+% write_metadata_h5(metadata, h5_fullfile, group_path);
+
 fields = fieldnames(metadata);
 for f = fields'
     value = metadata.(f{1});

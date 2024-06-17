@@ -3,11 +3,10 @@
 User Guide
 ##########
 
-This section covers each step in the pipeline in more detail.
+This section covers each step in the pipeline, parameters and metadata in more detail.
 
 .. toctree::
     :maxdepth: 2
-    :caption: User Guide:
 
     Parameters <parameters>
     Metadata <metadata>
