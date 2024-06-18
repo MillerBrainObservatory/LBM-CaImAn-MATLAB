@@ -24,11 +24,9 @@ function [fileHeader, frameDescs] = getHeaderData(tifObj)
     %Acquisition.m:LOG_TIFF_HEADER_EXPANSION
     try
         if ~isempty(strfind(tifObj.getTag('ImageDescription'), '<output truncated>'))
-            most.idioms.warn('Corrupt header data');
             return;
         end
     catch
-        most.idioms.warn('Corrupt or incomplete tiff header');
         return
     end
 
@@ -49,7 +47,7 @@ function [fileHeader, frameDescs] = getHeaderData(tifObj)
     
     try
         if fileHeaderStr(1) == '{'
-            s = most.json.loadjson(fileHeaderStr);
+            s = decodejson(fileHeaderStr);
             
             %known incorrect handling of channel luts!
             n = size(s.SI.hChannels.channelLUT,1);
@@ -72,7 +70,7 @@ function [fileHeader, frameDescs] = getHeaderData(tifObj)
                 end
             end
             
-            fileHeader = scanimage.util.private.decodeHeaderLines(rows(idxLine:end));
+            fileHeader = decodeHeaderLines(rows(idxLine:end));
         end
     catch
         fileHeader = struct();
@@ -82,7 +80,7 @@ end
 
 %--------------------------------------------------------------------------%
 % getHeaderData.m                                                          %
-% Copyright © 2016 Vidrio Technologies, LLC                                %
+% Copyright Â© 2016 Vidrio Technologies, LLC                                %
 %                                                                          %
 % ScanImage 2016 is premium software to be used under the purchased terms  %
 % Code may be modified, but not redistributed without the permission       %
