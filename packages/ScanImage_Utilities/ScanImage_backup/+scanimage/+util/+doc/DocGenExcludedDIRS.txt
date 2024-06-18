@@ -1,1 +1,0 @@
-.git, ., .., +private, private, guis, test, docs, mmockito, Samples, .gitattributes, .gitignore, +test, +testing, +doc, FPGA, +release, atlassian-cli-5.0.0-distribution

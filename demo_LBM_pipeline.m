@@ -26,11 +26,12 @@ end
 
 parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
 data_path = fullfile(parent_path, 'raw');
-save_path = fullfile(parent_path, sprintf('extracted_3px_3px_17px_0px'));
+save_path = fullfile(parent_path, sprintf('extracted_2px_2px_18px_0px'));
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Extraction %%%%%%%%
 
-clc; compute = 0;
+clc; compute = 1;
 if compute
     convertScanImageTiffToVolume( ...
         data_path, ...
@@ -38,7 +39,7 @@ if compute
         'dataset_name', '/Y', ... % default
         'debug_flag', 0, ... % default, if 1 will display files and return
         'fix_scan_phase', 1, ... % default, keep to 1
-        'trim_pixels', [3 3 17 0], ... % default, num pixels to trim for each roi
+        'trim_pixels', [2 2 18 0], ... % default, num pixels to trim for each roi
         'overwrite', 1 ...
         );
 end
@@ -46,7 +47,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Motion Correction %%%
 
-clc; compute = 1;
+clc; compute = 0;
 if compute
 
     mc_path = fullfile(parent_path, 'extracted_4px_4px_17px_0px');
@@ -83,7 +84,7 @@ end
 
 %% 3) CNMF Plane-by-plane SegmentationS
 
-clc; compute = 1;
+clc; compute = 0;
 if compute
     mc_path = fullfile(parent_path, 'corrected_trimmed_grid');
     if ~isfolder(mc_path); mkdir(mc_path); end

@@ -5,6 +5,8 @@ LBM-CaImAn-MATLAB Documentation
 
 |Repository| |Release| |Issues|
 
+.. image:: https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Matlab_Logo.png/858px-Matlab_Logo.png
+
 A pipeline for processing light beads microscopy (LBM) datasets.
 
 Currently, inputs to this pipeline are limited to `ScanImage`_ `tiff` files. However, only the
