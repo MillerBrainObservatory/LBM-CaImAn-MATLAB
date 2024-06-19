@@ -10,7 +10,7 @@ Utility functions for this step:
 :func:`read_H5_metadata`: View metadata associated with an extracted file.
 :func:`get_center_indices`: Get the Y,X index of a box of size `pixels` created around the center point of an image.
 
-.. video:: _static/_videos/video_1.mp4
+.. video: _static/_videos/video_1.mp4
 
 
 Before beginning pre-processing, follow setup steps in :ref:`getting started` to make sure the pipeline and dependencies are installed properly.
@@ -44,9 +44,9 @@ Each page is one *image*, but it doesn't look like an image:
 .. thumbnail:: ../_static/_images/assembly_1.png
    :width: 800
 
-| A: In the above image, represents vertically concatenated **strip** of our image.
-| B: Strips are cut and horizontally concatenated.
-| C: After a scan-phase correction, lines between strips become unnoticable (ideally)
+| A: In the above image, represents vertically concatenated **ROI** of our image.
+| B: ROI's are cut and horizontally concatenated.
+| C: After a scan-phase correction, lines between each ROI become unnoticable (ideally)
 
 **If you were to open up a raw ScanImage .tiff file in ImageJ, you would see a very long, thin bar as is shown in A.**
 
