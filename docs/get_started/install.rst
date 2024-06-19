@@ -4,7 +4,7 @@ Installation
 Install Recommendation
 ****************************************
 
-The easiest way to download the source code is to visit the `github repository <https://github.com/ru-rbo/caiman_matlab.git>`_.
+The easiest way to download the source code is to visit the `github repository <https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB>`_.
 
 The most reliable installation method is to clone/download the repository and move it into a folder on your `userpath`:
 
@@ -132,7 +132,6 @@ After installation, there a few helpful things you can do.
 
 .. thumbnail:: ../_static/_images/matlab_preferences.png
    :width: 1440
-
 
 .. _startup.m: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html
 .. _GITHUB_: https://github.com/ru-rbo/rbo-lbm'_
