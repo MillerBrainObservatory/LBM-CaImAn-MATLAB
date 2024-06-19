@@ -44,9 +44,8 @@ images_config = dict(backend='LightBox2',
 suppress_warnings = ["myst.domains", "ref.ref"]
 
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3.8", None),
+    "python": ("https://docs.python.org/3.9", None),
     "sphinx": ("https://www.sphinx-doc.org/en/master", None),
-    "pst": ("https://pydata-sphinx-theme.readthedocs.io/en/latest/", None),
 }
 
 templates_path = ["_templates"]
@@ -58,30 +57,18 @@ html_css_files = ['LBM_docs.css']
 html_logo = "_static/LBM_icon.ico"
 html_copy_source = True
 
-html_sidebars = {
-    "reference/blog/*": [
-        "navbar-logo.html",
-        "search-field.html",
-        "ablog/postcard.html",
-        "ablog/recentposts.html",
-        "ablog/tagcloud.html",
-        "ablog/categories.html",
-        "ablog/archives.html",
-        "sbt-sidebar-nav.html",
-    ]
-}
-
-
-html_theme_options = {
+# for sphinx_book_theme only
+# theme-dependent options make uploading
+# an MBO theme-option set confusing
+sphinx_book_options = {
     "path_to_docs": "docs",
     "repository_url": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
     "repository_branch": "master",
     "launch_buttons": {
         "binderhub_url": "https://mybinder.org",
         "colab_url": "https://colab.research.google.com/",
-        "deepnote_url": "https://deepnote.com/",
         "notebook_interface": "jupyterlab",
-        # "jupyterhub_url": "https://datahub.berkeley.edu",  # For testing
+        # "jupyterhub_url": "", TODO
     },
     "use_edit_page_button": True,
     "use_source_button": True,
@@ -91,46 +78,21 @@ html_theme_options = {
     "use_sidenotes": True,
     "show_toc_level": 2,
     "logo": {
-        "image_dark": "_static/LBM_icon.svg",
+        "image_dark": "https://github.com/MillerBrainObservatory/static-assets/blob/master/img/favicon/MillerBrainObservatory_logo.svg",
         "text": html_short_title
     },
     "icon_links": [
         {
+            "icon": "fa fa-github",
             "name": "MBO",
             "url": "https://mbo.rockefeller.edu",
         },
-
-  #     {"name": "MBO", "url": ""},
         {
             "name": "GitHub",
             "url": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
             "icon": "fa-brands fa-github",
         },
-        # {
-        #     "name": "PyPI",
-        #     "url": "https://pypi.org/project/sphinx-book-theme/",
-        #     "icon": "https://img.shields.io/pypi/dw/sphinx-book-theme",
-        #     "type": "url",
-        # },
     ],
-    # For testing
-    # "use_fullscreen_button": False,
-    # "home_page_in_toc": True,
-    # "extra_footer": "<a href='https://google.com'>Test</a>",  # DEPRECATED KEY
-    # "show_navbar_depth": 2,
-    # Testing layout areas
-    # "navbar_start": ["test.html"],
-    # "navbar_center": ["test.html"],
-    # "navbar_end": ["test.html"],
-    # "navbar_persistent": ["test.html"],
-    # "footer_start": ["test.html"],
-    # "footer_end": ["test.html"]
 }
 
-html_theme_options = {
-  "show_navbar_depth": 2,
-  "home_page_in_toc": True,
-  # "external_links": [
-  #     {"name": "MBO", "url": "https://mbo.rockefeller.edu"},
-  # ]
-}
+html_theme_options = sphinx_book_options

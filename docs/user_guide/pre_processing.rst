@@ -10,9 +10,6 @@ Utility functions for this step:
 :func:`read_H5_metadata`: View metadata associated with an extracted file.
 :func:`get_center_indices`: Get the Y,X index of a box of size `pixels` created around the center point of an image.
 
-.. video: _static/_videos/video_1.mp4
-
-
 Before beginning pre-processing, follow setup steps in :ref:`getting started` to make sure the pipeline and dependencies are installed properly.
 After that, review :ref:`parameters` to understand the general usage of each function going foreward.
 
@@ -41,8 +38,7 @@ In its raw form (see A in the below figure), ScanImage tiff files are multipage 
 
 Each page is one *image*, but it doesn't look like an image:
 
-.. thumbnail:: ../_static/_images/assembly_1.png
-   :width: 800
+.. thumbnail:: https://github.com/MillerBrainObservatory/static-assets/tree/master/img/data/extraction
 
 | A: In the above image, represents vertically concatenated **ROI** of our image.
 | B: ROI's are cut and horizontally concatenated.
@@ -71,12 +67,9 @@ of a suffix appended to the filename: `_000N`, where n=number of files chosen by
 
 :func:`fix_scan_phase` is a very important parameter: it attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
 
-.. thumbnail:: ../_static/_images/corr_nocorr_phase_example.png
-   :width: 1080
-
 This example shows that shifting every *other* row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.
 
-.. thumbnail:: ../_static/_images/offset_1.svg
+.. thumbnail:: https://github.com/MillerBrainObservatory/static-assets/tree/master/img/data/extraction/offset_1.svg
    :width: 800
 
 Newer versions (2019+) of ScanImage do this correction for you, but it won't hurt. Before any image manipulations, the routine first checks if any lateral (x) shift
@@ -179,31 +172,21 @@ scan-phase offset value (usually 1, 2 or 3 pixels).
 
 Lets see the first z-plane:
 
-.. thumbnail:: ../_static/_images/offset/plane_1.png
+.. thumbnail:: https://github.com/MillerBrainObservatory/static-assets/tree/master/img/data/extraction/offset/plane_1.png
    :width: 1440
 
 Lets see the tenth z-plane:
 
-.. thumbnail:: ../_static/_images/offset/plane_10.png
+.. thumbnail:: https://github.com/MillerBrainObservatory/static-assets/tree/master/img/data/extraction/offset/plane_10.png
    :width: 1440
 
 So far so good, but as we approach the end-plane (by order, not by depth):
 
-.. thumbnail:: ../_static/_images/offset/plane_30.png
+.. thumbnail:: https://github.com/MillerBrainObservatory/static-assets/tree/master/img/data/extraction/plane_30.png
    :width: 1440
 
-Tile Consistency
-*************************
-
-Lastly, examine :code:`mean_tile_consistency.png` which runs an edge detection, resulting in the image shown in `mean_tile_consistency`.
-
-.. thumbnail:: ../_static/_images/mean_tile_consistency.png
-   :width: 1440
-
-This will show you which frames result in horizontal or vertical edge inconsistencies over time.
-
-.. thumbnail:: ../_static/_images/mean_tile_consistency_edges.png
-   :width: 1440
+Further Validation
+**********************
 
 You should do some checks to make sure data was written properly before continuing. There are a few convenience functions
 to view a movie provided in the pipeline. Below is an example:
