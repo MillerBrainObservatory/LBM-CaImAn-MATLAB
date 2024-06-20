@@ -10,9 +10,6 @@ Utility functions for this step:
 :func:`read_H5_metadata`: View metadata associated with an extracted file.
 :func:`get_center_indices`: Get the Y,X index of a box of size `pixels` created around the center point of an image.
 
-.. video:: _static/_videos/video_1.mp4
-
-
 Before beginning pre-processing, follow setup steps in :ref:`getting started` to make sure the pipeline and dependencies are installed properly.
 After that, review :ref:`parameters` to understand the general usage of each function going foreward.
 
