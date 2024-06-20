@@ -140,7 +140,7 @@ try
         catch ME
             %% Likely missing binaries, see if scanimage.util package has access to the binaries
             warning("error on ScanImageTiffReader. Attempting ScanImage utility function OpenTiff.")
-            [~, Aout] = scanimage.util.opentif(full_filename);
+            % [~, Aout] = scanimage.util.opentif(full_filename);
         end
 
         % make our final array a little bigger than it needs to be
@@ -258,8 +258,8 @@ try
                 any(z_timeseries, [2, 3]), ...
                 any(z_timeseries, [1, 3]), ...
                 :);
-
-            mean_img = mean(z_timeseries, 3);
+            % 
+            % mean_img = mean(z_timeseries, 3);
 
             scale_fact = 10; % Length of the scale bar in microns
 
@@ -296,7 +296,6 @@ try
             %
             % saveas(f, fullfile(fig_save_path, sprintf('scan_correction_validation_plane_%d_offset_%d.png', plane_idx, abs(scan_offset))));
             % close(f);
-
 
             plane_save_path = fullfile(fig_save_path, sprintf('Extraction_validation_plane_%d.png', plane_idx));
             make_tiled_figure(images, metadata,'fig_title', labels,'scale_size', scale_fact,'save_name', plane_save_path);
