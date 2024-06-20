@@ -139,7 +139,8 @@ try
             Aout = reshape(Aout, [size(Aout, 1), size(Aout, 2), num_planes, num_frames_file]);
         catch ME
             %% Likely missing binaries, see if scanimage.util package has access to the binaries
-            [~, Aout] = scanimage.util.opentif(full_filename);
+            rethrow(ME);
+            % [~, Aout] = scanimage.util.opentif(full_filename);
         end
 
         % make our final array a little bigger than it needs to be
@@ -204,7 +205,7 @@ try
                     : ...
                     ) = roi_arr;
                 
-                if file==1
+                if i==1
                     [yind, xind] = get_central_indices(raw_timeseries(:,:,2), 40);
                     [yindr, xindr] = get_central_indices(roi_arr(:,:,2), 40);
     
