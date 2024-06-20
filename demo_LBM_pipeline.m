@@ -84,9 +84,9 @@ end
 
 %% 3) CNMF Plane-by-plane SegmentationS
 
-clc; compute = 0;
+clc; compute = 1;
 if compute
-    mc_path = fullfile(parent_path, 'corrected_trimmed_grid');
+    % mc_path = fullfile(parent_path, 'corrected_trimmed_grid');
     if ~isfolder(mc_path); mkdir(mc_path); end
     segment_path = fullfile(parent_path, 'results');
     if ~isfolder(segment_path); mkdir(segment_path); end
