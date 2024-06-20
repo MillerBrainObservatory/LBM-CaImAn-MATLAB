@@ -131,7 +131,7 @@ try
         tfile = tic;
         full_filename = fullfile(data_path, files(i).name);
         try
-            hTif = scanimage.util.ScanImageTiffReader(full_filename);
+            hTif = ScanImageTiffReader(full_filename);
             Aout = hTif.data();
             Aout = most.memfunctions.inPlaceTranspose(Aout);
             num_frames_file = size(Aout, 3) / num_planes;
@@ -139,6 +139,7 @@ try
             Aout = reshape(Aout, [size(Aout, 1), size(Aout, 2), num_planes, num_frames_file]);
         catch ME
             %% Likely missing binaries, see if scanimage.util package has access to the binaries
+            warning("error on ScanImageTiffReader. Attempting ScanImage utility function OpenTiff.")
             [~, Aout] = scanimage.util.opentif(full_filename);
         end
 
