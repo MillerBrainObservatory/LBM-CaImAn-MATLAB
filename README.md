@@ -9,6 +9,18 @@ For a python implementation, see [here](https://github.com/MillerBrainObservator
 [![Issues](https://img.shields.io/github/issues/Naereen/StrapDown.js.svg)](https://GitHub.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/)
 [![DOI](https://zenodo.org/badge/DOI/10.1007/978-3-319-76207-4_15.svg)](https://doi.org/10.1038/s41592-021-01239-8)
 
+## Quickstart
+To use this pipeline, the code in this repository needs to be on your `MATLAB path`. You can do this easily by:
+1. Downloading the code via the the `<Code>` button above -> `Download`
+2. Find your matlab path by opening MATLAB and entering `userpath`
+3. Copy this downloaded folder anywhere on your path, typically `C:/Users/<Username>/Documents/MATLAB/`
+4. Right click on "core" and "packages" folders -> `Add to Path` -> `Selected Folders and Subfolders`
+
+When re-opening MATLAB, you may need to re-add the `core` and `package` folders to your path. You could similarly add 
+an `addpath(genpath(fullfile(path/to/code))` to prevent this.
+
+For more details about installation, including with `git`, on different operating systems, see the [installation docs](https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/get_started/install.html).
+
 ## Overview
 
 This pipeline is unique only in the routines to extract raw data from [ScanImage BigTiff files](https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification), as is outlined below:
