@@ -38,7 +38,7 @@ In its raw form (see A in the below figure), ScanImage tiff files are multipage 
 
 Each page is one *image*, but it doesn't look like an image:
 
-.. image:: _static/_images/extraction/extraction_diagram.png
+.. image:: ../_static/_images/extraction/extraction_diagram.png
 
 | A: In the above image, represents vertically concatenated **ROI** of our image.
 | B: ROI's are cut and horizontally concatenated.
@@ -69,7 +69,7 @@ of a suffix appended to the filename: `_000N`, where n=number of files chosen by
 
 This example shows that shifting every *other* row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.
 
-.. thumbnail:: _static/_images/offset/offset_1.svg
+.. thumbnail:: ../_static/_images/offset/offset_1.svg
 
    :width: 800
 
@@ -173,15 +173,15 @@ scan-phase offset value (usually 1, 2 or 3 pixels).
 
 Lets see the first z-plane:
 
-.. thumbnail:: _static/_images/offset/offset_1.svg
+.. thumbnail:: ../_static/_images/offset/offset_1.svg
 
 Lets see the tenth z-plane:
 
-.. thumbnail:: _static/_images/offset/plane_1.png
+.. thumbnail:: ../_static/_images/offset/plane_1.png
 
 So far so good, but as we approach the end-plane (by order, not by depth):
 
-.. thumbnail:: _static/_images/offset/plane_30.png
+.. thumbnail:: ../_static/_images/offset/plane_30.png
 
 Further Validation
 **********************

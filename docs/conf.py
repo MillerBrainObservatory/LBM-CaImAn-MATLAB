@@ -14,7 +14,6 @@ copyright = '2024, Elizabeth R. Miller Brain Observatory (MBO) | The Rockefeller
 
 source_suffix = {
         '.rst': 'restructuredtext',
-        '.txt': 'restructuredtext',
         '.md': 'markdown',
         }
 
