@@ -69,9 +69,7 @@ of a suffix appended to the filename: `_000N`, where n=number of files chosen by
 
 This example shows that shifting every *other* row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.
 
-.. thumbnail:: ../_static/_images/offset/offset_1.svg
-
-   :width: 800
+.. thumbnail:: ../_static/_images/offset/plane_1.png
 
 Newer versions (2019+) of ScanImage do this correction for you, but it won't hurt. Before any image manipulations, the routine first checks if any lateral (x) shift
 will improve the correlation between adjacent rows and if not, will do nothing.

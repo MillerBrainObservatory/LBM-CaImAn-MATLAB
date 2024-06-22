@@ -16,7 +16,6 @@ Core Functions
 .. autofunction:: collatePlanes
 .. autofunction:: calculateZOffset
 
-
 .. currentmodule:: io
 
 IO Functions
