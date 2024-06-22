@@ -1,5 +1,6 @@
 import sys
 import os
+from pathlib import Path
 
 os.path.abspath(os.path.join("..", "core/utils"))
 sys.path.insert(0, os.path.abspath(os.path.join("..", "core")))
@@ -11,6 +12,16 @@ matlab_short_links = True
 
 project = 'LBM-CaImAn-MATLAB'
 copyright = '2024, Elizabeth R. Miller Brain Observatory (MBO) | The Rockefeller University. All Rights Reserved.'
+
+
+myst_enable_extensions = [
+    "amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "html_image",
+]
+myst_url_schemes = ("http", "https", "mailto")
 
 source_suffix = {
         '.rst': 'restructuredtext',
@@ -50,11 +61,20 @@ intersphinx_mapping = {
 templates_path = ["_templates"]
 
 html_theme = "sphinx_book_theme"
-html_short_title="LBM-CaImAn-MATLAB"
+
+html_logo = "_static/CaImAn-MATLAB_logo.svg"
+html_short_title="CaImAn Pipeline"
 html_static_path = ["_static"]
 html_css_files = ['LBM_docs.css']
-html_favicon = "_static/LBM_icon.ico"
+html_favicon = "_static/mbo_icon_dark.ico"
 html_copy_source = True
+
+html_context = {
+# "github_url": "https://github.com", # or your GitHub Enterprise site
+    "github_user": "://github.com/MillerBrainObservatory/",
+    "github_repo": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
+    "doc_path": "docs",
+}
 
 # for sphinx_book_theme only
 # theme-dependent options make uploading
@@ -76,22 +96,10 @@ sphinx_book_options = {
     "use_download_button": True,
     "use_sidenotes": True,
     "show_toc_level": 3,
-    "logo": {
-        "image_dark": "https://github.com/MillerBrainObservatory/static-assets/blob/master/img/favicon/MillerBrainObservatory_logo.svg",
-        "text": html_short_title
-    },
-    "icon_links": [
-        {
-            "icon": "fa fa-home",
-            "name": "MBO",
-            "url": "_static/LBM_icon.ico",
-        },
-        {
-            "name": "GitHub",
-            "url": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
-            "icon": "fa-brands fa-github",
-        },
-    ],
+    "use_fullscreen_button": True,
+    "show_nav_level": 0,
+    "navigation_depth": 4
 }
 
 html_theme_options = sphinx_book_options
+

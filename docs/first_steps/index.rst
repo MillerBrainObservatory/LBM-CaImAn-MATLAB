@@ -10,6 +10,7 @@ Be sure to review this section thoroughly before proceeding with the analysis.
 
 .. toctree::
     :maxdepth: 2
+    :caption: First Steps
 
     install
     semantics
