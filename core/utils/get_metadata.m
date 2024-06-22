@@ -46,7 +46,6 @@ num_pixel_xy = scanfields.pixelResolutionXY; % misleading name
 % TIFF header data for additional metadata
 [header, ~] = scanimage.util.private.getHeaderData(hTiff);
 
-% TODO: Add check for proper header extraction
 sample_format = hTiff.getTag('SampleFormat'); % raw data type, scanimage uses int16
 
 switch sample_format
