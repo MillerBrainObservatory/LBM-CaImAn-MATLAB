@@ -17,6 +17,6 @@ dependencies:
 - pip:
   - sphinxcontrib-matlabdomain
   - sphinxcontrib-images
-  - myst-nb
+  - myst_nb
   - sphinx-copybutton
   - sphinx-togglebutton
