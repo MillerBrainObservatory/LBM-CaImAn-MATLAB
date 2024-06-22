@@ -5,8 +5,6 @@ LBM-CaImAn-MATLAB Documentation
 
 |Repository| |Release| |Issues|
 
-.. image:: https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Matlab_Logo.png/858px-Matlab_Logo.png
-
 A pipeline for processing light beads microscopy (LBM) datasets.
 
 Currently, inputs to this pipeline are limited to `ScanImage`_ `tiff` files. However, only the
@@ -17,12 +15,6 @@ For background, theory and design of LBM technology, see the reference `publicat
 
 |Publication|
 
-=============
-Quickstart
-=============
-
-The easiest way to get started with the pipeline is to follow the demo_LBM_pipeline script, which contains sections
-for the pipeline setup, each step in the pipeline, and intermediate analysis along the way.
 
 Pipeline Steps
 *****************
@@ -33,6 +25,9 @@ There are 4 core steps in this pipeline:
 2. `motionCorrectPlane()`
 3. `segmentPlane()`
 4. `collatePlane()`
+
+Notice how these 4 functions are `camelCase` (lowerCaseUpperCase). Every **non-core** function you
+may use, such as :func:`read_h5_metadata`, is `snake_case`. This is a feature, not a bug.
 
 .. thumbnail:: _static/_images/extraction/extraction_diagram.png
    :width: 800
@@ -100,7 +95,7 @@ Contents
 .. toctree::
     :maxdepth: 2
 
-    get_started/index
+    first_steps/index
 
 .. toctree::
     :maxdepth: 2
