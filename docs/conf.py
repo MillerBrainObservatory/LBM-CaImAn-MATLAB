@@ -40,7 +40,7 @@ images_config = dict(backend='LightBox2',
                      default_group='default'
     )
 
-suppress_warnings = ["myst.domains", "ref.ref"]
+# suppress_warnings = ["myst.domains", "ref.ref"]
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3.9", None),
@@ -84,7 +84,7 @@ sphinx_book_options = {
         {
             "icon": "fa fa-home",
             "name": "MBO",
-            "url": "https://mbo.rockefeller.edu",
+            "url": "_static/LBM_icon.ico",
         },
         {
             "name": "GitHub",
