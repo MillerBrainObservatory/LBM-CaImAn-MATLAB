@@ -104,12 +104,12 @@ if compute
 end
 
 %% 4) Axial Offset Correction
-clc; compute = 0;
+clc; compute = 1;
 if compute
-    dpath="D:\Jeffs LBM paper data\Fig4a-c\20191121\MH70\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001\output";
-    h5_fullfile="C:/Users/RBO/Documents/data/high_res/corrected_trimmed_grid/motion_corrected_plane_1.h5";
+    % calculate Z offset requires the metadata, for now
+    % TODO: Get metadata from within calculateZOffset
+    h5_fullfile = fullfile(mc_path, "motion_corrected_plane_1.h5");
+    % h5_fullfile="C:/Users/RBO/Documents/data/high_res/corrected_trimmed_grid/motion_corrected_plane_1.h5";
     metadata = read_h5_metadata(h5_fullfile, '/Y');
-    data = h5read(h5_fullfile, '/Y');
-
-    calculateZOffset(dpath, metadata);
+    calculateZOffset(segment_path, metadata);
 end
