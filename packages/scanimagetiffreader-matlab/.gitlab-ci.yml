@@ -1,0 +1,78 @@
+# Matlab-enabled runners should set an environment where:
+#      1. The Matlab executable is _not_ on the PATH
+#      2. Environment variable Matlab_ROOT_DIR is defined and points to the correct MCR.
+#         The MCR determines the binary compatibility of the built binaries.
+#      3. Environment variable MATLAB is defined and points to the matlab executable.
+#         It will be used to run the tests and publish script.  It does not need to be
+#         the same version as the MCR.
+
+before_script:
+    - git lfs install
+
+build_windows:
+    stage: build
+    script:
+        - mkdir build
+        - cd build
+        - cmake -G "Visual Studio 17 2022" ..
+        - cd ..
+        - cmake --build build --config Release --target INSTALL
+    artifacts:
+        paths:
+            - +ScanImageTiffReader
+    tags:
+        - cmake
+        - windows
+        - matlab
+
+build_osx:
+    stage: build
+    when: manual
+    script:
+        - mkdir build
+        - cd build
+        - cmake  ..
+        - cd ..
+        - cmake --build build --config Release --target install
+        - $MATLAB -nosplash -nodesktop -nojvm -noFigureWindows -wait -r test
+    artifacts:
+        paths:
+            - +ScanImageTiffReader
+    tags:
+        - cmake
+        - osx
+        - matlab
+
+build_nix:
+    stage: build
+    when: manual
+    script:
+        - mkdir build
+        - cd build
+        - cmake ..
+        - cd ..
+        - cmake --build build --config Release --target install
+        - $MATLAB -nosplash -nodesktop -nojvm -noFigureWindows -wait -r test
+    artifacts:
+        paths:
+          - +ScanImageTiffReader
+    tags:
+        - cmake
+        - nix
+        - matlab
+
+pages:
+    stage: deploy
+    script:
+        - mkdir build
+        - cd build
+        - cmake ..
+        - cd ..
+        - cmake --build build --config Release --target install
+        - matlab -nosplash -nodesktop -noFigureWindows -wait -log -batch builddoc
+    artifacts:
+        paths:
+            - public
+    tags:
+        - cmake
+        - matlab

@@ -42,7 +42,7 @@ returning to you a set of `key-value pairs <https://stackoverflow.com/questions/
 Image Size
 ************
 
-ScanImage `multi-ROI`_ .tiff outputs are made up of individual sections called that ScanImage calls `ROIs`. These `ROIs` collectively form a
+ScanImage multi-ROI .tiff outputs are made up of individual sections called that ScanImage calls `ROIs`. These `ROIs` collectively form a
 ScanImage `ScanField`. The ScanField is measured in optical degrees. We use the `objective_resolution`, that gives the ratio of distance (in microns) between pixel
 poxitions after the stage movement and the distance (in optical degrees) of the same movement. This is a direct conversion factor for the field distance to physical microns.
 
@@ -67,7 +67,7 @@ Image Frames
 During aquisition, the user is prompted to split the recorded frames across multiple .tiff files.
 It doesn't matter which .tiff file is used for this function, the metadata used applies to each file.
 
-.. thumbnail:: ../_staic/_images/scanimage/data_log_gui.png
+.. thumbnail:: ../_static/_images/scanimage/data_log_gui.png
    :width: 800
    :title: ScanImage Frame Log
 

@@ -13,11 +13,10 @@ dependencies:
 - sphinx>=6.0
 - sphinxcontrib-video
 - numpydoc
-- pydata-sphinx-theme
 - sphinx-book-theme
 - pip:
   - sphinxcontrib-matlabdomain
   - sphinxcontrib-images
-  - myst-nb
+  - myst_nb
   - sphinx-copybutton
   - sphinx-togglebutton

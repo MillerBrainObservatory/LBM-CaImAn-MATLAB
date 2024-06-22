@@ -1,5 +1,6 @@
 import sys
 import os
+from pathlib import Path
 
 os.path.abspath(os.path.join("..", "core/utils"))
 sys.path.insert(0, os.path.abspath(os.path.join("..", "core")))
@@ -12,9 +13,18 @@ matlab_short_links = True
 project = 'LBM-CaImAn-MATLAB'
 copyright = '2024, Elizabeth R. Miller Brain Observatory (MBO) | The Rockefeller University. All Rights Reserved.'
 
+
+myst_enable_extensions = [
+    "amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "html_image",
+]
+myst_url_schemes = ("http", "https", "mailto")
+
 source_suffix = {
         '.rst': 'restructuredtext',
-        '.txt': 'restructuredtext',
         '.md': 'markdown',
         }
 
@@ -41,47 +51,43 @@ images_config = dict(backend='LightBox2',
                      default_group='default'
     )
 
-suppress_warnings = ["myst.domains", "ref.ref"]
+# suppress_warnings = ["myst.domains", "ref.ref"]
 
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3.8", None),
+    "python": ("https://docs.python.org/3.9", None),
     "sphinx": ("https://www.sphinx-doc.org/en/master", None),
-    "pst": ("https://pydata-sphinx-theme.readthedocs.io/en/latest/", None),
 }
 
 templates_path = ["_templates"]
 
 html_theme = "sphinx_book_theme"
-html_short_title="LBM-CaImAn-MATLAB"
+
+html_logo = "_static/CaImAn-MATLAB_logo.svg"
+html_short_title="CaImAn Pipeline"
 html_static_path = ["_static"]
 html_css_files = ['LBM_docs.css']
-html_logo = "_static/LBM_icon.ico"
+html_favicon = "_static/mbo_icon_dark.ico"
 html_copy_source = True
 
-html_sidebars = {
-    "reference/blog/*": [
-        "navbar-logo.html",
-        "search-field.html",
-        "ablog/postcard.html",
-        "ablog/recentposts.html",
-        "ablog/tagcloud.html",
-        "ablog/categories.html",
-        "ablog/archives.html",
-        "sbt-sidebar-nav.html",
-    ]
+html_context = {
+# "github_url": "https://github.com", # or your GitHub Enterprise site
+    "github_user": "://github.com/MillerBrainObservatory/",
+    "github_repo": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
+    "doc_path": "docs",
 }
 
-
-html_theme_options = {
+# for sphinx_book_theme only
+# theme-dependent options make uploading
+# an MBO theme-option set confusing
+sphinx_book_options = {
     "path_to_docs": "docs",
     "repository_url": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
     "repository_branch": "master",
     "launch_buttons": {
         "binderhub_url": "https://mybinder.org",
         "colab_url": "https://colab.research.google.com/",
-        "deepnote_url": "https://deepnote.com/",
         "notebook_interface": "jupyterlab",
-        # "jupyterhub_url": "https://datahub.berkeley.edu",  # For testing
+        # "jupyterhub_url": "", TODO
     },
     "use_edit_page_button": True,
     "use_source_button": True,
@@ -89,48 +95,11 @@ html_theme_options = {
     "use_repository_button": True,
     "use_download_button": True,
     "use_sidenotes": True,
-    "show_toc_level": 2,
-    "logo": {
-        "image_dark": "_static/LBM_icon.svg",
-        "text": html_short_title
-    },
-    "icon_links": [
-        {
-            "name": "MBO",
-            "url": "https://mbo.rockefeller.edu",
-        },
-
-  #     {"name": "MBO", "url": ""},
-        {
-            "name": "GitHub",
-            "url": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
-            "icon": "fa-brands fa-github",
-        },
-        # {
-        #     "name": "PyPI",
-        #     "url": "https://pypi.org/project/sphinx-book-theme/",
-        #     "icon": "https://img.shields.io/pypi/dw/sphinx-book-theme",
-        #     "type": "url",
-        # },
-    ],
-    # For testing
-    # "use_fullscreen_button": False,
-    # "home_page_in_toc": True,
-    # "extra_footer": "<a href='https://google.com'>Test</a>",  # DEPRECATED KEY
-    # "show_navbar_depth": 2,
-    # Testing layout areas
-    # "navbar_start": ["test.html"],
-    # "navbar_center": ["test.html"],
-    # "navbar_end": ["test.html"],
-    # "navbar_persistent": ["test.html"],
-    # "footer_start": ["test.html"],
-    # "footer_end": ["test.html"]
+    "show_toc_level": 3,
+    "use_fullscreen_button": True,
+    "show_nav_level": 0,
+    "navigation_depth": 4
 }
 
-html_theme_options = {
-  "show_navbar_depth": 2,
-  "home_page_in_toc": True,
-  # "external_links": [
-  #     {"name": "MBO", "url": "https://mbo.rockefeller.edu"},
-  # ]
-}
+html_theme_options = sphinx_book_options
+
