@@ -53,7 +53,7 @@ html_theme = "sphinx_book_theme"
 html_short_title="LBM-CaImAn-MATLAB"
 html_static_path = ["_static"]
 html_css_files = ['LBM_docs.css']
-html_logo = "_static/LBM_icon.ico"
+html_favicon = "_static/LBM_icon.ico"
 html_copy_source = True
 
 # for sphinx_book_theme only
@@ -75,14 +75,14 @@ sphinx_book_options = {
     "use_repository_button": True,
     "use_download_button": True,
     "use_sidenotes": True,
-    "show_toc_level": 2,
+    "show_toc_level": 3,
     "logo": {
         "image_dark": "https://github.com/MillerBrainObservatory/static-assets/blob/master/img/favicon/MillerBrainObservatory_logo.svg",
         "text": html_short_title
     },
     "icon_links": [
         {
-            "icon": "fa fa-github",
+            "icon": "fa fa-home",
             "name": "MBO",
             "url": "https://mbo.rockefeller.edu",
         },
