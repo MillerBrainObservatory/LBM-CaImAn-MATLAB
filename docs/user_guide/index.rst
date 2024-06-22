@@ -6,13 +6,14 @@ This section covers each step in the pipeline, parameters and metadata in more d
 
 .. toctree::
     :maxdepth: 2
+    :titlesonly:
 
-    Parameters <parameters>
-    Metadata <metadata>
-    Pre_processing <pre_processing>
-    Registration <registration>
-    Segmentation <segmentation>
-    Axial Alignment <offset_correction>
-    Tips and Tricks <tips_tricks>
-    Troubleshooting <troubleshooting>
+    parameters
+    metadata
+    pre_processing
+    registration
+    segmentation
+    offset_correction
+    tips_tricks
+    troubleshooting
 
