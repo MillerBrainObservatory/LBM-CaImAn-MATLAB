@@ -1,6 +1,6 @@
 
 Pre-Processing
-#######################################
+#############################
 
 Function for this step: :func:`convertScanImageTiffToVolume`
 
@@ -10,7 +10,7 @@ Utility functions for this step:
 :func:`read_H5_metadata`: View metadata associated with an extracted file.
 :func:`get_center_indices`: Get the Y,X index of a box of size `pixels` created around the center point of an image.
 
-Before beginning pre-processing, follow setup steps in :ref:`getting started` to make sure the pipeline and dependencies are installed properly.
+Before beginning pre-processing, follow setup steps in :ref:`first steps` started` to make sure the pipeline and dependencies are installed properly.
 After that, review :ref:`parameters` to understand the general usage of each function going foreward.
 
 See :ref:`troubleshooting` for common issues you may encounter along the way.

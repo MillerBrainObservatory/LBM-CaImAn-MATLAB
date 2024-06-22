@@ -6,8 +6,8 @@ Throughout the pipeline, several image-processing terms will be used such as::
 
     ROI STRIP FRAME IMAGE PLANE VOLUME TIMESERIES Z-STACK T-STACK
 
-ScanImage `multi-ROI`_ .tiff outputs are made up of individual sections called that ScanImage calls `ROIs`. These `ROIs` collectively form a
-ScanImage `ScanField`. In :ref:`pre_processing`, the term ROI refers to a "subsection" of the 2D image in which the scanner momentarily stopped acquisition.
+ScanImage `Multi Region Of Interest`_ (mROI) .tiff outputs are made up of individual sections called that ScanImage calls `ROIs`. These `ROIs` collectively form a
+ScanImage `ScanField`. In :ref:`assembly`, the term ROI refers to a "subsection" of the 2D image in which the scanner momentarily stopped acquisition.
 
 - `num_pixel_xy` are the number of pixels in each `ROI`.
 - With there being 9 ROIs, we know our image is :math:`144x8=1296` pixels wide.
@@ -33,10 +33,12 @@ This is because the scanner is actually moving to the next ROI, so we stop colle
    * - [X, Y, T]
      - Time-Series of a 2D Plane
 
-Within an image, we are dealing with ScanImage `multi-ROI`_ scans.
+Within an image, we are dealing with ScanImage `mROI`_ scans.
 
 During aquisition, the user choses the "number of pixels in X/Y (see :ref:`image size` in :ref:`metadata`)
 
 Each ROI can be trimmed and smoothed to blend with adjacent ROI's.
 
-.. _multi-ROI: https://docs.scanimage.org/Premium%2BFeatures/Multiple%2BRegion%2Bof%2BInterest%2B%28MROI%29.html#multiple-region-of-interest-mroi-imaging/
+.. _multi Region of Interest: https://docs.scanimage.org/Premium%2BFeatures/Multiple%2BRegion%2Bof%2BInterest%2B%28MROI%29.html#multiple-region-of-interest-mroi-imaging/
+.. _mROI: `multi Region of Interest`_
+

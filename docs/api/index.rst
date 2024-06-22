@@ -7,7 +7,7 @@ To keep code and documentation as *in-sync* as possible, many (if not most) of t
 
 .. currentmodule:: .
 
-Core Functions
+Core
 ==============
 
 .. autofunction:: convertScanImageTiffToVolume
@@ -18,7 +18,7 @@ Core Functions
 
 .. currentmodule:: io
 
-IO Functions
+Input/Output
 ==============
 
 .. autofunction:: read_plane

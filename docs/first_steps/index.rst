@@ -11,7 +11,7 @@ Be sure to review this section thoroughly before proceeding with the analysis.
 .. toctree::
     :maxdepth: 2
 
-    Installation <install>
-    Semantics <semantics>
-    Project Setup <setup>
+    install
+    semantics
+    setup
 
