@@ -44,6 +44,11 @@ if compute
         );
 end
 
+%%%%% Optional: Reorder Planes
+order = [1 5:10 2 11:17 3 18:19];
+order = fliplr(order);
+
+rename_planes()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Motion Correction %%%
 
