@@ -112,9 +112,8 @@ if ~exist("startDepth", "var")
     z0 = 0;
 end
 
-fprintf(fid, '%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); tall=tic;
+fprintf(fid, '%s : Beginning collating-planes...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); tall=tic;
 for curr_plane = 1:30
-
 
     plane_name = sprintf("%s/segmented_plane_%d.h5", data_path, curr_plane);
     plane_name_next = sprintf("%s/segmented_plane_%d.h5", data_path, curr_plane+1);
@@ -207,7 +206,7 @@ for curr_plane = 1:30
     N_all = N;
     C_all = C;
 
-    c = load([path 'three_neuron_mean_offsets.mat'],'offsets');
+    c = load([path 'mean_neuron_offsets.mat'],'offsets');
     offsets = round(c.offsets);
 
     xo = cumsum(-offsets(:,2));
