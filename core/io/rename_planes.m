@@ -51,6 +51,6 @@ end
 % Store the original order as a .mat file
 original_order = 1:num_files;
 original_order_filename = fullfile(h5path, 'original_order.mat');
-save(original_order_filename(fullfile(h5path, 'original_order.mat')), 'original_order', 'order');
+save(original_order_filename, 'original_order', 'order');
 fprintf('Plane files reordered successfully and original order saved the h5 attributes.\n');
 end
