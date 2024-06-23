@@ -14,9 +14,6 @@ function [offsets] = calculateZOffset(data_path, save_path, varargin)
 %     not continue processing. Defaults to 0.
 % overwrite : logical, optional
 %     Whether to overwrite existing files (default is 1).
-% num_cores : double, integer, positive
-%     Number of cores to use for computation. The value is limited to a maximum
-%     of 24 cores.
 % start_plane : double, integer, positive
 %     The starting plane index for processing.
 % end_plane : double, integer, positive
@@ -57,7 +54,6 @@ addRequired(p, 'save_path');
 addParameter(p, 'dataset_name', "/mov", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x));
-addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
 addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
 addParameter(p, 'num_features', 3, @(x) isnumeric(x) && isPositiveIntegerValuedNumeric(x));
@@ -68,7 +64,6 @@ save_path = p.Results.save_path;
 dataset_name = p.Results.dataset_name; % here for param consistency but ignored
 debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
-num_cores = p.Results.num_cores;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
 num_features = p.Results.num_features;
@@ -118,8 +113,8 @@ if ~exist("diffx", "var")
 end
 
 %% Pull metadata from attributes attached to this group
-num_cores = max(num_cores, 23);
-fprintf(fid, '%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); tall=tic;
+
+fprintf(fid, '%s : Beginning axial offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS')); tall=tic;
 for curr_plane = start_plane:end_plane
     if curr_plane+1 > end_plane
         fprintf("Current plane (%d) > Last Plane (%d)", curr_plane, end_plane)
@@ -137,14 +132,8 @@ for curr_plane = start_plane:end_plane
         end
     end
 
-    h5_data = h5info(plane_name, '/');
-    metadata = struct();
-    for k = 1:numel(h5_data.Attributes)
-        attr_name = h5_data.Attributes(k).Name;
-        attr_value = h5readatt(plane_name, sprintf("/%s",h5_data.Name), attr_name);
-        metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
-    end
-
+    metadata = read_h5_metadata(plane_name, '/');
+    if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
     pixel_resolution = metadata.pixel_resolution;
 
     if ~(metadata.num_planes >= end_plane)
@@ -163,7 +152,7 @@ for curr_plane = start_plane:end_plane
     p1 = h5read(plane_name, '/Ym');
     p2 = h5read(plane_name_next, '/Ym');
 
-    gix = nan(1,3);
+    gix = nan(1,num_features);
     giy = gix;
 
     %% search through the brightest features
