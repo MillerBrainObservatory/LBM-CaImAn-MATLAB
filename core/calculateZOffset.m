@@ -113,15 +113,23 @@ if ~exist("diffx", "var")
 end
 
 %% Pull metadata from attributes attached to this group
+% Initialize the persistent figure
+persistent h1;
+if isempty(h1) || ~isvalid(h1)
+    h1 = figure('Position', [100, 400, 1120, 420]);
+else
+    clf(h1);
+end
 
-fprintf(fid, '%s : Beginning axial offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS')); tall=tic;
+fprintf(fid, '%s : Beginning axial offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+tall = tic;
 for curr_plane = start_plane:end_plane
-    if curr_plane+1 > end_plane
-        fprintf("Current plane (%d) > Last Plane (%d)", curr_plane, end_plane)
+    if curr_plane + 1 > end_plane
+        fprintf("Current plane (%d) > Last Plane (%d)", curr_plane, end_plane);
         continue;
     end
     plane_name = sprintf("%s/segmented_plane_%d.h5", data_path, curr_plane);
-    plane_name_next = sprintf("%s/segmented_plane_%d.h5", data_path, curr_plane+1);
+    plane_name_next = sprintf("%s/segmented_plane_%d.h5", data_path, curr_plane + 1);
 
     plane_name_save = sprintf("%s/axial_corrected_plane_%d.h5", save_path, curr_plane);
     if isfile(plane_name_save)
@@ -133,7 +141,9 @@ for curr_plane = start_plane:end_plane
     end
 
     metadata = read_h5_metadata(plane_name, '/');
-    if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
+    if isempty(fieldnames(metadata))
+        error("No metadata found for this filepath.");
+    end
     pixel_resolution = metadata.pixel_resolution;
 
     if ~(metadata.num_planes >= end_plane)
@@ -152,85 +162,80 @@ for curr_plane = start_plane:end_plane
     p1 = h5read(plane_name, '/Ym');
     p2 = h5read(plane_name_next, '/Ym');
 
-    gix = nan(1,num_features);
+    gix = nan(1, num_features);
     giy = gix;
 
-    %% search through the brightest features
+    % search through the brightest features
     for feature_idx = 1:num_features
         try
-            buffer = 10*nsize;
+            buffer = 10 * nsize;
             p1m = p1;
-            p1m(1:buffer,:) = 0;
-            p1m(end-buffer:end,:) = 0;
-            p1m(:,1:buffer) = 0;
-            p1m(:,end-buffer:end) = 0;
+            p1m(1:buffer, :) = 0;
+            p1m(end-buffer:end, :) = 0;
+            p1m(:, 1:buffer) = 0;
+            p1m(:, end-buffer:end) = 0;
 
-            [mx,inds] = max(p1m(:));
-            [yi,xi] = ind2sub(size(p1),inds);
+            [mx, inds] = max(p1m(:));
+            [yi, xi] = ind2sub(size(p1), inds);
 
-            h1 = figure;
-            set(h1,'position',[100 400 560 420])
-            imagesc(p1); axis image
-            xlim([xi-scale_fact*nsize xi+scale_fact*nsize])
-            ylim([yi-scale_fact*nsize yi+scale_fact*nsize])
+            % plot the current plane
+            figure(h1);
+            subplot(1, 2, 1);
+            imagesc(p1); axis image;
+            xlim([xi-scale_fact*nsize xi+scale_fact*nsize]);
+            ylim([yi-scale_fact*nsize yi+scale_fact*nsize]);
+            title(sprintf('Plane %d', curr_plane));
+            set(gca, 'XColor', 'r', 'YColor', 'r'); % highlight left subplot
+            set(gcf, 'CurrentAxes', gca);
+            [x1, y1] = ginput(1);
 
-            figure(h1)
-            [x1,y1] = ginput(1);
-
-            h2 = figure;
-            set(h2,'position',[700 400 560 420])
-            imagesc(p2); axis image
-            xlim([xi-scale_fact*nsize+ddx(curr_plane) xi+scale_fact*nsize+ddx(curr_plane)])
-            ylim([yi-scale_fact*nsize+ddy(curr_plane) yi+scale_fact*nsize+ddy(curr_plane)])
+            % plot the next plane
+            subplot(1, 2, 2);
+            imagesc(p2); axis image;
+            xlim([xi-scale_fact*nsize+ddx(curr_plane) xi+scale_fact*nsize+ddx(curr_plane)]);
+            ylim([yi-scale_fact*nsize+ddy(curr_plane) yi+scale_fact*nsize+ddy(curr_plane)]);
+            title(sprintf('Plane %d', curr_plane + 1));
+            set(gca, 'XColor', 'k', 'YColor', 'k'); % reset left subplot color
+            set(gca, 'XColor', 'r', 'YColor', 'r'); % highlight right subplot
+            set(gcf, 'CurrentAxes', gca);
+            [x2, y2] = ginput(1);
+            set(gca, 'XColor', 'k', 'YColor', 'k'); % reset right subplot color
 
             y1 = round(y1);
             x1 = round(x1);
-            p1w = p1(y1-2*nsize:y1+2*nsize,x1-2*nsize:x1+2*nsize);
+            p1w = p1(y1-2*nsize:y1+2*nsize, x1-2*nsize:x1+2*nsize);
 
-            figure(h2)
-            [x2,y2] = ginput(1);
-
-            if x2 > xi+scale_fact*nsize+ddx(curr_plane) || x2 < xi-scale_fact*nsize+ddx(curr_plane) || y2 >  yi+scale_fact*nsize+ddy(curr_plane) || y2 < yi-scale_fact*nsize+ddy(curr_plane)
-
-                disp('Current point ignored.')
-
+            if x2 > xi + scale_fact * nsize + ddx(curr_plane) || x2 < xi - scale_fact * nsize + ddx(curr_plane) || y2 > yi + scale_fact * nsize + ddy(curr_plane) || y2 < yi - scale_fact * nsize + ddy(curr_plane)
+                disp('Current point ignored.');
                 gix(feature_idx) = NaN;
                 giy(feature_idx) = NaN;
-
-                close all
-                p1(y1-nsize:y1+nsize,x1-nsize:x1+nsize) = 0;
-
+                p1(y1-nsize:y1+nsize, x1-nsize:x1+nsize) = 0;
             else
-
                 y2 = round(y2);
                 x2 = round(x2);
-                p2w = p2(y2-nsize:y2+nsize,x2-nsize:x2+nsize);
+                p2w = p2(y2-nsize:y2+nsize, x2-nsize:x2+nsize);
 
-                r = xcorr2(p1w,p2w);
-                [mx,inds] = max(r(:));
-                [yo,xo] = ind2sub(size(r),inds);
-                yo = yo-ceil(size(r,1)/2);
-                xo = xo-ceil(size(r,2)/2);
+                r = xcorr2(p1w, p2w);
+                [mx, inds] = max(r(:));
+                [yo, xo] = ind2sub(size(r), inds);
+                yo = yo - ceil(size(r, 1) / 2);
+                xo = xo - ceil(size(r, 2) / 2);
 
-                oy = (y2-y1)-yo;
-                ox = (x2-x1)-xo;
+                oy = (y2 - y1) - yo;
+                ox = (x2 - x1) - xo;
 
                 gix(feature_idx) = ox;
                 giy(feature_idx) = oy;
 
-                close all
-                p1(y1-nsize:y1+nsize,x1-nsize:x1+nsize) = 0;
-                p2(y2-nsize:y2+nsize,x2-nsize:x2+nsize) = 0;
-
+                p1(y1-nsize:y1+nsize, x1-nsize:x1+nsize) = 0;
+                p2(y2-nsize:y2+nsize, x2-nsize:x2+nsize) = 0;
             end
         catch ME
             disp('Current mapping failed');
         end
     end
-    offsets(curr_plane+1,:) = [round(nanmean(giy)) round(nanmean(gix))];
+    offsets(curr_plane + 1, :) = [round(nanmean(giy)) round(nanmean(gix))];
 end
 
 offsets = round(offsets);
-save(fullfile(data_path, 'three_neuron_mean_offsets.mat'),'offsets')
-
-end
+save(fullfile(data_path, 'three_neuron_mean_offsets.mat'), 'offsets');
