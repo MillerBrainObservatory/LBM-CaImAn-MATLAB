@@ -54,7 +54,7 @@ function [offsets] = calculateZOffset(data_path, save_path, varargin)
 p = inputParser;
 addRequired(p, 'data_path');
 addRequired(p, 'save_path');
-addParameter(p, 'dataset_name', "/extraction", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addParameter(p, 'dataset_name', "/mov", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
@@ -83,9 +83,6 @@ if isempty(save_path)
     save_path = data_path;
 end
 
-fig_save_path = fullfile(save_path, "figures");
-if ~isfolder(fig_save_path); mkdir(fig_save_path); end
-
 files = dir(fullfile(data_path, '*.h*'));
 if isempty(files)
     error('No suitable data files found in: \n  %s', data_path);
@@ -104,7 +101,7 @@ end
 calib_files = fullfile(data_path, 'pollen*');
 calib_files = dir(calib_files);
 if length(calib_files) < 2
-    error("Missing pollen calibration files in folder:\n%s\n.", data_path);
+    error("Missing pollen calibration files in folder:\n%s\n", data_path);
 else
     for i=length(calib_files)
         calib = fullfile(calib_files(i).folder, calib_files(i).name);

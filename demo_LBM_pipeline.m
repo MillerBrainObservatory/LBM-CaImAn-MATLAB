@@ -106,10 +106,16 @@ end
 %% 4) Axial Offset Correction
 clc; compute = 1;
 if compute
-    % calculate Z offset requires the metadata, for now
-    % TODO: Get metadata from within calculateZOffset
-    h5_fullfile = fullfile(mc_path, "motion_corrected_plane_1.h5");
-    % h5_fullfile="C:/Users/RBO/Documents/data/high_res/corrected_trimmed_grid/motion_corrected_plane_1.h5";
-    metadata = read_h5_metadata(h5_fullfile, '/Y');
-    calculateZOffset(segment_path, metadata);
+    axial_path = fullfile(parent_path, 'axial_offset');
+    if ~isfolder(axial_path); mkdir(axial_path); end
+        calculateZOffset( ...
+            'C:/Users/RBO/Documents/data/high_res/results/', ... % we used this to save extracted data
+            axial_path, ... % save registered data here
+            'dataset_name', '/mov', ... % where we saved the last step in h5
+            'debug_flag', 0, ...
+            'overwrite', 1, ...
+            'num_cores', 23, ...
+            'start_plane', 1, ...
+            'end_plane', 18  ...
+        );
 end
