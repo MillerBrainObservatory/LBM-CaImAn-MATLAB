@@ -101,7 +101,9 @@ else
     for i=length(calib_files)
         calib = fullfile(calib_files(i).folder, calib_files(i).name);
         if calib_files(i).name == "pollen_sample_xy_calibration.mat"
-            load(calib);
+            pollen_offsets = matfile(calib);
+            diffx = pollen_offsets.diffx;
+            diffy = pollen_offsets.diffy;
         end
         fprintf("Loaded calibration file:\n");
         fprintf("%s\n",fullfile(calib_files(i).folder, calib_files(i).name));
@@ -178,35 +180,45 @@ for curr_plane = start_plane:end_plane
             [mx, inds] = max(p1m(:));
             [yi, xi] = ind2sub(size(p1), inds);
 
-            % plot the current plane
+            % current plane
             figure(h1);
-            subplot(1, 2, 1);
+            ax1 = subplot(1, 2, 1);
             imagesc(p1); axis image;
-            xlim([xi-scale_fact*nsize xi+scale_fact*nsize]);
-            ylim([yi-scale_fact*nsize yi+scale_fact*nsize]);
+            xlim(ax1, [xi-scale_fact*nsize xi+scale_fact*nsize]);
+            ylim(ax1, [yi-scale_fact*nsize yi+scale_fact*nsize]);
             title(sprintf('Plane %d', curr_plane));
 
-            % highlight left subplot
-            ax1 = gca;
-            set(ax1, 'XColor', 'r', 'YColor', 'r');
-            [x1, y1] = ginput(1);
-            set(ax1, 'XColor', 'k', 'YColor', 'k'); % reset left subplot color
-
-            % plot the next plane
-            subplot(1, 2, 2);
+            % next plane
+            ax2 = subplot(1, 2, 2);
             imagesc(p2); axis image;
-            xlim([xi-scale_fact*nsize+ddx(curr_plane) xi+scale_fact*nsize+ddx(curr_plane)]);
-            ylim([yi-scale_fact*nsize+ddy(curr_plane) yi+scale_fact*nsize+ddy(curr_plane)]);
             title(sprintf('Plane %d', curr_plane + 1));
-
-            % highlight right subplot
-            ax2 = gca;
-            set(ax2, 'XColor', 'r', 'YColor', 'r');
-            [x2, y2] = ginput(1);
-            set(ax2, 'XColor', 'k', 'YColor', 'k'); % reset right subplot color
-
+            
+            % plot the current plane
+            figure(h1);
+            ax1 = subplot(1, 2, 1);
+            imagesc(p1); axis image;
+            xlim(ax1, [xi-scale_fact*nsize xi+scale_fact*nsize]);
+            ylim(ax1, [yi-scale_fact*nsize yi+scale_fact*nsize]);
+            title(sprintf('Plane %d', curr_plane));
+            
+            % highlight left subplot
+            set(ax1, 'XColor', 'r', 'YColor', 'r');
+            [x1, y1] = safe_ginput(ax1, ax2);
+            set(ax1, 'XColor', 'k', 'YColor', 'k'); % reset left subplot color
+            
+            % update next plane plot limits based on first input
             y1 = round(y1);
             x1 = round(x1);
+            
+            % update ax2 limits
+            xlim(ax2, [x1-scale_fact*nsize+ddx(curr_plane) x1+scale_fact*nsize+ddx(curr_plane)]);
+            ylim(ax2, [y1-scale_fact*nsize+ddy(curr_plane) y1+scale_fact*nsize+ddy(curr_plane)]);
+            
+            % highlight right subplot
+            set(ax2, 'XColor', 'r', 'YColor', 'r');
+            [x2, y2] = safe_ginput(ax2, ax1);
+            set(ax2, 'XColor', 'k', 'YColor', 'k'); % reset right subplot color
+               
             p1w = p1(y1-2*nsize:y1+2*nsize, x1-2*nsize:x1+2*nsize);
 
             if x2 > xi + scale_fact * nsize + ddx(curr_plane) || x2 < xi - scale_fact * nsize + ddx(curr_plane) || y2 > yi + scale_fact * nsize + ddy(curr_plane) || y2 < yi - scale_fact * nsize + ddy(curr_plane)
@@ -235,11 +247,36 @@ for curr_plane = start_plane:end_plane
                 p2(y2-nsize:y2+nsize, x2-nsize:x2+nsize) = 0;
             end
         catch ME
-            disp('Current mapping failed');
+            disp(ME.message);
         end
     end
     offsets(curr_plane + 1, :) = [round(nanmean(giy)) round(nanmean(gix))];
 end
 
 offsets = round(offsets);
-save(fullfile(data_path, 'three_neuron_mean_offsets.mat'), 'offsets');
+save(fullfile(data_path, fprintf('mean_%d_neuron_offsets.mat', num_features)), 'offsets');
+
+function [x, y] = safe_ginput(active_ax, other_ax)
+    valid = false;
+    while ~valid
+        [x, y] = ginput(1);
+        % Get the current point in the normalized coordinates
+        pt = get(gca, 'CurrentPoint');
+        % Check if the point is within the active axis limits
+        if gca == active_ax
+            xlim = get(active_ax, 'XLim');
+            ylim = get(active_ax, 'YLim');
+            if x >= xlim(1) && x <= xlim(2) && y >= ylim(1) && y <= ylim(2)
+                valid = true;
+            else
+                warndlg('Please select a point within the highlighted subplot.', 'Invalid Selection');
+            end
+        elseif gca == other_ax
+            % Do nothing if the other subplot is clicked
+        else
+            % Do nothing if clicked outside any subplot
+        end
+    end
+end
+
+end
