@@ -2,8 +2,6 @@
 
 [![Documentation](https://img.shields.io/badge/Documentation-black?style=for-the-badge&logo=readthedocs&logoColor=white)](https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/)
 
-(Note: Currently only working on windows)
-
 A pipeline for processing light beads microscopy (LBM) datasets using the [flatironinstitute/CaImAn-MATLAB](https://github.com/flatironinstitute/CaImAn-MATLAB/) pipeline.
 
 For a python implementation, see [here](https://github.com/MillerBrainObservatory/LBM-CaImAn-Python)
@@ -29,6 +27,11 @@ For more details about installation, including with `git`, on different operatin
 
 The best way to begin with this pipeline is the `demo_LBM_pipeline.m` file at the root of this project.
 Modifications of this pipeline script are included in the use_cases folder.
+
+For the last step in the pipeline, you will need 2 calibration files aquired before the experiment:
+
+`pollen_sample_calibraion_xy.mat`
+`pollen_calibration_z_vs_N.fig`
 
 ## Overview
 
