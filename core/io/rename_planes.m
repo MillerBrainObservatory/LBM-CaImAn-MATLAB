@@ -11,6 +11,10 @@ function rename_planes(h5path, order)
 %     Array specifying the new order of the planes.
 
 % Get all relevant files in the directory
+
+if isstring(h5path) 
+    h5path = convertStringsToChars(h5path);
+end
 files = dir([h5path '/*_plane_*.h5']);
 if isempty(files)
     fprintf('No files found in %s\n', h5path);
@@ -39,7 +43,7 @@ for i = 1:num_files
         error('Filename %s does not match expected pattern: _plane_.', name);
     end
     base_name = tokens{1}{1};
-    new_name = fullfile(files(i).folder, sprintf('%s_plane_%d%s', base_name, order(i), ext));
+    new_name = fullfile(files(i).folder, sprintf('%s_reordered_plane_%d%s', base_name, order(i), ext));
     h5writeatt(original_name, '/', 'original_plane', i);
     movefile(original_name, new_name);
 end
