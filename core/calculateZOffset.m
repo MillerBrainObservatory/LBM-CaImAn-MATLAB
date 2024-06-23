@@ -185,9 +185,12 @@ for curr_plane = start_plane:end_plane
             xlim([xi-scale_fact*nsize xi+scale_fact*nsize]);
             ylim([yi-scale_fact*nsize yi+scale_fact*nsize]);
             title(sprintf('Plane %d', curr_plane));
-            set(gca, 'XColor', 'r', 'YColor', 'r'); % highlight left subplot
-            set(gcf, 'CurrentAxes', gca);
+
+            % highlight left subplot
+            ax1 = gca;
+            set(ax1, 'XColor', 'r', 'YColor', 'r');
             [x1, y1] = ginput(1);
+            set(ax1, 'XColor', 'k', 'YColor', 'k'); % reset left subplot color
 
             % plot the next plane
             subplot(1, 2, 2);
@@ -195,11 +198,12 @@ for curr_plane = start_plane:end_plane
             xlim([xi-scale_fact*nsize+ddx(curr_plane) xi+scale_fact*nsize+ddx(curr_plane)]);
             ylim([yi-scale_fact*nsize+ddy(curr_plane) yi+scale_fact*nsize+ddy(curr_plane)]);
             title(sprintf('Plane %d', curr_plane + 1));
-            set(gca, 'XColor', 'k', 'YColor', 'k'); % reset left subplot color
-            set(gca, 'XColor', 'r', 'YColor', 'r'); % highlight right subplot
-            set(gcf, 'CurrentAxes', gca);
+
+            % highlight right subplot
+            ax2 = gca;
+            set(ax2, 'XColor', 'r', 'YColor', 'r');
             [x2, y2] = ginput(1);
-            set(gca, 'XColor', 'k', 'YColor', 'k'); % reset right subplot color
+            set(ax2, 'XColor', 'k', 'YColor', 'k'); % reset right subplot color
 
             y1 = round(y1);
             x1 = round(x1);
