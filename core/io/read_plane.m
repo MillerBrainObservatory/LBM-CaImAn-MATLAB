@@ -16,7 +16,6 @@ while true
         end
 
         if isfolder(folder)
-            try
             files = dir(fullfile(folder, '*_plane_*.h5'));
             if isempty(files)
                 error('No plane files found in the given folder: %s', folder);
@@ -33,8 +32,6 @@ while true
                 error("The given plane (%d) exceeds the number of planes found in this folder: %d\n", plane_number, numel(files));
             end
             plane_file = fullfile(folder, files(plane_number).name);
-            catch ME
-            end
         elseif isfile(folder)
             plane_file = folder;
         else
@@ -46,6 +43,7 @@ while true
             dataset_name_selected = true;
         end
 
+        % Check if dataset exists
         data_info = h5info(plane_file, dataset_name);
         data_size = data_info.Dataspace.Size;
 
@@ -66,15 +64,11 @@ while true
     catch ME
         fprintf('\nError: %s\n', ME.message);
 
-        if strcmp(ME.identifier, 'MATLAB:imagesci:h5info:libraryError')
+        if strcmp(ME.identifier, 'MATLAB:imagesci:h5info:libraryError') || contains(ME.message, 'Unable to find object')
             fprintf('Dataset "%s" not found in file "%s".\n', dataset_name, plane_file);
             root_info = h5info(plane_file, '/');
             fprintf('Available datasets at root "/":\n');
-            for i = 1:length(root_info.Datasets)
-                ds = root_info.Datasets(i);
-                fprintf('Name: %s, Size: [%s], Datatype: %s\n', ...
-                    ds.Name, num2str(ds.Dataspace.Size), ds.Datatype.Class);
-            end
+            display_dataset_names(plane_file)
             dataset_name_selected = false;
         elseif contains(ME.message, 'No plane files found')
             folder_selected = false;
@@ -88,10 +82,13 @@ while true
             plane_selected = false;
         elseif contains(ME.message, 'element')
             plane_selected = false;
-
         else
             fprintf('Press Ctrl+C to exit or enter new values.\n');
         end
     end
+end
+
+if ~exist('Y_out', 'var')
+    Y_out = [];
 end
 end

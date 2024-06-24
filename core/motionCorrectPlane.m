@@ -9,7 +9,7 @@ function motionCorrectPlane(data_path, save_path, varargin)
 %     Path to the directory to save the motion vectors.
 % dataset_name : string, optional
 %     Group path within the hdf5 file that contains raw data.
-%     Default is 'registration'.
+%     Default is '/Y'.
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
@@ -40,7 +40,7 @@ function motionCorrectPlane(data_path, save_path, varargin)
 p = inputParser;
 addRequired(p, 'data_path', @ischar);
 addRequired(p, 'save_path', @ischar);
-addParameter(p, 'dataset_name', "/extraction", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addParameter(p, 'dataset_name', "/Y", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
