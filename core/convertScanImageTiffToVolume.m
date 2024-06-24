@@ -76,8 +76,6 @@ end
 
 fig_save_path = fullfile(save_path, "figures");
 if ~isfolder(fig_save_path); mkdir(fig_save_path); end
-roi_savepath = fullfile(fig_save_path, "rois");
-if ~isfolder(roi_savepath); mkdir(roi_savepath); end
 
 files = dir(fullfile(data_path, '*.tif*'));
 if isempty(files)
@@ -148,7 +146,12 @@ try
 
             tplane = tic;
             p_str = sprintf("plane_%d", plane_idx);
+
             plane_fullfile = sprintf("%s/extracted_%s.h5", save_path, p_str);
+            
+            % /figures folder with /plane_n subdirectories
+            plane_savepath = fullfile(fig_save_path, p_str);
+            if ~isfolder(plane_savepath); mkdir(plane_savepath); end
 
             %% SCAN PHASE CORRECTION METHOD 1:
             % Our planar timeseries returned from Aout can be used
@@ -210,7 +213,7 @@ try
                     images = {raw_timeseries(yind,xind,2), roi_arr(yindr, xindr, 2)};
                     labels = {'Raw-Untrimmed', 'Phase-Corrected-Trimmed'};
     
-                    roi_savename = fullfile(roi_savepath, sprintf('roi_%d.png', roi_idx));
+                    roi_savename = fullfile(plane_savepath, sprintf('roi_%d.png', roi_idx));
                     make_tiled_figure( ...
                         images, ...
                         metadata, ...
@@ -223,33 +226,33 @@ try
                 cnt = cnt + 1;
             end
 
-            % pixel_resolution = metadata.pixel_resolution;
-            % scale_fact = 10; % Length of the scale bar in microns
-            % scale_length_pixels = scale_fact / pixel_resolution;
-            % 
-            % img_frame = z_timeseries(:,:,2);
-            % [yind, xind] = get_central_indices(img_frame, 30); % 30 pixels around the center of the brightest part of an image frame
-            % 
-            % f = figure('Color', 'black');
-            % sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'w');
-            % tiledlayout(1, 1, 'TileSpacing', 'compact', 'Padding', 'compact');
-            % 
-            % % Post-correction image
-            % nexttile;
-            % imagesc(z_timeseries(yind, xind, 2));
-            % axis image; axis tight; axis off; colormap('gray');
-            % sgtitle(sprintf('Plane %d @ %.2f Hz | %.2f µm/px \nFOV: %.0fmm x %.0fmm', plane_idx, metadata.frame_rate, metadata.pixel_resolution, metadata.fov(1), metadata.fov(2)), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
-            % hold on;
-            % 
-            % % Scale bar coordinates relative to the cropped image
-            % scale_bar_x = [size(xind, 2) - scale_length_pixels - 3, size(xind, 2) - 3]; % 10 pixels padding from the right
-            % scale_bar_y = [size(yind, 2) - 3, size(yind, 2) - 3]; % 20 pixels padding from the bottom
-            % line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 5);
-            % text(mean(scale_bar_x), scale_bar_y(1), sprintf('%d µm', scale_fact), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
-            % hold off;
-            % 
-            % saveas(f, fullfile(fig_save_path, sprintf('scan_correction_validation_plane_%d_offset_%d.png', plane_idx, abs(scan_offset))));
-            % close(f);
+            pixel_resolution = metadata.pixel_resolution;
+            scale_fact = 10; % Length of the scale bar in microns
+            scale_length_pixels = scale_fact / pixel_resolution;
+
+            img_frame = z_timeseries(:,:,2);
+            [yind, xind] = get_central_indices(img_frame, 30); % 30 pixels around the center of the brightest part of an image frame
+
+            f = figure('Color', 'black');
+            sgtitle(sprintf('Scan-Correction: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'w');
+            tiledlayout(1, 1, 'TileSpacing', 'compact', 'Padding', 'compact');
+
+            % Post-correction image
+            nexttile;
+            imagesc(z_timeseries(yind, xind, 2));
+            axis image; axis tight; axis off; colormap('gray');
+            sgtitle(sprintf('Plane %d @ %.2f Hz | %.2f µm/px \nFOV: %.0fmm x %.0fmm', plane_idx, metadata.frame_rate, metadata.pixel_resolution, metadata.fov(1), metadata.fov(2)), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
+            hold on;
+
+            % Scale bar coordinates relative to the cropped image
+            scale_bar_x = [size(xind, 2) - scale_length_pixels - 3, size(xind, 2) - 3]; % 10 pixels padding from the right
+            scale_bar_y = [size(yind, 2) - 3, size(yind, 2) - 3]; % 20 pixels padding from the bottom
+            line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 5);
+            text(mean(scale_bar_x), scale_bar_y(1), sprintf('%d µm', scale_fact), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
+            hold off;
+
+            saveas(f, fullfile(plane_savepath, sprintf('scan_correction_plane_%d_offset_%d.png', plane_idx, abs(scan_offset))));
+            close(f);
 
             % remove padded 0's
             z_timeseries = z_timeseries( ...
@@ -257,7 +260,7 @@ try
                 any(z_timeseries, [1, 3]), ...
                 :);
             % 
-            % mean_img = mean(z_timeseries, 3);
+            mean_img = mean(z_timeseries, 3);
 
             scale_fact = 10; % Length of the scale bar in microns
 
@@ -266,37 +269,10 @@ try
 
             images = {mean(z_timeseries(yind, xind, 3),3)};
             labels = {sprintf('Plane %d Mean Image', plane_idx)};
-            %
-            % pixel_resolution = metadata.pixel_resolution;
-            % scale_fact = 10; % Length of the scale bar in microns
-            % scale_length_pixels = scale_fact / pixel_resolution;
-            %
-            % img_frame = z_timeseries(:,:,2);
-            % [yind, xind] = get_central_indices(img_frame, 30); % 30 pixels around the center of the brightest part of an image frame
-            %
-            % f = figure('Color', 'black');
-            % sgtitle(sprintf('Scan-Correction Validation: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'w');
-            % tiledlayout(1, 1, 'TileSpacing', 'compact', 'Padding', 'compact');
-            %
-            % % Post-correction image
-            % nexttile;
-            % imagesc(z_timeseries(yind, xind, 2));
-            % axis image; axis tight; axis off; colormap('gray');
-            % sgtitle(sprintf('Plane %d @ %.2f Hz | %.2f µm/px \nFOV: %.0fmm x %.0fmm', plane_idx, metadata.frame_rate, metadata.pixel_resolution, metadata.fov(1), metadata.fov(2)), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
-            % hold on;
-            %
-            % % Scale bar coordinates relative to the cropped image
-            % scale_bar_x = [size(xind, 2) - scale_length_pixels - 3, size(xind, 2) - 3]; % 10 pixels padding from the right
-            % scale_bar_y = [size(yind, 2) - 3, size(yind, 2) - 3]; % 20 pixels padding from the bottom
-            % line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 5);
-            % text(mean(scale_bar_x), scale_bar_y(1), sprintf('%d µm', scale_fact), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
-            % hold off;
-            %
-            % saveas(f, fullfile(fig_save_path, sprintf('scan_correction_validation_plane_%d_offset_%d.png', plane_idx, abs(scan_offset))));
-            % close(f);
 
-            plane_save_path = fullfile(fig_save_path, sprintf('Extraction_validation_plane_%d.png', plane_idx));
-            make_tiled_figure(images, metadata,'fig_title', labels,'scale_size', scale_fact,'save_name', plane_save_path);
+            plane_save_path = fullfile(plane_savepath, sprintf('mean_frame_plane_%d.png', plane_idx));
+            make_tiled_figure(images, metadata,'fig_title', labels, 'scale_size', scale_fact,'save_name', plane_save_path);
+
             if isfile(plane_fullfile)
                 if overwrite
                     fprintf(fid, "%s : Deleting %s\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS') ,plane_fullfile);

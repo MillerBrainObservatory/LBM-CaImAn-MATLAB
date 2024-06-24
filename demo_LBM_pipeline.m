@@ -17,37 +17,38 @@ addpath(genpath(fullfile(fpath, 'core', 'io')));
 %% Here you can validate that all dependencies are on the path and accessible from within this pipeline.
 % This does not check for package access on your path.
 
-result = validate_toolboxes();
-if ischar(result)
-    error(result);
-else
-    disp('Proceeding with execution...');
-end
-
 parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
 data_path = fullfile(parent_path, 'raw');
-save_path = fullfile(parent_path, sprintf('extracted_2px_2px_18px_0px'));
+save_path = [];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Extraction %%%%%%%%
 
 clc; compute = 1;
 if compute
+    % Number of pixels to trim
+    left = 5; right = 5; top = 17; bottom = 0;
+    save_path = fullfile(parent_path, sprintf('extracted_%dpx_%dpx_%dpx_%dpx', left, right, top, bottom));
     convertScanImageTiffToVolume( ...
         data_path, ...
         save_path, ...
         'dataset_name', '/Y', ... % default
         'debug_flag', 0, ... % default, if 1 will display files and return
         'fix_scan_phase', 1, ... % default, keep to 1
-        'trim_pixels', [2 2 18 0], ... % default, num pixels to trim for each roi
+        'trim_pixels', [left right top bottom], ... % default, num pixels to trim for each roi
         'overwrite', 1 ...
         );
+    %%%%% Optional: Reorder Planes
+    order = fliplr([1 5:10 2 11:17 3 18:23 4 24:30]);
+    
+    rename_planes(save_path, order);
 end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Motion Correction %%%
 
-clc; compute = 0;
+clc; compute = 1;
 if compute
 
     mc_path = fullfile(parent_path, 'extracted_4px_4px_17px_0px');
@@ -84,7 +85,7 @@ end
 
 %% 3) CNMF Plane-by-plane SegmentationS
 
-clc; compute = 1;
+clc; compute = 0;
 if compute
     % mc_path = fullfile(parent_path, 'corrected_trimmed_grid');
     if ~isfolder(mc_path); mkdir(mc_path); end
@@ -104,12 +105,26 @@ if compute
 end
 
 %% 4) Axial Offset Correction
-clc; compute = 1;
+clc; compute = 0;
 if compute
-    % calculate Z offset requires the metadata, for now
-    % TODO: Get metadata from within calculateZOffset
-    h5_fullfile = fullfile(mc_path, "motion_corrected_plane_1.h5");
-    % h5_fullfile="C:/Users/RBO/Documents/data/high_res/corrected_trimmed_grid/motion_corrected_plane_1.h5";
-    metadata = read_h5_metadata(h5_fullfile, '/Y');
-    calculateZOffset(segment_path, metadata);
+    axial_path = fullfile(parent_path, 'axial_offset');
+    if ~isfolder(axial_path); mkdir(axial_path); end
+        % calculateZOffset( ...
+        %     'C:/Users/RBO/Documents/data/high_res/results', ... % we used this to save extracted data
+        %     axial_path, ... % save registered data here
+        %     'dataset_name', '/mov', ... % where we saved the last step in h5
+        %     'debug_flag', 0, ...
+        %     'overwrite', 1, ...
+        %     'start_plane', 1, ...
+        %     'end_plane', 3  ...
+        % );
+        collatePlanes( ...
+            'C:/Users/RBO/Documents/data/high_res/results', ... % we used this to save extracted data
+            save_path, ... % save registered data here
+            'dataset_name', '/Y', ... % where we saved the last step in h5
+            'debug_flag', 0, ...
+            'overwrite', 1, ...
+            'start_plane', 1, ...
+            'end_plane', 3  ...
+        );
 end

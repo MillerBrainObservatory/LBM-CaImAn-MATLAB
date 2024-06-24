@@ -30,6 +30,11 @@ For more details about installation, including with `git`, on different operatin
 The best way to begin with this pipeline is the `demo_LBM_pipeline.m` file at the root of this project.
 Modifications of this pipeline script are included in the use_cases folder.
 
+For the last step in the pipeline, you will need 2 calibration files aquired before the experiment:
+
+`pollen_sample_calibraion_xy.mat`
+`pollen_calibration_z_vs_N.fig`
+
 ## Overview
 
 This pipeline is unique only in the routines to extract raw data from [ScanImage BigTiff files](https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification), as is outlined below:
