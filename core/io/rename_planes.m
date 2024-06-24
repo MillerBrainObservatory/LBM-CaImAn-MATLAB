@@ -43,7 +43,7 @@ for i = 1:num_files
         error('Filename %s does not match expected pattern: _plane_.', name);
     end
     base_name = tokens{1}{1};
-    new_name = fullfile(files(i).folder, sprintf('%s_reordered_plane_%d%s', base_name, order(i), ext));
+    new_name = fullfile(files(i).folder, sprintf('%s_plane_%d%s', base_name, order(i), ext));
     h5writeatt(original_name, '/', 'original_plane', i);
     movefile(original_name, new_name);
 end
