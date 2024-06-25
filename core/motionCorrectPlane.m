@@ -104,22 +104,18 @@ for plane_idx = start_plane:end_plane
         end
     end
 
-    h5_data = h5info(plane_name, dataset_name);
-    metadata = struct();
-    for k = 1:numel(h5_data.Attributes)
-        attr_name = h5_data.Attributes(k).Name;
-        attr_value = h5readatt(plane_name, sprintf("/%s",h5_data.Name), attr_name);
-        metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
-    end
-
+    if plane_idx == 1; metadata = read_h5_metadata(plane_name); end
+   
     poolobj = gcp("nocreate"); % If no pool, do not create new one.
     if isempty(poolobj)
-        parpool("Processes", num_cores,"IdleTimeout", 30);
+        clust=parcluster('local');
+        clust.NumWorkers=num_cores;
+        parpool(clust,num_cores, 'IdleTimeout', 30);
     end
 
     pixel_resolution = metadata.pixel_resolution;
 
-    Y = h5read(plane_name, dataset_name);
+    Y = read_plane(h)
     Y = Y - min(Y(:));
     volume_size = size(Y);
     d1 = volume_size(1);
