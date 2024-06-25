@@ -5,6 +5,8 @@ Axial-Offset Correction
 
 Core function(s): :func:`calculateZOffset` and :func:`collatePlanes`
 
+Before the session being processed, you should have aquired a cailbration file that conforms to scanimage naming convention. A file named something like `pollen_calibration_00001.tif`.
+
 Light beads traveling to our sample need to be temporally distinct relative to our sensor
 so that the aquisition system knows the origin and subsequent depth of each bead.
 

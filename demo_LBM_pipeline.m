@@ -47,7 +47,6 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Motion Correction %%%
-
 clc; compute = 1;
 if compute
 
@@ -84,7 +83,6 @@ if compute
 end
 
 %% 3) CNMF Plane-by-plane SegmentationS
-
 clc; compute = 0;
 if compute
     % mc_path = fullfile(parent_path, 'corrected_trimmed_grid');
@@ -109,15 +107,15 @@ clc; compute = 0;
 if compute
     axial_path = fullfile(parent_path, 'axial_offset');
     if ~isfolder(axial_path); mkdir(axial_path); end
-        % calculateZOffset( ...
-        %     'C:/Users/RBO/Documents/data/high_res/results', ... % we used this to save extracted data
-        %     axial_path, ... % save registered data here
-        %     'dataset_name', '/mov', ... % where we saved the last step in h5
-        %     'debug_flag', 0, ...
-        %     'overwrite', 1, ...
-        %     'start_plane', 1, ...
-        %     'end_plane', 3  ...
-        % );
+        calculateZOffset( ...
+            'C:/Users/RBO/Documents/data/high_res/results', ... % we used this to save extracted data
+            axial_path, ... % save registered data here
+            'dataset_name', '/mov', ... % where we saved the last step in h5
+            'debug_flag', 0, ...
+            'overwrite', 1, ...
+            'start_plane', 1, ...
+            'end_plane', 3  ...
+        );
         collatePlanes( ...
             'C:/Users/RBO/Documents/data/high_res/results', ... % we used this to save extracted data
             save_path, ... % save registered data here
