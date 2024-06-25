@@ -40,8 +40,25 @@ for fold_idx=1:length(folders)
     end
 end
 %%
-filename = fullfile(save_path, "extracted_plane_1.h5");
+images = {};
+for i=1:size(vol, 3)
+    images = {vol(:,:,i,1), vol(:,:,2,1)};
+    titles = {"tile1", "tile2"};
+end
 
+N = size(vol,3);
+
+for ii = 1:N
+    images{ii} = vol(:,:,ii, 1);
+    titles
+end
+
+%%
+% Display the tiled images
+display_tiled_images(images, titles);
+
+filename = fullfile(save_path, "extracted_plane_1.h5");
+%%
 files = dir([save_path '*.h5']);
 info = h5info(filename, '/Y');
 h = zeros([1 length(files)]);
