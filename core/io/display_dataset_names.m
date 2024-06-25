@@ -1,4 +1,4 @@
-function = display_dataset_names(h5_fullfile)
+function display_dataset_names(h5_fullfile)
 % display_dataset_names Display available datasets in an HDF5 file.
 %
 % This function displays the names, sizes, and datatypes of datasets in the
@@ -16,8 +16,8 @@ function = display_dataset_names(h5_fullfile)
 %
 % Example
 % -------
-% display_dataset_names('path/to/file.h5')
-%
+% display_dataset_names('path/to/h5folder/')
+% 
 % See also H5INFO, H5READ
 root_info = h5info(h5_fullfile, '/');
 fprintf('Available datasets at root "/":\n');
