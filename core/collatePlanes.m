@@ -1,17 +1,6 @@
 function [] = collatePlanes(data_path, save_path, varargin)
 % COLLATEPLANES Analyzes and processes imaging data by extracting and correcting features across multiple planes.
 %
-% This function analyzes imaging data from a specified directory, applying
-% various thresholds and corrections based on metadata. It processes neuron
-% activity data, handles z-plane corrections, and outputs figures representing
-% neuron distributions along with collated data files.
-%
-% The function expects the directory to contain 'caiman_output_plane_*.mat' files
-% with variables related to neuronal activity, and uses provided metadata for
-% processing parameters. It adjusts parameters dynamically based on the content
-% of metadata and filters, merges data across imaging planes, and performs
-% z-plane and field curvature corrections.
-%
 % Parameters
 % ----------
 % data_path : string
@@ -27,6 +16,13 @@ function [] = collatePlanes(data_path, save_path, varargin)
 %     not continue processing. Defaults to 0.
 % overwrite : logical, optional
 %     Whether to overwrite existing files (default is 1).
+% start_plane : double, integer, positive
+%     The starting plane index for processing.
+% end_plane : double, integer, positive
+%     The ending plane index for processing. Must be greater than or equal to
+%     start_plane.
+% reordered : logical, optional
+%      if `rename_planes` was ran, "reordered" will be in the name. 
 %
 % Returns
 % -------
@@ -55,14 +51,21 @@ function [] = collatePlanes(data_path, save_path, varargin)
 p = inputParser;
 addRequired(p, 'data_path');
 addRequired(p, 'save_path');
-addParameter(p, 'dataset_name', "/segmented", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addParameter(p, 'dataset_name', "/mov", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x));
+addParameter(p, 'overwrite', 1, @(x) isnumeric(x));
+addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
+addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
+addParameter(p, 'num_features', 3, @(x) isnumeric(x) && isPositiveIntegerValuedNumeric(x));
 parse(p, data_path, save_path, varargin{:});
 
 data_path = p.Results.data_path;
 save_path = p.Results.save_path;
 dataset_name = p.Results.dataset_name; % here for param consistency but ignored
 debug_flag = p.Results.debug_flag;
+overwrite = p.Results.overwrite;
+start_plane = p.Results.start_plane;
+end_plane = p.Results.end_plane;
 
 if ~isfolder(data_path)
     error("Data path:\n %s\n ..does not exist", data_path);
@@ -74,15 +77,12 @@ if isempty(save_path)
     save_path = data_path;
 end
 
-fig_save_path = fullfile(save_path, "figures");
-if ~isfolder(fig_save_path); mkdir(fig_save_path); end
-
 files = dir(fullfile(data_path, '*.h*'));
 if isempty(files)
     error('No suitable data files found in: \n  %s', data_path);
 end
 
-log_file_name = sprintf("%s_axial_offset_correction", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+log_file_name = sprintf("%s_collation", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 log_full_path = fullfile(save_path, log_file_name);
 fid = fopen(log_full_path, 'w');
 if fid == -1
@@ -95,47 +95,58 @@ end
 calib_files = fullfile(data_path, 'pollen*');
 calib_files = dir(calib_files);
 if length(calib_files) < 2
-    error("Missing pollen calibration files in folder:\n%s\n.", data_path);
+    error("Missing pollen calibration files in folder:\n%s\n", data_path);
 else
     for i=length(calib_files)
         calib = fullfile(calib_files(i).folder, calib_files(i).name);
         if calib_files(i).name == "pollen_sample_xy_calibration.mat"
-            load(calib);
+            pollen_offsets = matfile(calib);
+            diffx = pollen_offsets.diffx;
+            diffy = pollen_offsets.diffy;
         end
         fprintf("Loaded calibration file:\n");
         fprintf("%s\n",fullfile(calib_files(i).folder, calib_files(i).name));
     end
 end
 
-if ~exist("startDepth", "var")
-    % z0 = str2double(inputdlg('Enter minimum depth (um):'));
-    z0 = 0;
+if ~exist("diffx", "var")
+    error("Missing or incorrect pollen calibration file supplied.");
 end
 
-fprintf(fid, '%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); tall=tic;
-for curr_plane = 1:30
-
-
-    plane_name = sprintf("%s/segmented_plane_%d.h5", data_path, curr_plane);
-    plane_name_next = sprintf("%s/segmented_plane_%d.h5", data_path, curr_plane+1);
-
-    h5_data = h5info(plane_name, dataset_name);
-    metadata = struct();
-    for k = 1:numel(h5_data.Attributes)
-        attr_name = h5_data.Attributes(k).Name;
-        attr_value = h5readatt(plane_name, sprintf("/%s",h5_data.Name), attr_name);
-        metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
+fprintf(fid, '%s : Beginning axial offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+tall = tic;
+for curr_plane = start_plane:end_plane
+    if curr_plane + 1 > end_plane
+        fprintf("Current plane (%d) > Last Plane (%d)", curr_plane, end_plane);
+        continue;
     end
-
-    if isempty(gcp('nocreate')) && num_cores > 1
-        parpool(num_cores);
+    plane_name = sprintf("%s/segmented_plane_%d.h5", data_path, curr_plane);
+    plane_name_save = sprintf("%s/collated_plane_%d.h5", save_path, curr_plane);
+    if isfile(plane_name_save)
+        fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+        if overwrite
+            fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+            delete(plane_name_save)
+        end
+    end
+    try
+        metadata = read_h5_metadata(plane_name, '/');
+    catch ME
+        if contains(ME.message, 'not found')
+            
+            error("Error reading data given data-path: %s", data_path)
+        end
+    end
+    if isempty(fieldnames(metadata))
+        error("No metadata found for this filepath.");
+    end
+    if ~(metadata.num_planes >= end_plane)
+        error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
     end
 
     Y = h5read(plane_name, dataset_name);
     Y = Y - min(Y(:));
     volume_size = size(Y);
-    d1 = volume_size(1);
-    d2 = volume_size(2);
 
     r_thr = metadata.r_thr;
     pixel_resolution = metadata.pixel_resolution;
@@ -153,7 +164,7 @@ for curr_plane = 1:30
     num_ovlpd = 0;
 
     % p = load([path 'caiman_output_plane_1.mat']); % Load stuff from first p
-    % Ac_keep_n = h5read(h5_segmented, '/Ac_keep');
+    Ac_keep = h5read(h5_segmented, '/Ac_keep');
     T_keep = h5read(h5_segmented, '/T_keep');
 
     Cn = h5read(h5_segmented, '/Cn');
@@ -207,7 +218,7 @@ for curr_plane = 1:30
     N_all = N;
     C_all = C;
 
-    c = load([path 'three_neuron_mean_offsets.mat'],'offsets');
+    c = load([path 'mean_neuron_offsets.mat'],'offsets');
     offsets = round(c.offsets);
 
     xo = cumsum(-offsets(:,2));
