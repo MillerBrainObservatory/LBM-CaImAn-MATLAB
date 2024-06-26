@@ -2,8 +2,6 @@
 
 [![Documentation](https://img.shields.io/badge/Documentation-black?style=for-the-badge&logo=readthedocs&logoColor=white)](https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/)
 
-(Note: Currently only working on windows)
-
 A pipeline for processing light beads microscopy (LBM) datasets using the [flatironinstitute/CaImAn-MATLAB](https://github.com/flatironinstitute/CaImAn-MATLAB/) pipeline.
 
 For a python implementation, see [here](https://github.com/MillerBrainObservatory/LBM-CaImAn-Python)
