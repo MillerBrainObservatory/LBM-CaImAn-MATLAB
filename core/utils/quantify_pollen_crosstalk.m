@@ -48,7 +48,7 @@ channel_map = {
     "A", 2, 5;
     "A", 1, 1
 };
-
+channel_map = flip(channel_map);
 order = fliplr([1 5:10 2 11:17 3 18:23 4 24:30]);
 
 % Convert channel map to table for easier processing
@@ -123,9 +123,8 @@ for plane_idx = 1:num_comparisons
 
     % Adding crosstalk percentage text
     text(55, max(a_intensity) * 0.9, sprintf('%%Crosstalk: %.2f%%', xtalk_percent), 'FontSize', 12, 'Color', 'w');
-
+5
     hold off;
-
     save_name = sprintf("%s/plane_%d_vs_plane_%d.png", save_folder, cavity_a.pos, cavity_b.pos);
     exportgraphics(f, save_name, 'Resolution', 300);
     close(gcf);
@@ -133,20 +132,11 @@ for plane_idx = 1:num_comparisons
     image_files{end+1} = save_name;  % Add the filename to the list
     results(plane_idx, :) = [cavity_a.pos, cavity_b.pos, xtalk_percent];
 end
-channel_table = [channel_table array2table(results, 'VariableNames', {'ChannelA', 'ChannelB', 'XtalkPercent'})];
+
 %%
 
 clc;
 save_folder = "C://Users/RBO/Desktop/figs/"; % windows letting this work is ew
-gif_filename = fullfile(save_folder, 'crosstalk_profiles_bg_subtracted.gif');
-delay_time = 0.5;  % time between frames (s)
-for i = 1:length(image_files)
-    [img, cmap] = rgb2ind(imread(image_files{i}), 256);
-    if i == 1
-        imwrite(img, cmap, gif_filename, 'gif', 'LoopCount', Inf, 'DelayTime', delay_time);
-    else
-        imwrite(img, cmap, gif_filename, 'gif', 'WriteMode', 'append', 'DelayTime', delay_time);
-    end
-end
-
+gif_filename = fullfile(save_folder, 'crosstalk_profiles_bg_subtracted_flipped.gif');
+timeseries_to_gif(image_files, gif_filename, 0.01);
 
