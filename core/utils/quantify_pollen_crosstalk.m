@@ -2,8 +2,8 @@ clear;
 
 %% Pick Dataset to Compare
 clc;
-parent_path = fullfile("C:/Users/RBO/Documents/data/ground_truth/high_speed/");
-input_crosstalk = matfile(fullfile(parent_path, 'cross_talk_data_set.mat')).v;
+parent_path = fullfile("C:/Users/RBO/Documents/data/ground_truth/single_hemi/");
+% input_crosstalk = matfile(fullfile(parent_path, 'cross_talk_data_set.mat')).v;
 save_folder = fullfile(parent_path, 'results');
 if ~isfolder(save_folder); mkdir(save_folder); end
 
@@ -16,7 +16,7 @@ vv = reshape(vv, [size(vv, 1) size(vv,2) 30 size(vv, 3)/30]); %144x145x30x301
 
 %% Find Crosstalk Percent between Z-Planes
 % Define the channel mapping
-channel_map = {
+channel_map = flip({
     "B", 15, 30;
     "B", 14, 29;
     "B", 13, 28;
@@ -47,14 +47,12 @@ channel_map = {
     "A", 3, 6;
     "A", 2, 5;
     "A", 1, 1
-};
-channel_map = flip(channel_map);
-order = fliplr([1 5:10 2 11:17 3 18:23 4 24:30]);
+});
 
 % Convert channel map to table for easier processing
 channel_table = cell2table(channel_map, 'VariableNames', {'Cavity', 'RealBeam', 'ChannelIndex'});
 
-num_comparisons = size(order, 2) / 2;
+num_comparisons = size(channel_map, 1) / 2;
 
 %%
 clc;
@@ -123,8 +121,9 @@ for plane_idx = 1:num_comparisons
 
     % Adding crosstalk percentage text
     text(55, max(a_intensity) * 0.9, sprintf('%%Crosstalk: %.2f%%', xtalk_percent), 'FontSize', 12, 'Color', 'w');
-5
+
     hold off;
+
     save_name = sprintf("%s/plane_%d_vs_plane_%d.png", save_folder, cavity_a.pos, cavity_b.pos);
     exportgraphics(f, save_name, 'Resolution', 300);
     close(gcf);
@@ -133,10 +132,8 @@ for plane_idx = 1:num_comparisons
     results(plane_idx, :) = [cavity_a.pos, cavity_b.pos, xtalk_percent];
 end
 
-%%
-
 clc;
 save_folder = "C://Users/RBO/Desktop/figs/"; % windows letting this work is ew
-gif_filename = fullfile(save_folder, 'crosstalk_profiles_bg_subtracted_flipped.gif');
-timeseries_to_gif(image_files, gif_filename, 0.01);
-
+gif_filename = fullfile(save_folder, 'crosstalk_highres.gif');
+delay_time = 0.5;  % time between frames (s)
+timeseries_to_gif(image_files, gif_filename, delay_time);
