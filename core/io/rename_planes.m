@@ -11,6 +11,10 @@ function rename_planes(h5path, order)
 %     Array specifying the new order of the planes.
 
 % Get all relevant files in the directory
+
+if isstring(h5path) 
+    h5path = convertStringsToChars(h5path);
+end
 files = dir([h5path '/*_plane_*.h5']);
 if isempty(files)
     fprintf('No files found in %s\n', h5path);
@@ -47,6 +51,6 @@ end
 % Store the original order as a .mat file
 original_order = 1:num_files;
 original_order_filename = fullfile(h5path, 'original_order.mat');
-save(original_order_filename(fullfile(h5path, 'original_order.mat')), 'original_order', 'order');
+save(original_order_filename, 'original_order', 'order');
 fprintf('Plane files reordered successfully and original order saved the h5 attributes.\n');
 end

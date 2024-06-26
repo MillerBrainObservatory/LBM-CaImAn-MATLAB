@@ -3,7 +3,9 @@
 Axial-Offset Correction
 =======================
 
-Core function: :func:`collatePlanes`
+Core function(s): :func:`calculateZOffset` and :func:`collatePlanes`
+
+Before the session being processed, you should have aquired a cailbration file that conforms to scanimage naming convention. A file named something like `pollen_calibration_00001.tif`.
 
 Before the session being processed, you should have aquired a cailbration file that conforms to scanimage naming convention. A file named something like `pollen_calibration_00001.tif`.
 
@@ -26,6 +28,9 @@ look at our recording quality:
 .. thumbnail:: ../_static/_images/pollen/pollen_frame.png
    :width: 600
 
+Setup
+-----------
+
 Before proceeding:
 
 - You will need to be in a GUI environment for this step. Calculate offset will show you two images, click the feature that matches in both images.
@@ -34,29 +39,11 @@ Before proceeding:
 :code:`pollen_calibration_Z_vs_N.mat`
 :code:`pollen_calibration_x_y_offsets.fig`
 
-Axial Correction Setup
----------------------------
 
-These files hold data used to align each z-plane depth around the same [Y, X] coordinates.
+.. important::
 
-Place these files in the same directory as your `caiman_output_plane_N` files.
-
-.. code-block:: MATLAB
-
-    >> help collatePlanes
-
-    collatePlanes Analyzes and processes imaging data by extracting and correcting features across multiple planes.
-
-    This function analyzes imaging data from a specified directory, applying
-    various thresholds and corrections based on metadata. It processes neuron
-    activity data, handles z-plane corrections, and outputs figures representing
-    neuron distributions along with collated data files.
-
-    The function expects the directory to contain 'caiman_output_plane_*.mat' files
-    with variables related to neuronal activity, and uses provided metadata for
-    processing parameters. It adjusts parameters dynamically based on the content
-    of metadata and filters, merges data across imaging planes, and performs
-    z-plane and field curvature corrections.
+    These files hold data used to align each z-plane depth around the same [Y, X] coordinates.
+    Place these files in the same directory as your `segmentation_plane_N` files.
 
 First, the [Y, X] offsets (in microns) are used for an initial, dirty axial alignment:
 
@@ -71,6 +58,9 @@ We can use this to select a feature, and the same feature in n+1.
 
 .. thumbnail:: ../_static/_images/compare_planes.png
    :width: 600
+
+This makes a few assumptions about the axial distance between z-planes.
+First, each z-plane should be close enough in distance (for example, ~16um) that neuronal features will be similar and can be used for alignment.
 
 Axial Correction Outputs
 ----------------------------
