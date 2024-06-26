@@ -1,6 +1,5 @@
 function valid = check_valid_dataset(filename, location)
     try
-        % Read a small subset of data (e.g., the first 100 elements)
         data = h5read(filename, location, 1, 2);
         if size(data, 1) > 20
             valid = any(data(1:20) ~= 0);
