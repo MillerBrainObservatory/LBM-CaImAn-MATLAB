@@ -100,7 +100,7 @@ if isempty(files)
     error('No suitable data files found in: \n  %s', data_path);
 end
 
-log_file_name = sprintf("%s_segmentation", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+log_file_name = sprintf("%s_segmentation.log", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 log_full_path = fullfile(save_path, log_file_name);
 fid = fopen(log_full_path, 'w');
 if fid == -1
