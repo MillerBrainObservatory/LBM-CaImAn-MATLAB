@@ -26,7 +26,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 % trim_pixels : double, optional
 %     Pixels to trim from left, right,top, bottom of each scanfield before
 %     horizontally concatenating the scanfields within an image. Default is
-%     [0 0 0 0].
+%     [6 6 10 0].
 %
 % Notes
 % -----
@@ -55,7 +55,7 @@ addParameter(p, 'dataset_name', "/Y", @(x) (ischar(x) || isstring(x)) && isValid
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'fix_scan_phase', 1, @(x) isnumeric(x) || islogical(x));
-addParameter(p, 'trim_pixels', [0 0 0 0], @isnumeric);
+addParameter(p, 'trim_pixels', [6 6 10 0], @isnumeric);
 parse(p, data_path, save_path, varargin{:});
 
 data_path = p.Results.data_path;
@@ -187,12 +187,13 @@ try
                 roi_arr = fixScanPhase(raw_timeseries, offsets_roi(plane_idx,roi_idx), 1, 'int16');
 
                 % take whichever is smaller, our trimmed roi size, or corrected
-                % ROI
-                sx = min(trimmed_x, size(roi_arr, 2));
-                sy = min(trimmed_y, size(roi_arr, 1));
+                % ROI. BREAKING! Use the raw ROI size
+                % sx = min(trimmed_x, size(roi_arr, 2));
+                % sy = min(trimmed_y, size(roi_arr, 1));
 
-                trimmed_xslice = (t_left+1:sx-t_right);
-                trimmed_yslice = (t_top+1:sy-t_bottom);
+                % trimmed_xslice = (t_left+1:sx-t_right);
+                trimmed_xslice = (t_left+1:raw_x-t_right);
+                trimmed_yslice = (t_top+1:raw_y-t_bottom);
 
                 % pre-trim this roi
                 roi_arr = squeeze(roi_arr(trimmed_yslice, trimmed_xslice, :));
@@ -340,10 +341,8 @@ elseif dim == 2
         dataOut(1+floor(offset/2):sy+floor(offset/2),:,:,:) = dataIn;
     end
 end
-dataOut = dataOut(:, 1:sx-offset, :, :);
+% dataOut = dataOut(:, 1:sx-offset, :, :);
 end
-
-
 
 function correction = returnScanOffset(Iin,dim,dtype)
 
