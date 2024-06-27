@@ -228,9 +228,8 @@ try
                 cnt = cnt + 1;
             end
 
-            pixel_resolution = metadata.pixel_resolution;
             scale_fact = 10; % Length of the scale bar in microns
-            scale_length_pixels = scale_fact / pixel_resolution;
+            scale_length_pixels = scale_fact / metadata.pixel_resolution;
 
             img_frame = z_timeseries(:,:,2);
             [yind, xind] = get_central_indices(img_frame, 30); % 30 pixels around the center of the brightest part of an image frame
@@ -265,15 +264,11 @@ try
             mean_img = mean(z_timeseries, 3);
 
             scale_fact = 10; % Length of the scale bar in microns
-
-            img_frame = z_timeseries(:,:,2);
-            [yind, xind] = get_central_indices(img_frame, 40); % 30 pixels around the center of the brightest part of an image frame
-
-            images = {mean(z_timeseries(yind, xind, 3),3)};
-            labels = {sprintf('Plane %d Mean Image', plane_idx)};
+            images = {img_frame, mean_img};
+            labels = {'Frame 2', 'Mean Image'};
 
             plane_save_path = fullfile(plane_savepath, sprintf('mean_frame_plane_%d.png', plane_idx));
-            make_tiled_figure(images, metadata,'fig_title', labels, 'scale_size', scale_fact,'save_name', plane_save_path);
+            make_tiled_figure(images, metadata,'tile_titles', labels,'fig_title',sprintf("Plane %d", plane_idx), 'scale_size', scale_fact,'save_name', plane_save_path);
 
             if isfile(plane_fullfile)
                 if overwrite
