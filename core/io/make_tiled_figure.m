@@ -67,7 +67,11 @@ for i = 1:num_images
         title(tile_titles{i}, 'FontSize', 12, 'FontWeight', 'bold', 'Color', 'w');
     end
     
-    if scale_size
+    if isempty(scale_size) || scale_size < size(img,2) / 10 %make sure its not too small
+        scale_size = calculate_scale(size(img, 2), metadata.pixel_resolution);
+    end
+    
+    if scale_size > 0
         scale_length_pixels = scale_size / metadata.pixel_resolution;
 
         hold on;

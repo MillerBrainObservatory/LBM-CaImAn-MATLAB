@@ -131,13 +131,7 @@ for plane_idx = start_plane:end_plane
     end
 
     %% Attach metadata to attributes for this plane
-    h5_data = h5info(plane_name, dataset_name);
-    metadata = struct();
-    for k = 1:numel(h5_data.Attributes)
-        attr_name = h5_data.Attributes(k).Name;
-        attr_value = h5readatt(plane_name, sprintf("/%s",h5_data.Name), attr_name);
-        metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
-    end
+    metadata = read_h5_metadata(plane_name, '/');
    
     if first % log metadata once
         log_metadata(metadata, log_full_path,fid);
