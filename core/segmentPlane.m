@@ -131,14 +131,10 @@ for plane_idx = start_plane:end_plane
     end
 
     %% Attach metadata to attributes for this plane
-    metadata = read_h5_metadata(plane_name, '/');
-   
-    if first % log metadata once
+    if plane_idx == start_plane
+        metadata = read_h5_metadata(plane_name, '/');
+        if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
         log_metadata(metadata, log_full_path,fid);
-        first = false;
-    end
-    if ~(metadata.num_planes >= end_plane)
-        error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
     end
 
     %% Load in data

@@ -104,7 +104,10 @@ for plane_idx = start_plane:end_plane
         end
     end
 
-    if plane_idx == 1; metadata = read_h5_metadata(plane_name); end
+    if plane_idx == start_plane
+        metadata = read_h5_metadata(plane_name);
+        log_metadata(metadata,log_full_path,fid);
+    end
    
     poolobj = gcp("nocreate"); % If no pool, do not create new one.
     if isempty(poolobj)
@@ -115,8 +118,8 @@ for plane_idx = start_plane:end_plane
 
     pixel_resolution = metadata.pixel_resolution;
 
-    Y = read_plane(h)
-    Y = Y - min(Y(:));
+    Y = read_plane(plane_name, dataset_name, plane_idx, 1:metadata.num_frames);
+    Y = Y - min(Y(:)); % min normalization
     volume_size = size(Y);
     d1 = volume_size(1);
     d2 = volume_size(2);
