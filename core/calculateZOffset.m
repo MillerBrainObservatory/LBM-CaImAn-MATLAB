@@ -125,15 +125,15 @@ end
 
 fprintf(fid, '%s : Beginning axial offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 tall = tic;
-for curr_plane = start_plane:end_plane
-    if curr_plane + 1 > end_plane
-        fprintf("Current plane (%d) > Last Plane (%d)", curr_plane, end_plane);
+for plane_idx = start_plane:end_plane
+    if plane_idx + 1 > end_plane
+        fprintf("Current plane (%d) > Last Plane (%d)", plane_idx, end_plane);
         continue;
     end
-    plane_name = sprintf("%s/segmented_plane_%d.h5", data_path, curr_plane);
-    plane_name_next = sprintf("%s/segmented_plane_%d.h5", data_path, curr_plane + 1);
+    plane_name = sprintf("%s/segmented_plane_%d.h5", data_path, plane_idx);
+    plane_name_next = sprintf("%s/segmented_plane_%d.h5", data_path, plane_idx + 1);
 
-    plane_name_save = sprintf("%s/axial_corrected_plane_%d.h5", save_path, curr_plane);
+    plane_name_save = sprintf("%s/axial_corrected_plane_%d.h5", save_path, plane_idx);
     if isfile(plane_name_save)
         fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
         if overwrite
@@ -142,15 +142,12 @@ for curr_plane = start_plane:end_plane
         end
     end
 
-    metadata = read_h5_metadata(plane_name, '/');
-    if isempty(fieldnames(metadata))
-        error("No metadata found for this filepath.");
+    if plane_idx == start_plane
+        metadata = read_h5_metadata(plane_name, '/');
+        if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
+        log_metadata(metadata, log_full_path,fid);
     end
     pixel_resolution = metadata.pixel_resolution;
-
-    if ~(metadata.num_planes >= end_plane)
-        error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
-    end
 
     dy = round(diffy/pixel_resolution);
     dx = round(diffx/pixel_resolution);
@@ -186,12 +183,12 @@ for curr_plane = start_plane:end_plane
             imagesc(p1); axis image;
             xlim(ax1, [xi-scale_fact*nsize xi+scale_fact*nsize]);
             ylim(ax1, [yi-scale_fact*nsize yi+scale_fact*nsize]);
-            title(sprintf('Plane %d', curr_plane));
+            title(sprintf('Plane %d', plane_idx));
 
             % next plane
             ax2 = subplot(1, 2, 2);
             imagesc(p2); axis image;
-            title(sprintf('Plane %d', curr_plane + 1));
+            title(sprintf('Plane %d', plane_idx + 1));
             
             % plot the current plane
             figure(h1);
@@ -199,7 +196,7 @@ for curr_plane = start_plane:end_plane
             imagesc(p1); axis image;
             xlim(ax1, [xi-scale_fact*nsize xi+scale_fact*nsize]);
             ylim(ax1, [yi-scale_fact*nsize yi+scale_fact*nsize]);
-            title(sprintf('Plane %d', curr_plane));
+            title(sprintf('Plane %d', plane_idx));
             
             % highlight left subplot
             set(ax1, 'XColor', 'r', 'YColor', 'r');
@@ -211,8 +208,8 @@ for curr_plane = start_plane:end_plane
             x1 = round(x1);
             
             % update ax2 limits
-            xlim(ax2, [x1-scale_fact*nsize+ddx(curr_plane) x1+scale_fact*nsize+ddx(curr_plane)]);
-            ylim(ax2, [y1-scale_fact*nsize+ddy(curr_plane) y1+scale_fact*nsize+ddy(curr_plane)]);
+            xlim(ax2, [x1-scale_fact*nsize+ddx(plane_idx) x1+scale_fact*nsize+ddx(plane_idx)]);
+            ylim(ax2, [y1-scale_fact*nsize+ddy(plane_idx) y1+scale_fact*nsize+ddy(plane_idx)]);
             
             % highlight right subplot
             set(ax2, 'XColor', 'r', 'YColor', 'r');
@@ -221,7 +218,7 @@ for curr_plane = start_plane:end_plane
                
             p1w = p1(y1-2*nsize:y1+2*nsize, x1-2*nsize:x1+2*nsize);
 
-            if x2 > xi + scale_fact * nsize + ddx(curr_plane) || x2 < xi - scale_fact * nsize + ddx(curr_plane) || y2 > yi + scale_fact * nsize + ddy(curr_plane) || y2 < yi - scale_fact * nsize + ddy(curr_plane)
+            if x2 > xi + scale_fact * nsize + ddx(plane_idx) || x2 < xi - scale_fact * nsize + ddx(plane_idx) || y2 > yi + scale_fact * nsize + ddy(plane_idx) || y2 < yi - scale_fact * nsize + ddy(plane_idx)
                 disp('Current point ignored.');
                 gix(feature_idx) = NaN;
                 giy(feature_idx) = NaN;
@@ -250,7 +247,7 @@ for curr_plane = start_plane:end_plane
             disp(ME.message);
         end
     end
-    offsets(curr_plane + 1, :) = [round(nanmean(giy)) round(nanmean(gix))];
+    offsets(plane_idx + 1, :) = [round(nanmean(giy)) round(nanmean(gix))];
 end
 
 offsets = round(offsets);

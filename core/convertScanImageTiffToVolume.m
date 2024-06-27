@@ -96,7 +96,7 @@ if fid == -1
 else
     fprintf('Log file created: %s\n', log_full_path);
 end
-closeCleanupObj = onCleanup(@() fclose(fid));
+% closeCleanupObj = onCleanup(@() fclose(fid));
 
 firstFileFullPath = fullfile(files(1).folder, files(1).name);
 
@@ -208,67 +208,51 @@ try
                     : ...
                     ) = roi_arr;
                 
-                if i==1
-                    [yind, xind] = get_central_indices(raw_timeseries(:,:,2), 40);
-                    [yindr, xindr] = get_central_indices(roi_arr(:,:,2), 40);
-    
-                    images = {raw_timeseries(yind,xind,2), roi_arr(yindr, xindr, 2)};
-                    labels = {'Raw-Untrimmed', 'Phase-Corrected-Trimmed'};
-    
-                    roi_savename = fullfile(plane_savepath, sprintf('roi_%d.png', roi_idx));
-                    make_tiled_figure( ...
-                        images, ...
-                        metadata, ...
-                        'fig_title', sprintf('ROI %d', roi_idx), ...
-                        'tile_titles', labels, ...
-                        'scale_size', 10, ...
-                        'save_name', roi_savename ...
-                        );
-                end
+                [yind, xind] = get_central_indices(raw_timeseries(:,:,2), 40);
+                [yindr, xindr] = get_central_indices(roi_arr(:,:,2), 40);
+
+                images = {raw_timeseries(yind,xind,2), roi_arr(yindr, xindr, 2)};
+                zoomed_scale = calculate_scale(size(images{1},2),metadata.pixel_resolution);
+                roi_scales = {zoomed_scale,zoomed_scale};
+                labels = {'Raw', 'Phase-Corrected/Trimmed'};
+
+                roi_savename = fullfile(plane_savepath, sprintf('roi_%d.png', roi_idx));
+                make_tiled_figure( ...
+                    images, ...
+                    metadata, ...
+                    'fig_title', sprintf('ROI %d', roi_idx), ...
+                    'titles', labels, ...
+                    'scales', roi_scales, ...
+                    'save_name', roi_savename ...
+                    );
+                
                 cnt = cnt + 1;
             end
-
-            scale_fact = 10; % Length of the scale bar in microns
-            scale_length_pixels = scale_fact / metadata.pixel_resolution;
-
-            img_frame = z_timeseries(:,:,2);
-            [yind, xind] = get_central_indices(img_frame, 30); % 30 pixels around the center of the brightest part of an image frame
-
-            f = figure('Color', 'black');
-            sgtitle(sprintf('Scan-Correction: Frame 2, Plane %d', plane_idx), 'FontSize', 16, 'FontWeight', 'bold', 'Color', 'w');
-            tiledlayout(1, 1, 'TileSpacing', 'compact', 'Padding', 'compact');
-
-            % Post-correction image
-            nexttile;
-            imagesc(z_timeseries(yind, xind, 2));
-            axis image; axis tight; axis off; colormap('gray');
-            sgtitle(sprintf('Plane %d @ %.2f Hz | %.2f µm/px \nFOV: %.0fmm x %.0fmm', plane_idx, metadata.frame_rate, metadata.pixel_resolution, metadata.fov(1), metadata.fov(2)), 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'k');
-            hold on;
-
-            % Scale bar coordinates relative to the cropped image
-            scale_bar_x = [size(xind, 2) - scale_length_pixels - 3, size(xind, 2) - 3]; % 10 pixels padding from the right
-            scale_bar_y = [size(yind, 2) - 3, size(yind, 2) - 3]; % 20 pixels padding from the bottom
-            line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 5);
-            text(mean(scale_bar_x), scale_bar_y(1), sprintf('%d µm', scale_fact), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
-            hold off;
-
-            saveas(f, fullfile(plane_savepath, sprintf('scan_correction_plane_%d_offset_%d.png', plane_idx, abs(scan_offset))));
-            close(f);
 
             % remove padded 0's
             z_timeseries = z_timeseries( ...
                 any(z_timeseries, [2, 3]), ...
                 any(z_timeseries, [1, 3]), ...
                 :);
-            % 
+
+            img_frame = z_timeseries(:,:,2);
             mean_img = mean(z_timeseries, 3);
-
-            scale_fact = 10; % Length of the scale bar in microns
-            images = {img_frame, mean_img};
-            labels = {'Frame 2', 'Mean Image'};
-
+            [yind, xind] = get_central_indices(mean_img, 30); % 30 pixels around the center of the brightest part of an image frame
+            images = {img_frame, mean_img, mean_img(yind, xind)};
+            labels = {'Frame 2', 'Mean Image', 'Mean Image(Zoom)'};
+            scale_full = calculate_scale(size(img_frame, 2), metadata.pixel_resolution);
+            scale_roi = calculate_scale( size(img_frame(yind, xind),2), metadata.pixel_resolution);
+            scales = {scale_full, scale_full, scale_roi};
             plane_save_path = fullfile(plane_savepath, sprintf('mean_frame_plane_%d.png', plane_idx));
-            make_tiled_figure(images, metadata,'tile_titles', labels,'fig_title',sprintf("Plane %d", plane_idx), 'scale_size', scale_fact,'save_name', plane_save_path);
+
+            make_tiled_figure( ...
+                images, ...
+                metadata, ...
+                'fig_title', sprintf("Plane %d", plane_idx), ...
+                'titles', labels, ...
+                'scales', scales, ...
+                'save_name', plane_save_path ...
+            );
 
             if isfile(plane_fullfile)
                 if overwrite
@@ -281,7 +265,7 @@ try
             end
 
             metadata.scan_offset = offsets_plane(plane_idx);
-            write_chunk_h5(plane_fullfile, z_timeseries, size(z_timeseries,3), '/Y');
+            write_chunk_h5(plane_fullfile, z_timeseries, size(z_timeseries,3), dataset_name);
             write_chunk_h5(plane_fullfile, mean(z_timeseries, 3), size(z_timeseries,3), '/Ym');
             write_metadata_h5(metadata, plane_fullfile, '/Y');
             write_metadata_h5(metadata, plane_fullfile, '/'); %for convenience
@@ -299,7 +283,6 @@ catch ME
     rethrow(ME);
 end
 fprintf(fid, "%s : Processing complete. Time: %.3f minutes\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tfile)/60);
-complete = true;
 end
 
 function dataOut = fixScanPhase(dataIn,offset,dim, dtype)

@@ -7,36 +7,40 @@ function [f] = make_tiled_figure(images, metadata, varargin)
 %     Cell array of 2D or 3D images to be tiled.
 % metadata : struct
 %     Metadata structure containing necessary information.
-% 'fig_title' : char, optional
-%     Title for the entire figure.
-% 'tile_titles' : cell array, optional
+% titles : cell array, optional
 %     Cell array of titles for each image.
-% 'scale_size' : int, optional
-%     Size of scale bar, in microns. If empty, no scale is drawn.
-% 'save_name' : char, optional
+% scales : cell array, optional
+%      Cell array of sizes for the scale bar, in micron.
+%      If empty or 0, no scale is drawn.
+% fig_title : char, optional
+%     Title for the entire figure.
+% save_name : char, optional
 %     Name to save the figure.
-% 'layout' : char, optional
+% layout : char, optional
 %     Layout for the tiles ('horizontal', 'vertical', 'square').
 
 p = inputParser;
 addRequired(p, 'images', @iscell);
 addRequired(p, 'metadata', @isstruct);
-addParameter(p, 'fig_title', '');
-addParameter(p, 'tile_titles', {}, @iscell);
-addParameter(p, 'scale_size', 10, @isnumeric);
-addParameter(p, 'save_name', '');
+addParameter(p, 'fig_title', 'Unnamed Tiled Figure');
+addParameter(p, 'titles', {}, @iscell);
+addParameter(p, 'scales', {10}, @iscell);
+addParameter(p, 'save_name', sprintf("Unnamed_image_%d.png",  datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS')));
 addParameter(p, 'layout', 'horizontal', @(x) any(validatestring(x, {'horizontal', 'vertical', 'square'})));
 parse(p, images, metadata, varargin{:});
 
 images = p.Results.images;
 metadata = p.Results.metadata;
 fig_title = p.Results.fig_title;
-tile_titles = p.Results.tile_titles;
-scale_size = p.Results.scale_size;
+titles = p.Results.titles;
+scales = p.Results.scales;
 save_name = p.Results.save_name;
 layout = p.Results.layout;
 
 num_images = length(images);
+num_scales = length(scales);
+num_titles = length(titles);
+assert((num_images == num_scales) && (num_scales == num_titles)); % careful here!
 
 f = figure('Color', 'k');
 sgtitle(fig_title, 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'w');
@@ -53,23 +57,34 @@ switch layout
         error('Invalid layout option. Use ''horizontal'', ''vertical'', or ''square''.');
 end
 
-mod_scale = scale_size; % store our input scale size
+if ~iscell(scales)
+    this_scale = cell(num_images);
+    for ii=1:length(images)
+        this_scale{ii} = scales;
+    end
+end
+
+mod_scale = scales; % store our input scale size
 for i = 1:num_images
 
     img = images{i};
+    this_scale = scales{i};
     if ndims(img) == 3
+        % make sure this is a 2D image
         img = img(:, :, 2);
     end
 
     nexttile;
     imagesc(img);
     axis image; axis tight; axis off; colormap('gray');
-    if ~isempty(tile_titles) > 0
-        title(tile_titles{i}, 'FontSize', 12, 'FontWeight', 'bold', 'Color', 'w');
+    if ~isempty(titles) > 0
+        title(titles{i}, 'FontSize', 12, 'FontWeight', 'bold', 'Color', 'w');
     end
 
-    if scale_size < size(img,2) / 10 %make sure its not too small
+    if this_scale < size(img,2) / 10 %make sure its not too small
         mod_scale = calculate_scale(size(img, 2), metadata.pixel_resolution);
+    else
+        mod_scale = this_scale;
     end
 
     if mod_scale > 0
