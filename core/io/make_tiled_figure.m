@@ -53,6 +53,7 @@ switch layout
         error('Invalid layout option. Use ''horizontal'', ''vertical'', or ''square''.');
 end
 
+mod_scale = scale_size; % store our input scale size
 for i = 1:num_images
 
     img = images{i};
@@ -66,19 +67,19 @@ for i = 1:num_images
     if ~isempty(tile_titles) > 0
         title(tile_titles{i}, 'FontSize', 12, 'FontWeight', 'bold', 'Color', 'w');
     end
-    
-    if isempty(scale_size) || scale_size < size(img,2) / 10 %make sure its not too small
-        scale_size = calculate_scale(size(img, 2), metadata.pixel_resolution);
+
+    if scale_size < size(img,2) / 10 %make sure its not too small
+        mod_scale = calculate_scale(size(img, 2), metadata.pixel_resolution);
     end
-    
-    if scale_size > 0
-        scale_length_pixels = scale_size / metadata.pixel_resolution;
+
+    if mod_scale > 0
+        scale_length_pixels = mod_scale / metadata.pixel_resolution;
 
         hold on;
         scale_bar_x = [size(img, 2) - scale_length_pixels - 3, size(img, 2) - 3];
         scale_bar_y = [size(img, 1) - 3, size(img, 1) - 3];
         line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 5);
-        text(mean(scale_bar_x), scale_bar_y(1), sprintf('%d µm', scale_size), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
+        text(mean(scale_bar_x), scale_bar_y(1), sprintf('%d µm', mod_scale), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
         hold off;
     end
 end
