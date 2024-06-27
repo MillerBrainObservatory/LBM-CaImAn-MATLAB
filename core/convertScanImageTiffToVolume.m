@@ -46,12 +46,13 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath')));
 addpath(genpath(fullfile(currpath, '../packages/ScanImage/')));
-addpath(genpath("utils"));
+addpath(genpath("utils")); addpath(genpath("io")); addpath(genpath("internal"));
 
 p = inputParser;
-addRequired(p, 'data_path', @ischar);
-addOptional(p, 'save_path', data_path, @ischar);
-addParameter(p, 'dataset_name', "/Y", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+
+addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
+addOptional(p, 'save_path', data_path, @(x) ischar(x) || isstring(x));
+addParameter(p, 'dataset_name', "/Y", @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'fix_scan_phase', 1, @(x) isnumeric(x) || islogical(x));
