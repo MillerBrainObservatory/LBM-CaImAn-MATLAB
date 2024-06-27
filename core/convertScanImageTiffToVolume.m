@@ -122,13 +122,22 @@ metadata.dataset_name = dataset_name;
 offsets_plane = zeros(num_planes, 1);
 offsets_roi = zeros(num_planes, num_rois);
 try
-    fprintf(fid, '%s : Processing %d file(s) with %d planes.\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), length(files), num_planes);
+    fprintf(fid, '%s : Processing %d file(s) with %d planes.\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), length(files), num_planes);
+    fprintf('%s : Processing %d file(s) with %d planes.\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), length(files), num_planes);
+
     log_metadata(metadata, log_full_path, fid);
     fprintf("Metadata:\n\n")
     disp(metadata)
     for i = 1:length(files)
+        fprintf(fid, '%s : Processing %d/%d file(s) with %d planes.\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'),i, length(files), num_planes);
+        fprintf('%s : Processing %d/%d file(s) with %d planes.\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'),i, length(files), num_planes);
+
         tfile = tic;
         full_filename = fullfile(data_path, files(i).name);
+
+        fprintf(fid, '%s : Loading in data...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'));
+        fprintf('%s : Loading in data...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'));
+
         try
             hTif = ScanImageTiffReader(full_filename);
             Aout = hTif.data();
@@ -140,14 +149,20 @@ try
             rethrow(ME);
         end
 
+        fprintf(fid, '%s :Data loaded for file %d/%d in %.2f seconds...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), i, length(files), toc(tfile));
+        fprintf('%s :Data loaded for file %d/%d in %.2f seconds...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), i, length(files), toc(tfile));
+
         % make our final array a little bigger than it needs to be
         % just encase our offset makes our image bigger
         z_timeseries = zeros(raw_y, raw_x * metadata.num_rois, num_frames_file, 'like', Aout);
         for plane_idx = 1:num_planes
-
             tplane = tic;
-            p_str = sprintf("plane_%d", plane_idx);
+            
+            fprintf(fid, '%s : Processing z-plane %d/%d...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), plane_idx, num_planes);
+            fprintf('%s : Processing z-plane %d/%d...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), plane_idx, num_planes);
 
+            
+            p_str = sprintf("plane_%d", plane_idx);
             plane_fullfile = sprintf("%s/extracted_%s.h5", save_path, p_str);
             
             % /figures folder with /plane_n subdirectories
@@ -170,6 +185,8 @@ try
             raw_offset_x = 0;
             raw_offset_y = 0;
             for roi_idx = 1:metadata.num_rois
+                fprintf(fid, "Processing ROI: %d/%d\n", roi_idx, num_rois);
+                fprintf("Processing ROI: %d/%d\n", roi_idx, num_rois);
                 if cnt > 1
                     offset_y = offset_y + trimmed_y + metadata.num_lines_between_scanfields;
                     raw_offset_y = raw_offset_y + raw_y + metadata.num_lines_between_scanfields;
@@ -228,7 +245,7 @@ try
                 
                 cnt = cnt + 1;
             end
-
+            
             % remove padded 0's
             z_timeseries = z_timeseries( ...
                 any(z_timeseries, [2, 3]), ...
@@ -269,7 +286,9 @@ try
             write_chunk_h5(plane_fullfile, mean(z_timeseries, 3), size(z_timeseries,3), '/Ym');
             write_metadata_h5(metadata, plane_fullfile, '/Y');
             write_metadata_h5(metadata, plane_fullfile, '/'); %for convenience
-            fprintf(fid, "%s : Plane %d processed in %.2f seconds\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), plane_idx, toc(tplane));
+            fprintf(fid, "%s : Plane %d processed in %.2f seconds\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), plane_idx, toc(tplane));
+            fprintf("%s : Plane %d processed in %.2f seconds\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), plane_idx, toc(tplane));
+
         end
     end
 catch ME
@@ -283,6 +302,8 @@ catch ME
     rethrow(ME);
 end
 fprintf(fid, "%s : Processing complete. Time: %.3f minutes\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tfile)/60);
+fprintf("%s : Processing complete. Time: %.3f minutes\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tfile)/60);
+fclose('all');
 end
 
 function dataOut = fixScanPhase(dataIn,offset,dim, dtype)
