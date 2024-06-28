@@ -1,8 +1,12 @@
+
+%%%%%%%%%%%%%%%%%%%%%
+%%%%%% Setup %%%%%%%%
 clc, clear;
 [fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
-addpath(genpath(fullfile(fpath, 'core')));
-addpath(genpath(fullfile(fpath, 'core', 'utils')));
-addpath(genpath(fullfile(fpath, 'core', 'io')));
+addpath(genpath(fullfile(fpath, '../core')));
+addpath(genpath(fullfile(fpath, '../core', 'utils')));
+addpath(genpath(fullfile(fpath, '../core', 'io')));
+addpath(genpath(fullfile(fpath, '../core', 'internal')));
 
 result = validate_toolboxes();
 if ischar(result)
@@ -11,19 +15,31 @@ else
     disp('Proceeding with execution...');
 end
 
-parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
-data_path = fullfile(parent_path, 'raw');
-save_path = fullfile(parent_path, sprintf('v1.4.2'));
+homedir = getenv('HOMEPATH'); % will autofill /home/<username> (linux) or C:/Users/Username (windows)
 
-%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% User Parameters %%%%%%%%
+
+parent_path = fullfile(sprintf('%s/Documents/data/high_res/v1.6', homedir));
+raw_tiff_path = fullfile(parent_path, 'raw');
+extract_path = fullfile(parent_path, 'extracted');
+registered_path = fullfile(parent_path, 'registered');
+segment_path = fullfile(parent_path, 'segmented');
+collate_path = fullfile(parent_path, 'collated');
+
+do_extraction = 1;
+do_registration = 1;
+do_segmentation = 1;
+do_axial_correction = 1;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Extraction %%%%%%%%
+%%
 
-clc; compute = 1;
-if compute
+if do_extraction
     convertScanImageTiffToVolume( ...
-        data_path, ...
-        save_path, ...
+        raw_tiff_path, ...
+        extract_path, ...
         'dataset_name', '/Y', ... % default
         'debug_flag', 0, ... % default, if 1 will display files and return
         'fix_scan_phase', 1, ... % default, keep to 1
@@ -31,61 +47,34 @@ if compute
         'overwrite', 1 ...
         );
 end
-%%
-order = 2;
 
-%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Motion Correction %%%
+%%
 
-clc; compute = 1;
-if compute
-
-    mc_path = fullfile(parent_path, 'extracted_4px_4px_17px_0px');
-    if ~isfolder(mc_path); mkdir(mc_path); end
-
-    filename = fullfile(save_path, "extracted_plane_1.h5");
-    metadata = read_h5_metadata(filename, '/Y');
-    info = h5info(filename, '/Y');
-    data_size = info.Dataspace.Size;
-
-    options_nonrigid = NoRMCorreSetParms(...
-        'd1', data_size(1),...
-        'd2', data_size(2),...
-        'grid_size', [128,128], ...
-        'bin_width', 24,... % number of frames to avg when updating template
-        'max_shift', round(20/metadata.pixel_resolution),... % 20 microns
-        'us_fac', 20,...
-        'init_batch', 120,...
-        'correct_bidir', false...
-        );
-
+if do_registration
     motionCorrectPlane( ...
-        save_path, ... % we used this to save extracted data
-        mc_path, ... % save registered data here
+        extract_path, ... % we used this to save extracted data
+        registered_path, ... % save registered data here
         'dataset_name', '/Y', ... % where we saved the last step in h5
         'debug_flag', 0, ...
         'overwrite', 1, ...
         'num_cores', 23, ...
         'start_plane', 1, ...
-        'end_plane', 30,  ...
-        'options_nonrigid', options_nonrigid ...
-        );
+        'end_plane', 30 ...
+        );  %...
+       % 'options_nonrigid', options_nonrigid ...
 end
 
+order = fliplr([1 5:10 2 11:17 3 18:23 4 24:30]);
+rename_planes(registered_path, order);
 %% 3) CNMF Plane-by-plane SegmentationS
 
-clc; compute = 1;
-if compute
-    mc_path = fullfile(parent_path, 'corrected_trimmed_grid');
-    if ~isfolder(mc_path); mkdir(mc_path); end
-    segment_path = fullfile(parent_path, 'results');
-    if ~isfolder(segment_path); mkdir(segment_path); end
-
+if do_segmentation
     segmentPlane( ...
-        mc_path, ... % we used this to save extracted data
+        registered_path, ... % we used this to save extracted data
         segment_path, ... % save registered data here
-        'dataset_name', '/mov', ... % where we saved the last step in h5
+        'dataset_name', '/Y', ... % where we saved the last step in h5
         'debug_flag', 0, ...
         'overwrite', 1, ...
         'num_cores', 23, ...
@@ -95,12 +84,16 @@ if compute
 end
 
 %% 4) Axial Offset Correction
-clc; compute = 0;
-if compute
-    dpath="D:\Jeffs LBM paper data\Fig4a-c\20191121\MH70\MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001\output";
-    h5_fullfile="C:/Users/RBO/Documents/data/high_res/corrected_trimmed_grid/motion_corrected_plane_1.h5";
-    metadata = read_h5_metadata(h5_fullfile, '/Y');
-    data = h5read(h5_fullfile, '/Y');
 
-    calculateZOffset(dpath, metadata);
+if do_axial_correction
+    axial_save_path = fullfile(parent_path, 'axial_offset/');
+    calculateZOffset( ...
+        registered_path, ...
+        segment_path, ...
+        axial_save_path, ...
+        'start_plane',1, ...
+        'end_plane',8, ...
+        'base_name', 'motion_corrected', ...
+        'dataset_name','/mov' ...
+        );
 end
