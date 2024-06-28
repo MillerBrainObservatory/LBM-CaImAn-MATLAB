@@ -1,4 +1,4 @@
-function = display_dataset_names(h5_fullfile)
+function display_dataset_names(h5_fullfile, loc)
 % display_dataset_names Display available datasets in an HDF5 file.
 %
 % This function displays the names, sizes, and datatypes of datasets in the
@@ -8,6 +8,8 @@ function = display_dataset_names(h5_fullfile)
 % ----------
 % h5_fullfile : char
 %     Full path to the HDF5 file.
+% loc : char
+%     Dataset group name. Default is '/'.
 %
 % Notes
 % -----
@@ -19,8 +21,9 @@ function = display_dataset_names(h5_fullfile)
 % display_dataset_names('path/to/h5folder/')
 %
 % See also H5INFO, H5READ
-root_info = h5info(h5_fullfile, '/');
-fprintf('Available datasets at root "/":\n');
+if ~exist('loc', 'var'); loc='/'; end
+root_info = h5info(h5_fullfile, loc);
+fprintf('Available datasets in %s (group: %s):\n', h5_fullfile, loc);
 for i = 1:length(root_info.Datasets)
     ds = root_info.Datasets(i);
     fprintf('Name: %s, Size: [%s], Datatype: %s\n', ...

@@ -1,4 +1,4 @@
-function write_metadata_h5(metadata, h5_fullfile, group_path)
+function write_metadata_h5(metadata, h5_fullfile, loc)
 % WRITE_METADATA_H5 Write scanimage metadata fields to HDF5
 % attributes, taking care of flattening structured arrays to their
 % key:value pairs.
@@ -9,7 +9,7 @@ function write_metadata_h5(metadata, h5_fullfile, group_path)
 %     The metadata structure containing the fields to be written as attributes.
 % h5_fullfile : char
 %     The full file path to the HDF5 file.
-% group_path : char
+% loc : char
 %     The path within the HDF5 file where the attributes will be written.
 %
 % Notes
@@ -21,9 +21,9 @@ function write_metadata_h5(metadata, h5_fullfile, group_path)
 % --------
 % metadata = struct('name', 'LBM_guru', 'age', 'young_enough');
 % h5_fullfile = 'guru.h5';
-% group_path = '/young_guru';
-% write_metadata_h5(metadata, h5_fullfile, group_path);
-
+% loc = '/young_guru';
+% write_metadata_h5(metadata, h5_fullfile, loc);
+if ~exist('loc', 'var'); loc='/'; end
 fields = fieldnames(metadata);
 for f = fields'
     value = metadata.(f{1});
@@ -34,13 +34,13 @@ for f = fields'
             subvalue = value.(sf{1});
             att_name = [f{1} '_' sf{1}];
             if ischar(subvalue)
-                h5writeatt(h5_fullfile, group_path, att_name, subvalue);
+                h5writeatt(h5_fullfile, loc, att_name, subvalue);
             elseif isnumeric(subvalue)
-                h5writeatt(h5_fullfile, group_path, att_name, mat2str(subvalue));
+                h5writeatt(h5_fullfile, loc, att_name, mat2str(subvalue));
             end
         end
     else
-        h5writeatt(h5_fullfile, group_path, f{1}, value);
+        h5writeatt(h5_fullfile, loc, f{1}, value);
     end
 end
 end
