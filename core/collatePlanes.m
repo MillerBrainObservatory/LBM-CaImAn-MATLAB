@@ -154,7 +154,6 @@ for curr_plane = start_plane:end_plane
     num_corr_no_ovp = 0;
     num_ovlpd = 0;
 
-    % p = load([path 'caiman_output_plane_1.mat']); % Load stuff from first p
     Ac_keep = h5read(h5_segmented, '/Ac_keep');
     T_keep = h5read(h5_segmented, '/T_keep');
 

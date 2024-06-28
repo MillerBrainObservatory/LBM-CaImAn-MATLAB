@@ -1,28 +1,34 @@
-function [offsets] = calculateZOffset(data_path, save_path, varargin)
+function [offsets] = calculateZOffset(data_path, segmentation_path, save_path, varargin)
 % Parameters
 % ----------
 % data_path : string
 %     Path to the directory containing the image data and calibration files.
 %     The function expects to find 'pollen_sample_xy_calibration.mat' in this directory along with each caiman_output_plane_N.
+% segmentation_path : char
+%     Path to the directory containing CaImAn (step 3) segmentation results.
 % save_path : char
 %     Path to the directory to save the motion vectors.
+% base_name : char
+%     Base name of motion-corrected data file. Default is
+%     'motion_corrected'.
 % dataset_name : string, optional
 %     Group path within the hdf5 file that contains raw data.
-%     Default is 'registration'.
+%     Default is '/Y'.
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
-%     not continue processing. Defaults to 0.
+%     not continue processing. Default is 0.
 % overwrite : logical, optional
-%     Whether to overwrite existing files (default is 1).
+%     Whether to overwrite existing files. Default is 1.
 % start_plane : double, integer, positive
-%     The starting plane index for processing.
+%     The starting plane index for processing. Default is 1.
 % end_plane : double, integer, positive
 %     The ending plane index for processing. Must be greater than or equal to
-%     start_plane.
+%     start_plane. Default is 2.
 % num_features : double, integer, positive
 %     The number of features to identify and use in each plane for
 %     calculating offsets. Default is 3 features/neurons compared across
 %     z-plane/z-plane+1.
+%
 %
 % Returns
 % -------
@@ -50,38 +56,37 @@ function [offsets] = calculateZOffset(data_path, save_path, varargin)
 
 p = inputParser;
 addRequired(p, 'data_path');
+addRequired(p, 'segmentation_path');
 addRequired(p, 'save_path');
-addParameter(p, 'dataset_name', "/mov", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addOptional(p, 'dataset_name', "/mov", @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x));
-addParameter(p, 'overwrite', 1, @(x) isnumeric(x));
-addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
-addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
-addParameter(p, 'num_features', 3, @(x) isnumeric(x) && isPositiveIntegerValuedNumeric(x));
-parse(p, data_path, save_path, varargin{:});
+addOptional(p, 'overwrite', 1, @(x) isnumeric(x));
+addOptional(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
+addOptional(p, 'end_plane', 2, @(x) isnumeric(x) && x >= p.Results.start_plane);
+addOptional(p, 'num_features', 3, @(x) isnumeric(x) && isPositiveIntegerValuedNumeric(x));
+addOptional(p, 'base_name', 'motion_corrected');
+
+parse(p, data_path, segmentation_path, save_path, varargin{:});
 
 data_path = p.Results.data_path;
+segmentation_path = p.Results.segmentation_path;
 save_path = p.Results.save_path;
-dataset_name = p.Results.dataset_name; % here for param consistency but ignored
+base_name = p.Results.base_name;
+dataset_name = p.Results.dataset_name;
 debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
 num_features = p.Results.num_features;
 
-if ~isfolder(data_path)
-    error("Data path:\n %s\n ..does not exist", data_path);
-end
-
+if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", data_path); end
+if ~isfolder(segmentation_path); error("Data path:\n %s\n ..does not exist", data_path); end
+if ~isfolder(save_path);mkdir(save_path); end
 if debug_flag == 1; dir([data_path, '*.tif']); return; end
-if isempty(save_path)
-    warning("No save_path given. Saving data in data_path: %s\n", data_path);
-    save_path = data_path;
-end
 
 files = dir(fullfile(data_path, '*.h*'));
-if isempty(files)
-    error('No suitable data files found in: \n  %s', data_path);
-end
+if isempty(files); error('No suitable data files found in: \n  %s', data_path); end
+if ~(start_plane<end_plane); error("Start plane must be < end plane"); end
 
 log_file_name = sprintf("%s_axial_offset_correction.log", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 log_full_path = fullfile(save_path, log_file_name);
@@ -91,10 +96,8 @@ if fid == -1
 else
     fprintf('Log file created: %s\n', log_full_path);
 end
-% closeCleanupObj = onCleanup(@() fclose(fid));
 
-calib_files = fullfile(data_path, 'pollen*');
-calib_files = dir(calib_files);
+calib_files = dir(fullfile(segmentation_path, 'pollen*'));
 if length(calib_files) < 2
     error("Missing pollen calibration files in folder:\n%s\n", data_path);
 else
@@ -124,14 +127,13 @@ else
 end
 
 fprintf(fid, '%s : Beginning axial offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+fprintf('%s : Beginning axial offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+
 tall = tic;
 for plane_idx = start_plane:end_plane
-    if plane_idx + 1 > end_plane
-        fprintf("Current plane (%d) > Last Plane (%d)", plane_idx, end_plane);
-        continue;
-    end
-    plane_name = sprintf("%s/segmented_plane_%d.h5", data_path, plane_idx);
-    plane_name_next = sprintf("%s/segmented_plane_%d.h5", data_path, plane_idx + 1);
+
+    plane_name = sprintf("%s/%s_plane_%d.h5",data_path,base_name,plane_idx);
+    plane_name_next = sprintf("%s/%s_plane_%d.h5",data_path,base_name,plane_idx + 1);
 
     plane_name_save = sprintf("%s/axial_corrected_plane_%d.h5", save_path, plane_idx);
     if isfile(plane_name_save)
@@ -145,7 +147,7 @@ for plane_idx = start_plane:end_plane
     if plane_idx == start_plane
         metadata = read_h5_metadata(plane_name, '/');
         if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
-        log_metadata(metadata, log_full_path,fid);
+        log_struct(metadata,'metadata',log_full_path,fid);
     end
     pixel_resolution = metadata.pixel_resolution;
 

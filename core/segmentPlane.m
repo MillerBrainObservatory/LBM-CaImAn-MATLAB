@@ -59,7 +59,7 @@ function segmentPlane(data_path, save_path, varargin)
 p = inputParser;
 addRequired(p, 'data_path', @ischar);
 addRequired(p, 'save_path', @ischar);
-addParameter(p, 'dataset_name', "/mov", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addParameter(p, 'dataset_name', "/mov", @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
@@ -122,11 +122,16 @@ for plane_idx = start_plane:end_plane
     plane_name_save = sprintf("%s//segmented_%s.h5", save_path, z_str);
     if isfile(plane_name_save)
         fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+        fprintf('%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+
         if overwrite
             fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+            fprintf('%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
             delete(plane_name_save)
         else
             fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+            fprintf('%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+
         end
     end
 
@@ -134,7 +139,7 @@ for plane_idx = start_plane:end_plane
     if plane_idx == start_plane
         metadata = read_h5_metadata(plane_name, '/');
         if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
-        log_metadata(metadata, log_full_path,fid);
+        log_struct(metadata,'metadata', log_full_path,fid);
     end
 
     %% Load in data
@@ -201,14 +206,20 @@ for plane_idx = start_plane:end_plane
     );
 
     fprintf(fid, "%s : Data loaded in. This process took: %0.2f seconds.\nBeginning CNMF.\n\n",datetime("now"), toc(t_start));
+    fprintf("%s : Data loaded in. This process took: %0.2f seconds.\nBeginning CNMF with the following parameters:\n\n",datetime("now"), toc(t_start));
+    log_struct(options,'CNMF Parameters', log_full_path, fid);
+    disp(options);
+
     t_cnmf = tic;
 
     [A,b,C,f,S,P,~,YrA] = run_CNMF_patches(data,K,patches,tau,p,options);
     fprintf(fid, '%s : Initialized CNMF patches complete.  Process took: %.2f seconds\Classifying components ...',datetime("now"), toc(t_cnmf));
+    fprintf('%s : Initialized CNMF patches complete.  Process took: %.2f seconds\Classifying components ...',datetime("now"), toc(t_cnmf));
 
     t_class = tic;
     [rval_space,rval_time,max_pr,sizeA,keep0,~,traces] = classify_components_jeff(data,A,C,b,f,YrA,options);
     fprintf(fid, '%s : Classification complete. Process took: %.2f seconds\Running spatial/temporal acceptance tests ... to dF/F ...', datetime("now"), toc(t_class));
+    fprintf('%s : Classification complete. Process took: %.2f seconds\Running spatial/temporal acceptance tests ... to dF/F ...', datetime("now"), toc(t_class));
 
     t_test = tic;
     Cn =  correlation_image(data);

@@ -40,7 +40,7 @@ function motionCorrectPlane(data_path, save_path, varargin)
 p = inputParser;
 addRequired(p, 'data_path', @ischar);
 addRequired(p, 'save_path', @ischar);
-addParameter(p, 'dataset_name', "/Y", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addParameter(p, 'dataset_name', '/Y', @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
@@ -89,24 +89,35 @@ end
 
 %% Pull metadata from attributes attached to this group
 num_cores = max(num_cores, 23);
-fprintf(fid, '%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); tall=tic;
+fprintf(fid, '%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); 
+fprintf('%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores);
+tall=tic;
+
+
 for plane_idx = start_plane:end_plane
+    tplane=tic;
+
     fprintf(fid, '%s : Beginning plane %d\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_idx);
+    fprintf('%s : Beginning plane %d\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_idx);
 
     z_str = sprintf('plane_%d', plane_idx);
     plane_name = sprintf("%s/extracted_%s.h5", data_path, z_str);
     plane_name_save = sprintf("%s/motion_corrected_%s.h5", save_path, z_str);
-    if isfile(plane_name_save)
-        fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
-        if overwrite
-            fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
-            delete(plane_name_save)
-        end
-    end
 
     if plane_idx == start_plane
         metadata = read_h5_metadata(plane_name);
-        log_metadata(metadata,log_full_path,fid);
+        num_frames = metadata.num_frames_file * metadata.num_files;
+        log_struct(metadata,'metadata',log_full_path,fid);
+    end
+
+    if isfile(plane_name_save)
+        fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+        fprintf('%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+        if overwrite
+            fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+            fprintf('%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+            delete(plane_name_save)
+        end
     end
    
     poolobj = gcp("nocreate"); % If no pool, do not create new one.
@@ -118,7 +129,7 @@ for plane_idx = start_plane:end_plane
 
     pixel_resolution = metadata.pixel_resolution;
 
-    Y = read_plane(plane_name, dataset_name, plane_idx, 1:metadata.num_frames);
+    Y = read_plane(plane_name, dataset_name, plane_idx, 1:num_frames);
     Y = Y - min(Y(:)); % min normalization
     volume_size = size(Y);
     d1 = volume_size(1);
@@ -136,12 +147,20 @@ for plane_idx = start_plane:end_plane
             'correct_bidir', false... % DONT Correct bidirectional scanning
             );
     end
+    if plane_idx == start_plane %only log this once
+        log_struct(options_rigid,'Rigid Registration Parameters',log_full_path,fid);
+    end
 
     % start timer for registration after parpool to avoid inconsistent
     % pool startup times.
     t_rigid=tic;
+
+    fprintf(fid, "%s : Beginning batch template.\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'));
+    fprintf("%s : Beginning batch template..\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'));
+    
     [M1,shifts_template,~,~] = normcorre_batch(Y, options_rigid);
-    fprintf(fid, "%s : Rigid registration complete. Elapsed time: %.3f minutes\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_rigid)/60);
+    fprintf(fid, "%s : Rigid registration complete. Elapsed time: %.3f minutes\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_rigid)/60);
+    fprintf("%s : Rigid registration complete. Elapsed time: %.3f minutes\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_rigid)/60);
 
     % create the template using X/Y shift displacements
     shifts_template = squeeze(cat(3,shifts_template(:).shifts));
@@ -151,7 +170,7 @@ for plane_idx = start_plane:end_plane
     template_good = mean(M1(:,:,best_idx), 3);
 
     % % Non-rigid motion correction using the good template from the rigid
-    if numel(options_rigid) < 3
+    if numel(options_nonrigid) < 3
         options_nonrigid = NoRMCorreSetParms(...
             'd1', d1,...
             'd2', d2,...
@@ -162,26 +181,50 @@ for plane_idx = start_plane:end_plane
             'correct_bidir', false...
         );
     end
-
+    if plane_idx == start_plane %only log this once
+         log_struct(options_nonrigid,'Non-Rigid Registration Parameters',log_full_path,fid);
+    end
+   
     % DFT subpixel registration - results used in CNMF
     t_nonrigid=tic;
-    fprintf(fid, "%s : Non-rigid registration complete. Elapsed time: %.3f minutes\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_nonrigid)/60);
-    [M2, shifts_nr, ~, ~] = normcorre_batch(Y, options_nonrigid, template_good);
-    shifts_nr = squeeze(cat(3,shifts_nr(:).shifts));
-    t_save=tic;
 
-    write_chunk_h5(plane_name_save, M2, size(M2,3), '/mov');
+    fprintf(fid, "%s : Beginning non-rigid registration.\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'));
+    fprintf("%s : Beginning non-rigid registration.\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'));
+    
+    [M2, shifts_nr, ~, ~] = normcorre_batch(Y, options_nonrigid, template_good);
+    fprintf(fid, "%s : Non-rigid registration complete. Elapsed time: %.3f minutes\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_nonrigid)/60);
+    fprintf("%s : Non-rigid registration complete. Elapsed time: %.3f minutes\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_nonrigid)/60);
+
+    shifts_nr = squeeze(cat(3,shifts_nr(:).shifts));
+
+    mean_img = mean(M2, 3);
+    [yind, xind] = get_central_indices(mean_img, 30); % 30 pixels around the center of the brightest part of an image frame
+    images = {template_good, mean_img, mean_img(yind, xind)};
+    labels = {'Template', 'Mean Image', 'Mean Image(Zoom)'};
+    scale_full = calculate_scale(size(template_good, 2), metadata.pixel_resolution);
+    scale_roi = calculate_scale( size(template_good(yind, xind),2), metadata.pixel_resolution);
+    scales = {scale_full, scale_full, scale_roi};
+    plane_save_path = fullfile(fig_save_path, sprintf('mean_frame_plane_%d.png', plane_idx));
+
+    make_tiled_figure( ...
+        images, ...
+        metadata, ...
+        'fig_title', sprintf("Plane %d", plane_idx), ...
+        'titles', labels, ...
+        'scales', scales, ...
+        'save_name', plane_save_path, ...
+        'show_figure', false ...
+    );
+
+    write_chunk_h5(plane_name_save, M2, size(M2,3), '/Y');
     write_chunk_h5(plane_name_save, shifts_nr, size(shifts_nr,2), '/shifts');
     write_chunk_h5(plane_name_save, shifts_template, size(shifts_template,2), '/template');
-    write_metadata_h5(metadata, plane_name_save, '/mov');
-    fprintf(fid, "%s : Data saved. Elapsed time: %.2f seconds\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_save)/60);
+    write_metadata_h5(metadata, plane_name_save, '/');
+    h5create(plane_name_save,"/Ym",size(mean_img));
+    h5write(plane_name_save, '/Ym', mean_img);
+    fprintf(fid, "%s : Plane %d finished, data saved. Elapsed time: %.2f minutes\n", datestr(datetime('now'),'yyyy_mm_dd:HH:MM:SS'),plane_idx, toc(tplane)/60);
+    fprintf("%s : Plane %d finished, data saved. Elapsed time: %.2f minutes\n",datestr(datetime('now'),'yyyy_mm_dd:HH:MM:SS'),plane_idx,toc(tplane)/60);
 
     clear M1 M2 shifts template;
-    try
-        fprintf(fid, "%s : Motion correction for plane %d complete. Time: %.2f minutes. Beginning next plane...\n", datestr(datetime('now'), 'yyyy_mm_dd HH:MM:SS'), plane_idx, toc(t_rigid)/60);
-    catch ME
-        warning("File ID, no longer valid: %d", fid);
-        return;
-    end
-    fprintf(fid, "%s : Processing complete. Time: %.2f hours\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tall)/3600);
 end
+ fprintf(fid, "%s : Processing complete. Time: %.2f hours\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tall)/3600);
