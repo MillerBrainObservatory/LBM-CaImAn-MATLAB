@@ -43,6 +43,12 @@ Once data is extracted to an intermediate filetype `h5`, `.tiff`, `.memmap`, reg
 
 Follow the root `demo_LBM_pipeline.m` file for an example pipeline, or the root `/notebooks` folder for more in-depth exploration of individual pipeline steps.
 
+There are several utility functions you can take advantage of in the `core/utils` folder/. Learn about them in the docstrings via the [api documentation](https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/api/index.html).
+
+For example, this graphic was created via the [images_to_gif()]() function: 
+
+![crosstalk_single_hemi](https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/assets/75346097/f5478a6f-18c6-455f-91e7-aeb57e73f502)
+
 ## Requirements
 
 - MATLAB (Tested on 2023a, 2023b, 2024b)
