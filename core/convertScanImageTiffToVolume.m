@@ -79,14 +79,10 @@ fig_save_path = fullfile(save_path, "figures");
 if ~isfolder(fig_save_path); mkdir(fig_save_path); end
 
 files = dir(fullfile(data_path, '*.tif*'));
-if isempty(files)
-    error('No suitable tiff files found in: \n  %s', data_path);
-end
+if isempty(files); error('No suitable tiff files found in: \n  %s', data_path); end
 
 fprintf("Files found in data path:\n");
-for i = 1:length(files)
-    fprintf('%d: %s\n', i, files(i).name);
-end
+for i = 1:length(files); fprintf('%d: %s\n', i, files(i).name); end
 
 log_file_name = sprintf("%s_extraction.log", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
 log_full_path = fullfile(save_path, log_file_name);
@@ -96,7 +92,6 @@ if fid == -1
 else
     fprintf('Log file created: %s\n', log_full_path);
 end
-% closeCleanupObj = onCleanup(@() fclose(fid));
 
 firstFileFullPath = fullfile(files(1).folder, files(1).name);
 
@@ -118,14 +113,17 @@ trimmed_y = raw_y - t_top - t_bottom;
 num_planes = metadata.num_planes;
 num_rois = metadata.num_rois;
 metadata.dataset_name = dataset_name;
+metadata.num_files = length(files);
 
 offsets_plane = zeros(num_planes, 1);
 offsets_roi = zeros(num_planes, num_rois);
 try
+
+    log_struct(metadata,'metadata',log_full_path,fid);
+
     fprintf(fid, '%s : Processing %d file(s) with %d planes.\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), length(files), num_planes);
     fprintf('%s : Processing %d file(s) with %d planes.\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), length(files), num_planes);
 
-    log_metadata(metadata, log_full_path, fid);
     fprintf("Metadata:\n\n")
     disp(metadata)
     for i = 1:length(files)
@@ -143,6 +141,7 @@ try
             Aout = hTif.data();
             Aout = most.memfunctions.inPlaceTranspose(Aout);
             num_frames_file = size(Aout, 3) / num_planes;
+            metadata.num_frames_file = num_frames_file;
 
             Aout = reshape(Aout, [size(Aout, 1), size(Aout, 2), num_planes, num_frames_file]);
         catch ME
@@ -161,7 +160,6 @@ try
             fprintf(fid, '%s : Processing z-plane %d/%d...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), plane_idx, num_planes);
             fprintf('%s : Processing z-plane %d/%d...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), plane_idx, num_planes);
 
-            
             p_str = sprintf("plane_%d", plane_idx);
             plane_fullfile = sprintf("%s/extracted_%s.h5", save_path, p_str);
             
@@ -203,12 +201,7 @@ try
                 % an offset for each individual strip.
                 offsets_roi(plane_idx, roi_idx) = returnScanOffset(Aout(raw_yslice,:,plane_idx,:), 1, 'int16');
                 roi_arr = fixScanPhase(raw_timeseries, offsets_roi(plane_idx,roi_idx), 1, 'int16');
-
-                % take whichever is smaller, our trimmed roi size, or corrected
-                % ROI. BREAKING! Use the raw ROI size
-                % sx = min(trimmed_x, size(roi_arr, 2));
-                % sy = min(trimmed_y, size(roi_arr, 1));
-
+                
                 % trimmed_xslice = (t_left+1:sx-t_right);
                 trimmed_xslice = (t_left+1:raw_x-t_right);
                 trimmed_yslice = (t_top+1:raw_y-t_bottom);
@@ -240,7 +233,8 @@ try
                     'fig_title', sprintf('ROI %d', roi_idx), ...
                     'titles', labels, ...
                     'scales', roi_scales, ...
-                    'save_name', roi_savename ...
+                    'save_name', roi_savename, ...
+                    'show_figure', false ...
                     );
                 
                 cnt = cnt + 1;
@@ -256,7 +250,7 @@ try
             mean_img = mean(z_timeseries, 3);
             [yind, xind] = get_central_indices(mean_img, 30); % 30 pixels around the center of the brightest part of an image frame
             images = {img_frame, mean_img, mean_img(yind, xind)};
-            labels = {'Frame 2', 'Mean Image', 'Mean Image(Zoom)'};
+            labels = {'Second Frame', 'Mean Image', 'Mean Image(Zoom)'};
             scale_full = calculate_scale(size(img_frame, 2), metadata.pixel_resolution);
             scale_roi = calculate_scale( size(img_frame(yind, xind),2), metadata.pixel_resolution);
             scales = {scale_full, scale_full, scale_roi};
@@ -268,7 +262,8 @@ try
                 'fig_title', sprintf("Plane %d", plane_idx), ...
                 'titles', labels, ...
                 'scales', scales, ...
-                'save_name', plane_save_path ...
+                'save_name', plane_save_path, ...
+                'show_figure', false ...
             );
 
             if isfile(plane_fullfile)
@@ -284,8 +279,8 @@ try
             metadata.scan_offset = offsets_plane(plane_idx);
             write_chunk_h5(plane_fullfile, z_timeseries, size(z_timeseries,3), dataset_name);
             write_chunk_h5(plane_fullfile, mean(z_timeseries, 3), size(z_timeseries,3), '/Ym');
-            write_metadata_h5(metadata, plane_fullfile, '/Y');
-            write_metadata_h5(metadata, plane_fullfile, '/'); %for convenience
+            % write_metadata_h5(metadata, plane_fullfile, '/Y');
+            write_metadata_h5(metadata, plane_fullfile, '/');
             fprintf(fid, "%s : Plane %d processed in %.2f seconds\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), plane_idx, toc(tplane));
             fprintf("%s : Plane %d processed in %.2f seconds\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), plane_idx, toc(tplane));
 
