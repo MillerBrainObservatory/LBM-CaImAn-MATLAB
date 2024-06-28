@@ -18,15 +18,18 @@ function [f] = make_tiled_figure(images, metadata, varargin)
 %     Name to save the figure.
 % layout : char, optional
 %     Layout for the tiles ('horizontal', 'vertical', 'square').
+% show_figure : logical, optional
+%     If false, the figure will not be displayed. Default is true.
 
 p = inputParser;
 addRequired(p, 'images', @iscell);
 addRequired(p, 'metadata', @isstruct);
-addParameter(p, 'fig_title', 'Unnamed Tiled Figure');
+addParameter(p, 'fig_title', '');
 addParameter(p, 'titles', {}, @iscell);
 addParameter(p, 'scales', {10}, @iscell);
-addParameter(p, 'save_name', sprintf("Unnamed_image_%d.png",  datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS')));
+addParameter(p, 'save_name', 'unnamed.png');
 addParameter(p, 'layout', 'horizontal', @(x) any(validatestring(x, {'horizontal', 'vertical', 'square'})));
+addParameter(p, 'show_figure', true, @islogical);
 parse(p, images, metadata, varargin{:});
 
 images = p.Results.images;
@@ -36,13 +39,16 @@ titles = p.Results.titles;
 scales = p.Results.scales;
 save_name = p.Results.save_name;
 layout = p.Results.layout;
+show_figure = p.Results.show_figure;
 
 num_images = length(images);
 num_scales = length(scales);
 num_titles = length(titles);
 assert((num_images == num_scales) && (num_scales == num_titles)); % careful here!
 
-f = figure('Color', 'k');
+% set figure visibility
+f = figure('Color', 'k', 'Visible', show_figure);
+
 sgtitle(fig_title, 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'w');
 
 switch layout
@@ -59,14 +65,13 @@ end
 
 if ~iscell(scales)
     this_scale = cell(num_images);
-    for ii=1:length(images)
+    for ii = 1:length(images)
         this_scale{ii} = scales;
     end
 end
 
 mod_scale = scales; % store our input scale size
 for i = 1:num_images
-
     img = images{i};
     this_scale = scales{i};
     if ndims(img) == 3
@@ -81,7 +86,7 @@ for i = 1:num_images
         title(titles{i}, 'FontSize', 12, 'FontWeight', 'bold', 'Color', 'w');
     end
 
-    if this_scale < size(img,2) / 10 %make sure its not too small
+    if this_scale < size(img, 2) / 10 % make sure its not too small
         mod_scale = calculate_scale(size(img, 2), metadata.pixel_resolution);
     else
         mod_scale = this_scale;
