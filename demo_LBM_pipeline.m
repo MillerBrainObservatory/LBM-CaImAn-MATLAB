@@ -5,45 +5,52 @@
 % manually by right clicking caiman_matlab folder and "add packages and
 % subpackages to path" or via the startup.m file. Both methods described in
 % more detail in the README.
+%% Two %'s lets you run code section-by-section via the Run Section button or pressing cntl+enter
+
 
 %% UPDATE: RUN THIS WITH THE PLAY BUTTON, NOT "RUN SECTION"
-% To get eveything added to your path
-clc, clear;
+% When ran as a script (the "Run" button), this will automatically add the
+% core and packages folders to your MATLAB path
+% Not needed if the project code is stored in the Documents/MATLAB folder
+clc, clear; % !! Careful, this will clear all variables from memory
 [fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
-addpath(genpath(fullfile(fpath, 'core')));
-addpath(genpath(fullfile(fpath, 'core', 'utils')));
-addpath(genpath(fullfile(fpath, 'core', 'io')));
+addpath(genpath(fullfile(fpath, 'core'))); addpath(genpath(fullfile(fpath, 'packages')));
 
 %% Here you can validate that all dependencies are on the path and accessible from within this pipeline.
 % This does not check for package access on your path.
 
-parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
-data_path = fullfile(parent_path, 'raw');
-save_path = [];
+homedir = getenv('HOMEPATH'); % will autofill /home/<username> (linux) or C:/Users/Username (windows)
+parent_path = fullfile(sprintf('%s/Documents/data/high_res/', homedir));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Extraction %%%%%%%%
+%%
 
-clc; compute = 1;
+compute = 1;
 if compute
-    % Number of pixels to trim
-    left = 5; right = 5; top = 17; bottom = 0;
-    save_path = fullfile(parent_path, sprintf('extracted_%dpx_%dpx_%dpx_%dpx', left, right, top, bottom));
+    % Number of pixels to trim on the edge of EACH ROI, not the full image
+    left = 6; right = 6; top = 17; bottom = 0;
+
+    % Construct data/save paths. You can also enter them manually. 
+    % The sprintf() will add the pixel trimming values above to the filename.
+    data_path = fullfile(parent_path, 'raw'); % as an example, we store our tiff files in parent/raw/*.tif
+    extraction_save_name =  sprintf('extracted_%dpx_%dpx_%dpx_%dpx', left, right, top, bottom);
+    save_path = fullfile(parent_path, extraction_save_name);
+    
     convertScanImageTiffToVolume( ...
         data_path, ...
         save_path, ...
         'dataset_name', '/Y', ... % default
         'debug_flag', 0, ... % default, if 1 will display files and return
-        'fix_scan_phase', 1, ... % default, keep to 1
+        'fix_scan_phase', 1, ... % fix bi-directional scan phase
         'trim_pixels', [left right top bottom], ... % default, num pixels to trim for each roi
         'overwrite', 1 ...
         );
-    %%%%% Optional: Reorder Planes
+
+    %% Optional: Reorder Planes
     order = fliplr([1 5:10 2 11:17 3 18:23 4 24:30]);
-    
     rename_planes(save_path, order);
 end
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Motion Correction %%%
