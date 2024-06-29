@@ -1,5 +1,5 @@
-function timeseries_to_gif(image_files, save_name, delay_time)
-% TIMESERIES_TO_GIF Creates an animated GIF from a series of images.
+function images_to_gif(image_files, save_name, delay_time)
+% Creates an animated GIF from a series of images.
 %
 % This function generates an animated GIF from a series of images specified
 % by their file paths. The images are read, converted to indexed color, and
@@ -10,7 +10,7 @@ function timeseries_to_gif(image_files, save_name, delay_time)
 % image_files : cell array of strings
 %     A cell array containing the file paths of the images to be included in the GIF.
 % save_name : string
-%     Fully qualified name (folder + name + extension). 
+%     Fully qualified name (folder + name + extension).
 %     The directory and filename where the output GIF file will be saved.
 %
 % Returns
