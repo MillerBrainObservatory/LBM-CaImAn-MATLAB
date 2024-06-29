@@ -1,5 +1,5 @@
 function [f] = make_tiled_figure(images, metadata, varargin)
-% MAKE_TILED_FIGURE Creates a tiled figure with scale bars and specified titles.
+% Creates a tiled figure with scale bars and specified titles.
 %
 % Parameters
 % ----------

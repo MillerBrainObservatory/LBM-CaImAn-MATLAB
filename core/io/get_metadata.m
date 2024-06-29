@@ -1,5 +1,5 @@
 function [metadata_out] = get_metadata(filename)
-%GET_METADATA Extract metadata quickly from a ScanImage TIFF file.
+% Extract metadata from a ScanImage TIFF file.
 %
 % Read and parse Tiff metadata stored in the .tiff header
 % and ScanImage metadata stored in the 'Artist' tag which contains roi sizes/locations and scanning configuration

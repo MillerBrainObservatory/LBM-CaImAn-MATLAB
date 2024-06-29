@@ -8,7 +8,7 @@ To keep code and documentation as *in-sync* as possible, many (if not most) of t
 .. currentmodule:: .
 
 Core
-==============
+=======
 
 .. autofunction:: convertScanImageTiffToVolume
 .. autofunction:: motionCorrectPlane
@@ -16,18 +16,18 @@ Core
 .. autofunction:: collatePlanes
 .. autofunction:: calculateZOffset
 
-.. currentmodule:: io
 
-Input/Output
+Utilities
 ==============
+
+.. currentmodule:: io
 
 .. autofunction:: read_plane
 .. autofunction:: read_h5_metadata
 .. autofunction:: rename_planes
 .. autofunction:: log_metadata
 .. autofunction:: make_zoomed_movie
-.. autofunction:: write_chunk_h5
-.. autofunction:: write_metadata_h5
+.. autofunction:: display_dataset_names
 
 .. currentmodule:: utils
 
