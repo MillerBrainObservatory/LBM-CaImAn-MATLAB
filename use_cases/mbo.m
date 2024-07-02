@@ -21,7 +21,7 @@ homedir = getenv('HOMEPATH'); % will autofill /home/<username> (linux) or C:/Use
 
 parent_path = fullfile(sprintf('%s/Desktop', homedir));
 raw_tiff_path = fullfile(parent_path);
-extract_path = fullfile(parent_path, 'v1.8/extracted');
+extract_path = fullfile(parent_path, 'pipeline/extracted');
 registered_path = fullfile(parent_path, 'registered');
 segment_path = fullfile(parent_path, 'segmented');
 collate_path = fullfile(parent_path, 'collated');
