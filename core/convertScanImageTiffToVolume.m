@@ -44,7 +44,6 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 % processing.
 %
 % .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
-
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath')));
 addpath(genpath(fullfile(currpath, '../packages/ScanImage/')));
 addpath(genpath("utils")); addpath(genpath("io")); addpath(genpath("internal"));
