@@ -31,12 +31,12 @@ if compute
     % Number of pixels to trim on the edge of EACH ROI, not the full image
     left = 6; right = 6; top = 17; bottom = 0;
 
-    % Construct data/save paths. You can also enter them manually. 
+    % Construct data/save paths. You can also enter them manually.
     % The sprintf() will add the pixel trimming values above to the filename.
     data_path = fullfile(parent_path, 'raw'); % as an example, we store our tiff files in parent/raw/*.tif
     extraction_save_name =  sprintf('extracted_%dpx_%dpx_%dpx_%dpx', left, right, top, bottom);
     save_path = fullfile(parent_path, extraction_save_name);
-    
+
     convertScanImageTiffToVolume( ...
         data_path, ...
         save_path, ...
@@ -49,7 +49,7 @@ if compute
 
     %% Optional: Reorder Planes
     order = fliplr([1 5:10 2 11:17 3 18:23 4 24:30]);
-    rename_planes(save_path, order);
+    reorder_h5_files(save_path, order);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
