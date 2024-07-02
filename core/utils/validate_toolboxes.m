@@ -1,10 +1,20 @@
 function [output] = validate_toolboxes()
-    %% Report missing toolboxes
+% Report missing MATLAB toolboxes that are required to execute this pipeline.
+%
+% Parameters
+% -----------
+% None
+%
     v = ver;
     installed = {v.Name};
-    required = {'Parallel Computing Toolbox', 'Statistics and Machine Learning Toolbox', 'Image Processing Toolbox', 'Signal Processing Toolbox'};
-    missing = {};
+    required = {
+        'Parallel Computing Toolbox', ...
+        'Statistics and Machine Learning Toolbox', ...
+        'Image Processing Toolbox', ...
+        'Signal Processing Toolbox' ...
+        };
 
+    missing = {};
     for i = 1:length(required)
         if ~any(strcmp(installed, required{i}))
             missing{end+1} = required{i};
