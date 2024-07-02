@@ -14,7 +14,6 @@ clc, clear;
 [fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
 addpath(genpath(fullfile(fpath, 'core')));
 addpath(genpath(fullfile(fpath, 'core', 'utils')));
-addpath(genpath(fullfile(fpath, 'core', 'io')));
 
 %% Here you can validate that all dependencies are on the path and accessible from within this pipeline.
 % This does not check for package access on your path.
@@ -26,7 +25,7 @@ else
     disp('Proceeding with execution...');
 end
 
-parent_path = fullfile('C:/Users/RBO/Documents/data/augustina/');
+parent_path = fullfile('E:\augustina');
 data_path = fullfile(parent_path, 'raw');
 save_path = fullfile(parent_path, sprintf('extracted'));
 
@@ -43,7 +42,7 @@ if compute
         'fix_scan_phase', 1, ... % default, keep to 1
         'trim_pixels', [0 0 0 0], ... % default, num pixels to trim for each roi
         'overwrite', 1 ...
-        );
+    );
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -52,24 +51,10 @@ end
 clc; compute = 1;
 if compute
 
-    mc_path = fullfile(parent_path, 'extracted_4px_4px_17px_0px');
-    if ~isfolder(mc_path); mkdir(mc_path); end
-
     filename = fullfile(save_path, "extracted_plane_1.h5");
     metadata = read_h5_metadata(filename, '/Y');
     info = h5info(filename, '/Y');
     data_size = info.Dataspace.Size;
-
-    options_nonrigid = NoRMCorreSetParms(...
-        'd1', data_size(1),...
-        'd2', data_size(2),...
-        'grid_size', [128,128], ...
-        'bin_width', 24,... % number of frames to avg when updating template
-        'max_shift', round(20/metadata.pixel_resolution),... % 20 microns
-        'us_fac', 20,...
-        'init_batch', 120,...
-        'correct_bidir', false...
-        );
 
     motionCorrectPlane( ...
         save_path, ... % we used this to save extracted data
