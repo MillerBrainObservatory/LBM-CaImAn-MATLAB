@@ -284,18 +284,18 @@ for plane_idx = start_plane:end_plane
     % Save data
     t_save = tic;
     fprintf(fid, "%s : Writing data.\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'));
-    write_chunk_h5(plane_name_save, T_keep, 2000, '/T_keep');
-    write_chunk_h5(plane_name_save, Ac_keep, 2000, '/Ac_keep');
-    write_chunk_h5(plane_name_save, C_keep, 2000, '/C_keep');
-    write_chunk_h5(plane_name_save, Km, 2000, '/Km');
-    write_chunk_h5(plane_name_save, rVals, 2000, '/rVals');
-    write_chunk_h5(plane_name_save, single(mean(data,3)), 2000, '/Ym');
-    write_chunk_h5(plane_name_save, Cn, 2000, '/Cn');
-    write_chunk_h5(plane_name_save, b, 2000, '/b');
-    write_chunk_h5(plane_name_save, f, 2000, '/f');
-    write_chunk_h5(plane_name_save, acx, 2000, '/acx');
-    write_chunk_h5(plane_name_save, acy, 2000, '/acy');
-    write_chunk_h5(plane_name_save, acm, 2000, '/acm');
+    write_frames_to_h5(plane_name_save, T_keep, 2000, '/T_keep');
+    write_frames_to_h5(plane_name_save, Ac_keep, 2000, '/Ac_keep');
+    write_frames_to_h5(plane_name_save, C_keep, 2000, '/C_keep');
+    write_frames_to_h5(plane_name_save, Km, 2000, '/Km');
+    write_frames_to_h5(plane_name_save, rVals, 2000, '/rVals');
+    write_frames_to_h5(plane_name_save, single(mean(data,3)), 2000, '/Ym');
+    write_frames_to_h5(plane_name_save, Cn, 2000, '/Cn');
+    write_frames_to_h5(plane_name_save, b, 2000, '/b');
+    write_frames_to_h5(plane_name_save, f, 2000, '/f');
+    write_frames_to_h5(plane_name_save, acx, 2000, '/acx');
+    write_frames_to_h5(plane_name_save, acy, 2000, '/acy');
+    write_frames_to_h5(plane_name_save, acm, 2000, '/acm');
 
     write_metadata_h5(metadata, plane_name_save, '/');
     fprintf(fid, "%s : Data saved. Elapsed time: %.2f seconds\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_save)/60);

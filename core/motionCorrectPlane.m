@@ -206,7 +206,7 @@ for plane_idx = start_plane:end_plane
     scales = {scale_full, scale_full, scale_roi};
     plane_save_path = fullfile(fig_save_path, sprintf('mean_frame_plane_%d.png', plane_idx));
 
-    make_tiled_figure( ...
+    write_tiled_figure( ...
         images, ...
         metadata, ...
         'fig_title', sprintf("Plane %d", plane_idx), ...
@@ -216,9 +216,9 @@ for plane_idx = start_plane:end_plane
         'show_figure', false ...
     );
 
-    write_chunk_h5(plane_name_save, M2, size(M2,3), '/Y');
-    write_chunk_h5(plane_name_save, shifts_nr, size(shifts_nr,2), '/shifts');
-    write_chunk_h5(plane_name_save, shifts_template, size(shifts_template,2), '/template');
+    write_frames_to_h5(plane_name_save, M2, size(M2,3), '/Y');
+    write_frames_to_h5(plane_name_save, shifts_nr, size(shifts_nr,2), '/shifts');
+    write_frames_to_h5(plane_name_save, shifts_template, size(shifts_template,2), '/template');
     write_metadata_h5(metadata, plane_name_save, '/');
     h5create(plane_name_save,"/Ym",size(mean_img));
     h5write(plane_name_save, '/Ym', mean_img);
