@@ -1,5 +1,5 @@
-function translate_frames = translate_frames(Y, shifts_2D)
-%TRANSLATE_FRAMES Translate image frames based on provided translation vectors.
+function translatedFrames = translate_frames(Y, shifts_2D)
+% Translate image frames based on provided translation vectors.
 %
 % This function applies 2D translations to an image time series based on
 % a series of translation vectors, one per frame. Each frame is translated

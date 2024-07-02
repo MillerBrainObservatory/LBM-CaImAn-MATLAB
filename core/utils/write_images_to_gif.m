@@ -1,5 +1,5 @@
-function images_to_gif(image_files, save_name, delay_time)
-% Creates an animated GIF from a series of images.
+function write_images_to_gif(image_files, save_name, delay_time)
+% Creates an animated GIF from a series images on disk.
 %
 % This function generates an animated GIF from a series of images specified
 % by their file paths. The images are read, converted to indexed color, and
@@ -12,6 +12,9 @@ function images_to_gif(image_files, save_name, delay_time)
 % save_name : string
 %     Fully qualified name (folder + name + extension).
 %     The directory and filename where the output GIF file will be saved.
+% from_file : logical
+%     Flag for whether inputs are filenames or in-memory data, true
+%     indicates filenames. Default is true.
 %
 % Returns
 % -------
@@ -20,15 +23,13 @@ function images_to_gif(image_files, save_name, delay_time)
 % Example
 % -------
 % image_files = {'image1.png', 'image2.png', 'image3.png'};
-% save_folder = 'C:/Users/RBO/Desktop/figs/';
-% timeseries_to_gif(image_files, save_folder);
+% save_folder = 'C:/Users/MBO/Desktop/figs/';
+% write_images_to_gif(image_files, save_folder);
 %
 % Notes
 % -----
 % - This function assumes that the images are in a format compatible with
 %   MATLAB's `imread` function.
-% - The generated GIF will loop infinitely with a delay time of 0.5 seconds
-%   between frames.
 %
 
 if ~exist("delay_time", "var"); delay_time = 0.5; end

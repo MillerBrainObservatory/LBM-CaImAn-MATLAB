@@ -1,14 +1,36 @@
-function rename_planes(h5path, order)
-% REORDERPLANEFILES Reorder z-plane filenames.
+function reorder_h5_files(h5path, order)
+% Reorder and rename HDF5 files based on a specified order.
+%
+% This function reorders and renames HDF5 files in a specified directory (`h5path`)
+% based on the provided `order` array. It temporarily renames files to avoid conflicts,
+% updates the HDF5 attributes to store the original order, and saves the original order
+% as a .mat file.
 %
 % Parameters
 % ----------
-% h5path : char
-%     Path to the directory containing the plane files.
-% metadata : struct
-%     Metadata containing information about the number of planes.
+% h5path : char or string
+%     The path to the directory containing the HDF5 files to be reordered.
 % order : array
-%     Array specifying the new order of the planes.
+%     An array specifying the new order of the HDF5 files. The length of this array
+%     must match the number of HDF5 files in the directory.
+%
+% Notes
+% -----
+% The function ensures that the HDF5 files are sorted, renames them to temporary names
+% to avoid conflicts, and then renames them to their new ordered names. The original
+% order is stored as an attribute in each HDF5 file and saved as a .mat file.
+%
+% Examples
+% --------
+% Reorder HDF5 files in a directory based on a specified order:
+%
+%     h5path = 'path/to/h5/files';
+%     order = [3, 1, 2, 4];
+%     reorder_h5_files(h5path, order);
+%
+% See also
+% --------
+% h5writeatt, movefile, save
 
 % Get all relevant files in the directory
 

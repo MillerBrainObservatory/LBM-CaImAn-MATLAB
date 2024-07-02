@@ -1,4 +1,4 @@
-function valid = isValidGroupPath(x)
+function valid = is_valid_group(x)
 if startsWith(x, '/')
     x = char(x);
     if endsWith(x, '/')

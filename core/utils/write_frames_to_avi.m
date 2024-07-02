@@ -1,16 +1,48 @@
-function timeseries_to_movie(data, filename, frame_rate,x,y)
-% TIMESERIES_TO_MOVIE Generate a movie from image data.
+function write_frames_to_avi(data, filename, frame_rate,x,y)
+% Write a 3D array to an AVI video file.
 %
-% This function processes a 3D array of image data to create a video file,
-% applying optional cropping, and color scaling. The final video is
-% saved in AVI format and can be transcoded to MP4.
+% This function takes a 3D numeric array `data` and writes it to an AVI video
+% file specified by `filename`. The video is created with the specified frame
+% rate and spatial dimensions `x` and `y`.
 %
-% Inputs:
-%   data - 3D matrix of image data.
-%   filename - Name of the output video file. Use '' single quotes.
-%   frame_rate - Frame rate of the output video.
-%   x - Horizontal coordinates. Default is the size of data(:,2).
-%   y - Vertical coordinates. Default is the size of data(:,1).
+% Parameters
+% ----------
+% data : numeric array
+%     A 3D array containing the data to be written to the video file.
+% filename : char
+%     The name of the output AVI video file.
+% frame_rate : double, optional
+%     The frame rate of the video. Default is 1.
+% x : double array, optional
+%     The x-coordinates for the spatial dimensions of the data. Default is
+%     1:size(data,2).
+% y : double array, optional
+%     The y-coordinates for the spatial dimensions of the data. Default is
+%     1:size(data,1).
+%
+% Notes
+% -----
+% The function normalizes the data, applies a moving mean filter, and writes
+% the frames to an uncompressed AVI video file. It also sets up the figure
+% properties for visualization and adjusts the color axis limits.
+%
+% Examples
+% --------
+% Write a 3D array to an AVI file with default settings:
+%
+%     write_frames_to_avi(my_data, 'output.avi');
+%
+% Write a 3D array to an AVI file with a specified frame rate:
+%
+%     write_frames_to_avi(my_data, 'output.avi', 10);
+%
+% Write a 3D array to an AVI file with specified spatial dimensions:
+%
+%     write_frames_to_avi(my_data, 'output.avi', 10, 1:256, 1:256);
+%
+% See also
+% --------
+% VideoWriter, movmean
 arguments
     data {mustBeNumeric}
     filename (1,:) char

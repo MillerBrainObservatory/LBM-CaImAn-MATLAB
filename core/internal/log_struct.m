@@ -1,44 +1,30 @@
-function log_struct(structured_arr,label,logFilePath, fid)
-% LOG_STRUCT Print struct to a log file in tabular format.
-%
-% Parameters
-% ----------
-% structured_arr : struct
-%     Metadata structure to be printed.
-% label : char
-%     Title label to print above the log entry.
-% logFilePath : char
-%     Path to the log file.
-% fid : single
-%     Filepath identifyer for this logfile.
+function log_struct(metadata, struct_name, log_full_path, fid)
+    % log_struct Log the contents of a structure to a log file and the command window.
+    %
+    % Parameters
+    % ----------
+    % metadata : struct
+    %     The structure to log.
+    % struct_name : char
+    %     The name of the structure.
+    % log_full_path : char
+    %     The path to the log file.
+    % fid : file identifier
+    %     The file identifier for the log file.
 
-% Open the log file for writing
-% TODO: Append to existing/partial logfile
-if ~exist('fid', 'var') || length(nargin) < 3; fid = fopen(logFilePath, 'a'); end
-if fid == -1; error('Cannot open log file: %s', logFilePath); end
-try
-    fprintf(fid, '\n\n');
-    fprintf(fid, '%s\n', label);
-    fprintf(fid, '-----------------------------------------------------\n');
-    
-    fields = fieldnames(structured_arr);
+    fprintf(fid, '%s : %s contents:\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), struct_name);
+    fprintf('%s contents:\n', struct_name);
+
+    fields = fieldnames(metadata);
     for i = 1:numel(fields)
-        field = fields{i};
-        value = structured_arr.(field);
-        
-        if isnumeric(value)
-            valueStr = mat2str(value);
-        elseif ischar(value)
-            valueStr = value;
-        elseif isstruct(value)
-            valueStr = 'struct';
+        field_value = metadata.(fields{i});
+        if isstruct(field_value)
+            fprintf(fid, '%s : %s.%s:\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), struct_name, fields{i});
+            fprintf('%s.%s:\n', struct_name, fields{i});
+            log_struct(field_value, [struct_name '.' fields{i}], log_full_path, fid);
         else
-            valueStr = 'unknown';
+            fprintf(fid, '%s : %s.%s = %s\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), struct_name, fields{i}, mat2str(field_value));
+            fprintf('%s.%s = %s\n', struct_name, fields{i}, mat2str(field_value));
         end
-        fprintf(fid, '%-30s: %s\n', field, valueStr);
     end
-    fprintf(fid, '-----------------------------------------------------\n');
-catch ME
-    rethrow(ME);
-end
 end

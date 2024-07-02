@@ -1,4 +1,4 @@
-function [f] = make_tiled_figure(images, metadata, varargin)
+function [f] = write_tiled_tight(images, metadata, varargin)
 % Creates a tiled figure with scale bars and specified titles.
 %
 % Parameters
@@ -26,10 +26,11 @@ addRequired(p, 'images', @iscell);
 addRequired(p, 'metadata', @isstruct);
 addParameter(p, 'fig_title', '');
 addParameter(p, 'titles', {}, @iscell);
-addParameter(p, 'scales', {10}, @iscell);
+addParameter(p, 'scales', {}, @iscell);
 addParameter(p, 'save_name', 'unnamed.png');
-addParameter(p, 'layout', 'horizontal', @(x) any(validatestring(x, {'horizontal', 'vertical', 'square'})));
+addParameter(p, 'layout', 'square', @(x) any(validatestring(x, {'horizontal', 'vertical', 'square'})));
 addParameter(p, 'show_figure', true, @islogical);
+addParameter(p, 'font_size', 10, @isscalar);
 parse(p, images, metadata, varargin{:});
 
 images = p.Results.images;
@@ -39,43 +40,34 @@ titles = p.Results.titles;
 scales = p.Results.scales;
 save_name = p.Results.save_name;
 layout = p.Results.layout;
+font_size = p.Results.font_size;
 show_figure = p.Results.show_figure;
 
 num_images = length(images);
-num_scales = length(scales);
 num_titles = length(titles);
-assert((num_images == num_scales) && (num_scales == num_titles)); % careful here!
 
 % set figure visibility
 f = figure('Color', 'k', 'Visible', show_figure);
 
-sgtitle(fig_title, 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'w');
+if ~isempty(fig_title)
+    sgtitle(fig_title, 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'w');
+end
 
 switch layout
     case 'horizontal'
-        tiledlayout(1, num_images, 'TileSpacing', 'compact', 'Padding', 'compact');
+        tiledlayout(1, num_images, 'TileSpacing', 'none', 'Padding', 'none');
     case 'vertical'
-        tiledlayout(num_images, 1, 'TileSpacing', 'compact', 'Padding', 'compact');
+        tiledlayout(num_images, 1, 'TileSpacing', 'none', 'Padding', 'none');
     case 'square'
         n = ceil(sqrt(num_images));
-        tiledlayout(n, n, 'TileSpacing', 'compact', 'Padding', 'compact');
+        tiledlayout(n, n, 'TileSpacing', 'none', 'Padding', 'none');
     otherwise
         error('Invalid layout option. Use ''horizontal'', ''vertical'', or ''square''.');
 end
 
-if ~iscell(scales)
-    this_scale = cell(num_images);
-    for ii = 1:length(images)
-        this_scale{ii} = scales;
-    end
-end
-
-mod_scale = scales; % store our input scale size
 for i = 1:num_images
     img = images{i};
-    this_scale = scales{i};
     if ndims(img) == 3
-        % make sure this is a 2D image
         img = img(:, :, 2);
     end
 
@@ -83,29 +75,18 @@ for i = 1:num_images
     imagesc(img);
     axis image; axis tight; axis off; colormap('gray');
     if ~isempty(titles) > 0
-        title(titles{i}, 'FontSize', 12, 'FontWeight', 'bold', 'Color', 'w');
-    end
-
-    if this_scale < size(img, 2) / 10 % make sure its not too small
-        mod_scale = calculate_scale(size(img, 2), metadata.pixel_resolution);
-    else
-        mod_scale = this_scale;
-    end
-
-    if mod_scale > 0
-        scale_length_pixels = mod_scale / metadata.pixel_resolution;
-
-        hold on;
-        scale_bar_x = [size(img, 2) - scale_length_pixels - 3, size(img, 2) - 3];
-        scale_bar_y = [size(img, 1) - 3, size(img, 1) - 3];
-        line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 5);
-        text(mean(scale_bar_x), scale_bar_y(1), sprintf('%d µm', mod_scale), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
-        hold off;
+        title(titles{i}, 'FontSize', font_size, 'Color', 'w');
     end
 end
 
 if ~isempty(save_name)
     saveas(f, save_name, 'png');
-    close(f);
+    if ~show_figure
+        close(f);
+    end
+end
+
+if nargout == 0 && show_figure
+    clear f;
 end
 end

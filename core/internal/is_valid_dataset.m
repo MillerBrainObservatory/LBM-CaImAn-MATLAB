@@ -1,4 +1,4 @@
-function valid = check_valid_dataset(filename, location)
+function valid = is_valid_dataset(filename, location)
     try
         data = h5read(filename, location, 1, 2);
         if size(data, 1) > 20
