@@ -48,6 +48,8 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 addpath(genpath(fullfile(currpath, '../packages/ScanImage/')));
 addpath(genpath("utils")); addpath(genpath("io")); addpath(genpath("internal"));
 
+import ScanImageTiffReader.*
+
 p = inputParser;
 
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
@@ -59,19 +61,20 @@ addParameter(p, 'fix_scan_phase', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'trim_pixels', [6 6 10 0], @isnumeric);
 parse(p, data_path, save_path, varargin{:});
 
-data_path = p.Results.data_path;
-save_path = p.Results.save_path;
+data_path = fullfile(p.Results.data_path);
+save_path = fullfile(p.Results.save_path);
 dataset_name = p.Results.dataset_name;
 debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
 fix_scan_phase = p.Results.fix_scan_phase;
 trim_pixels = p.Results.trim_pixels;
 
-if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", data_path); end
+if fix_scan_phase == 0; warning("Setting fix_scan_phase = 0 not yet implemented."); end
+if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", fullfile(data_path)); end
 if debug_flag == 1; dir([data_path, '*.tif']); return; end
 
 if isempty(save_path)
-    warning("No save_path given. Saving data in data_path: %s\n", data_path);
+    warning("No save_path given. Saving data in data_path: %s\n", fullfile(data_path));
     save_path = data_path;
 end
 
@@ -80,9 +83,7 @@ if ~isfolder(fig_save_path); mkdir(fig_save_path); end
 
 files = dir(fullfile(data_path, '*.tif*'));
 if isempty(files); error('No suitable tiff files found in: \n  %s', data_path); end
-
-fprintf("Files found in data path:\n");
-for i = 1:length(files); fprintf('%d: %s\n', i, files(i).name); end
+num_files=length(files);
 
 log_file_name = sprintf("%s_extraction.log", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
 log_full_path = fullfile(save_path, log_file_name);
@@ -103,17 +104,16 @@ metadata.extraction_params = p.Results();
 [t_left, t_right, t_top, t_bottom] = deal(trim_pixels(1), trim_pixels(2), trim_pixels(3), trim_pixels(4));
 metadata.trim_pixels = [t_left, t_right, t_top, t_bottom]; % store the number of pixels to trim
 raw_x = metadata.num_pixel_xy(1);
+raw_x = raw_x-1;
 raw_y = metadata.num_pixel_xy(2);
-
-% make sure to calc the amount of pixels relative to the original image
-% sizes stored in raw_x and raw_y
-trimmed_x = raw_x - t_left - t_right;
-trimmed_y = raw_y - t_top - t_bottom;
 
 num_planes = metadata.num_planes;
 num_rois = metadata.num_rois;
+num_frames = metadata.num_frames;
+data_type = metadata.sample_format;
+
 metadata.dataset_name = dataset_name;
-metadata.num_files = length(files);
+metadata.num_files = num_files;
 
 offsets_plane = zeros(num_planes, 1);
 offsets_roi = zeros(num_planes, num_rois);
@@ -121,174 +121,187 @@ try
 
     log_struct(metadata,'metadata',log_full_path,fid);
 
-    fprintf(fid, '%s : Processing %d file(s) with %d planes.\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), length(files), num_planes);
-    fprintf('%s : Processing %d file(s) with %d planes.\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), length(files), num_planes);
-
     fprintf("Metadata:\n\n")
     disp(metadata)
-    for i = 1:length(files)
-        fprintf(fid, '%s : Processing %d/%d file(s) with %d planes.\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'),i, length(files), num_planes);
-        fprintf('%s : Processing %d/%d file(s) with %d planes.\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'),i, length(files), num_planes);
 
-        tfile = tic;
-        full_filename = fullfile(data_path, files(i).name);
+    log_message(fid, "Aggregating data from %d file(s) with %d plane(s).",num_files, num_planes);
+    % We dont know how many frames there are in each files are yet
+    % We only know how many files there are
+    offset_file = 0;
+    Aout = zeros(metadata.tiff_length, metadata.tiff_width, num_planes, num_frames, data_type);
+    for file_idx = 1:num_files
+        if file_idx > 1; offset_file = offset_file + num_frames; end
 
-        fprintf(fid, '%s : Loading in data...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'));
-        fprintf('%s : Loading in data...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'));
+        full_filename = fullfile(data_path, files(file_idx).name);
+
+        log_message(fid, 'Loading data for file %d of %d...', file_idx, num_files);
 
         try
             hTif = ScanImageTiffReader(full_filename);
-            Aout = hTif.data();
-            Aout = most.memfunctions.inPlaceTranspose(Aout);
-            num_frames_file = size(Aout, 3) / num_planes;
-            metadata.num_frames_file = num_frames_file;
+            hTif = hTif.data();
+            hTif = most.memfunctions.inPlaceTranspose(hTif);
+            size_y = size(hTif);
+            if file_idx == 1
+                frames_file = size_y(end)/num_planes;
+            end
 
-            Aout = reshape(Aout, [size(Aout, 1), size(Aout, 2), num_planes, num_frames_file]);
+            file_slice = (offset_file + 1):(offset_file + frames_file);
+            Aout( ...
+                :, ...
+                :, ...
+                :, ...
+                file_slice ...
+                ) = reshape(hTif, [size_y(1), size_y(2), num_planes,num_frames]);
         catch ME
             rethrow(ME);
         end
+    end
 
-        fprintf(fid, '%s :Data loaded for file %d/%d in %.2f seconds...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), i, length(files), toc(tfile));
-        fprintf('%s :Data loaded for file %d/%d in %.2f seconds...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), i, length(files), toc(tfile));
+    tfile = tic;
+    % fprintf(fid, '%s :Data loaded for file %d/%d in %.2f seconds...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), file_idx, num_files, toc(tfile));
+    % fprintf('Data loaded for file %d/%d in %.2f seconds...\n\n', file_idx, num_files, toc(tfile));
+    log_message(fid, "Data loaded for file %d/%d in %.2f seconds...", file_idx, num_files, toc(tfile))
+    % make our final array a little bigger than it needs to be
+    % just encase our offset makes our image bigger
+    session_images = {};
+    session_labels = {};
+    
+    z_timeseries = zeros(raw_y, raw_x * metadata.num_rois, num_frames, 'like', Aout);
+    for plane_idx = 1:num_planes
+        tplane = tic;
 
-        % make our final array a little bigger than it needs to be
-        % just encase our offset makes our image bigger
-        z_timeseries = zeros(raw_y, raw_x * metadata.num_rois, num_frames_file, 'like', Aout);
-        for plane_idx = 1:num_planes
-            tplane = tic;
-            
-            fprintf(fid, '%s : Processing z-plane %d/%d...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), plane_idx, num_planes);
-            fprintf('%s : Processing z-plane %d/%d...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), plane_idx, num_planes);
+        log_message(fid, 'Processing z-plane %d/%d...', plane_idx, num_planes);
 
-            p_str = sprintf("plane_%d", plane_idx);
-            plane_fullfile = sprintf("%s/extracted_%s.h5", save_path, p_str);
-            
-            % /figures folder with /plane_n subdirectories
-            plane_savepath = fullfile(fig_save_path, p_str);
-            if ~isfolder(plane_savepath); mkdir(plane_savepath); end
+        p_str = sprintf("plane_%d", plane_idx);
+        plane_name_save = sprintf("%s/extracted_%s.h5", save_path, p_str);
 
-            %% SCAN PHASE CORRECTION METHOD 1:
-            % Our planar timeseries returned from Aout can be used
-            % while it's still vertically tiled
-            scan_offset = returnScanOffset(Aout(:,:,plane_idx,:), 1, 'int16');
+        % /figures folder with /plane_n subdirectories
+        plane_savepath = fullfile(fig_save_path, p_str);
+        if ~isfolder(plane_savepath); mkdir(plane_savepath); end
 
-            % We use the entire timeseries
-            % [~] = fixScanPhase(Aout(:,:,plane_idx,:), scan_offset, 1, 'int16');
-            % disp(toc);
+        %% SCAN PHASE CORRECTION METHOD 1:
+        % Our planar timeseries returned from Aout can be used
+        % while it's still vertically tiled
+        scan_offset = returnScanOffset(Aout(:,:,plane_idx,:), 1, 'int16');
 
-            metadata.scan_offset = scan_offset;
-            cnt = 1;
-            offset_y = 0;
-            offset_x = 0;
-            raw_offset_x = 0;
-            raw_offset_y = 0;
-            for roi_idx = 1:metadata.num_rois
-                fprintf(fid, "Processing ROI: %d/%d\n", roi_idx, num_rois);
-                fprintf("Processing ROI: %d/%d\n", roi_idx, num_rois);
-                if cnt > 1
-                    offset_y = offset_y + trimmed_y + metadata.num_lines_between_scanfields;
-                    raw_offset_y = raw_offset_y + raw_y + metadata.num_lines_between_scanfields;
-                    raw_offset_x = raw_offset_x + raw_x;
-                end
+        % We use the entire timeseries
+        % [~] = fixScanPhase(Aout(:,:,plane_idx,:), scan_offset, 1, 'int16');
+        % disp(toc);
 
-                % use the **untrimmed** roi in the phase offset correction
-                raw_yslice = (raw_offset_y + 1):(raw_offset_y + raw_y);
-                raw_timeseries = Aout(raw_yslice, 1:raw_x, plane_idx, :);
-
-                %% SCAN PHASE CORRECTION METHOD 2:
-                % Because the offsets could be different in each ROI depending
-                % on the flourescence/contrast, so we can also evaluate get
-                % an offset for each individual strip.
-                offsets_roi(plane_idx, roi_idx) = returnScanOffset(Aout(raw_yslice,:,plane_idx,:), 1, 'int16');
-                roi_arr = fixScanPhase(raw_timeseries, offsets_roi(plane_idx,roi_idx), 1, 'int16');
-                
-                % trimmed_xslice = (t_left+1:sx-t_right);
-                trimmed_xslice = (t_left+1:raw_x-t_right);
-                trimmed_yslice = (t_top+1:raw_y-t_bottom);
-
-                % pre-trim this roi
-                roi_arr = squeeze(roi_arr(trimmed_yslice, trimmed_xslice, :));
-                if cnt > 1 % wait until the new array size is calculated
-                    offset_x = offset_x + size(roi_arr, 2);
-                end
-
-                z_timeseries( ...
-                    1: size(roi_arr,1), ...
-                    (offset_x + 1):(offset_x + size(roi_arr,2)), ...
-                    : ...
-                    ) = roi_arr;
-                
-                [yind, xind] = get_central_indices(raw_timeseries(:,:,2), 40);
-                [yindr, xindr] = get_central_indices(roi_arr(:,:,2), 40);
-
-                images = {raw_timeseries(yind,xind,2), roi_arr(yindr, xindr, 2)};
-                zoomed_scale = calculate_scale(size(images{1},2),metadata.pixel_resolution);
-                roi_scales = {zoomed_scale,zoomed_scale};
-                labels = {'Raw', 'Phase-Corrected/Trimmed'};
-
-                roi_savename = fullfile(plane_savepath, sprintf('roi_%d.png', roi_idx));
-                make_tiled_figure( ...
-                    images, ...
-                    metadata, ...
-                    'fig_title', sprintf('ROI %d', roi_idx), ...
-                    'titles', labels, ...
-                    'scales', roi_scales, ...
-                    'save_name', roi_savename, ...
-                    'show_figure', false ...
-                    );
-                
-                cnt = cnt + 1;
+        metadata.scan_offset = scan_offset;
+        cnt = 1;
+        offset_x = 0;
+        raw_offset_y = 0;
+        for roi_idx = 1:metadata.num_rois
+            log_message(fid, "Processing ROI: %d/%d", roi_idx, num_rois);
+            if cnt > 1
+                raw_offset_y = raw_offset_y + raw_y + metadata.num_lines_between_scanfields;
             end
-            
-            % remove padded 0's
-            z_timeseries = z_timeseries( ...
-                any(z_timeseries, [2, 3]), ...
-                any(z_timeseries, [1, 3]), ...
-                :);
 
-            img_frame = z_timeseries(:,:,2);
-            mean_img = mean(z_timeseries, 3);
-            [yind, xind] = get_central_indices(mean_img, 30); % 30 pixels around the center of the brightest part of an image frame
-            images = {img_frame, mean_img, mean_img(yind, xind)};
-            labels = {'Second Frame', 'Mean Image', 'Mean Image(Zoom)'};
-            scale_full = calculate_scale(size(img_frame, 2), metadata.pixel_resolution);
-            scale_roi = calculate_scale( size(img_frame(yind, xind),2), metadata.pixel_resolution);
-            scales = {scale_full, scale_full, scale_roi};
-            plane_save_path = fullfile(plane_savepath, sprintf('mean_frame_plane_%d.png', plane_idx));
+            % use the **untrimmed** roi in the phase offset correction
+            raw_yslice = (raw_offset_y + 1):(raw_offset_y + raw_y);
+            raw_timeseries = Aout(raw_yslice, 1:raw_x, plane_idx, :);
 
-            make_tiled_figure( ...
+            %% SCAN PHASE CORRECTION METHOD 2:
+            % Because the offsets could be different in each ROI depending
+            % on the flourescence/contrast, so we can also evaluate get
+            % an offset for each individual strip.
+            offsets_roi(plane_idx, roi_idx) = returnScanOffset(Aout(raw_yslice,:,plane_idx,:), 1, 'int16');
+            roi_arr = fixScanPhase(raw_timeseries, offsets_roi(plane_idx,roi_idx), 1, 'int16');
+
+            % trimmed_xslice = (t_left+1:sx-t_right);
+            trimmed_xslice = (t_left+1:raw_x-t_right);
+            trimmed_yslice = (t_top+1:raw_y-t_bottom);
+
+            % pre-trim this roi
+            roi_arr = squeeze(roi_arr(trimmed_yslice, trimmed_xslice, :));
+            if cnt > 1 % wait until the new array size is calculated
+                offset_x = offset_x + size(roi_arr, 2);
+            end
+
+            z_timeseries( ...
+                1: size(roi_arr,1), ...
+                (offset_x + 1):(offset_x + size(roi_arr,2)), ...
+                : ...
+                ) = roi_arr;
+
+            [yind, xind] = get_central_indices(raw_timeseries(:,:,2), 40);
+            [yindr, xindr] = get_central_indices(roi_arr(:,:,2), 40);
+
+            images = {raw_timeseries(yind,xind,2), roi_arr(yindr, xindr, 2)};
+            zoomed_scale = calculate_scale(size(images{1},2),metadata.pixel_resolution);
+            roi_scales = {zoomed_scale,zoomed_scale};
+            labels = {'Pre-Corrected/Trimmed', 'Phase-Corrected/Trimmed'};
+
+            roi_savename = fullfile(plane_savepath, sprintf('roi_%d.png', roi_idx));
+            write_tiled_figure( ...
                 images, ...
                 metadata, ...
-                'fig_title', sprintf("Plane %d", plane_idx), ...
+                'fig_title', sprintf('ROI %d', roi_idx), ...
                 'titles', labels, ...
-                'scales', scales, ...
-                'save_name', plane_save_path, ...
-                'show_figure', false ...
+                'scales', roi_scales, ...
+                'save_name', roi_savename ...
             );
 
-            if isfile(plane_fullfile)
-                if overwrite
-                    fprintf(fid, "%s : Deleting %s\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS') ,plane_fullfile);
-                    delete(plane_fullfile);
-                else
-                    fprintf("Not Implemented Error:\nSave_file %s already exists\nUser set overwrite = 0.\nReturning without extracting data.\nTo extract this dataset, change the save_path, partial overwrites are not implemented.", plane_fullfile);
-                    return
-                end
-            end
-
-            metadata.scan_offset = offsets_plane(plane_idx);
-            write_chunk_h5(plane_fullfile, z_timeseries, size(z_timeseries,3), dataset_name);
-            write_chunk_h5(plane_fullfile, mean(z_timeseries, 3), size(z_timeseries,3), '/Ym');
-            % write_metadata_h5(metadata, plane_fullfile, '/Y');
-            write_metadata_h5(metadata, plane_fullfile, '/');
-            fprintf(fid, "%s : Plane %d processed in %.2f seconds\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), plane_idx, toc(tplane));
-            fprintf("%s : Plane %d processed in %.2f seconds\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), plane_idx, toc(tplane));
-
+            cnt = cnt + 1;
         end
+
+        % remove padded 0's
+        z_timeseries = z_timeseries( ...
+            any(z_timeseries, [2, 3]), ...
+            any(z_timeseries, [1, 3]), ...
+            :);
+
+        img_frame = z_timeseries(:,:,2);
+        mean_img = mean(z_timeseries, 3);
+        session_images{plane_idx} = mean_img;
+        session_labels{plane_idx} = sprintf("Plane %d", plane_idx);
+
+        [yind, xind] = get_central_indices(mean_img, 30); % 30 pixels around the center of the brightest part of an image frame
+        images = {img_frame, mean_img, mean_img(yind, xind)};
+        labels = {'Second Frame', 'Mean Image', 'Mean Image(Zoom)'};
+        scale_full = calculate_scale(size(img_frame, 2), metadata.pixel_resolution);
+        scale_roi = calculate_scale( size(img_frame(yind, xind),2), metadata.pixel_resolution);
+        scales = {scale_full, scale_full, scale_roi};
+        plane_save_path = fullfile(plane_savepath, sprintf('mean_frame_plane_%d.png', plane_idx));
+
+        write_tiled_figure( ...
+            images, ...
+            metadata, ...
+            'titles', labels, ...
+            'scales', scales, ...
+            'save_name', plane_save_path ...
+        );
+
+        if isfile(plane_name_save)
+            if overwrite
+                log_message(fid, "Deleting %s",plane_name_save);
+                delete(plane_name_save);
+            else
+                log_message(fid, "Not Implemented Error:\nSave_file %s already exists\n" + ...
+                    "User set overwrite = 0. Returning without extracting data.\n" + ...
+                    "To extract this dataset, change the save_path, partial overwrites are not implemented.", plane_name_save);
+               
+                return
+            end
+        end
+
+        metadata.scan_offset = offsets_plane(plane_idx);
+        write_frames_to_h5(plane_name_save, z_timeseries, size(z_timeseries,3), dataset_name);
+        h5create(plane_name_save,"/Ym",size(mean_img));
+        h5write(plane_name_save, '/Ym', mean_img);
+        write_metadata_h5(metadata, plane_name_save, '/');
+        log_message(fid, "Plane %d processed in %.2f seconds",plane_idx, toc(tplane));
+
     end
+    write_tiled_tight( ...
+        session_images, ...
+        'titles', session_labels, ...
+        'save_name', fullfile(fig_save_path, "all_planes.png") ...
+    );
 catch ME
     if exist('log_full_path', 'var') && isfile(log_full_path)
-        fprintf('Deleting errored logfile: %s\n', log_full_path);
+        fprintf('Deleting errored logfile: %s', log_full_path);
         for k = 1:length(ME.stack)
             fprintf('Error in %s (line %d)\n', ME.stack(k).file, ME.stack(k).line);
         end
@@ -296,8 +309,8 @@ catch ME
     end
     rethrow(ME);
 end
-fprintf(fid, "%s : Processing complete. Time: %.3f minutes\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tfile)/60);
-fprintf("%s : Processing complete. Time: %.3f minutes\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tfile)/60);
+
+log_message(fid,"%s : Processing complete. Time: %.3f minutes.",toc(tfile)/60);
 fclose('all');
 end
 
