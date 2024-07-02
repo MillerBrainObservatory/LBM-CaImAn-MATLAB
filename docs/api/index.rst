@@ -1,9 +1,11 @@
 
-###
-API
-###
+Functions
+###########
 
-To keep code and documentation as *in-sync* as possible, many (if not most) of the most helpful comments are in the functions docstring (directly under where the function is defined).
+There are core functions used to run the pipeline and several helper functions for tasks such as loading data,
+
+.. toctree::
+    :maxdepth: 2
 
 .. currentmodule:: .
 
@@ -20,26 +22,34 @@ Core
 Utilities
 ==============
 
-.. currentmodule:: io
-
-.. autofunction:: read_plane
-.. autofunction:: read_h5_metadata
-.. autofunction:: rename_planes
-.. autofunction:: log_metadata
-.. autofunction:: make_zoomed_movie
-.. autofunction:: display_dataset_names
-
 .. currentmodule:: utils
 
-Utilities
-=============
-
-.. toctree::
-    :maxdepth: 1
-
-.. autofunction:: get_metadata
-.. autofunction:: get_segmentation_metrics
+.. autofunction:: display_dataset_names
 .. autofunction:: get_central_indices
-.. autofunction:: make_tiled_figure
-.. autofunction:: translate_frames
-.. autofunction:: validate_toolboxes
+.. .. autofunction:: get_metadata
+.. .. autofunction:: get_segmentation_metrics
+.. .. autofunction:: translate_frames
+.. .. autofunction:: read_h5_metadata
+.. .. autofunction:: read_plane
+.. .. autofunction:: rename_planes
+.. .. autofunction:: validate_toolboxes
+.. .. autofunction:: write_frames_to_h5
+.. .. autofunction:: write_frames_to_avi
+.. .. autofunction:: write_frames_to_gif
+.. .. autofunction:: write_frames_to_tiff
+.. .. autofunction:: write_tiled_figure
+
+.. Internal
+.. =============
+
+.. .. currentmodule:: internal
+
+.. Functions that are meant for use within the pipeline, not for public use.
+
+.. .. autofunction:: log_struct
+.. .. autofunction:: set_caxis
+.. .. autofunction:: calculate_scale
+.. .. autofunction:: is_valid_group
+.. .. autofunction:: is_valid_dataset
+.. .. autofunction:: write_metadata_h5
+
