@@ -70,8 +70,6 @@ for i=1:length(files)
     h2(:, i) = metadata.offsets_roi;
 end
 
-
-
 %% Analysis matching offsets taken for the entire plane, vs offsets 
 %  taken for individual ROI's
 clc;
