@@ -1,92 +1,85 @@
-function [f] = write_tiled_tight(images, metadata, varargin)
-% Creates a tiled figure with scale bars and specified titles.
-%
-% Parameters
-% ----------
-% images : cell array
-%     Cell array of 2D or 3D images to be tiled.
-% metadata : struct
-%     Metadata structure containing necessary information.
-% titles : cell array, optional
-%     Cell array of titles for each image.
-% scales : cell array, optional
-%      Cell array of sizes for the scale bar, in micron.
-%      If empty or 0, no scale is drawn.
-% fig_title : char, optional
-%     Title for the entire figure.
-% save_name : char, optional
-%     Name to save the figure.
-% layout : char, optional
-%     Layout for the tiles ('horizontal', 'vertical', 'square').
-% show_figure : logical, optional
-%     If false, the figure will not be displayed. Default is true.
+function write_tiled_tight(images,varargin)
+    % write_tiled_tight Tiling function for 2D images with titles.
+    %
+    % Parameters
+    % ----------
+    % images : cell array
+    %     Cell array containing 2D images to be tiled.
+    % varargin : additional parameters
+    %     fig_title : string, optional
+    %         Title of the figure.
+    %     titles : cell array, optional
+    %         Titles for each individual image.
+    %     save_name : string, optional
+    %         Path to save the resulting figure.
+    %     show_figure : logical, optional
+    %         Whether to display the figure.
 
-p = inputParser;
-addRequired(p, 'images', @iscell);
-addRequired(p, 'metadata', @isstruct);
-addParameter(p, 'fig_title', '');
-addParameter(p, 'titles', {}, @iscell);
-addParameter(p, 'scales', {}, @iscell);
-addParameter(p, 'save_name', 'unnamed.png');
-addParameter(p, 'layout', 'square', @(x) any(validatestring(x, {'horizontal', 'vertical', 'square'})));
-addParameter(p, 'show_figure', true, @islogical);
-addParameter(p, 'font_size', 10, @isscalar);
-parse(p, images, metadata, varargin{:});
+    p = inputParser;
+    addRequired(p, 'images', @iscell);
+    addParameter(p, 'fig_title', '', @(x) ischar(x) || isstring(x));
+    addParameter(p, 'titles', {}, @iscell);
+    addParameter(p, 'save_name', '', @(x) ischar(x) || isstring(x));
+    addParameter(p, 'show_figure', false, @islogical);
+    parse(p, images, varargin{:});
 
-images = p.Results.images;
-metadata = p.Results.metadata;
-fig_title = p.Results.fig_title;
-titles = p.Results.titles;
-scales = p.Results.scales;
-save_name = p.Results.save_name;
-layout = p.Results.layout;
-font_size = p.Results.font_size;
-show_figure = p.Results.show_figure;
+    images = p.Results.images;
+    fig_title = p.Results.fig_title;
+    titles = p.Results.titles;
+    save_name = p.Results.save_name;
+    show_figure = p.Results.show_figure;
 
-num_images = length(images);
-num_titles = length(titles);
+    num_images = numel(images);
+    grid_size = ceil(sqrt(num_images));
 
-% set figure visibility
-f = figure('Color', 'k', 'Visible', show_figure);
+    figure('Visible', 'off');
 
-if ~isempty(fig_title)
-    sgtitle(fig_title, 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'w');
-end
-
-switch layout
-    case 'horizontal'
-        tiledlayout(1, num_images, 'TileSpacing', 'none', 'Padding', 'none');
-    case 'vertical'
-        tiledlayout(num_images, 1, 'TileSpacing', 'none', 'Padding', 'none');
-    case 'square'
-        n = ceil(sqrt(num_images));
-        tiledlayout(n, n, 'TileSpacing', 'none', 'Padding', 'none');
-    otherwise
-        error('Invalid layout option. Use ''horizontal'', ''vertical'', or ''square''.');
-end
-
-for i = 1:num_images
-    img = images{i};
-    if ndims(img) == 3
-        img = img(:, :, 2);
+    for i = 1:num_images
+        subplot(grid_size, grid_size, i);
+        imshow(images{i}, []);
+        if ~isempty(titles)
+            title(titles{i}, 'Interpreter', 'none', 'FontSize', 10);
+        end
+        axis tight;
     end
 
-    nexttile;
-    imagesc(img);
-    axis image; axis tight; axis off; colormap('gray');
-    if ~isempty(titles) > 0
-        title(titles{i}, 'FontSize', font_size, 'Color', 'w');
+    if ~isempty(fig_title)
+        sgtitle(fig_title, 'FontSize', 12);
+    end
+
+    set(gcf, 'Position', [100, 100, 1200, 800]);
+    tight_layout();
+
+    if ~isempty(save_name)
+        exportgraphics(gcf, save_name, "Resolution",600);
+    end
+
+    if show_figure
+        close(gcf);
     end
 end
 
-if ~isempty(save_name)
-    saveas(f, save_name, 'png');
-    if ~show_figure
-        close(f);
+function tight_layout()
+    % tight_layout Adjusts subplot layout to minimize whitespace.
+    ha = get(gcf, 'Children');
+    for i = 1:numel(ha)
+        if isprop(ha(i), 'OuterPosition')
+            outerpos = get(ha(i), 'OuterPosition');
+            ti = get(ha(i), 'TightInset');
+            left(i) = outerpos(1) - ti(1);
+            bottom(i) = outerpos(2) - ti(2);
+            right(i) = outerpos(1) + outerpos(3) + ti(3);
+            top(i) = outerpos(2) + outerpos(4) + ti(4);
+        else
+            left(i) = Inf;
+            bottom(i) = Inf;
+            right(i) = -Inf;
+            top(i) = -Inf;
+        end
     end
-end
-
-if nargout == 0 && show_figure
-    clear f;
-end
+    left = min(left);
+    bottom = min(bottom);
+    right = max(right);
+    top = max(top);
+    set(gcf, 'Units', 'normalized', 'OuterPosition', [left, bottom, right - left, top - bottom]);
 end
