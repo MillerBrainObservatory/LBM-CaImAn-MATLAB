@@ -1,4 +1,4 @@
-function convertScanImageTiffToVolume(data_path, save_path, varargin)
+function [session_images, session_labels] = convertScanImageTiffToVolume(data_path, save_path, varargin)
 % convertScanImageTiffToVolume Convert ScanImage .tif files into a 4D volume.
 %
 % Convert raw `ScanImage`_ multi-roi .tif files from a single session
@@ -104,7 +104,7 @@ metadata.extraction_params = p.Results();
 [t_left, t_right, t_top, t_bottom] = deal(trim_pixels(1), trim_pixels(2), trim_pixels(3), trim_pixels(4));
 metadata.trim_pixels = [t_left, t_right, t_top, t_bottom]; % store the number of pixels to trim
 raw_x = metadata.num_pixel_xy(1);
-raw_x = raw_x-1;
+raw_x = min(raw_x, metadata.tiff_width);
 raw_y = metadata.num_pixel_xy(2);
 
 num_planes = metadata.num_planes;
@@ -119,7 +119,7 @@ offsets_plane = zeros(num_planes, 1);
 offsets_roi = zeros(num_planes, num_rois);
 try
 
-    log_struct(metadata,'metadata',log_full_path,fid);
+    log_struct(fid,metadata,'metadata',log_full_path,);
 
     fprintf("Metadata:\n\n")
     disp(metadata)
@@ -139,11 +139,10 @@ try
         try
             hTif = ScanImageTiffReader(full_filename);
             hTif = hTif.data();
-            hTif = most.memfunctions.inPlaceTranspose(hTif);
+            % hTif = most.memfunctions.inPlaceTranspose(hTif);
+            hTif = permute(hTif, [2 1 3 4]);
             size_y = size(hTif);
-            if file_idx == 1
-                frames_file = size_y(end)/num_planes;
-            end
+            if file_idx == 1; frames_file = size_y(end)/num_planes; end
 
             file_slice = (offset_file + 1):(offset_file + frames_file);
             Aout( ...
@@ -158,11 +157,9 @@ try
     end
 
     tfile = tic;
-    % fprintf(fid, '%s :Data loaded for file %d/%d in %.2f seconds...\n\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), file_idx, num_files, toc(tfile));
-    % fprintf('Data loaded for file %d/%d in %.2f seconds...\n\n', file_idx, num_files, toc(tfile));
+    
     log_message(fid, "Data loaded for file %d/%d in %.2f seconds...", file_idx, num_files, toc(tfile))
-    % make our final array a little bigger than it needs to be
-    % just encase our offset makes our image bigger
+
     session_images = {};
     session_labels = {};
     
@@ -281,7 +278,6 @@ try
                 log_message(fid, "Not Implemented Error:\nSave_file %s already exists\n" + ...
                     "User set overwrite = 0. Returning without extracting data.\n" + ...
                     "To extract this dataset, change the save_path, partial overwrites are not implemented.", plane_name_save);
-               
                 return
             end
         end
