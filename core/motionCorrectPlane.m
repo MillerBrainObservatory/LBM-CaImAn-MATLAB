@@ -86,12 +86,8 @@ else
     fprintf('Log file created: %s\n', log_full_path);
 end
 
-%% Pull metadata from attributes attached to this group
 num_cores = max(num_cores, 23);
-fprintf(fid, '%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); 
-fprintf('%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores);
-tall=tic;
-
+tall=tic; log_message(fid, 'Beginning registration with %d cores...\n', num_cores); 
 for plane_idx = start_plane:end_plane
     tplane=tic;
 
@@ -122,7 +118,7 @@ for plane_idx = start_plane:end_plane
         parpool(clust,num_cores, 'IdleTimeout', 30);
     end
 
-    Y = read_plane(plane_name,'dataset_name',dataset_name,'plane_number',plane_idx);
+    Y = read_plane(plane_name,'ds',dataset_name,'plane',plane_idx);
     if ~isa(Y,'single');Y = single(Y);end  % we want float32
 
     volume_size = size(Y);
@@ -185,7 +181,7 @@ for plane_idx = start_plane:end_plane
 
     log_message(fid, "Plotting registration metrics...\n");
 
-    fig_plane_name = sprintf("%s/plane_%s", fig_save_path, plane_idx);
+    fig_plane_name = sprintf("%s/plane_%d", fig_save_path, plane_idx);
     metrics_name = sprintf("%s_metrics.png", fig_plane_name);
     f = figure('Visible', 'off', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
     ax1 = subplot(2, 3, 1); imagesc(mY); axis equal; axis tight; axis off; 
@@ -251,3 +247,4 @@ for plane_idx = start_plane:end_plane
     clear M* shifts* template Ym;
 end
 log_message(fid, "Processing complete. Time: %.2f hours\n",toc(tall)/3600);
+close('all');
