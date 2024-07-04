@@ -20,7 +20,7 @@ function log_message(fid, msg, varargin)
     end
 
     log_window_msg = sprintf('%s\n', sprintf(msg, varargin{:}));
-    log_file_msg = sprintf('%s : %s', timestamp, log_window_msg);
+    log_file_msg = sprintf('%s : %s\n', timestamp, log_window_msg);
 
     fprintf(fid, '%s', log_file_msg);
 

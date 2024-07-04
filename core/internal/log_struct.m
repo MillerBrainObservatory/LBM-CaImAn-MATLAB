@@ -1,30 +1,32 @@
-function log_struct(metadata, struct_name, log_full_path, fid)
+function log_struct(fid, in_struct, struct_name, log_full_path)
     % log_struct Log the contents of a structure to a log file and the command window.
     %
     % Parameters
     % ----------
-    % metadata : struct
+    % fid : file identifier
+    %     The file identifier for the log file.
+    % in_struct : struct
     %     The structure to log.
     % struct_name : char
     %     The name of the structure.
     % log_full_path : char
     %     The path to the log file.
-    % fid : file identifier
-    %     The file identifier for the log file.
 
-    fprintf(fid, '%s : %s contents:\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), struct_name);
-    fprintf('%s contents:\n', struct_name);
+    if ~isstruct(in_struct)
+        error('log_struct:InvalidInput', 'Input argument metadata must be a structure.');
+    end
 
-    fields = fieldnames(metadata);
+    log_message(fid, '%s contents:\n',struct_name);
+
+    fields = fieldnames(in_struct);
     for i = 1:numel(fields)
-        field_value = metadata.(fields{i});
+        field_value = in_struct.(fields{i});
         if isstruct(field_value)
-            fprintf(fid, '%s : %s.%s:\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), struct_name, fields{i});
-            fprintf('%s.%s:\n', struct_name, fields{i});
-            log_struct(field_value, [struct_name '.' fields{i}], log_full_path, fid);
+            log_struct(fid, field_value, [struct_name '.' fields{i}], log_full_path);
+        elseif ismatrix(in_struct)
+            log_message(fid, '%s = %s',fields{i}, mat2str(field_value));
         else
-            fprintf(fid, '%s : %s.%s = %s\n', datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS'), struct_name, fields{i}, mat2str(field_value));
-            fprintf('%s.%s = %s\n', struct_name, fields{i}, mat2str(field_value));
+            log_message(fid, '%s = %s',fields{i},convertCharsToString(field_value));
         end
     end
 end
