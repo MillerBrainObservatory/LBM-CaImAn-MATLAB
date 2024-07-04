@@ -85,7 +85,6 @@ if fid == -1
 else
     fprintf('Log file created: %s\n', log_full_path);
 end
-% closeCleanupObj = onCleanup(@() fclose(fid));
 
 %% Pull metadata from attributes attached to this group
 num_cores = max(num_cores, 23);
@@ -179,7 +178,6 @@ for plane_idx = start_plane:end_plane
     
     log_message(fid, "Calculating registration metrics...\n");
 
-    shifts2 = squeeze(cat(3,shifts2(:).shifts));
     [cY,mY,~] = motion_metrics(Y,10);
     [cM1,mM1,~] = motion_metrics(M1,10);
     [cM2,mM2,~] = motion_metrics(M2,10);
@@ -211,7 +209,6 @@ for plane_idx = start_plane:end_plane
 
     log_message(fid, "Calculating registration shifts...\n");
 
-    shifts1 = squeeze(cat(3,shifts1(:).shifts));
     shifts2 = cat(ndims(shifts2(1).shifts)+1,shifts2(:).shifts);
     shifts2 = reshape(shifts2,[],ndims(Y)-1,T);
     shifts_x = squeeze(shifts2(:,1,:))';
