@@ -10,7 +10,7 @@ function log_message(fid, msg, varargin)
     % varargin : any
     %     Additional arguments to format the message.
     
-    timestamp = datestr(datetime('now'), 'yyyy_mm_dd-HH_MM_SS');
+    timestamp = datestr(datetime('now'), 'yyyy_mm_dd-HH:MM:SS');
 
     % Sanitize varargin to escape backslashes, but allow \n
     for arg = 1:numel(varargin)
@@ -19,8 +19,8 @@ function log_message(fid, msg, varargin)
         end
     end
 
-    log_window_msg = sprintf('%s\n', sprintf(msg, varargin{:}));
-    log_file_msg = sprintf('%s : %s\n', timestamp, log_window_msg);
+    log_window_msg = sprintf('%s', sprintf(msg, varargin{:}));
+    log_file_msg = sprintf('%s : %s', timestamp, log_window_msg);
 
     fprintf(fid, '%s', log_file_msg);
 
