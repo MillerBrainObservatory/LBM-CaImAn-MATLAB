@@ -39,12 +39,29 @@ try
 catch
     error("File %s does not exist with group %s. ", h5_fullfile, loc);
 end
+% find valid dataset if empty
+if isempty(h5_data.Attributes)
+    if loc ~= "/"
+        fprintf("WARNING! Attempt made to read an unknown dataset: %s.\nAttempting with the root dataset '/'...\n", loc);
+        h5_data = h5info(h5_fullfile, "/");
+        if isempty(h5_data.Attributes)
+            error("Given group %s does not exist in file: %s", loc, h5_fullfile);
+        else
+            fprintf("Woo! Metadata found in the root '/' group of the dataset.\n");
+        end
+    else
+        log_message("No valid metadata in the root group or in group %s for file:\n %s\n", loc, h5_fullfile);
+        return
+    end
+end
+
 metadata = struct();
 for k = 1:numel(h5_data.Attributes)
     attr_name = h5_data.Attributes(k).Name;
     attr_value = h5readatt(h5_fullfile, ['/' h5_data.Name], attr_name);
     metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
 end
+
 if isempty(metadata)
     error("No valid metadata:\nFile: %s\nLocation: %s\n", h5_fullfile, loc)
 end
