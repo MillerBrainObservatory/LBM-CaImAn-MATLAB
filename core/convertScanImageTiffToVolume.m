@@ -1,4 +1,4 @@
-function [session_images, session_labels] = convertScanImageTiffToVolume(data_path, save_path, varargin)
+function convertScanImageTiffToVolume(data_path, save_path, varargin)
 % convertScanImageTiffToVolume Convert ScanImage .tif files into a 4D volume.
 %
 % Convert raw `ScanImage`_ multi-roi .tif files from a single session
@@ -82,7 +82,10 @@ fig_save_path = fullfile(save_path, "figures");
 if ~isfolder(fig_save_path); mkdir(fig_save_path); end
 
 files = dir(fullfile(data_path, '*.tif*'));
-if isempty(files); error('No suitable tiff files found in: \n  %s', data_path); end
+if isempty(files)
+    error('No suitable tiff files found in: \n\n   %s', data_path);
+end
+
 num_files=length(files);
 
 log_file_name = sprintf("%s_extraction.log", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
@@ -119,12 +122,12 @@ offsets_plane = zeros(num_planes, 1);
 offsets_roi = zeros(num_planes, num_rois);
 try
 
-    log_struct(fid,metadata,'metadata',log_full_path,);
+    log_struct(fid,metadata,'metadata',log_full_path);
 
     fprintf("Metadata:\n\n")
     disp(metadata)
 
-    log_message(fid, "Aggregating data from %d file(s) with %d plane(s).",num_files, num_planes);
+    log_message(fid, "Aggregating data from %d file(s) with %d plane(s).\n",num_files, num_planes);
     % We dont know how many frames there are in each files are yet
     % We only know how many files there are
     offset_file = 0;
@@ -134,7 +137,7 @@ try
 
         full_filename = fullfile(data_path, files(file_idx).name);
 
-        log_message(fid, 'Loading data for file %d of %d...', file_idx, num_files);
+        log_message(fid, 'Loading data for file %d of %d...\n', file_idx, num_files);
 
         try
             hTif = ScanImageTiffReader(full_filename);
@@ -158,7 +161,7 @@ try
 
     tfile = tic;
     
-    log_message(fid, "Data loaded for file %d/%d in %.2f seconds...", file_idx, num_files, toc(tfile))
+    log_message(fid, "Data loaded for file %d/%d in %.2f seconds...\n", file_idx, num_files, toc(tfile))
 
     session_images = {};
     session_labels = {};
@@ -167,7 +170,7 @@ try
     for plane_idx = 1:num_planes
         tplane = tic;
 
-        log_message(fid, 'Processing z-plane %d/%d...', plane_idx, num_planes);
+        log_message(fid, 'Processing z-plane %d/%d...\n', plane_idx, num_planes);
 
         p_str = sprintf("plane_%d", plane_idx);
         plane_name_save = sprintf("%s/extracted_%s.h5", save_path, p_str);
@@ -190,7 +193,7 @@ try
         offset_x = 0;
         raw_offset_y = 0;
         for roi_idx = 1:metadata.num_rois
-            log_message(fid, "Processing ROI: %d/%d", roi_idx, num_rois);
+            log_message(fid, "Processing ROI: %d/%d...\n", roi_idx, num_rois);
             if cnt > 1
                 raw_offset_y = raw_offset_y + raw_y + metadata.num_lines_between_scanfields;
             end
@@ -251,8 +254,6 @@ try
 
         img_frame = z_timeseries(:,:,2);
         mean_img = mean(z_timeseries, 3);
-        session_images{plane_idx} = mean_img;
-        session_labels{plane_idx} = sprintf("Plane %d", plane_idx);
 
         [yind, xind] = get_central_indices(mean_img, 30); % 30 pixels around the center of the brightest part of an image frame
         images = {img_frame, mean_img, mean_img(yind, xind)};
@@ -287,26 +288,26 @@ try
         h5create(plane_name_save,"/Ym",size(mean_img));
         h5write(plane_name_save, '/Ym', mean_img);
         write_metadata_h5(metadata, plane_name_save, '/');
-        log_message(fid, "Plane %d processed in %.2f seconds",plane_idx, toc(tplane));
-
+        if getenv("OS") == "Windows_NT"
+            mem = memory;
+            max_gb = mem.MaxPossibleArrayBytes / 1e9;
+            max_avail = mem.MemAvailableAllArrays / 1e9;
+            mem_used = mem.MemUsedMATLAB / 1e9;
+            log_message(fid, "MEMORY USAGE (max/available/used): %.2f/%.2f/%.2f\n", max_gb, max_avail, mem_used)
+        end
+        log_message(fid, "---- Complete: Plane %d processed in %.2f seconds ----\n",plane_idx, toc(tplane));
     end
-    write_tiled_tight( ...
-        session_images, ...
-        'titles', session_labels, ...
-        'save_name', fullfile(fig_save_path, "all_planes.png") ...
-    );
 catch ME
     if exist('log_full_path', 'var') && isfile(log_full_path)
         fprintf('Deleting errored logfile: %s', log_full_path);
         for k = 1:length(ME.stack)
-            fprintf('Error in %s (line %d)\n', ME.stack(k).file, ME.stack(k).line);
+            fprintf('Error in %s (line %d) \n', ME.stack(k).file, ME.stack(k).line);
         end
         delete(log_full_path);
     end
     rethrow(ME);
 end
-
-log_message(fid,"%s : Processing complete. Time: %.3f minutes.",toc(tfile)/60);
+log_message(fid,"Processing complete. Time: %.3f minutes.",toc(tfile)/60);
 fclose('all');
 end
 
