@@ -21,18 +21,15 @@ save_path = fullfile(parent_path, sprintf('extracted'));
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Extraction %%%%%%%%
 
-clc; compute = 0;
-if compute
-    convertScanImageTiffToVolume( ...
-        data_path, ...
-        save_path, ...
-        'dataset_name', '/Y', ... % default
-        'debug_flag', 0, ... % default, if 1 will display files and return
-        'fix_scan_phase', 1, ... % default, keep to 1
-        'trim_pixels', [0 0 0 0], ... % default, num pixels to trim for each roi
-        'overwrite', 1 ...
-    );
-end
+convertScanImageTiffToVolume( ...
+    data_path, ...
+    save_path, ...
+    'dataset_name', '/Y', ... % default
+    'debug_flag', 0, ... % default, if 1 will display files and return
+    'fix_scan_phase', 1, ... % default, keep to 1
+    'trim_pixels', [0 0 0 0], ... % default, num pixels to trim for each roi
+    'overwrite', 1 ...
+);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Motion Correction %%%
