@@ -1,4 +1,4 @@
-function motionCorrectPlane(data_path, save_path, varargin)
+function motionCorrectPlane(data_path, save_path, ds, debug_flag, varargin)
 % MOTIONCORRECTPLANE Perform piecewise-rigid motion correction on imaging data.
 %
 % Parameters
@@ -7,7 +7,7 @@ function motionCorrectPlane(data_path, save_path, varargin)
 %     Path to the directory containing the files extracted via convertScanImageTiffToVolume.
 % save_path : char
 %     Path to the directory to save the motion vectors.
-% dataset_name : string, optional
+% ds : char, optional
 %     Group path within the hdf5 file that contains raw data.
 %     Default is '/Y'.
 % debug_flag : double, logical, optional
@@ -40,24 +40,26 @@ function motionCorrectPlane(data_path, save_path, varargin)
 p = inputParser;
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
 addRequired(p, 'save_path', @(x) ischar(x) || isstring(x));
-addParameter(p, 'dataset_name', '/Y', @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
+addOptional(p, 'ds', '/Y', @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
 addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
+addParameter(p, 'do_figures', 1, @(x) isnumeric(x) && isPositiveIntegerValuedNumeric(x));
 addParameter(p, 'options_rigid', {}, @(x) isstruct(x));
 addParameter(p, 'options_nonrigid', {}, @(x) isstruct(x));
-parse(p, data_path, save_path, varargin{:});
+parse(p,data_path,save_path,ds,debug_flag,varargin{:});
 
 data_path = p.Results.data_path;
 save_path = p.Results.save_path;
-dataset_name = p.Results.dataset_name;
+ds = p.Results.dataset_name;
 debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
 num_cores = p.Results.num_cores;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
+do_figures = p.Results.do_figures;
 options_rigid = p.Results.options_rigid;
 options_nonrigid = p.Results.options_nonrigid;
 
@@ -118,7 +120,7 @@ for plane_idx = start_plane:end_plane
         parpool(clust,num_cores, 'IdleTimeout', 30);
     end
 
-    Y = read_plane(plane_name,'ds',dataset_name,'plane',plane_idx);
+    Y = read_plane(plane_name,'ds',ds,'plane',plane_idx);
     if ~isa(Y,'single');Y = single(Y);end  % we want float32
 
     volume_size = size(Y);

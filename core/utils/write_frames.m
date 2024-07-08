@@ -36,10 +36,6 @@ function write_frames(file,Y_in,varargin)
 % Write a 3D array to an HDF5 file with a specified dataset name:
 %
 %     write_frames('data.h5', my_data, '/Y');
-%
-% See also
-% --------
-% h5create, h5write
 
 p = inputParser;
 p.addRequired('file', @(x) validateattributes(x, {'char', 'string'}, {'nonempty', 'scalartext'}, '', 'file'));
@@ -117,7 +113,7 @@ while current_position < prev_size(end) + sizY(end)
         % chunk_data = reshape(chunk_data, [size(chunk_data, 1), size(chunk_data, 2) 1]);
         % h5write(file, ds, chunk_data);
         return
-    else 
+    else
         start = [ones(1, ndims(Y_in)-1), current_position + 1];
     end
     h5write(file, ds, chunk_data, start, size(chunk_data));

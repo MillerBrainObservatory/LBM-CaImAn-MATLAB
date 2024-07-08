@@ -1,5 +1,5 @@
 function convertScanImageTiffToVolume(data_path, save_path, varargin)
-% convertScanImageTiffToVolume Convert ScanImage .tif files into a 4D volume.
+% Convert ScanImage .tif files into a 4D volume.
 %
 % Convert raw `ScanImage`_ multi-roi .tif files from a single session
 % into a single 4D volumetric time-series (x, y, z, t). It's designed to process files for the
@@ -13,7 +13,7 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 % save_path : char, optional
 %     The directory where processed files will be saved. It is created if it does
 %     not exist. Defaults to the data_path directory.
-% dataset_name : string, optional
+% ds : string, optional
 %     Name of the group (h5 dataset) to save the extracted data. Default is
 %     '/Y'. Must contain a leading slash.
 % debug_flag : double, logical, optional
@@ -55,17 +55,17 @@ p = inputParser;
 
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
 addOptional(p, 'save_path', data_path, @(x) ischar(x) || isstring(x));
-addParameter(p, 'dataset_name', "/Y", @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
+addParameter(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'fix_scan_phase', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'trim_pixels', [6 6 10 0], @isnumeric);
-addParameter(p, 'do_figures',  @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'do_figures',0,  @(x) isnumeric(x) || islogical(x));
 parse(p, data_path, save_path, varargin{:});
 
 data_path = fullfile(p.Results.data_path);
 save_path = fullfile(p.Results.save_path);
-dataset_name = p.Results.dataset_name;
+ds = p.Results.ds;
 debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
 fix_scan_phase = p.Results.fix_scan_phase;
@@ -133,7 +133,7 @@ num_rois = metadata.num_rois;
 num_frames = metadata.num_frames;
 data_type = metadata.sample_format;
 
-metadata.dataset_name = dataset_name;
+metadata.dataset_name = ds;
 metadata.num_files = num_files;
 
 log_struct(fid,metadata,'metadata',log_full_path);
@@ -271,7 +271,7 @@ for plane_idx = 1:num_planes
         );
 
         metadata.scan_offset = offsets_plane(plane_idx);
-        write_frames_to_h5(plane_name_save, z_timeseries, 'ds',dataset_name);
+        write_frames_to_h5(plane_name_save, z_timeseries, 'ds',ds);
         h5create(plane_name_save,"/Ym",size(mean_img));
         h5write(plane_name_save, '/Ym', mean_img);
         write_metadata_h5(metadata, plane_name_save, '/');
@@ -284,7 +284,7 @@ for plane_idx = 1:num_planes
         end
         log_message(fid, "---- Complete: Plane %d processed in %.2f seconds ----\n",plane_idx, toc(tplane));
     end
-    write_frames(plane_name, z_timeseries,'ds',dataset_name);
+    write_frames(plane_name, z_timeseries,'ds',ds);
     if ~is_valid_dataset(plane_name, '/Ym')
         h5create(plane_name,"/Ym",size(mean_img));
         h5write(plane_name, '/Ym', mean_img);

@@ -31,10 +31,9 @@ Utilities for reading, writing, inspecting and visualizing data.
 .. autofunction:: read_plane
 .. autofunction:: reorder_h5_files
 .. autofunction:: validate_toolboxes
-.. autofunction:: write_images_to_h5
-.. autofunction:: write_images_to_avi
-.. autofunction:: write_images_to_gif
-.. autofunction:: write_images_to_tiff
+.. autofunction:: write_frames_to_h5
+.. autofunction:: write_frames_to_gif
+.. autofunction:: write_frames_to_tiff
 .. autofunction:: write_tiled_figure
 
 Internal
