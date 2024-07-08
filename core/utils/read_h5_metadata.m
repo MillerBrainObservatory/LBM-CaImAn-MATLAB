@@ -1,5 +1,5 @@
 function metadata = read_h5_metadata(h5_fullfile, loc)
-% read_h5_metadata Reads metadata from an HDF5 file.
+% Reads metadata from an HDF5 file.
 %
 % Reads the metadata attributes from a specified location within an HDF5 file
 % and returns them as a structured array.
@@ -30,8 +30,7 @@ function metadata = read_h5_metadata(h5_fullfile, loc)
 % The function uses `h5info` to retrieve information about the specified location
 % within the HDF5 file and `h5readatt` to read attribute values. The attribute names
 % are converted to valid MATLAB field names using `matlab.lang.makeValidName`.
-%
-% See also H5INFO, H5READATT, MATLAB.LANG.MAKEVALIDNAME
+
 if ~exist('h5_fullfile', 'var'); h5_fullfile = uigetfile('title', 'Select a processed h5 dataset:'); end
 if ~exist('loc', 'var'); loc = '/'; end
 try

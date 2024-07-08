@@ -43,8 +43,6 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 % by cleaning up and providing detailed error messages if something goes wrong during
 % processing.
 %
-% See also FILEPARTS, ADDPATH, GENPATH, ISFOLDER, DIR, FULLFILE, ERROR, REGEXP, SAVEFAST
-%
 % .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
 
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath')));
@@ -270,7 +268,21 @@ for plane_idx = 1:num_planes
             'titles', labels, ...
             'scales', scales, ...
             'save_name', plane_save_path ...
-            );
+        );
+
+        metadata.scan_offset = offsets_plane(plane_idx);
+        write_frames_to_h5(plane_name_save, z_timeseries, 'ds',dataset_name);
+        h5create(plane_name_save,"/Ym",size(mean_img));
+        h5write(plane_name_save, '/Ym', mean_img);
+        write_metadata_h5(metadata, plane_name_save, '/');
+        if getenv("OS") == "Windows_NT"
+            mem = memory;
+            max_gb = mem.MaxPossibleArrayBytes / 1e9;
+            max_avail = mem.MemAvailableAllArrays / 1e9;
+            mem_used = mem.MemUsedMATLAB / 1e9;
+            log_message(fid, "MEMORY USAGE (max/available/used): %.2f/%.2f/%.2f\n", max_gb, max_avail, mem_used)
+        end
+        log_message(fid, "---- Complete: Plane %d processed in %.2f seconds ----\n",plane_idx, toc(tplane));
     end
     write_frames(plane_name, z_timeseries,'ds',dataset_name);
     if ~is_valid_dataset(plane_name, '/Ym')

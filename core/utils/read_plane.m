@@ -40,9 +40,6 @@ function Y_out = read_plane(varargin)
 % Read specific frames from a dataset in a file:
 %     Y_out = read_plane('path/to/file.h5', '/Y', [], 1:10);
 %
-% See also
-% --------
-% h5info, h5read
 
 p = inputParser;
 addOptional(p, 'path', '', @(x) (ischar(x) || isstring(x)));

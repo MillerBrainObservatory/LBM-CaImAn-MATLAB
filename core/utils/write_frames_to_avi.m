@@ -39,10 +39,7 @@ function write_frames_to_avi(data, filename, frame_rate,x,y)
 % Write a 3D array to an AVI file with specified spatial dimensions:
 %
 %     write_frames_to_avi(my_data, 'output.avi', 10, 1:256, 1:256);
-%
-% See also
-% --------
-% VideoWriter, movmean
+
 arguments
     data {mustBeNumeric}
     filename (1,:) char

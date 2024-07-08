@@ -25,8 +25,7 @@ function [metadata_out] = get_metadata(filename)
 % --------
 % - Image Processing Toolbox
 % - MOST toolbox for JSON decoding or an alternative JSON parser
-%
-% See also TIFF, MOST.JSON.LOADJSON
+
 hTiff = Tiff(filename);
 [fpath, fname, ~] = fileparts(filename);
 
