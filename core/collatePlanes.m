@@ -22,7 +22,7 @@ function [] = collatePlanes(data_path, save_path, varargin)
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
 % reordered : logical, optional
-%      if `rename_planes` was ran, "reordered" will be in the name. 
+%      if `rename_planes` was ran, "reordered" will be in the name.
 %
 % Returns
 % -------
@@ -42,11 +42,10 @@ function [] = collatePlanes(data_path, save_path, varargin)
 % - The function assumes that the consecutive images will have some overlap
 %   and that features will be manually identifiable and trackable across planes.
 %
-% Example
-% -------
+% Examples
+% --------
 % offsets = calculateZOffset('C:/data/images/', metadata, 1, 10, 5);
 %
-% See also LOAD, MAX, IND2SUB, XCORR2, GINPUT, NANMEAN
 
 p = inputParser;
 addRequired(p, 'data_path');
@@ -82,7 +81,7 @@ if isempty(files)
     error('No suitable data files found in: \n  %s', data_path);
 end
 
-log_file_name = sprintf("%s_collation", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+log_file_name = sprintf("%s_collation.log", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 log_full_path = fullfile(save_path, log_file_name);
 fid = fopen(log_full_path, 'w');
 if fid == -1
@@ -129,19 +128,10 @@ for curr_plane = start_plane:end_plane
             delete(plane_name_save)
         end
     end
-    try
+    if plane_idx == start_plane
         metadata = read_h5_metadata(plane_name, '/');
-    catch ME
-        if contains(ME.message, 'not found')
-            
-            error("Error reading data given data-path: %s", data_path)
-        end
-    end
-    if isempty(fieldnames(metadata))
-        error("No metadata found for this filepath.");
-    end
-    if ~(metadata.num_planes >= end_plane)
-        error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
+        if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
+        log_metadata(metadata, log_full_path,fid);
     end
 
     Y = h5read(plane_name, dataset_name);
@@ -163,7 +153,6 @@ for curr_plane = start_plane:end_plane
     num_corr_no_ovp = 0;
     num_ovlpd = 0;
 
-    % p = load([path 'caiman_output_plane_1.mat']); % Load stuff from first p
     Ac_keep = h5read(h5_segmented, '/Ac_keep');
     T_keep = h5read(h5_segmented, '/T_keep');
 

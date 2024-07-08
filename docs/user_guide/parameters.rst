@@ -1,7 +1,7 @@
 Parameters
 ##########
 
-For the :ref:`core` functions** in this pipeline, the initial parameters are always the same.
+For the :ref:`Core` functions in this pipeline, the initial parameters are always the same.
 
 .. note::
 
@@ -30,19 +30,18 @@ Definitions
 
 :code:`save_path` : A filepath leading to the directory where results are saved.
 
-:code:`data_input_group` : If the input path is h5, this is the group containing the data.
-
-:code:`data_output_group` : If the output file is h5, this is the group name where the data will be saved.
+:code:`ds` : Dataset name/group path, a character or string ('' or "") array beginning with a foreward slash '\'. For example, '/Y', "/mov", '/raw'.
 
 :code:`debug_flag` : Set to 1 to print all files / datasets that would be processed, then stop before any processing occurs.
 
 :code:`overwrite` : Set to 1 to overwrite pre-existing data. Setting to 0 will simply return without processing that file.
 
-:code:`num_cores` : Set to the number of CPU cores to use for parallel computing. Note that even though this is an option in pre-processing, there is actually no parallel computations during this step so the value will be ignored.
+:code:`num_cores` : Set to the number of CPU cores to use for parallel computing.
 
+Note that even though this is an option in pre-processing, there is actually no parallel computations during this step so the value will be ignored.
 
 The recommended method for saving data is to save each step in a separate HDF5 file and name the group after the step being executed.
 This is demonstrated in the :scpt:`demo_LBM_pipeline` at the root of this repository.
 
-For information about the parameters unique to each function, see the :ref:`api` or the help documentation for that individual function.
+For information about the parameters unique to each function, see the :ref:`Core` API or the help documentation for that individual function.
 

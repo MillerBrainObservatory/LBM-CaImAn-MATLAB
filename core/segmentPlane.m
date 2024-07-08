@@ -59,7 +59,7 @@ function segmentPlane(data_path, save_path, varargin)
 p = inputParser;
 addRequired(p, 'data_path', @ischar);
 addRequired(p, 'save_path', @ischar);
-addParameter(p, 'dataset_name', "/mov", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addParameter(p, 'dataset_name', "/mov", @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
@@ -100,7 +100,7 @@ if isempty(files)
     error('No suitable data files found in: \n  %s', data_path);
 end
 
-log_file_name = sprintf("%s_segmentation", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+log_file_name = sprintf("%s_segmentation.log", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 log_full_path = fullfile(save_path, log_file_name);
 fid = fopen(log_full_path, 'w');
 if fid == -1
@@ -122,29 +122,24 @@ for plane_idx = start_plane:end_plane
     plane_name_save = sprintf("%s//segmented_%s.h5", save_path, z_str);
     if isfile(plane_name_save)
         fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+        fprintf('%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+
         if overwrite
             fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+            fprintf('%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
             delete(plane_name_save)
         else
             fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+            fprintf('%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+
         end
     end
 
     %% Attach metadata to attributes for this plane
-    h5_data = h5info(plane_name, dataset_name);
-    metadata = struct();
-    for k = 1:numel(h5_data.Attributes)
-        attr_name = h5_data.Attributes(k).Name;
-        attr_value = h5readatt(plane_name, sprintf("/%s",h5_data.Name), attr_name);
-        metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
-    end
-   
-    if first % log metadata once
-        log_metadata(metadata, log_full_path,fid);
-        first = false;
-    end
-    if ~(metadata.num_planes >= end_plane)
-        error("Not enough planes to process given user supplied argument: %d as end_plane when only %d planes exist in this dataset.", end_plane, metadata.num_planes);
+    if plane_idx == start_plane
+        metadata = read_h5_metadata(plane_name, '/');
+        if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
+        log_struct(metadata,'metadata', log_full_path,fid);
     end
 
     %% Load in data
@@ -211,14 +206,20 @@ for plane_idx = start_plane:end_plane
     );
 
     fprintf(fid, "%s : Data loaded in. This process took: %0.2f seconds.\nBeginning CNMF.\n\n",datetime("now"), toc(t_start));
+    fprintf("%s : Data loaded in. This process took: %0.2f seconds.\nBeginning CNMF with the following parameters:\n\n",datetime("now"), toc(t_start));
+    log_struct(options,'CNMF Parameters', log_full_path, fid);
+    disp(options);
+
     t_cnmf = tic;
 
     [A,b,C,f,S,P,~,YrA] = run_CNMF_patches(data,K,patches,tau,p,options);
     fprintf(fid, '%s : Initialized CNMF patches complete.  Process took: %.2f seconds\Classifying components ...',datetime("now"), toc(t_cnmf));
+    fprintf('%s : Initialized CNMF patches complete.  Process took: %.2f seconds\Classifying components ...',datetime("now"), toc(t_cnmf));
 
     t_class = tic;
     [rval_space,rval_time,max_pr,sizeA,keep0,~,traces] = classify_components_jeff(data,A,C,b,f,YrA,options);
     fprintf(fid, '%s : Classification complete. Process took: %.2f seconds\Running spatial/temporal acceptance tests ... to dF/F ...', datetime("now"), toc(t_class));
+    fprintf('%s : Classification complete. Process took: %.2f seconds\Running spatial/temporal acceptance tests ... to dF/F ...', datetime("now"), toc(t_class));
 
     t_test = tic;
     Cn =  correlation_image(data);
@@ -283,18 +284,18 @@ for plane_idx = start_plane:end_plane
     % Save data
     t_save = tic;
     fprintf(fid, "%s : Writing data.\n\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'));
-    write_chunk_h5(plane_name_save, T_keep, 2000, '/T_keep');
-    write_chunk_h5(plane_name_save, Ac_keep, 2000, '/Ac_keep');
-    write_chunk_h5(plane_name_save, C_keep, 2000, '/C_keep');
-    write_chunk_h5(plane_name_save, Km, 2000, '/Km');
-    write_chunk_h5(plane_name_save, rVals, 2000, '/rVals');
-    write_chunk_h5(plane_name_save, single(mean(data,3)), 2000, '/Ym');
-    write_chunk_h5(plane_name_save, Cn, 2000, '/Cn');
-    write_chunk_h5(plane_name_save, b, 2000, '/b');
-    write_chunk_h5(plane_name_save, f, 2000, '/f');
-    write_chunk_h5(plane_name_save, acx, 2000, '/acx');
-    write_chunk_h5(plane_name_save, acy, 2000, '/acy');
-    write_chunk_h5(plane_name_save, acm, 2000, '/acm');
+    write_frames_to_h5(plane_name_save, T_keep, 2000, '/T_keep');
+    write_frames_to_h5(plane_name_save, Ac_keep, 2000, '/Ac_keep');
+    write_frames_to_h5(plane_name_save, C_keep, 2000, '/C_keep');
+    write_frames_to_h5(plane_name_save, Km, 2000, '/Km');
+    write_frames_to_h5(plane_name_save, rVals, 2000, '/rVals');
+    write_frames_to_h5(plane_name_save, single(mean(data,3)), 2000, '/Ym');
+    write_frames_to_h5(plane_name_save, Cn, 2000, '/Cn');
+    write_frames_to_h5(plane_name_save, b, 2000, '/b');
+    write_frames_to_h5(plane_name_save, f, 2000, '/f');
+    write_frames_to_h5(plane_name_save, acx, 2000, '/acx');
+    write_frames_to_h5(plane_name_save, acy, 2000, '/acy');
+    write_frames_to_h5(plane_name_save, acm, 2000, '/acm');
 
     write_metadata_h5(metadata, plane_name_save, '/');
     fprintf(fid, "%s : Data saved. Elapsed time: %.2f seconds\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_save)/60);

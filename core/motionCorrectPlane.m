@@ -1,4 +1,4 @@
-function motionCorrectPlane(data_path, save_path, varargin)
+function motionCorrectPlane(data_path, save_path, ds, debug_flag, varargin)
 % MOTIONCORRECTPLANE Perform piecewise-rigid motion correction on imaging data.
 %
 % Parameters
@@ -7,7 +7,7 @@ function motionCorrectPlane(data_path, save_path, varargin)
 %     Path to the directory containing the files extracted via convertScanImageTiffToVolume.
 % save_path : char
 %     Path to the directory to save the motion vectors.
-% dataset_name : string, optional
+% ds : char, optional
 %     Group path within the hdf5 file that contains raw data.
 %     Default is '/Y'.
 % debug_flag : double, logical, optional
@@ -38,26 +38,28 @@ function motionCorrectPlane(data_path, save_path, varargin)
 % - Only .h5 files containing processed volumes should be in the file_path.
 
 p = inputParser;
-addRequired(p, 'data_path', @ischar);
-addRequired(p, 'save_path', @ischar);
-addParameter(p, 'dataset_name', "/Y", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
+addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
+addRequired(p, 'save_path', @(x) ischar(x) || isstring(x));
+addOptional(p, 'ds', '/Y', @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
 addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
+addParameter(p, 'do_figures', 1, @(x) isnumeric(x) && isPositiveIntegerValuedNumeric(x));
 addParameter(p, 'options_rigid', {}, @(x) isstruct(x));
 addParameter(p, 'options_nonrigid', {}, @(x) isstruct(x));
-parse(p, data_path, save_path, varargin{:});
+parse(p,data_path,save_path,ds,debug_flag,varargin{:});
 
 data_path = p.Results.data_path;
 save_path = p.Results.save_path;
-dataset_name = p.Results.dataset_name;
+ds = p.Results.dataset_name;
 debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
 num_cores = p.Results.num_cores;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
+do_figures = p.Results.do_figures;
 options_rigid = p.Results.options_rigid;
 options_nonrigid = p.Results.options_nonrigid;
 
@@ -77,7 +79,7 @@ if isempty(files)
     error('No suitable data files found in: \n  %s', data_path);
 end
 
-log_file_name = sprintf("%s_correction", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+log_file_name = sprintf("%s_correction.log", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 log_full_path = fullfile(save_path, log_file_name);
 fid = fopen(log_full_path, 'w');
 if fid == -1
@@ -85,47 +87,47 @@ if fid == -1
 else
     fprintf('Log file created: %s\n', log_full_path);
 end
-% closeCleanupObj = onCleanup(@() fclose(fid));
 
-%% Pull metadata from attributes attached to this group
 num_cores = max(num_cores, 23);
-fprintf(fid, '%s : Beginning registration with %d cores...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), num_cores); tall=tic;
+tall=tic; log_message(fid, 'Beginning registration with %d cores...\n', num_cores); 
 for plane_idx = start_plane:end_plane
-    fprintf(fid, '%s : Beginning plane %d\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_idx);
+    tplane=tic;
+
+    log_message(fid, 'Beginning plane %d\n', plane_idx);
 
     z_str = sprintf('plane_%d', plane_idx);
     plane_name = sprintf("%s/extracted_%s.h5", data_path, z_str);
     plane_name_save = sprintf("%s/motion_corrected_%s.h5", save_path, z_str);
+
+    if plane_idx == start_plane
+        metadata = read_h5_metadata(plane_name);
+        log_struct(fid, metadata,'metadata',log_full_path);
+    end
+
     if isfile(plane_name_save)
-        fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+        log_message(fid, '%s already exists.\n',plane_name_save);
         if overwrite
-            fprintf(fid, '%s : Parameter Overwrite=true. Deleting file: %s\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
+            log_message(fid, 'Parameter Overwrite=true. Deleting file: %s\n',plane_name_save);
             delete(plane_name_save)
         end
     end
-
-    h5_data = h5info(plane_name, dataset_name);
-    metadata = struct();
-    for k = 1:numel(h5_data.Attributes)
-        attr_name = h5_data.Attributes(k).Name;
-        attr_value = h5readatt(plane_name, sprintf("/%s",h5_data.Name), attr_name);
-        metadata.(matlab.lang.makeValidName(attr_name)) = attr_value;
-    end
-
+   
     poolobj = gcp("nocreate"); % If no pool, do not create new one.
     if isempty(poolobj)
-        parpool("Processes", num_cores,"IdleTimeout", 30);
+        log_message(fid, "Initializing parallel cluster with %d workers.\n", num_cores);
+        clust=parcluster('local');
+        clust.NumWorkers=num_cores;
+        parpool(clust,num_cores, 'IdleTimeout', 30);
     end
 
-    pixel_resolution = metadata.pixel_resolution;
+    Y = read_plane(plane_name,'ds',ds,'plane',plane_idx);
+    if ~isa(Y,'single');Y = single(Y);end  % we want float32
 
-    Y = h5read(plane_name, dataset_name);
-    Y = Y - min(Y(:));
     volume_size = size(Y);
     d1 = volume_size(1);
     d2 = volume_size(2);
+    pixel_resolution = metadata.pixel_resolution;
 
-    %% Motion correction: Create Template
     if numel(options_rigid) < 3
         options_rigid = NoRMCorreSetParms(...
             'd1',d1,...
@@ -141,18 +143,21 @@ for plane_idx = start_plane:end_plane
     % start timer for registration after parpool to avoid inconsistent
     % pool startup times.
     t_rigid=tic;
-    [M1,shifts_template,~,~] = normcorre_batch(Y, options_rigid);
-    fprintf(fid, "%s : Rigid registration complete. Elapsed time: %.3f minutes\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_rigid)/60);
+
+    log_message(fid, "Beginning batch template.\n");
+    [M1,shifts1,~,~] = normcorre_batch(Y, options_rigid);
+    log_message(fid, "Rigid registration complete. Elapsed time: %.3f minutes\n",toc(t_rigid)/60);
 
     % create the template using X/Y shift displacements
-    shifts_template = squeeze(cat(3,shifts_template(:).shifts));
-    shifts_v = movvar(shifts_template, 24, 1);
+    log_message(fid, "Calculating template...\n");
+    shifts1 = squeeze(cat(3,shifts1(:).shifts));
+    shifts_v = movvar(shifts1, 24, 1);
     [~, minv_idx] = sort(shifts_v, 120);
     best_idx = unique(reshape(minv_idx, 1, []));
     template_good = mean(M1(:,:,best_idx), 3);
 
     % % Non-rigid motion correction using the good template from the rigid
-    if numel(options_rigid) < 3
+    if numel(options_nonrigid) < 3
         options_nonrigid = NoRMCorreSetParms(...
             'd1', d1,...
             'd2', d2,...
@@ -165,24 +170,84 @@ for plane_idx = start_plane:end_plane
     end
 
     % DFT subpixel registration - results used in CNMF
-    t_nonrigid=tic;
-    fprintf(fid, "%s : Non-rigid registration complete. Elapsed time: %.3f minutes\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_nonrigid)/60);
-    [M2, shifts_nr, ~, ~] = normcorre_batch(Y, options_nonrigid, template_good);
-    shifts_nr = squeeze(cat(3,shifts_nr(:).shifts));
-    t_save=tic;
+    t_nonrigid=tic; log_message(fid, "Template creation complete. Beginning non-rigid registration...\n");    
+    [M2, shifts2, ~, ~] = normcorre_batch(Y, options_nonrigid, template_good);
+    log_message(fid, "Non-rigid registration complete. Elapsed time: %.3f minutes.\n",toc(t_nonrigid)/60);
+    
+    log_message(fid, "Calculating registration metrics...\n");
 
-    write_chunk_h5(plane_name_save, M2, size(M2,3), '/mov');
-    write_chunk_h5(plane_name_save, shifts_nr, size(shifts_nr,2), '/shifts');
-    write_chunk_h5(plane_name_save, shifts_template, size(shifts_template,2), '/template');
-    write_metadata_h5(metadata, plane_name_save, '/mov');
-    fprintf(fid, "%s : Data saved. Elapsed time: %.2f seconds\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(t_save)/60);
+    [cY,mY,~] = motion_metrics(Y,10);
+    [cM1,mM1,~] = motion_metrics(M1,10);
+    [cM2,mM2,~] = motion_metrics(M2,10);
+    T = length(cY);
 
-    clear M1 M2 shifts template;
-    try
-        fprintf(fid, "%s : Motion correction for plane %d complete. Time: %.2f minutes. Beginning next plane...\n", datestr(datetime('now'), 'yyyy_mm_dd HH:MM:SS'), plane_idx, toc(t_rigid)/60);
-    catch ME
-        warning("File ID, no longer valid: %d", fid);
-        return;
+    log_message(fid, "Plotting registration metrics...\n");
+
+    fig_plane_name = sprintf("%s/plane_%d", fig_save_path, plane_idx);
+    metrics_name = sprintf("%s_metrics.png", fig_plane_name);
+    f = figure('Visible', 'off', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
+    ax1 = subplot(2, 3, 1); imagesc(mY); axis equal; axis tight; axis off; 
+    title('mean raw data', 'fontsize', 10, 'fontweight', 'bold');
+    
+    ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off; 
+    title('mean rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
+    ax3 = subplot(2, 3, 3); imagesc(mM2); axis equal; axis tight; axis off; 
+    title('mean non-rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
+    subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid'); 
+    title('correlation coefficients', 'fontsize', 10, 'fontweight', 'bold');
+    subplot(2, 3, 5); scatter(cY, cM1); hold on; 
+    plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
+    xlabel('raw data', 'fontsize', 10, 'fontweight', 'bold'); ylabel('rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
+    subplot(2, 3, 6); scatter(cM1, cM2); hold on; 
+    plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
+    xlabel('rigid corrected', 'fontsize', 10, 'fontweight', 'bold'); ylabel('non-rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
+    linkaxes([ax1, ax2, ax3], 'xy');
+    exportgraphics(f,metrics_name,'Resolution',600,'BackgroundColor','k');
+    close(f);
+
+    log_message(fid, "Calculating registration shifts...\n");
+
+    shifts2 = cat(ndims(shifts2(1).shifts)+1,shifts2(:).shifts);
+    shifts2 = reshape(shifts2,[],ndims(Y)-1,T);
+    shifts_x = squeeze(shifts2(:,1,:))';
+    shifts_y = squeeze(shifts2(:,2,:))';
+
+    log_message(fid, "Plotting registration shifts...\n");
+    shifts_name = sprintf("%s_shifts.png", fig_plane_name);
+    f = figure("Visible","off");
+    ax1 = subplot(311);
+    plot(1:T,cY,1:T,cM1,1:T,cM2); legend('raw data','rigid','non-rigid');
+    title('correlation coefficients','fontsize',8,'fontweight','bold')
+            set(gca,'Xtick',[])
+    ax2 = subplot(312);
+    plot(shifts_x); hold on; plot(shifts1(:,1),'--r','linewidth',2);
+    title('displacements along x','fontsize',8,'fontweight','bold')
+            set(gca,'Xtick',[])
+    ax3 = subplot(313);
+    plot(shifts_y); hold on; plot(shifts1(:,2),'--r','linewidth',2);
+    title('displacements along y','fontsize',8,'fontweight','bold')
+            xlabel('timestep','fontsize',8,'fontweight','bold')
+    linkaxes([ax1,ax2,ax3],'x')
+    exportgraphics(f,shifts_name, 'Resolution', 600, 'BackgroundColor', 'k');
+    close(f);
+
+    write_frames_to_h5(plane_name_save,M2,'ds','/Y');
+    write_frames_to_h5(plane_name_save,shifts2,'ds','/shifts');
+    write_frames_to_h5(plane_name_save,shifts1,'ds','/template');
+    write_metadata_h5(metadata, plane_name_save, '/');
+
+    h5create(plane_name_save,"/Ym",size(mM2));
+    h5write(plane_name_save, '/Ym', mM2);
+
+    log_message(fid, "Plane %d finished, data saved. Elapsed time: %.2f minutes\n",plane_idx,toc(tplane)/60);
+    if getenv("OS") == "Windows_NT"
+        mem = memory;
+        max_gb = mem.MaxPossibleArrayBytes / 1e9;
+        max_avail = mem.MemAvailableAllArrays / 1e9;
+        mem_used = mem.MemUsedMATLAB / 1e9;
+        log_message(fid, "MEMORY USAGE (max/available/used): %.2f/%.2f/%.2f\n", max_gb, max_avail, mem_used)
     end
-    fprintf(fid, "%s : Processing complete. Time: %.2f hours\n", datestr(datetime('now'), 'yyyy_mm_dd:HH:MM:SS'), toc(tall)/3600);
+    clear M* shifts* template Ym;
 end
+log_message(fid, "Processing complete. Time: %.2f hours\n",toc(tall)/3600);
+close('all');

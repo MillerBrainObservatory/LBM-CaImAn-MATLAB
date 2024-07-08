@@ -1,45 +1,17 @@
 
-###
 API
-###
+#####
 
-To keep code and documentation as *in-sync* as possible, many (if not most) of the most helpful comments are in the functions docstring (directly under where the function is defined).
+There are two forms of functions to know for this pipeline:
 
-.. currentmodule:: .
-
-Core
-==============
-
-.. autofunction:: convertScanImageTiffToVolume
-.. autofunction:: motionCorrectPlane
-.. autofunction:: segmentPlane
-.. autofunction:: collatePlanes
-.. autofunction:: calculateZOffset
-
-.. currentmodule:: io
-
-Input/Output
-==============
-
-.. autofunction:: read_plane
-.. autofunction:: read_h5_metadata
-.. autofunction:: rename_planes
-.. autofunction:: log_metadata
-.. autofunction:: make_zoomed_movie
-.. autofunction:: write_chunk_h5
-.. autofunction:: write_metadata_h5
-
-.. currentmodule:: utils
-
-Utilities
-=============
+1. :ref:`Core` functions used to run the pipeline
+2. :ref:`Utility` functions for interacting with pipeline outputs.
+3. :ref:`Internal` functions intended for the pipeline, not public use.
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 3
 
-.. autofunction:: get_metadata
-.. autofunction:: get_segmentation_metrics
-.. autofunction:: get_central_indices
-.. autofunction:: make_tiled_figure
-.. autofunction:: translate_frames
-.. autofunction:: validate_toolboxes
+    Core Functions <core>
+    Utility Functions <utility>
+    Internal Functions <internal>
+
