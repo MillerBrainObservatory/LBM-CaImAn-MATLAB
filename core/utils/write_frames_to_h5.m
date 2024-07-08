@@ -23,21 +23,6 @@ function write_frames_to_h5(file,Y_in,varargin)
 % file to manage memory usage efficiently. It also trims the last frame of each
 % chunk if the chunk size exceeds the remaining data size.
 %
-% Examples
-% --------
-% Write a 3D array to an HDF5 file with default chunk size and dataset name:
-%
-%     write_frames('data.h5', my_data);
-%
-% Write a 4D array to an HDF5 file with a specified chunk size:
-%
-%     write_frames('data.h5', my_data, 2); % 2Mb chunks
-%
-% Write a 3D array to an HDF5 file with a specified dataset name:
-%
-%     write_frames('data.h5', my_data, '/Y');
-%
-
 
 p = inputParser;
 p.addRequired('file', @(x) validateattributes(x, {'char', 'string'}, {'nonempty', 'scalartext'}, '', 'file'));
@@ -111,11 +96,8 @@ while current_position < prev_size(end) + sizY(end)
     end
 
     if ismatrix(chunk_data)
-        % start = [1 1];
-        % chunk_data = reshape(chunk_data, [size(chunk_data, 1), size(chunk_data, 2) 1]);
-        % h5write(file, ds, chunk_data);
         return
-    else 
+    else
         start = [ones(1, ndims(Y_in)-1), current_position + 1];
     end
     h5write(file, ds, chunk_data, start, size(chunk_data));
