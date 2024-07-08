@@ -1,7 +1,7 @@
 Core
-=======
+======
 
-Functions used to run the pipeline.
+Core functions used to run the pipeline.
 
 .. currentmodule:: .
 
