@@ -20,13 +20,18 @@ function log_struct(fid, in_struct, struct_name, log_full_path)
 
     fields = fieldnames(in_struct);
     for i = 1:numel(fields)
-        field_value = in_struct.(fields{i});
-        if isstruct(field_value)
-            log_struct(fid, field_value, [struct_name '.' fields{i}], log_full_path);
-        elseif ismatrix(in_struct)
-            log_message(fid, '%s = %s',fields{i}, mat2str(field_value));
-        else
-            log_message(fid, '%s = %s',fields{i},convertCharsToString(field_value));
+        try
+            field_value = in_struct.(fields{i});
+            if isstruct(field_value)
+                log_struct(fid, field_value, [struct_name '.' fields{i}], log_full_path);
+            elseif ismatrix(in_struct)
+                log_message(fid, '%s = %s\n',fields{i}, mat2str(field_value));
+            else
+                log_message(fid, '%s = %s',fields{i},convertCharsToString(field_value));
+            end
+        catch
+            warning("Invalid field name: %s", fields{i});
+            continue
         end
     end
 end
