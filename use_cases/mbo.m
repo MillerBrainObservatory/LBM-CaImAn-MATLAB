@@ -20,8 +20,8 @@ homedir = getenv('HOMEPATH'); % will autofill /home/<username> (linux) or C:/Use
 %%%%%%%%%% User Parameters %%%%%%%%
 
 parent_path = fullfile('C:\Users\RBO\Documents\data\high_res\');
-raw_tiff_path = fullfile(parent_path,'raw');
-extract_path = fullfile(parent_path, 'v2.0/extracted');
+raw_tiff_path = fullfile(parent_path);
+extract_path = fullfile(parent_path);
 
 convertScanImageTiffToVolume( ...
     raw_tiff_path, ...
