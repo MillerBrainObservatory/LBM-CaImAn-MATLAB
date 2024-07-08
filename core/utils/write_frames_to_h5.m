@@ -23,6 +23,49 @@ function write_frames_to_h5(file,Y_in,varargin)
 % file to manage memory usage efficiently. It also trims the last frame of each
 % chunk if the chunk size exceeds the remaining data size.
 %
+% Examples
+% --------
+% Write a 3D array to an HDF5 file with default chunk size and dataset name:
+%
+%     write_frames_to_h5('data.h5', my_data);
+%
+% Write a 4D array to an HDF5 file with a specified chunk size:
+%
+%     write_frames_to_h5('data.h5', my_data);
+%
+% Write a 3D array to an HDF5 file with a specified dataset name:
+%
+%     write_frames_to_h5('data.h5', my_data,'/Y');
+
+if nargin > 0
+    file = convertStringsToChars(file);
+end
+
+if nargin > 1
+    Y_in = convertStringsToChars(Y_in);
+end
+
+if nargin > 2
+    ds = convertStringsToChars(ds);
+end
+
+if ~exist('ds', 'var') || isempty(ds)
+    ds = '/Y';
+end
+
+p = inputParser;
+p.addRequired('file', ...
+    @(x) validateattributes(x, {'char', 'string'}, {'nonempty', 'scalartext'}, '', 'file'));
+p.addRequired('Y_in', ...
+    @(x) validateattributes(x, {'numeric'}, {'nonempty'}, '', 'Y_in'));
+p.addOptional('ds', '/Y', ...
+    @(x) validateattributes(x, {'char', 'string'}, {'nonempty', 'scalartext'}, '', 'ds'));
+
+p.parse(file, Y_in, ds);
+options = p.Results;
+
+keep_reading = true;
+=======
 
 p = inputParser;
 p.addRequired('file', @(x) validateattributes(x, {'char', 'string'}, {'nonempty', 'scalartext'}, '', 'file'));
@@ -41,7 +84,58 @@ overwrite = p.Results.overwrite;
 file = convertStringsToChars(file);
 ds = convertStringsToChars(ds);
 Y_in = squeeze(Y_in);
+
 cl = class(Y_in);
+
+if sizY(end) < chunk + 1
+    keep_reading = false;
+else
+    if nd == 2
+        Y_in(:, :, end) = [];
+    elseif nd == 3
+        Y_in(:, :, :, end) = [];
+    end
+    sizY(end) = sizY(end) - 1;
+end
+
+h5_filename = options.file;
+dataset_exists = false;
+try
+    h5info(h5_filename, options.ds);
+    dataset_exists = true;
+catch
+    % Dataset does not exist
+end
+
+imageSizeMBytes = (prod(sizY(1:2)) * 2) / 1e6;
+chunk_size = round(4/imageSizeMBytes);
+
+if ~dataset_exists
+    h5create(h5_filename,options.ds,[sizY(1:nd), Inf],'ChunkSize',[size(1:nd) chunk_size],'Datatype',cl);
+    h5write(h5_filename, options.ds, Y_in);
+else
+    dset_info = h5info(h5_filename, options.ds);
+    current_size = dset_info.Dataspace.Size;
+    % Extend the dataset
+    h5write(h5_filename, options.ds, Y_in, [ones(1, nd), current_size(end) + 1], sizY);
+end
+
+cnt = sizY(end);
+while keep_reading
+    Y_in = read_file(options.file, cnt + 1, chunk + 1);
+    sizY = size(Y_in);
+    if sizY(end) < chunk + 1
+        keep_reading = false;
+    else
+        if nd == 2
+            Y_in(:, :, end) = [];
+        elseif nd == 3
+            Y_in(:, :, :, end) = [];
+        end
+        sizY(end) = sizY(end) - 1;
+    end 
+    h5write(h5_filename, options.ds, Y_in, [ones(1, nd), cnt + 1], sizY);
+    cnt = cnt + sizY(end);
 
 element_size_map = containers.Map(...
     {'double', 'single', 'uint64', 'int64', 'uint32', 'int32', 'uint16', 'int16', 'uint8', 'int8', 'char'}, ...
@@ -102,4 +196,6 @@ while current_position < prev_size(end) + sizY(end)
     end
     h5write(file, ds, chunk_data, start, size(chunk_data));
     current_position = chunk_end;
+end
+
 end

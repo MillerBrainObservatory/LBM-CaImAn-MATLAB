@@ -33,25 +33,20 @@ if strcmpi(ext,'.tiff') || strcmpi(ext,'.tif') || strcmpi(ext,'.btf')
        imData(:,:,i)=TifLink.read();
     end
     TifLink.close()
-    %imData = loadtiff(path_to_file,sframe,num2read);    
 elseif strcmpi(ext,'.hdf5') || strcmpi(ext,'.h5')
-%     info = hdf5info(path_to_file);
-%     dims = info.GroupHierarchy.Datasets.Dims;
-%     name = info.GroupHierarchy.Datasets.Name;
     info = h5info(path_to_file);
     dsets=info.Datasets;
     if numel(dsets)>1
         dims = dsets(1).Dataspace.Size; 
-        name = dsets(1).Datasets.Name;
+        name = dsets(1).Name;
     else
         dims = dsets.Dataspace.Size;
-        name = info.Datasets.Name;
+        name = dsets.Datatype.Name;
     end
     if nargin < 3
         num2read = dims(end)-sframe+1;
     end
     num2read = min(num2read,dims(end)-sframe+1);
-%    imData = h5read(path_to_file,name,[ones(1,length(dims)-1),sframe],[dims(1:end-1),num2read]);
     imData = h5read(path_to_file,['/',name],[ones(1,length(dims)-1),sframe],[dims(1:end-1),num2read]);
 elseif strcmpi(ext,'.avi')
     v = VideoReader(path_to_file);
