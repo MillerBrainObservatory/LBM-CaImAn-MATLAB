@@ -42,10 +42,10 @@ elseif strcmpi(ext,'.hdf5') || strcmpi(ext,'.h5')
     dsets=info.Datasets;
     if numel(dsets)>1
         dims = dsets(1).Dataspace.Size; 
-        name = dsets(1).Datasets.Name;
+        name = dsets(1).Name;
     else
         dims = dsets.Dataspace.Size;
-        name = info.Datasets.Name;
+        name = dsets.Datatype.Name;
     end
     if nargin < 3
         num2read = dims(end)-sframe+1;
