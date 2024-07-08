@@ -48,11 +48,10 @@ function [offsets] = calculateZOffset(data_path, segmentation_path, save_path, v
 % - The function assumes that the consecutive images will have some overlap
 %   and that features will be manually identifiable and trackable across planes.
 %
-% Example
-% -------
+% Examples
+% --------
 % offsets = calculateZOffset('C:/data/images/', metadata, 1, 10, 5);
 %
-% See also LOAD, MAX, IND2SUB, XCORR2, GINPUT, NANMEAN
 
 p = inputParser;
 addRequired(p, 'data_path');
@@ -191,7 +190,7 @@ for plane_idx = start_plane:end_plane
             ax2 = subplot(1, 2, 2);
             imagesc(p2); axis image;
             title(sprintf('Plane %d', plane_idx + 1));
-            
+
             % plot the current plane
             figure(h1);
             ax1 = subplot(1, 2, 1);
@@ -199,25 +198,25 @@ for plane_idx = start_plane:end_plane
             xlim(ax1, [xi-scale_fact*nsize xi+scale_fact*nsize]);
             ylim(ax1, [yi-scale_fact*nsize yi+scale_fact*nsize]);
             title(sprintf('Plane %d', plane_idx));
-            
+
             % highlight left subplot
             set(ax1, 'XColor', 'r', 'YColor', 'r');
             [x1, y1] = safe_ginput(ax1, ax2);
             set(ax1, 'XColor', 'k', 'YColor', 'k'); % reset left subplot color
-            
+
             % update next plane plot limits based on first input
             y1 = round(y1);
             x1 = round(x1);
-            
+
             % update ax2 limits
             xlim(ax2, [x1-scale_fact*nsize+ddx(plane_idx) x1+scale_fact*nsize+ddx(plane_idx)]);
             ylim(ax2, [y1-scale_fact*nsize+ddy(plane_idx) y1+scale_fact*nsize+ddy(plane_idx)]);
-            
+
             % highlight right subplot
             set(ax2, 'XColor', 'r', 'YColor', 'r');
             [x2, y2] = safe_ginput(ax2, ax1);
             set(ax2, 'XColor', 'k', 'YColor', 'k'); % reset right subplot color
-               
+
             p1w = p1(y1-2*nsize:y1+2*nsize, x1-2*nsize:x1+2*nsize);
 
             if x2 > xi + scale_fact * nsize + ddx(plane_idx) || x2 < xi - scale_fact * nsize + ddx(plane_idx) || y2 > yi + scale_fact * nsize + ddy(plane_idx) || y2 < yi - scale_fact * nsize + ddy(plane_idx)

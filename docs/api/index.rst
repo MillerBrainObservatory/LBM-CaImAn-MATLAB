@@ -2,9 +2,16 @@
 API
 #####
 
-There are core functions used to run the pipeline and several helper functions for tasks such as loading data,
+There are two forms of functions to know for this pipeline:
+
+1. :ref:`Core` functions used to run the pipeline
+2. :ref:`Utility` functions for interacting with pipeline outputs.
+3. :ref:`Internal` functions intended for the pipeline, not public use.
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
 
-    functions
+    Core Functions <core>
+    Utility Functions <utility>
+    Internal Functions <internal>
+

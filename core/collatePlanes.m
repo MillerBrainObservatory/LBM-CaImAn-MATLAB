@@ -22,7 +22,7 @@ function [] = collatePlanes(data_path, save_path, varargin)
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
 % reordered : logical, optional
-%      if `rename_planes` was ran, "reordered" will be in the name. 
+%      if `rename_planes` was ran, "reordered" will be in the name.
 %
 % Returns
 % -------
@@ -42,11 +42,10 @@ function [] = collatePlanes(data_path, save_path, varargin)
 % - The function assumes that the consecutive images will have some overlap
 %   and that features will be manually identifiable and trackable across planes.
 %
-% Example
-% -------
+% Examples
+% --------
 % offsets = calculateZOffset('C:/data/images/', metadata, 1, 10, 5);
 %
-% See also LOAD, MAX, IND2SUB, XCORR2, GINPUT, NANMEAN
 
 p = inputParser;
 addRequired(p, 'data_path');

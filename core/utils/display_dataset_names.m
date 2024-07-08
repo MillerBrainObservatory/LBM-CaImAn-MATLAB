@@ -12,7 +12,7 @@ function display_dataset_names(h5_fullfile, loc)
 %     Dataset group name. Default is '/'.
 %
 % Returns
-% ----------
+% -------
 % None
 %
 

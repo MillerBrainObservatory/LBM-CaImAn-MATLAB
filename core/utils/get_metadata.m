@@ -21,10 +21,6 @@ function [metadata_out] = get_metadata(filename)
 % --------
 % metadata = get_metadata("path/to/file.tif");
 %
-% Requires
-% --------
-% - Image Processing Toolbox
-% - MOST toolbox for JSON decoding or an alternative JSON parser
 
 hTiff = Tiff(filename);
 [fpath, fname, ~] = fileparts(filename);
@@ -44,7 +40,7 @@ num_pixel_xy = scanfields.pixelResolutionXY; % misleading name
 tic;
 
 % TIFF header data for additional metadata
-% getHeaderData() is a ScanImage utility that iterates through every 
+% getHeaderData() is a ScanImage utility that iterates through every
 
 [header, desc] = scanimage.util.private.getHeaderData(hTiff);
 toc
@@ -64,13 +60,13 @@ tiff_length = hTiff.getTag("ImageLength");
 tiff_width = hTiff.getTag("ImageWidth");
 
 % .. deprecated:: v1.8.0
-%   
+%
 %   hStackManager.framesPerSlice - only works for slow-stack aquisition
 %   hScan2D.logFramesPerFile - this only logs multi-file recordings,
-%   otherwise is set to 'Inf', which isn't useful for the primary use 
+%   otherwise is set to 'Inf', which isn't useful for the primary use
 %   case of this variable that is preallocating an array to fill this image
 %   data
-%   
+%
 %   num_frames_total = header.SI.hStackManager.framesPerSlice; % the total number of frames for this imaging session
 %   num_frames_file = header.SI.hScan2D.logFramesPerFile; % integer, for split files only: how many images per file to capture before rolling over a new file.
 
@@ -78,7 +74,7 @@ num_planes = length(header.SI.hChannels.channelSave); % an array of active chann
 num_frames = numel(desc) / num_planes;
 
 % .. deprecated:: v1.3.x
-%   
+%
 % hRoiManager.linesPerFrame - not captured for multi-roi recordings
 % lines_per_frame = header.SI.hRoiManager.linesPerFrame; % essentially gives our "raw roi width"
 
