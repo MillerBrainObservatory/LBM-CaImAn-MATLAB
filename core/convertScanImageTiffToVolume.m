@@ -40,8 +40,6 @@ function convertScanImageTiffToVolume(data_path, save_path, varargin)
 % by cleaning up and providing detailed error messages if something goes wrong during
 % processing.
 %
-% See also FILEPARTS, ADDPATH, GENPATH, ISFOLDER, DIR, FULLFILE, ERROR, REGEXP, SAVEFAST
-%
 % .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
 
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath')));
@@ -284,7 +282,7 @@ try
         end
 
         metadata.scan_offset = offsets_plane(plane_idx);
-        write_frames_to_h5(plane_name_save, z_timeseries, size(z_timeseries,3), dataset_name);
+        write_frames_to_h5(plane_name_save, z_timeseries, 'ds',dataset_name);
         h5create(plane_name_save,"/Ym",size(mean_img));
         h5write(plane_name_save, '/Ym', mean_img);
         write_metadata_h5(metadata, plane_name_save, '/');

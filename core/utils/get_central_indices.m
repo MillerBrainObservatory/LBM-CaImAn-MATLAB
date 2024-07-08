@@ -1,5 +1,5 @@
 function [yind, xind] = get_central_indices(img, margin)
-% GET_CENTRAL_INDICES Returns the central indices of the image with a given margin.
+% Returns the central indices of the image with a given margin.
 %
 % Parameters
 % ----------
