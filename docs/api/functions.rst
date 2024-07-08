@@ -1,13 +1,15 @@
 Functions
 ===========
 
-There are core functions used to run the pipeline and several helper functions for tasks such as loading data,
+There are two forms of functions to know for this pipeline:
 
-.. currentmodule:: .
+1. :ref:`Core` functions used to run the pipeline
+2. :ref:`Utility` functions for interacting with pipeline outputs.
 
 Core
-===========
+=======
 
+.. currentmodule:: .
 .. autofunction:: convertScanImageTiffToVolume
 .. autofunction:: motionCorrectPlane
 .. autofunction:: segmentPlane
@@ -15,12 +17,12 @@ Core
 .. autofunction:: calculateZOffset
 
 
-Utilities
-==============
-
-Utilities for reading, writing, inspecting and visualizing data.
+Utility
+========
 
 .. currentmodule:: utils
+
+Utilities for reading, writing, inspecting and visualizing data.
 
 .. autofunction:: display_dataset_names
 .. autofunction:: get_central_indices
@@ -45,6 +47,6 @@ Functions that are meant for use within the pipeline, not for public use.
 
 .. autofunction:: is_valid_group
 .. autofunction:: is_valid_dataset
-   .. .. autofunction:: log_struct
-   .. .. autofunction:: set_caxis
-   .. .. autofunction:: calculate_scale
+.. autofunction:: log_struct
+.. autofunction:: set_caxis
+.. autofunction:: calculate_scale
