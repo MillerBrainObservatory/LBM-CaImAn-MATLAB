@@ -15,21 +15,8 @@ function write_images_to_gif(image_files, save_name, delay_time)
 % from_file : logical
 %     Flag for whether inputs are filenames or in-memory data, true
 %     indicates filenames. Default is true.
-%
-% Returns
-% -------
-% None
-%
-% Example
-% -------
-% image_files = {'image1.png', 'image2.png', 'image3.png'};
-% save_folder = 'C:/Users/MBO/Desktop/figs/';
-% write_images_to_gif(image_files, save_folder);
-%
-% Notes
-% -----
-% - This function assumes that the images are in a format compatible with
-%   MATLAB's `imread` function.
+% delay_time : int, optional
+%     Time, in ms, to delay each frame of the gif.
 %
 
 if ~exist("delay_time", "var"); delay_time = 0.5; end

@@ -17,7 +17,4 @@ This section covers each step in the pipeline, parameters and metadata in more d
     offset_correction
     tips_tricks
     troubleshooting
-    ../../notebooks/python_bindings.ipynb
-
-
 

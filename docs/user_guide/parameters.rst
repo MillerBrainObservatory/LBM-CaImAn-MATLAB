@@ -44,5 +44,5 @@ Definitions
 The recommended method for saving data is to save each step in a separate HDF5 file and name the group after the step being executed.
 This is demonstrated in the :scpt:`demo_LBM_pipeline` at the root of this repository.
 
-For information about the parameters unique to each function, see the :ref:`api` or the help documentation for that individual function.
+For information about the parameters unique to each function, see the :ref:`Core Functions` API or the help documentation for that individual function.
 

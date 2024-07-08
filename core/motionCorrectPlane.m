@@ -229,13 +229,14 @@ for plane_idx = start_plane:end_plane
     exportgraphics(f,shifts_name, 'Resolution', 600, 'BackgroundColor', 'k');
     close(f);
 
-    write_frames_to_h5(plane_name_save, M2, size(M2,3), '/Y');
-    write_frames_to_h5(plane_name_save, shifts2, size(shifts2,2), '/shifts');
-    write_frames_to_h5(plane_name_save, shifts1, size(shifts1,2), '/template');
+    write_frames_to_h5(plane_name_save,M2,'ds','/Y');
+    write_frames_to_h5(plane_name_save,shifts2,'ds','/shifts');
+    write_frames_to_h5(plane_name_save,shifts1,'ds','/template');
     write_metadata_h5(metadata, plane_name_save, '/');
 
-    h5create(plane_name_save,"/Ym",size(mean_img));
-    h5write(plane_name_save, '/Ym', mean_img);
+    h5create(plane_name_save,"/Ym",size(mM2));
+    h5write(plane_name_save, '/Ym', mM2);
+
     log_message(fid, "Plane %d finished, data saved. Elapsed time: %.2f minutes\n",plane_idx,toc(tplane)/60);
     if getenv("OS") == "Windows_NT"
         mem = memory;

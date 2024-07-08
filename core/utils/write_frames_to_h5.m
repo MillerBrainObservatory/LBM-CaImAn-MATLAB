@@ -187,6 +187,8 @@ while current_position < prev_size(end) + sizY(end)
         chunk_data = Y_in(:, :, current_position - prev_size(end) + 1:chunk_end - prev_size(end));
     elseif ndims(Y_in) == 4
         chunk_data = Y_in(:, :, :, current_position - prev_size(end) + 1:chunk_end - prev_size(end));
+    elseif ndims(Y_in) == 2
+        chunk_data = Y_in;
     end
 
     if ismatrix(chunk_data)

@@ -1,7 +1,6 @@
 
-##########
-Setup
-##########
+Project Setup
+#################
 
 Dependencies
 ============
@@ -49,7 +48,7 @@ used for the demo.
 
 .. code-block:: text
 
-    Parent
+    Parent/
     ├── raw/
     │   └── basename_00001_0001.tiff
     │   └── basename_00001_0002.tiff
@@ -79,8 +78,6 @@ used for the demo.
     │   └── segmented_plane_1.h5
     │   └── segmented_plane_2.h5
     │   └── segmented_plane_NN.h5
-    └── figures/
-        └── WIP/
 
 - `N` = the number of `[Y, X, T]` planar time-series.
 - `R` = the number of `[Y, X, T]` ROI's per scanfield.

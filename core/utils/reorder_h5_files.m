@@ -27,14 +27,10 @@ function reorder_h5_files(h5path, order)
 %     h5path = 'path/to/h5/files';
 %     order = [3, 1, 2, 4];
 %     reorder_h5_files(h5path, order);
-%
-% See also
-% --------
-% h5writeatt, movefile, save
 
 % Get all relevant files in the directory
 
-if isstring(h5path) 
+if isstring(h5path)
     h5path = convertStringsToChars(h5path);
 end
 files = dir([h5path '/*_plane_*.h5']);
