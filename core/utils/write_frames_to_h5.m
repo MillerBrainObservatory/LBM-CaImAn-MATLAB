@@ -65,7 +65,6 @@ p.parse(file, Y_in, ds);
 options = p.Results;
 
 keep_reading = true;
-=======
 
 p = inputParser;
 p.addRequired('file', @(x) validateattributes(x, {'char', 'string'}, {'nonempty', 'scalartext'}, '', 'file'));
