@@ -5,26 +5,19 @@ LBM-CaImAn-MATLAB Documentation
 
 |Repository| |Release| |Issues|
 
-A pipeline for processing light beads microscopy (LBM) datasets.
-
 Currently, inputs to this pipeline are limited to `ScanImage`_ `tiff` files. However, only the
 first step of this pipeline which converts the multi-ROI .tiff into a 4D volumetric time-series
 requires scanimage `.tiff` files.
-
-For background, theory and design of LBM technology, see the reference `publication`_.
-
-|Publication|
-
 
 Pipeline Steps
 *****************
 
 There are 4 core steps in this pipeline:
 
-1. `convertScanImageTiffToVolume()`
-2. `motionCorrectPlane()`
-3. `segmentPlane()`
-4. `collatePlane()`
+1. :func:`convertScanImageTiffToVolume()`
+2. :func:`motionCorrectPlane()`
+3. :func:`segmentPlane()`
+4. :func:`collatePlane()`
 
 Notice how these 4 functions are `camelCase` (lowerCaseUpperCase). Every **non-core** function you
 may use, such as :func:`read_h5_metadata`, is `snake_case`. This is a feature, not a bug.
