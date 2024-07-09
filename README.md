@@ -33,6 +33,21 @@ For the last step in the pipeline, you will need 2 calibration files aquired bef
 `pollen_sample_calibraion_xy.mat`
 `pollen_calibration_z_vs_N.fig`
 
+### Requirements
+
+- MATLAB (Tested on 2023a, 2024a)
+- Windows 10 or Ubuntu 22.04
+- Toolboxes:
+  - Parallel Computing Toolbox
+  - Statistics and Machine Learning Toolbox
+  - Image Processing Toolbox
+  - Signal Processing Toolbox
+
+
+The pipeline won't work with MacOS without the correct `mex` binaries. If this needed, submit an issue.
+
+The most up to date mexfiles are always kept in the [releases](https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/releases/tag/v2.1.0-mex>) on Github.
+
 ## Overview
 
 This pipeline is unique only in the routines to extract raw data from [ScanImage BigTiff files](https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification), as is outlined below:
@@ -44,18 +59,6 @@ Once data is extracted to an intermediate filetype `h5`, `.tiff`, `.memmap`, reg
 Follow the root `demo_LBM_pipeline.m` file for an example pipeline, or the root `/notebooks` folder for more in-depth exploration of individual pipeline steps.
 
 There are several utility functions you can take advantage of in the `core/utils` folder/. Learn about them in the docstrings via the [api documentation](https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/api/index.html).
-
-## Requirements
-
-- MATLAB (Tested on 2023a, 2024a)
-- Windows 10 or Ubuntu 22.04
-- Toolboxes:
-  - Parallel Computing Toolbox
-  - Statistics and Machine Learning Toolbox
-  - Image Processing Toolbox
-  - Signal Processing Toolbox
-
-The pipeline won't work with MacOS without the correct `mex` binaries. If this needed, submit an issue.
 
 ## Algorithms
 
