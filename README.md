@@ -13,9 +13,9 @@ For a python implementation, see [here](https://github.com/MillerBrainObservator
 ### Installation
 
 To use this pipeline, the code in this repository needs to be on your `MATLAB path`. You can do this easily by:
-1. Downloading the code via the the `<Code>` button above -> `Download`
+1. Downloading the code via the blue `<> Code` button above, and select -> `Download`
 2. Find your matlab path by opening MATLAB and entering `userpath`
-3. Copy this downloaded folder anywhere on your path, typically `C:/Users/<Username>/Documents/MATLAB/`
+3. Extract this downloaded folder anywhere listed here on your MATLAB path, typically `C:/Users/<Username>/Documents/MATLAB/`
 4. Right click on "core" and "packages" folders -> `Add to Path` -> `Selected Folders and Subfolders`
 
 When re-opening MATLAB, you may need to re-add the `core` and `package` folders to your path. You could similarly add
@@ -45,18 +45,17 @@ Follow the root `demo_LBM_pipeline.m` file for an example pipeline, or the root 
 
 There are several utility functions you can take advantage of in the `core/utils` folder/. Learn about them in the docstrings via the [api documentation](https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/api/index.html).
 
-For example, this graphic was created via the [images_to_gif()]() function: 
-
-![crosstalk_single_hemi](https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/assets/75346097/f5478a6f-18c6-455f-91e7-aeb57e73f502)
-
 ## Requirements
 
-- MATLAB (Tested on 2023a, 2023b, 2024b)
+- MATLAB (Tested on 2023a, 2024a)
+- Windows 10 or Ubuntu 22.04
 - Toolboxes:
   - Parallel Computing Toolbox
   - Statistics and Machine Learning Toolbox
   - Image Processing Toolbox
   - Signal Processing Toolbox
+
+The pipeline won't work with MacOS without the correct `mex` binaries. If this needed, submit an issue.
 
 ## Algorithms
 
