@@ -25,24 +25,7 @@ may use, such as :func:`read_h5_metadata`, is `snake_case`. This is a feature, n
 .. thumbnail:: _static/_images/extraction/extraction_diagram.png
    :width: 800
 
-Requirements
-=============
-
-- MATLAB (Tested on 2023a, 2023b, 2024b)
-- Toolboxes:
-    - Parallel Computing Toolbox
-    - Statistics and Machine Learning Toolbox
-    - Image Processing Toolbox
-    - Signal Processing Toolbox
-
-Algorithms
-=============
-
-The following algorithms perform the main computations and are included by default in the pipeline:
-
-- `CNMF`_ segmentation and neuronal source extraction.
-- `NoRMCorre`_ piecewise rigid motion correction.
-- `constrained-foopsi`_ constrained deconvolution spike inference.
+For up-to-date pipeline requirements and algorithms, see the github `repository readme <https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB>`_
 
 .. _CNMF: https://github.com/simonsfoundation/NoRMCorre
 .. _CaImAn: https://github.com/flatironinstitute/CaImAn-MATLAB/
@@ -86,19 +69,17 @@ Contents
 =================
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
 
     first_steps/index
 
 .. toctree::
-    :maxdepth: 2
-    :caption: User Guide
+    :maxdepth: 3
 
     user_guide/index
 
 .. toctree::
     :maxdepth: 2
-    :caption: API:
 
     api/index
 
