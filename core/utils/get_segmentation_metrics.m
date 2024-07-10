@@ -1,5 +1,7 @@
 function [] = get_segmentation_metrics(savePath, T_all, Nsamples)
-% GET_SEGMENTATION_METRICS Compute and save segmentation metrics.
+% Compute and save segmentation metrics based on the ration of t Z-Score of the moving mean
+% to the standard deviation of the difference between time-series data and
+% the moving mean.
 %
 % Parameters
 % ----------
@@ -10,8 +12,7 @@ function [] = get_segmentation_metrics(savePath, T_all, Nsamples)
 % Nsamples : numeric
 %     Number of samples for the moving mean calculation.
 %
-% This function computes segmentation metrics for neurons based on the
-% given time series data. Specifically, it calculates the Z-score for
+% This function calculates the Z-score for
 % each neuron and plots histograms of the Z-scores and maximum
 % \DeltaF/F_0 (%) values. The resulting figures are saved to the specified
 % save path.
