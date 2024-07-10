@@ -52,9 +52,9 @@ The most up to date mexfiles are always kept in the [releases](https://github.co
 
 This pipeline is unique only in the routines to extract raw data from [ScanImage BigTiff files](https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification), as is outlined below:
 
-![Extraction Diagram]( docs/_static/_images/extraction/extraction_diagram.png)
+![Extraction Diagram]( docs/_images/ex_diagram.png)
 
-Once data is extracted to an intermediate filetype `h5`, `.tiff`, `.memmap`, registration, segmentation and deconvolution can all be performed as described in the corresponding pipelines documentation.
+Once data is extracted to an intermediate filetype `h5`, `.tiff`, `.memmap`, registration, segmentation and deconvolution can all be performed as described in the pipelines documentation.
 
 Follow the root `demo_LBM_pipeline.m` file for an example pipeline, or the root `/notebooks` folder for more in-depth exploration of individual pipeline steps.
 
