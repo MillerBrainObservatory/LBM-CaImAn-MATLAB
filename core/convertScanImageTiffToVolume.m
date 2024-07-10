@@ -71,7 +71,6 @@ fix_scan_phase = p.Results.fix_scan_phase;
 trim_pixels = p.Results.trim_pixels;
 do_figures = p.Results.do_figures;
 
-if fix_scan_phase == 0; warning("Setting fix_scan_phase = 0 not yet implemented."); end
 if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", fullfile(data_path)); end
 if debug_flag == 1; dir([data_path, '*.tif']); return; end
 
@@ -126,6 +125,8 @@ metadata.trim_pixels = [t_left, t_right, t_top, t_bottom]; % store the number of
 raw_x = metadata.num_pixel_xy(1);
 raw_x = min(raw_x, metadata.tiff_width);
 raw_y = metadata.num_pixel_xy(2);
+raw_y = min(raw_y, metadata.tiff_length);
+trimmed_yslice = (t_top+1:raw_y-t_bottom);
 
 num_planes = metadata.num_planes;
 num_rois = metadata.num_rois;
@@ -134,43 +135,39 @@ data_type = metadata.sample_format;
 
 metadata.dataset_name = ds;
 metadata.num_files = num_files;
-
-log_struct(fid,metadata,'metadata',log_full_path);
-
-fprintf("Metadata:\n")
-disp(metadata)
-
+log_message(fid, "------- Metadata ------------");
+log_struct(fid,metadata,'Metadata',log_full_path);
+log_message(fid, "-----------------------------");
 log_message(fid, "Aggregating data from %d file(s) with %d plane(s).\n",num_files, num_planes);
-offset_file = 0;
 
+% offset_file = 0;
 % Aout = zeros(metadata.tiff_length, metadata.tiff_width, num_planes, num_frames*num_files, data_type);
-for file_idx = 1:num_files
-    if file_idx > 1; offset_file = offset_file + num_frames; end
-    tpf = tic;
-    full_filename = fullfile(data_path, files(file_idx).name);
-    log_message(fid, 'Loading file %d of %d...\n', file_idx, num_files);
-
-    hTif=ScanImageTiffReader(full_filename);
-    hTif=hTif.data();
-    size_y=size(hTif);
-    hTif=reshape(hTif, [size_y(1), size_y(2), num_planes, num_frames]);
-    hTif=permute(hTif, [2 1 3 4]);
-
-    log_message(fid, '%.2f Mb tiff data loaded. Saving data to file...\n', whos('hTif').bytes / 1e6);
-    for pi = 1:num_planes
-        tps = tic;
-        plane_name = sprintf("plane_%d.h5", pi);
-        full_name = fullfile(save_path, plane_name);
-
-        write_frames(full_name, hTif(:,:,pi,:), 'ds', '/raw');
-        log_message(fid, 'Plane %d saved in %.2f seconds.\n',pi, toc(tps));
-    end
-    log_message(fid, 'File %d/%d loaded and saved in %.2f seconds.\n',pi, toc(tpf));
-end
-clear hTif size_y plane_name
+% for file_idx = 1:num_files
+%     if file_idx > 1; offset_file = offset_file + num_frames; end
+%     tpf = tic;
+%     full_filename = fullfile(data_path, files(file_idx).name);
+%     log_message(fid, 'Loading file %d of %d...\n', file_idx, num_files);
+% 
+%     hTif=ScanImageTiffReader(full_filename);
+%     hTif=hTif.data();
+%     size_y=size(hTif);
+%     hTif=reshape(hTif, [size_y(1), size_y(2), num_planes, num_frames]);
+%     hTif=permute(hTif, [2 1 3 4]);
+% 
+%     log_message(fid, '%.2f Gb tiff data loaded. Saving data to file...\n', whos('hTif').bytes / 1e9);
+%     for pi = 1:num_planes
+%         tps = tic;
+%         plane_name = sprintf("raw_plane_%d.h5", pi);
+%         full_name = fullfile(save_path, plane_name);
+% 
+%         write_frames(full_name, hTif(:,:,pi,:),'append', true);
+%         log_message(fid, 'Plane %d saved in %.2f seconds.\n',pi,toc(tps));
+%     end
+%     log_message(fid, 'File %d loaded and saved in %.2f seconds.\n',pi,toc(tpf));
+% end
+% clear hTif size_y plane_name
 tfile = tic;
 
-log_message(fid, "Data loaded for file %d/%d in %.2f seconds...\n", file_idx, num_files, toc(tfile))
 z_timeseries = zeros(raw_y, raw_x * metadata.num_rois, num_frames, data_type);
 for plane_idx = 1:num_planes
     tplane = tic;
@@ -178,13 +175,26 @@ for plane_idx = 1:num_planes
     log_message(fid, 'Processing z-plane %d/%d...\n', plane_idx, num_planes);
 
     p_str = sprintf("plane_%d", plane_idx);
-    plane_name = sprintf("%s.h5",fullfile(data_path, p_str));
+    raw_p_str = sprintf("raw_%s", p_str);
+    extracted_p_str = sprintf("extracted_%s", p_str);
+    plane_name = sprintf("%s.h5",fullfile(data_path,raw_p_str));
+    frame_name = sprintf("%s.h5",fullfile(data_path,extracted_p_str));
 
-    vol = h5read(plane_name, '/raw');
+    vol = h5read(plane_name,'/Y');
+    plane_offset = returnScanOffset(vol,1,data_type);
+
+    % account for pixels removed during scan offset correction
+    % when assessing how many pixels to trim.
+    cut_left = max(0, t_left-abs(plane_offset));
+    cut_right = max(0, t_right-abs(plane_offset));
+    trimmed_xslice = (cut_left+1:raw_x-cut_right);
+
+    vol = fixScanPhase(vol,plane_offset,1,data_type);
+    vol = vol(:,trimmed_xslice,:);
     % /figures folder with /plane_n subdirectories
     if do_figures
-        plane_savepath = fullfile(fig_save_path, p_str);
-        if ~isfolder(plane_savepath); mkdir(plane_savepath); end
+        fig_savepath = fullfile(fig_save_path, p_str);
+        if ~isfolder(fig_savepath); mkdir(fig_savepath); end
     end
 
     cnt = 1;
@@ -199,17 +209,9 @@ for plane_idx = 1:num_planes
         % use the **untrimmed** roi in the phase offset correction
         raw_yslice = (raw_offset_y + 1):(raw_offset_y + raw_y);
         roi_arr = vol(raw_yslice, :, :);
-        
-        offset=returnScanOffset(roi_arr, 1, data_type);
-
-        log_message(fid, "Roi %d offset = %d...\n", roi_idx,offset)
-        roi_arr = fixScanPhase(vol, offset, 1, data_type);
-
-        trimmed_xslice = (t_left+1:raw_x-t_right);
-        trimmed_yslice = (t_top+1:raw_y-t_bottom);
 
         % pre-trim this roi
-        roi_arr = squeeze(roi_arr(trimmed_yslice, trimmed_xslice, :));
+        roi_arr = squeeze(roi_arr(trimmed_yslice, :, :));
         if cnt > 1 % wait until the new array size is calculated
             offset_x = offset_x + size(roi_arr, 2);
         end
@@ -230,7 +232,7 @@ for plane_idx = 1:num_planes
             roi_scales = {zoomed_scale,zoomed_scale};
             labels = {'Pre-Corrected/Trimmed', 'Phase-Corrected/Trimmed'};
 
-            roi_savename = fullfile(plane_savepath, sprintf('roi_%d.png', roi_idx));
+            roi_savename = fullfile(fig_savepath, sprintf('roi_%d.png', roi_idx));
             write_tiled_figure( ...
                 images, ...
                 metadata, ...
@@ -249,17 +251,17 @@ for plane_idx = 1:num_planes
         any(z_timeseries, [2, 3]), ...
         any(z_timeseries, [1, 3]), ...
         :);
+
+    mean_img = mean(z_timeseries, 3);
     if do_figures
         img_frame = z_timeseries(:,:,2);
-        mean_img = mean(z_timeseries, 3);
-
         [yind, xind] = get_central_indices(mean_img, 30); % 30 pixels around the center of the brightest part of an image frame
         images = {img_frame, mean_img, mean_img(yind, xind)};
         labels = {'Second Frame', 'Mean Image', 'Mean Image(Zoom)'};
         scale_full = calculate_scale(size(img_frame, 2), metadata.pixel_resolution);
         scale_roi = calculate_scale( size(img_frame(yind, xind),2), metadata.pixel_resolution);
         scales = {scale_full, scale_full, scale_roi};
-        plane_save_path = fullfile(plane_savepath, sprintf('mean_frame_plane_%d.png', plane_idx));
+        plane_save_path = fullfile(fig_savepath, sprintf('mean_frame_plane_%d.png', plane_idx));
 
         write_tiled_figure( ...
             images, ...
@@ -267,28 +269,23 @@ for plane_idx = 1:num_planes
             'titles', labels, ...
             'scales', scales, ...
             'save_name', plane_save_path ...
-        );
+            );
+    end
+    if getenv("OS") == "Windows_NT"
+        mem = memory;
+        max_gb = mem.MaxPossibleArrayBytes / 1e9;
+        max_avail = mem.MemAvailableAllArrays / 1e9;
+        mem_used = mem.MemUsedMATLAB / 1e9;
+        log_message(fid, "MEMORY USAGE (max/available/used): %.2f/%.2f/%.2f\n", max_gb, max_avail, mem_used)
+    end
 
-        metadata.scan_offset = offsets_plane(plane_idx);
-        write_frames_to_h5(plane_name_save, z_timeseries, 'ds',ds);
-        h5create(plane_name_save,"/Ym",size(mean_img));
-        h5write(plane_name_save, '/Ym', mean_img);
-        write_metadata_h5(metadata, plane_name_save, '/');
-        if getenv("OS") == "Windows_NT"
-            mem = memory;
-            max_gb = mem.MaxPossibleArrayBytes / 1e9;
-            max_avail = mem.MemAvailableAllArrays / 1e9;
-            mem_used = mem.MemUsedMATLAB / 1e9;
-            log_message(fid, "MEMORY USAGE (max/available/used): %.2f/%.2f/%.2f\n", max_gb, max_avail, mem_used)
-        end
-        log_message(fid, "---- Complete: Plane %d processed in %.2f seconds ----\n",plane_idx, toc(tplane));
+    write_frames(frame_name, z_timeseries,'append',true);
+    try
+        h5create(frame_name,"/Ym",size(mean_img));
+    catch
     end
-    write_frames(plane_name, z_timeseries,'ds',ds);
-    if ~is_valid_dataset(plane_name, '/Ym')
-        h5create(plane_name,"/Ym",size(mean_img));
-        h5write(plane_name, '/Ym', mean_img);
-    end
-    write_metadata_h5(metadata, plane_name, '/');
+    h5write(frame_name, '/Ym', mean_img);
+    write_metadata_h5(metadata, frame_name, '/');
     if getenv("OS") == "Windows_NT"
         mem = memory;
         max_avail = mem.MemAvailableAllArrays / 1e9;
@@ -296,6 +293,7 @@ for plane_idx = 1:num_planes
         log_message(fid, "MEMORY USAGE (max/available/used): %.2f/%.2f\n", max_avail, mem_used)
     end
     log_message(fid, "---- Complete: Plane %d processed in %.2f seconds ----\n",plane_idx, toc(tplane));
+    close all hidden;
 end
 log_message(fid,"Processing complete. Time: %.3f minutes.",toc(tfile)/60);
 fclose('all');
@@ -336,7 +334,7 @@ elseif dim == 2
         dataOut(1+floor(offset/2):sy+floor(offset/2),:,:,:) = dataIn;
     end
 end
-% dataOut = dataOut(:, 1+offset:sx-offset, :, :);
+dataOut = dataOut(:, 1+offset:sx-offset, :, :);
 end
 
 function correction = returnScanOffset(Iin,dim,dtype)

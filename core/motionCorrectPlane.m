@@ -26,15 +26,11 @@ function motionCorrectPlane(data_path, save_path, ds, debug_flag, varargin)
 % options : struct
 %     NormCorre Params Object,
 %
-% Returns
-% -------
-% shifts : array
-%     2D motion vectors as single precision.
-%
 % Notes
 % -----
-% - Each motion-corrected plane is saved as a .h5 group containing the 2D
-%   shift vectors in x and y
+% Each motion-corrected plane is saved as a .h5 group containing the 2D
+%   shift vectors in x and y. The raw movie is saved in '/Y' and the 
+%   
 % - Only .h5 files containing processed volumes should be in the file_path.
 
 p = inputParser;
@@ -53,7 +49,7 @@ parse(p,data_path,save_path,ds,debug_flag,varargin{:});
 
 data_path = p.Results.data_path;
 save_path = p.Results.save_path;
-ds = p.Results.dataset_name;
+ds = p.Results.ds;
 debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
 num_cores = p.Results.num_cores;
@@ -161,7 +157,7 @@ for plane_idx = start_plane:end_plane
         options_nonrigid = NoRMCorreSetParms(...
             'd1', d1,...
             'd2', d2,...
-            'bin_width', 24,...
+            'bin_width', 200,...
             'max_shift', round(20/pixel_resolution),...
             'us_fac', 20,...
             'init_batch', 120,...
@@ -180,30 +176,32 @@ for plane_idx = start_plane:end_plane
     [cM1,mM1,~] = motion_metrics(M1,10);
     [cM2,mM2,~] = motion_metrics(M2,10);
     T = length(cY);
+    if do_figures
 
-    log_message(fid, "Plotting registration metrics...\n");
-
-    fig_plane_name = sprintf("%s/plane_%d", fig_save_path, plane_idx);
-    metrics_name = sprintf("%s_metrics.png", fig_plane_name);
-    f = figure('Visible', 'off', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
-    ax1 = subplot(2, 3, 1); imagesc(mY); axis equal; axis tight; axis off; 
-    title('mean raw data', 'fontsize', 10, 'fontweight', 'bold');
+        log_message(fid, "Plotting registration metrics...\n");
     
-    ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off; 
-    title('mean rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
-    ax3 = subplot(2, 3, 3); imagesc(mM2); axis equal; axis tight; axis off; 
-    title('mean non-rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
-    subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid'); 
-    title('correlation coefficients', 'fontsize', 10, 'fontweight', 'bold');
-    subplot(2, 3, 5); scatter(cY, cM1); hold on; 
-    plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-    xlabel('raw data', 'fontsize', 10, 'fontweight', 'bold'); ylabel('rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
-    subplot(2, 3, 6); scatter(cM1, cM2); hold on; 
-    plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-    xlabel('rigid corrected', 'fontsize', 10, 'fontweight', 'bold'); ylabel('non-rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
-    linkaxes([ax1, ax2, ax3], 'xy');
-    exportgraphics(f,metrics_name,'Resolution',600,'BackgroundColor','k');
-    close(f);
+        fig_plane_name = sprintf("%s/plane_%d", fig_save_path, plane_idx);
+        metrics_name = sprintf("%s_metrics.png", fig_plane_name);
+        f = figure('Visible', 'off', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
+        ax1 = subplot(2, 3, 1); imagesc(mY); axis equal; axis tight; axis off; 
+        title('mean raw data', 'fontsize', 10, 'fontweight', 'bold');
+        
+        ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off; 
+        title('mean rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
+        ax3 = subplot(2, 3, 3); imagesc(mM2); axis equal; axis tight; axis off; 
+        title('mean non-rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
+        subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid'); 
+        title('correlation coefficients', 'fontsize', 10, 'fontweight', 'bold');
+        subplot(2, 3, 5); scatter(cY, cM1); hold on; 
+        plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
+        xlabel('raw data', 'fontsize', 10, 'fontweight', 'bold'); ylabel('rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
+        subplot(2, 3, 6); scatter(cM1, cM2); hold on; 
+        plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
+        xlabel('rigid corrected', 'fontsize', 10, 'fontweight', 'bold'); ylabel('non-rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
+        linkaxes([ax1, ax2, ax3], 'xy');
+        exportgraphics(f,metrics_name,'Resolution',600,'BackgroundColor','k');
+        close(f);
+    end
 
     log_message(fid, "Calculating registration shifts...\n");
 
@@ -211,43 +209,43 @@ for plane_idx = start_plane:end_plane
     shifts2 = reshape(shifts2,[],ndims(Y)-1,T);
     shifts_x = squeeze(shifts2(:,1,:))';
     shifts_y = squeeze(shifts2(:,2,:))';
+    if do_figures
+        log_message(fid, "Plotting registration shifts...\n");
+        shifts_name = sprintf("%s_shifts.png", fig_plane_name);
+        f = figure("Visible","off");
+        ax1 = subplot(311);
+        plot(1:T,cY,1:T,cM1,1:T,cM2); legend('raw data','rigid','non-rigid');
+        title('correlation coefficients','fontsize',8,'fontweight','bold')
+                set(gca,'Xtick',[])
+        ax2 = subplot(312);
+        plot(shifts_x); hold on; plot(shifts1(:,1),'--r','linewidth',2);
+        title('displacements along x','fontsize',8,'fontweight','bold')
+                set(gca,'Xtick',[])
+        ax3 = subplot(313);
+        plot(shifts_y); hold on; plot(shifts1(:,2),'--r','linewidth',2);
+        title('displacements along y','fontsize',8,'fontweight','bold')
+                xlabel('timestep','fontsize',8,'fontweight','bold')
+        linkaxes([ax1,ax2,ax3],'x')
+        exportgraphics(f,shifts_name, 'Resolution', 600, 'BackgroundColor', 'k');
+        close(f);
+    end
 
-    log_message(fid, "Plotting registration shifts...\n");
-    shifts_name = sprintf("%s_shifts.png", fig_plane_name);
-    f = figure("Visible","off");
-    ax1 = subplot(311);
-    plot(1:T,cY,1:T,cM1,1:T,cM2); legend('raw data','rigid','non-rigid');
-    title('correlation coefficients','fontsize',8,'fontweight','bold')
-            set(gca,'Xtick',[])
-    ax2 = subplot(312);
-    plot(shifts_x); hold on; plot(shifts1(:,1),'--r','linewidth',2);
-    title('displacements along x','fontsize',8,'fontweight','bold')
-            set(gca,'Xtick',[])
-    ax3 = subplot(313);
-    plot(shifts_y); hold on; plot(shifts1(:,2),'--r','linewidth',2);
-    title('displacements along y','fontsize',8,'fontweight','bold')
-            xlabel('timestep','fontsize',8,'fontweight','bold')
-    linkaxes([ax1,ax2,ax3],'x')
-    exportgraphics(f,shifts_name, 'Resolution', 600, 'BackgroundColor', 'k');
-    close(f);
+    write_frames(plane_name_save,M2,'ds','/Y','overwrite',true);
 
-    write_frames_to_h5(plane_name_save,M2,'ds','/Y');
-    write_frames_to_h5(plane_name_save,shifts2,'ds','/shifts');
-    write_frames_to_h5(plane_name_save,shifts1,'ds','/template');
-    write_metadata_h5(metadata, plane_name_save, '/');
-
+    h5create(plane_name_save,"/shifts",size(shifts2));
     h5create(plane_name_save,"/Ym",size(mM2));
+    h5write(plane_name_save, '/shifts', shifts2);
     h5write(plane_name_save, '/Ym', mM2);
 
+    write_metadata_h5(metadata, plane_name_save, '/');
     log_message(fid, "Plane %d finished, data saved. Elapsed time: %.2f minutes\n",plane_idx,toc(tplane)/60);
     if getenv("OS") == "Windows_NT"
         mem = memory;
-        max_gb = mem.MaxPossibleArrayBytes / 1e9;
         max_avail = mem.MemAvailableAllArrays / 1e9;
         mem_used = mem.MemUsedMATLAB / 1e9;
-        log_message(fid, "MEMORY USAGE (max/available/used): %.2f/%.2f/%.2f\n", max_gb, max_avail, mem_used)
+        log_message(fid, "MEMORY USAGE (max/available/used): %.2f/%.2f\n", max_avail, mem_used)
     end
-    clear M* shifts* template Ym;
+    clear M* shifts* template Ym; close all hidden;
 end
 log_message(fid, "Processing complete. Time: %.2f hours\n",toc(tall)/3600);
 close('all');

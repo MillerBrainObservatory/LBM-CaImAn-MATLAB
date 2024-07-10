@@ -82,13 +82,12 @@ used for the demo.
 - `N` = the number of `[Y, X, T]` planar time-series.
 - `R` = the number of `[Y, X, T]` ROI's per scanfield.
 
-Following the recommendation described in :ref:`install recommendation` all necessary functions should already be on your
+Following the recommendation described in the :ref:`installation` guide all necessary functions should already be on your
 MATLAB path. If an error is encountered, such as:
 
 .. code-block:: MATLAB
 
     Undefined function 'convertScanImageTiffToVolume' for input arguments of type 'char'.
-
 
 This means the input is not on your MATLAB path. Add this to the top of the script you are running:
 

@@ -37,55 +37,28 @@ function write_frames_to_h5(file,Y_in,varargin)
 %
 %     write_frames_to_h5('data.h5', my_data,'/Y');
 
-if nargin > 0
-    file = convertStringsToChars(file);
-end
-
-if nargin > 1
-    Y_in = convertStringsToChars(Y_in);
-end
-
-if nargin > 2
-    ds = convertStringsToChars(ds);
-end
-
-if ~exist('ds', 'var') || isempty(ds)
-    ds = '/Y';
-end
-
-p = inputParser;
-p.addRequired('file', ...
-    @(x) validateattributes(x, {'char', 'string'}, {'nonempty', 'scalartext'}, '', 'file'));
-p.addRequired('Y_in', ...
-    @(x) validateattributes(x, {'numeric'}, {'nonempty'}, '', 'Y_in'));
-p.addOptional('ds', '/Y', ...
-    @(x) validateattributes(x, {'char', 'string'}, {'nonempty', 'scalartext'}, '', 'ds'));
-
-p.parse(file, Y_in, ds);
-options = p.Results;
-
-keep_reading = true;
-=======
-
 p = inputParser;
 p.addRequired('file', @(x) validateattributes(x, {'char', 'string'}, {'nonempty', 'scalartext'}, '', 'file'));
 p.addRequired('Y_in', @(x) validateattributes(x, {'numeric'}, {'nonempty'}, '', 'Y_in'));
 p.addOptional('ds', '/Y', @(x) is_valid_group(convertStringsToChars(x)));
-p.addOptional('overwrite', 0, @(x) validateattributes(x, {'scalar', 'positive'}));
-p.addOptional('target_chunk_mb', 4, @(x) validateattributes(x,{'numeric','scalar'},{'positive'}));
 
-p.parse(file,Y_in,varargin{:});
-target_chunk_mb = p.Results.target_chunk_mb;
+p.parse(file, Y_in, varargin{:});
 ds = p.Results.ds;
-overwrite = p.Results.overwrite;
+p.parse(file, Y_in, ds);
+options = p.Results;
+chunk=2000;
+
+keep_reading = true;
 
 %% Setup Arguments ------
 
 file = convertStringsToChars(file);
 ds = convertStringsToChars(ds);
 Y_in = squeeze(Y_in);
+nd = ndims(Y_in)-1;
 
 cl = class(Y_in);
+sizY = size(Y_in);
 
 if sizY(end) < chunk + 1
     keep_reading = false;
@@ -111,8 +84,13 @@ imageSizeMBytes = (prod(sizY(1:2)) * 2) / 1e6;
 chunk_size = round(4/imageSizeMBytes);
 
 if ~dataset_exists
-    h5create(h5_filename,options.ds,[sizY(1:nd), Inf],'ChunkSize',[size(1:nd) chunk_size],'Datatype',cl);
-    h5write(h5_filename, options.ds, Y_in);
+     if ndims(Y_in) == 2
+        h5create(h5_filename, options.ds, size(Y_in), 'ChunkSize', size(Y_in), 'Datatype', cl);
+        h5write(h5_filename, options.ds, Y_in);
+    else
+        h5create(h5_filename, options.ds, [size(Y_in, 1), size(Y_in, 2), 1], 'ChunkSize', [size(Y_in, 1), size(Y_in, 2), chunk_size], 'Datatype', cl);
+        h5write(h5_filename, options.ds, Y_in, ones(1, ndims(Y_in)));
+    end
 else
     dset_info = h5info(h5_filename, options.ds);
     current_size = dset_info.Dataspace.Size;
@@ -187,11 +165,7 @@ while current_position < prev_size(end) + sizY(end)
         chunk_data = Y_in(:, :, current_position - prev_size(end) + 1:chunk_end - prev_size(end));
     elseif ndims(Y_in) == 4
         chunk_data = Y_in(:, :, :, current_position - prev_size(end) + 1:chunk_end - prev_size(end));
-    elseif ndims(Y_in) == 2
-        chunk_data = Y_in;
-    end
-
-    if ismatrix(chunk_data)
+    elseif ismatrix(chunk_data)
         return
     else
         start = [ones(1, ndims(Y_in)-1), current_position + 1];
