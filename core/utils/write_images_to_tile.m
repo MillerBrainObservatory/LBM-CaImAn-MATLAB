@@ -1,4 +1,4 @@
-function write_tiled_figure(images, metadata, varargin)
+function write_images_to_tile(images, metadata, varargin)
 % Creates a tiled figure with scale bars and specified titles.
 %
 % Parameters

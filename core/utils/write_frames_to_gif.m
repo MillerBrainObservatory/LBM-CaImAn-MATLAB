@@ -1,44 +1,111 @@
-function write_frames_to_gif(image_files, save_name, delay_time)
-% Creates an animated GIF from a series of images on disk.
+function write_frames_to_gif(array_3D, gif_filename, size_mb)
+% Create a GIF from a 3D array with a target size in MB.
 %
-% This function generates an animated GIF from a series of images specified
-% by their file paths. The images are read, converted to indexed color, and
-% sequentially written to a GIF file with a specified delay between frames.
+% This function converts a 3D array (height x width x frames) into a GIF
+% file with a specified maximum size in megabytes. The function normalizes
+% each frame, converts it to grayscale, and writes it to the GIF file.
 %
 % Parameters
 % ----------
-% image_files : cell array of strings
-%     A cell array containing the file paths of the images to be included in the GIF.
-% save_name : string
-%     The directory and filename where the output GIF file will be saved.
-% delay_time : int, optional
-%     Time, in seconds, to delay each frame of the GIF. Defaults to 0.5 seconds.
+% array_3D : 3D array
+%     The 3D array to convert to a GIF, with dimensions (height x width x frames).
+% gif_filename : char
+%     The name of the output GIF file.
+% size_mb : numeric
+%     The target size of the GIF in megabytes. The number of frames will be
+%     adjusted to fit within this size, rounding down to the nearest whole frame.
 %
-% Returns
-% -------
-% None
+% Examples
+% --------
+% Example 1:
+%     % Create a GIF from a 3D array with a target size of 45 MB
+%     array_3D = rand(100, 100, 500); % Example 3D array
+%     write_frames_to_gif(array_3D, 'output.gif', 45);
+%
+% Example 2:
+%     % Create a GIF from a 3D array loaded from a file with a target size of 25 MB
+%     array_3D = h5read('data.h5', '/dataset'); % Load 3D array from file
+%     write_frames_to_gif(array_3D, 'output_25mb.gif', 25);
 %
 % Notes
 % -----
-% The function reads each image file, converts it to an indexed color map, and writes
-% it to the GIF file. The first image initializes the GIF file, and subsequent images
-% are appended. If the delay_time parameter is not specified, it defaults to 0.5 seconds
-% between frames. The function checks for valid input types and existence of image files
-% before proceeding with the GIF creation.
+% Frames are normalized to [0, 1] and converted to grayscale before being written to the GIF file.
+% This will result in the final image being smaller than the original, as will the resulting gif.
+%
 
-if ~exist("delay_time", "var"); delay_time = 0.5; end
-if ~iscell(image_files); error("First argument must be of type: Cell, not:\n%s", class(image_files)); end
-if ~isfile(image_files{1}); error("%s is not a valid file.", save_name); end
-
-for i = 1:length(image_files)
-    % make sure its greyscale for imwrite
-	[img, cmap] = rgb2ind(imread(image_files{i}), 256);
-	if i == 1
-		imwrite(img, cmap, save_name, 'gif', 'LoopCount', Inf, 'DelayTime', delay_time);
-	else
-		imwrite(img, cmap, save_name, 'gif', 'WriteMode', 'append', 'DelayTime', delay_time);
-	end
-end
-fprintf("Timeseries successfully saved as a .gif to:\n%s", save_name);
+if ndims(array_3D) ~= 3
+    error('Input must be a 3D array');
 end
 
+fprintf("Array size: %.2f Mb\n", get_mb(array_3D));
+
+sizY = size(array_3D);
+ndY = numel(sizY);
+nd = ndY-1;
+
+samples_per_frame = prod(sizY(1:nd));
+bytes_per_sample = get_bytes_per_sample(array_3D(:,:,1));
+bytes_per_frame = samples_per_frame * bytes_per_sample;
+
+num_frames = min(sizY(end), floor((size_mb * 1e6) / bytes_per_frame));
+
+fprintf("Gif size: %.2f Mb\n", get_mb(array_3D(:,:,1:num_frames)));
+
+min_mov = min(array_3D(:));
+max_mov = max(array_3D(:));
+for t = 1:num_frames
+    fprintf('Saving frame %d/%d\r', t, num_frames);
+    frame = (array_3D(:, :, t) - min_mov) / (max_mov - min_mov);
+    [imind, cm] = gray2ind(frame, 256);
+    if t == 1
+        imwrite(imind, cm, gif_filename, 'gif', 'Loopcount', inf, 'DelayTime', 0.01);
+    else
+        imwrite(imind, cm, gif_filename, 'gif', 'WriteMode', 'append', 'DelayTime', 0.01);
+    end
+end
+
+fprintf('\nSaved %d frames\n', num_frames);
+
+end
+
+function bytes = get_bytes_per_sample(array)
+switch class(array)
+    case 'double'
+        bytes = 8;
+    case 'single'
+        bytes = 4;
+    case 'uint64'
+        bytes = 8;
+    case 'int64'
+        bytes = 8;
+    case 'uint32'
+        bytes = 4;
+    case 'int32'
+        bytes = 4;
+    case 'uint16'
+        bytes = 2;
+    case 'int16'
+        bytes = 2;
+    case 'uint8'
+        bytes = 1;
+    case 'int8'
+        bytes = 1;
+    case 'char'
+        bytes = 1;
+    otherwise
+        error('Unsupported data type: %s', class(array));
+end
+end
+
+function sz = get_mb(array, unit)
+if nargin < 2; unit = 'mb'; end
+switch unit
+    case 'mb'
+        fact = 1e6;
+    case 'gb'
+        fact = 1e9;
+    otherwise
+        error('Only gb/mb supported sizes')
+end
+sz = numel(array) * get_bytes_per_sample(array) / fact;
+end

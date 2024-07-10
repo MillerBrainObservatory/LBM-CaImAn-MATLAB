@@ -1,4 +1,4 @@
-function write_frames(file, Y_in, varargin)
+function write_frames_3d(file, Y_in, varargin)
 % Write in-memory 3D or 4D data to an HDF5 file in chunks.
 %
 % This function writes a multidimensional array `Y_in` to an HDF5 file specified
