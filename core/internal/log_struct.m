@@ -25,15 +25,22 @@ function log_struct(fid, in_struct, struct_name, log_full_path)
     for i = 1:numel(fields)
         try
             field_value = in_struct.(fields{i});
-            if isstruct(field_value)
-                log_struct(fid, field_value, [struct_name '.' fields{i}], log_full_path);
-            elseif ismatrix(field_value)
-                log_message(fid, '       %s = %s\n', fields{i}, mat2str(field_value));
-            else
-                log_message(fid, '       %s = %s\n', fields{i}, convertCharsToString(field_value));
+             switch class(field_value)
+                case 'struct'
+                    log_struct(fid, field_value, [struct_name '.' fields{i}], log_full_path);
+                case 'double'
+                    log_message(fid, '       %s = %s\n', fields{i}, mat2str(field_value));
+                case 'char'
+                    log_message(fid, '       %s = %s\n', fields{i}, convertCharsToStrings(field_value));
+                case 'logical'
+                    log_message(fid, '       %s = %d\n', fields{i}, field_value);
+                case 'cell'
+                    log_message(fid, '       %s = %s\n', fields{i}, mat2str(field_value));
+                otherwise
+                    log_message(fid, '       %s = %s\n', fields{i}, 'Unsupported data type');
             end
         catch
-            warning("Invalid field name: %s", fields{i});
+            warning('Invalid field name: %s of type %s', fields{i}, class(fields{i}));
             continue
         end
     end
