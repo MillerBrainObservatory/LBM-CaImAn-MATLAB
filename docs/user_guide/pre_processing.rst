@@ -38,7 +38,7 @@ In its raw form (see A in the below figure), ScanImage tiff files are multipage 
 
 Each page is one *image*, but it doesn't look like an image:
 
-.. image:: ../_static/_images/extraction/extraction_diagram.png
+.. image:: ../_images/ex_diagram.png
 
 | A: In the above image, represents vertically concatenated **ROI** of our image.
 | B: ROI's are cut and horizontally concatenated.
@@ -69,7 +69,7 @@ of a suffix appended to the filename: `_000N`, where n=number of files chosen by
 
 This example shows that shifting every *other* row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.
 
-.. thumbnail:: ../_static/_images/offset/plane_1.png
+.. thumbnail:: ../_images/ex_phase.png
 
 Newer versions (2019+) of ScanImage do this correction for you, but it won't hurt. Before any image manipulations, the routine first checks if any lateral (x) shift
 will improve the correlation between adjacent rows and if not, will do nothing.
@@ -169,17 +169,31 @@ In this folder is a close-up of the brightest image in every plane for a random 
 image shoes the neuron before and after scan-correction. This lets you compare planes, validate the correct
 scan-phase offset value (usually 1, 2 or 3 pixels).
 
-Lets see the first z-plane:
+We can see that our plane quality changes with depth:
 
-.. thumbnail:: ../_static/_images/offset/offset_1.svg
+.. thumbnail:: ../_images/ex_plane_1.png
+    :title: Plane 1
+    :width: 800
+    :align: center
+    :group: planes
 
-Lets see the tenth z-plane:
+.. thumbnail:: ../_images/ex_plane_1.png
+    :title: Plane 10
+    :width: 800
+    :align: center
+    :group: planes
 
-.. thumbnail:: ../_static/_images/offset/plane_1.png
+.. thumbnail:: ../_images/ex_plane_30.png
+    :title: Plane 30
+    :width: 800
+    :align: center
+    :group: planes
 
-So far so good, but as we approach the end-plane (by order, not by depth):
-
-.. thumbnail:: ../_static/_images/offset/plane_30.png
+.. thumbnail:: ../_images/ex_offset.svg
+    :width: 800
+    :title: ScanImage Objective Resolution
+    :align: center
+    :group: finish
 
 Further Validation
 **********************

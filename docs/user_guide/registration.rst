@@ -1,7 +1,7 @@
 Piecewise-Rigid Motion-Correction
 ================================================================
 
-Function for this step: :func:`motionCorrectPlane`
+Function for this step: :func:`motionCorrectPlane()`
 
 For a quick demo on how to run motion correction, see the demo_registration.m script.
 
@@ -28,10 +28,10 @@ Non-rigid artifacts are much more complex as one region of the 2D image requires
 
 Motion correction relies on _`NoRMCorre` for piecewise-rigid motion correction resulting in shifts for each patch.
 
-.. thumbnail:: ../_static/_images/patches.png
+.. thumbnail:: ../_images/reg_patches.png
    :width: 1440
 
-To run motion-correction, call `motionCorrectPlane()`:
+To run registration, call :ref:`motionCorrectPlane()` :
 
 .. code-block:: MATLAB
 
@@ -64,7 +64,7 @@ Registration Output
 Perform both piecewise-rigid motion correction using `NormCORRe`_ to stabilize the imaging data. Each plane is motion corrected sequentially, so
 only a single plane is ever loaded into memory due to large LBM filesizes (>35GB). A template of 150-200 frames is used to initialize a "reference image".
 
-.. thumbnail:: ../_static/_images/template1.png
+.. thumbnail:: ../_images/reg_template.png
     :title: Template Image
     :download: true
 
@@ -74,14 +74,41 @@ Compared with the below frame:
 
 .. _storage:
 
-.. thumbnail:: ../_static/_images/quickview_blue.png
+.. thumbnail:: ../_images/reg_quickview_blue.png
    :group: ck
    :align: center
 
-Storage
+
+Registration Metrics
+***********************
+
+NormCORRe provides some useful metrics to determine the effectiveness of registration. These will be placed in the same directory as your save_path, `figures/registration_metrics_plane_N`.
+
+First, lets look at the mean-image for our raw, rigid and non-rigid images:
+
+.. thumbnail:: ../_images/reg_metrics.png
+   :download: true
+
+We are looking for differences in the "blurryness" differences between the top row of 3 images.
+In the above example, our raw image isn't easily distinguished from the corrected images.
+
+Next, we look at the bottom 3 images showing the correlation betwene pixels. Proper registration should **increase the correlation between neighboring pixels**.
+We see in our example session that the last iteration of rigid registration leads to the highest correlation.
+
+Registration Shifts
+***********************
+
+Next, we take a look at the transformations that occur between rigid and non-ridid shifts.
+
+.. thumbnail:: ../_images/reg_shifts.png
+   :download: true
+
+To view the video, use the function :func:`play_movie()`.
+
+Storage (WIP)
 ******************
 
-.. thumbnail:: ../_static/_images/storage_rec.png
+.. thumbnail:: ../_images/gen_storage_rec.png
     :title: Recommended Data Storage Paradigm
     :download: true
 
@@ -105,30 +132,3 @@ and reconstruct the video afterwards. :func:`translateFrames` will accomplish th
 
       Output:
         translatedFrames - A 3D array of translated image frames, same size and type as Y.
-
-
-Metrics
-*************************
-
-CaImAn provides some useful metrics to determine the effectiveness of registration.
-These will be placed in the same directory as your save_path, `metrics/registration_metrics_plane_N`.
-
-.. thumbnail:: ../_static/_images/motion_metrics.png
-   :download: true
-
-The top figure shows our shifts for rigid and non-rigid motion correction. This gives an idea what proportion of the movement corrected for can be attributed to rigid or non-rigid motion.
-Underneath you see the rigid shifts for X and Y, respectively.
-
-To view the video, use the function :func:`planeToMovie`, which can also zoom in on select areas of your movie::
-
-    Inputs:
-      data - 3D matrix of image data.
-      filename - Name of the output video file.
-      x - Horizontal coordinates.
-      y - Vertical coordinates.
-      frameRate - Frame rate of the output video.
-      avgs - Number of frames to average.
-      zoom - Zoom factors. (not implemented)
-      decenter - Decentering offsets.
-      crf - Constant Rate Factor for video quality.
-

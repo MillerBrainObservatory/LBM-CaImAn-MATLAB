@@ -12,6 +12,7 @@ This section covers each step in the pipeline, parameters and metadata in more d
     parameters
     metadata
     pre_processing
+    Data Exploration <explore_data>
     registration
     segmentation
     offset_correction

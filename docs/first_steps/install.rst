@@ -1,28 +1,32 @@
+################
 Installation
-############
+################
 
 Install with source
-****************************************
+========================
 
 userpath
-=================
+--------------
 
-The easiest way to download the source code is to visit the `github repository <https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB>`_, download the source code via the  <> Code button,
-and simply move/extract it into a folder on your `userpath`:
+The easiest way to download the source code is to visit the `github repository <https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB>`_, download the source code via the  <> Code button.
 
-.. code-block:: MATLAB
+.. thumbnail:: ../_images/gh_download.png
 
-    >> userpath
+and simply move/extract it into a folder on your :code:`userpath`.
 
-    ans =
-        '/home/<username>/Documents/MATLAB'
+.. note::
+
+   To find your userpath, open matlab, and in the command window: :code:`userpath`
+
+        ans =
+            '/home/<username>/Documents/MATLAB'
 
 This will automatically add all necessary files for this pipeline to your MATLAB path to be fully accessable.
 You can tell if the pipeline is added successfully to the path by looking at the file window.
 
 .. sidebar::
 
-    .. image:: ../_static/_images/matlab_path_explorer.png
+    .. image:: ../_images/gen_matlab_path_explorer.png
        :width: 200
 
 Here, `/core` and `/packages` are both bright in the files window, this indicates those folders are properly in the MATLAB path.
@@ -30,7 +34,7 @@ These two folders contain all of the code the pipeline needs to run and are the 
 If either of these folders is not bright, right-click on the folder and "Add to path -> Selected Folders and Subfolders"
 
 Startup
-==============
+--------------
 
 You can create a `startup.m`_ file located in this same `userpath` directory: `~/Documents/MATLAB/startup.m` and add the following code snippet:
 
@@ -41,12 +45,12 @@ You can create a `startup.m`_ file located in this same `userpath` directory: `~
    addpath(genpath(fullfile("path/to/caiman_matlab")))
 
 Install with git
-******************
+==========================
 
 Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.
 
 Windows
-=================
+--------------------------------------
 
 The easiest method to download this repository with git is via `mysys <https://gitforwindows.org/>`_
 
@@ -56,7 +60,7 @@ The easiest method to download this repository with git is via `mysys <https://g
     due to the separate filesystems. Pay attention to which environment you install.
 
 WSL2 (Windows Subsystem for Linux)
-======================================
+--------------------------------------
 
 Windows subsystem for Linux (WSL/WSL2) is a local environment on your windows machine that is capable of running linux commands using a separate filesystem. As of 2024, Mathworks does not officially support and is not planning support for MATLAB on WSL or WSL2.
 If you have MATLAB installed on Windows and wish to use this repository from a WSL instance, see `this discussion on how to accomplish this <https://ww2.mathworks.cn/matlabcentral/answers/1597219-can-microsoft-s-wslg-windows-subsystem-for-linux-gui-support-running-matlab>`_.
@@ -69,7 +73,7 @@ This means you will not be able to run matlab from the WSL filesystem (i.e. `//w
 This pipeline has been tested on WSL2, Ubuntu 22.04. Though any debian-based distribution should work.
 
 Linux
-======================================
+-----------
 
 In Linux, WSL or mysys, clone this repository with the pre-installed git client:
 
@@ -82,7 +86,7 @@ In Linux, WSL or mysys, clone this repository with the pre-installed git client:
 
 
 Find MATLAB Install Location
-********************************
+==============================
 
 The location of the installation is often in `~/Documents/MATLAB/`.
 If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI.
@@ -128,7 +132,7 @@ Otherwise, you can simply navigate to that directory within the matlab GUI or ad
 shown in the :ref:`install with source` section.
 
 Post-Install
-*******************
+=================
 
 After installation, there a few helpful things you can do.
 
@@ -136,7 +140,7 @@ After installation, there a few helpful things you can do.
 
     Prevent `.asv` files, which are essentially copies of the scripts you run. I just find these annoying.
 
-    .. thumbnail:: ../_static/_images/matlab_preferences.png
+    .. thumbnail:: ../_images/gen_matlab_preferences.png
        :width: 1440
 
 .. _startup.m: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html

@@ -1,24 +1,36 @@
 Utility
 ==========
 
+Functions used by the pipeline that users can take advantage of to further process LBM datasets.
+
 .. currentmodule:: utils
 
 Readers
 *********
 .. autofunction:: read_h5_metadata
 .. autofunction:: read_plane
+.. autofunction:: get_metadata
 
 Writers
 *********
 
-.. autofunction:: write_frames_to_h5
+.. autofunction:: write_frames_2d
+.. autofunction:: write_frames_3d
+.. autofunction:: write_frames_to_avi
 .. autofunction:: write_frames_to_gif
+.. autofunction:: write_frames_to_h5
 .. autofunction:: write_frames_to_tiff
-.. autofunction:: write_tiled_figure
+.. autofunction:: write_images_to_gif
+.. autofunction:: write_images_to_tile
+.. autofunction:: write_mean_images_to_png
+.. autofunction:: reorder_h5_files
 
 Visualization
 ****************
 
+.. autofunction:: play_movie
+.. autofunction:: set_caxis
+.. autofunction:: calculate_scale
 .. autofunction:: get_central_indices
 .. autofunction:: get_segmentation_metrics
 .. autofunction:: translate_frames
@@ -26,8 +38,6 @@ Visualization
 Validation
 ***********
 
-.. autofunction:: reorder_h5_files
-.. autofunction:: get_metadata
 .. autofunction:: validate_toolboxes
 .. autofunction:: display_dataset_names
 
@@ -39,7 +49,7 @@ Internals
 Functions that are meant for use within the pipeline, not for public use.
 
 .. autofunction:: is_valid_group
+.. autofunction:: write_metadata_h5
 .. autofunction:: is_valid_dataset
 .. autofunction:: log_struct
-.. autofunction:: set_caxis
-.. autofunction:: calculate_scale
+.. autofunction:: log_message

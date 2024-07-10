@@ -109,7 +109,7 @@ You can make sure all of the requirements for the package are in the path with t
 
 It is helpful to first set-up directories where youd like your results to go. Each core function in this pipeline takes a "data" path and a "save" path as arguments. Following the :ref:`Directory Structure`:
 
-.. thumbnail:: ../_static/_images/output_paths.png
+.. thumbnail:: ../_images/gen_output_paths.png
    :download: true
    :align: center
 

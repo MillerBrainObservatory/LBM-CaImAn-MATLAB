@@ -19,10 +19,12 @@ There are 4 core steps in this pipeline:
 3. :func:`segmentPlane()`
 4. :func:`collatePlane()`
 
-Notice how these 4 functions are `camelCase` (lowerCaseUpperCase). Every **non-core** function you
-may use, such as :func:`read_h5_metadata`, is `snake_case`. This is a feature, not a bug.
+.. note::
 
-.. thumbnail:: _static/_images/extraction/extraction_diagram.png
+    The core functions used to initiate this pipeline are `camelCase` (lowerUpperCase).
+    Every **non-core** function you may use, such as :func:`play_movie`, is `snake_case`.
+
+.. thumbnail:: _images/ex_diagram.png
    :width: 800
 
 For up-to-date pipeline requirements and algorithms, see the github `repository readme <https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB>`_

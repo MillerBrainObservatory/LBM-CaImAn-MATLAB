@@ -5,6 +5,7 @@ ScanImage Metadata
 As discussed in :ref:`pre-processing`, reconstructing an image from the ScanImage `.tiff` file is handled internally by the pipeline.
 This describes the metadata that hold all of the values used for that process.
 
+
 The funcion :func:`get_metadata` takes as input a path to any `ScanImage`_ tiff file and extracts all of the critical information used for calculations,
 returning to you a set of `key-value pairs <https://stackoverflow.com/questions/25955749/what-is-a-key-value-pair>`_ containing the metadata name and the value.
 
@@ -48,9 +49,10 @@ poxitions after the stage movement and the distance (in optical degrees) of the 
 
 This is essentially a scale factor, converting the size / location from units of degrees to microns.
 
-.. thumbnail:: ../_static/_images/objective_resolution.png
-   :width: 800
-   :title: ScanImage Objective Resolution
+.. thumbnail:: ../_images/si-objective-resolution.png
+    :width: 800
+    :title: ScanImage Objective Resolution
+    :align: center
 
 `num_pixel_xy` are the number of pixels in each `ROI`. With there being 9 ROIs, we know our image is :math:`144x8=1296` pixels wide.
 
@@ -67,9 +69,10 @@ Image Frames
 During aquisition, the user is prompted to split the recorded frames across multiple .tiff files.
 It doesn't matter which .tiff file is used for this function, the metadata used applies to each file.
 
-.. thumbnail:: ../_static/_images/scanimage/data_log_gui.png
-   :width: 800
-   :title: ScanImage Frame Log
+.. thumbnail:: ../_images/si-data-log-gui.png
+    :width: 800
+    :title: ScanImage Frame Log
+    :align: center
 
 .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
 .. _BigTiffSpec: _https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification
