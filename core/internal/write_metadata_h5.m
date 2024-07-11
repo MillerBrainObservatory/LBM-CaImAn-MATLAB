@@ -1,5 +1,5 @@
 function write_metadata_h5(metadata, h5_fullfile, loc)
-% WRITE_METADATA_H5 Write scanimage metadata fields to HDF5
+% Write scanimage metadata fields to HDF5
 % attributes, taking care of flattening structured arrays to their
 % key:value pairs.
 %
@@ -37,6 +37,10 @@ for f = fields'
                 h5writeatt(h5_fullfile, loc, att_name, subvalue);
             elseif isnumeric(subvalue)
                 h5writeatt(h5_fullfile, loc, att_name, mat2str(subvalue));
+            elseif islogical(subvalue)
+                h5writeatt(h5_fullfile, loc, att_name, num2str(subvalue));
+            else
+                warning("Failed to write attribute for metadata value: %s", subvalue);
             end
         end
     else
