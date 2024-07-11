@@ -19,24 +19,17 @@ Pre-processing LBM datasets consists of 2 main processing steps:
 
 1. Assemble our images
 
-- reshape vertically concatenated strips into horizontally concatenated strips.
-- reorder our images into 3D time-series.
+    - reshape vertically stacked strips into horizontally concatenated strips.
+    - deinterleave our images into 3D time-series.
 
 2. Correcting for scan-phase alignment inconsistencies
 
 .. _assembly:
 
-1. Assemble Volumetric Time-Series
+Assemble Volumetric Time-Series
 ================================================================
 
-Before processing starts, the raw scanimage output needs to be reconstructed to form a correctly-ordered time-series.
-This is accomplished through the use of :func:`convertScanImageTiffToVolume`.
-
-Shown in the image below is a graphical representation of this reconstruction.
-
-In its raw form (see A in the below figure), ScanImage tiff files are multipage tiffs - like a book.
-
-Each page is one *image*, but it doesn't look like an image:
+For a more in-depth look at the LBM datasets, see the MBO user documentation
 
 .. image:: ../_images/ex_diagram.png
 
@@ -65,7 +58,10 @@ of a suffix appended to the filename: `_000N`, where n=number of files chosen by
 
 .. _scan_phase:
 
-:func:`fix_scan_phase` is a very important parameter: it attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
+Scan Phase
+-------------
+
+The :ref:`parameter` :code:`fix_scan_phase` is a very important parameter: it attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
 
 This example shows that shifting every *other* row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.
 
