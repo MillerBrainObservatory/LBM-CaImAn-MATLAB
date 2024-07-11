@@ -1,7 +1,7 @@
 Piecewise-Rigid Motion-Correction
 ================================================================
 
-Function for this step: :func:`motionCorrectPlane()`
+Function for this step: :func:`motionCorrectPlane`
 
 For a quick demo on how to run motion correction, see the demo_registration.m script.
 
@@ -31,7 +31,7 @@ Motion correction relies on _`NoRMCorre` for piecewise-rigid motion correction r
 .. thumbnail:: ../_images/reg_patches.png
    :width: 1440
 
-To run registration, call :ref:`motionCorrectPlane()` :
+To run registration, call :ref:`motionCorrectPlane`:
 
 .. code-block:: MATLAB
 
@@ -39,44 +39,42 @@ To run registration, call :ref:`motionCorrectPlane()` :
     % tiff reconstruction step
     mcpath = 'C:\Users\RBO\Documents\data\bi_hemisphere\registration';
 
-    % data_path, save_path, num_cores, start_plane, end_plane
-    motionCorrectPlane(extract_path, mcpath, 23, 1, 3);
-
-For input, use the same directory as `save_path` parameter in :func:`convertScanImageTiffToVolume`.
-
-- `data_path`: Path to your extracted dataset.
-- `save_path`: Path to save your data.
-- `num_cores`: the number of CPU cores to dedicate to motion-correction.
-- `start_plane`: The index of the first z-plane to motion-correct.
-- `end_plane`: The index of the last z-plane to motion-correct.
+    % use 23 CPU cores to process z-planes 1-27
+    motionCorrectPlane(extract_path, mcpath, 23, 1, 27);
 
 .. note::
 
-   Each Z-plane in between start_plane and end_plane will be processed. In the future we may want to provide a way to give an array of indices to correct e.g. if the user wants to throw out Z-planes.
+   Each z-plane in between start_plane and end_plane will be processed.
+   In the future we may want to provide a way to give an array of indices to correct e.g. if the user wants to throw out z-planes 16 and 18.
+
 
 Registration Output
-************************
+*********************
 
-- The output is a 2D column vector [x, y] with shifts that allow you to reconstruct the motion-corrected movie with _`core.utils.translateFrames`.
-- shifts(:,1) represent pixel-shifts in *x*
-- shifts(:,2) represent pixel-shifts in *y*
+The output `h5` files are saved to the path entered in the :code:`save_path` :ref:`parameter`. There will be a single file for each z-plane in the volume.
 
-Perform both piecewise-rigid motion correction using `NormCORRe`_ to stabilize the imaging data. Each plane is motion corrected sequentially, so
-only a single plane is ever loaded into memory due to large LBM filesizes (>35GB). A template of 150-200 frames is used to initialize a "reference image".
+This file has the following groups:
 
-.. thumbnail:: ../_images/reg_template.png
-    :title: Template Image
-    :download: true
+`/Y` or `/<param>`
+: This group contains the 3D planar timeseries and the default `'/Y'` name can be changed via the `'ds'` :ref:`parameter` to :ref:`convertScanImageTiffToVolume`.
 
-This image is your "ground truth" per-se, it is the image you want to most accurately represent the movement in your video.
+`/Ym`
+: The mean image of the motion-corrected movie. Each image is averaged over time to produce the mean pixel intensity. This is your
 
-Compared with the below frame:
+`/template`
+: The mean image used to adjust each frame. Each frame in the 3D planar timeseries is displaced to align with this image, thus you want it to most accurately represent your mean-image.
 
-.. _storage:
+`/shifts`
+: A :code:`2xN` column vector containing X and Y shifts in px.
 
-.. thumbnail:: ../_images/reg_quickview_blue.png
-   :group: ck
-   :align: center
+.. hint::
+
+    To get the shifts and plot them in MATLAB:
+
+    .. code-block:: MATLAB
+
+        x_shifts = shifts(:,1) % represent pixel-shifts in *x*
+        y_shifts = shifts(:,2) % represent pixel-shifts in *y*
 
 
 Registration Metrics
@@ -91,6 +89,20 @@ First, lets look at the mean-image for our raw, rigid and non-rigid images:
 
 We are looking for differences in the "blurryness" differences between the top row of 3 images.
 In the above example, our raw image isn't easily distinguished from the corrected images.
+
+.. thumbnail:: ../_images/reg_template.png
+    :title: Template Image
+    :download: true
+
+This image is your "ground truth" per-se, it is the image you want to most accurately represent the movement in your video.
+
+Compared with the below frame:
+
+.. _storage:
+
+.. thumbnail:: ../_images/reg_quickview_blue.png
+   :group: ck
+   :align: center
 
 Next, we look at the bottom 3 images showing the correlation betwene pixels. Proper registration should **increase the correlation between neighboring pixels**.
 We see in our example session that the last iteration of rigid registration leads to the highest correlation.
