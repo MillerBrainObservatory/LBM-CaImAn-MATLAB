@@ -110,7 +110,7 @@ elseif append
         current_position = prev_size(end);
     end
 else
-    disp("Overwrite and append set to false but the dataset exists, skipping this dataset.");
+    disp("User set: Overwrite=false & append=false, but the dataset exists, skipping this dataset.");
     return
 end
 
