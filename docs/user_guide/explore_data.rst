@@ -1,7 +1,7 @@
 Exploring Datasets
 ======================
 
-There are several helper functions located in ``core/utils``
+There are several helper functions located in ``core/utils``.
 
 Making Gifs
 ==============
