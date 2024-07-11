@@ -1,5 +1,5 @@
 function scale_size = calculate_scale(img_size, pixel_resolution)
-% CALCULATE_SCALE_BAR Calculates the appropriate scale bar size.
+% Calculates the appropriate scale bar size from an image size and pixel resolution.
 %
 % Parameters
 % ----------
