@@ -33,18 +33,37 @@ for f = fields'
         for sf = subfields'
             subvalue = value.(sf{1});
             att_name = [f{1} '_' sf{1}];
-            if ischar(subvalue)
-                h5writeatt(h5_fullfile, loc, att_name, subvalue);
-            elseif isnumeric(subvalue)
-                h5writeatt(h5_fullfile, loc, att_name, mat2str(subvalue));
-            elseif islogical(subvalue)
-                h5writeatt(h5_fullfile, loc, att_name, num2str(subvalue));
-            else
-                warning("Failed to write attribute for metadata value: %s", subvalue);
+            try
+                if ischar(subvalue)
+                    h5writeatt(h5_fullfile, loc, att_name, subvalue);
+                elseif isnumeric(subvalue)
+                    h5writeatt(h5_fullfile, loc, att_name, mat2str(subvalue));
+                elseif islogical(subvalue)
+                    h5writeatt(h5_fullfile, loc, att_name, num2str(subvalue));
+                elseif iscell(subvalue)
+                    h5writeatt(h5_fullfile, loc, att_name, mat2str(cell2mat(subvalue)));
+                else
+                    warning("Unsupported metadata type for attribute: %s", att_name);
+                end
+            catch ME
+                warning("Failed to write attribute '%s': %s", att_name, ME.message);
             end
         end
     else
-        h5writeatt(h5_fullfile, loc, f{1}, value);
+        try
+            if ischar(value)
+                h5writeatt(h5_fullfile, loc, f{1}, value);
+            elseif isnumeric(value)
+                h5writeatt(h5_fullfile, loc, f{1}, mat2str(value));
+            elseif islogical(value)
+                h5writeatt(h5_fullfile, loc, f{1}, num2str(value));
+            elseif iscell(value)
+                h5writeatt(h5_fullfile, loc, f{1}, mat2str(cell2mat(value)));
+            else
+                warning("Unsupported metadata type for attribute: %s", f{1});
+            end
+        catch ME
+            warning("Failed to write attribute '%s': %s", f{1}, ME.message);
+        end
     end
-end
 end
