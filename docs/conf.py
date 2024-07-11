@@ -52,15 +52,21 @@ images_config = dict(backend='LightBox2',
     )
 
 # suppress_warnings = ["myst.domains", "ref.ref"]
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.ipynb': 'myst-nb',
+    '.myst': 'myst-nb',
+}
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3.9", None),
-    "sphinx": ("https://www.sphinx-doc.org/en/master", None),
+    'mbo': ('https://millerbrainobservatory.github.io/',None),
+    'lbmpy': ('https://millerbrainobservatory.github.io/LBM-CaImAn-Python/', None)
 }
 
 templates_path = ["_templates"]
 
-html_theme = "sphinx_book_theme"
+html_theme = "pydata_sphinx_theme"
 
 html_logo = "_static/CaImAn-MATLAB_logo.svg"
 html_short_title="CaImAn Pipeline"
@@ -81,24 +87,27 @@ html_context = {
 # an MBO theme-option set confusing
 sphinx_book_options = {
     "path_to_docs": "docs",
-    "repository_url": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
+    # "repository_url": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
+    "external_links": [
+        {"name": "MBO.edu", "url": "https://mbo.rockefeller.edu/"},
+        {"name": "LBM.Mat", "url": "https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/index.html"},
+        {"name": "LBM.Py", "url": "https://millerbrainobservatory.github.io/LBM-CaImAn-Python/index.html"},
+    ],
+    "icon_links": [
+        {
+            "name": "MBO",
+            "url": "https://mbo.rockefeller.edu",
+            "icon": "_static/mbo.png",
+            "type": "local",
+        },
+    ],
     "repository_branch": "master",
-    "launch_buttons": {
-        "binderhub_url": "https://mybinder.org",
-        "colab_url": "https://colab.research.google.com/",
-        "notebook_interface": "jupyterlab",
-        # "jupyterhub_url": "", TODO
-    },
-    "use_edit_page_button": True,
-    "use_source_button": True,
-    "use_issues_button": True,
-    "use_repository_button": True,
-    "use_download_button": True,
+    # "use_source_button": True,
+    # "use_issues_button": True,
+    # "use_repository_button": True,
+    # "use_download_button": True,
     "use_sidenotes": True,
-    "show_toc_level": 3,
     "use_fullscreen_button": True,
-    "show_nav_level": 0,
-    "navigation_depth": 4
 }
 
 html_theme_options = sphinx_book_options
