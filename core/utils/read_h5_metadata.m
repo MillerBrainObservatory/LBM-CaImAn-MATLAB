@@ -36,8 +36,9 @@ if ~exist('loc', 'var'); loc = '/'; end
 try
     h5_data = h5info(h5_fullfile, loc);
 catch
-    error("File %s does not exist with group %s. ", h5_fullfile, loc);
+    % error("File %s does not exist with group %s. ", h5_fullfile, loc);
 end
+metadata = struct();
 % find valid dataset if empty
 if isempty(h5_data.Attributes)
     if loc ~= "/"
@@ -49,12 +50,11 @@ if isempty(h5_data.Attributes)
             fprintf("Woo! Metadata found in the root '/' group of the dataset.\n");
         end
     else
-        log_message("No valid metadata in the root group or in group %s for file:\n %s\n", loc, h5_fullfile);
+        % h5_data = h5info(h5_fullfile, "/");
+        fprintf("No valid metadata in the root group or in group %s for file:\n %s\n", loc, h5_fullfile);
         return
     end
 end
-
-metadata = struct();
 for k = 1:numel(h5_data.Attributes)
     attr_name = h5_data.Attributes(k).Name;
     attr_value = h5readatt(h5_fullfile, ['/' h5_data.Name], attr_name);
