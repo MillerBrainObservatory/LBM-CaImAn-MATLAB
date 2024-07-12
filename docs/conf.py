@@ -23,11 +23,6 @@ myst_enable_extensions = [
 ]
 myst_url_schemes = ("http", "https", "mailto")
 
-source_suffix = {
-        '.rst': 'restructuredtext',
-        '.md': 'markdown',
-        }
-
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'exclude']
 
@@ -55,8 +50,24 @@ images_config = dict(backend='LightBox2',
 source_suffix = {
     '.rst': 'restructuredtext',
     '.ipynb': 'myst-nb',
-    '.myst': 'myst-nb',
+    '.md': 'myst-nb',
 }
+myst_enable_extensions = [
+    "amsmath",
+    "attrs_inline",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "linkify",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
+]
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3.9", None),
@@ -71,43 +82,22 @@ html_theme = "pydata_sphinx_theme"
 html_logo = "_static/CaImAn-MATLAB_logo.svg"
 html_short_title="CaImAn Pipeline"
 html_static_path = ["_static"]
-html_css_files = ['LBM_docs.css']
+html_css_files = ['custom.css']
 html_favicon = "_static/mbo_icon_dark.ico"
 html_copy_source = True
 
 html_context = {
-# "github_url": "https://github.com", # or your GitHub Enterprise site
-    "github_user": "://github.com/MillerBrainObservatory/",
+    "github_user": "https://github.com/MillerBrainObservatory/",
     "github_repo": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
     "doc_path": "docs",
 }
 
-# for sphinx_book_theme only
-# theme-dependent options make uploading
-# an MBO theme-option set confusing
 sphinx_book_options = {
-    # "path_to_docs": "docs",
-    # "repository_url": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
     "external_links": [
-        {"name": "MBO.edu", "url": "https://mbo.rockefeller.edu/"},
-        {"name": "LBM.Mat", "url": "https://millerbrainobservatory.github.io/LBM-CaImAn-MATLAB/index.html"},
+        {"name": "MBO.io", "url": "https://millerbrainobservatory.github.io/index.html"},
         {"name": "LBM.Py", "url": "https://millerbrainobservatory.github.io/LBM-CaImAn-Python/index.html"},
+        {"name": "scanreader", "url": "https://millerbrainobservatory.github.io/scanreader/index.html"},
     ],
-    "icon_links": [
-        {
-            "name": "MBO",
-            "url": "https://mbo.rockefeller.edu",
-            "icon": "_static/mbo.png",
-            "type": "local",
-        },
-    ],
-    # "repository_branch": "master",2
-    # "use_source_button": True,
-    # "use_issues_button": True,
-    # "use_repository_button": True,
-    # "use_download_button": True,
-    # "use_sidenotes": True,
-    # "use_fullscreen_button": True,
 }
 
 html_theme_options = sphinx_book_options

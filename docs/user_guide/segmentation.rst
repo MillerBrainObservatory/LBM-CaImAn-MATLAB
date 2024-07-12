@@ -100,7 +100,25 @@ A correlation coefficient determining the amount of correlation between pixels i
 min_SNR
 ************************************
 
- The minimum "shot noise" to calcium activity to accept a neurons initialization.
+The minimum "shot noise" to calcium activity to accept a neurons initialization (accept it as valid).
+
+This value is used for an event exceptionality test, which tests the probabilty if some "exceptional events" (like a spike).
+
+.. hint::
+
+    **If this value is low, even a very slight deviation in signal will be considered exceptional and many background-neurons will be accepted**.
+
+- The likeihood of observing the actual trace value over N samples given an estimated noise distribution.
+
+- The function first estimates the noise distribution by considering the dispersion around the mode.
+
+- This is done only using values lower than the mode. The estimation of the noise std is made robust by using the approximation std=iqr/1.349.
+
+- Then, the probavility of having N consecutive eventsis estimated.
+
+This probability is used to order the components according to "most likely to be exceptional".
+
+:func:`compareZPlanes()` is primarily used to tune this value.
 
 Tau
 ************************************
@@ -113,18 +131,18 @@ Half-size of your neurons.
 P
 ************************************
 
-The term autoregression indicates that it is a regression of the variable against itself. Thus, an autoregressive model of order p can be written as yt=c+ϕ1yt−1+ϕ2yt−2+⋯+ϕpyt−p+εt,
+This is the autoregressive order of the system. It is a measure of how the signal changes with respect to time. This value will always be 1 or 2, depending on the frame rate of the video and the dynamics of the calcium indicator.
 
-- I dont know what that means, but that's wikipedia. P = 1 is used when you have a fast indicator, for the reasons mentioned above regarding decay time. Use p=2 for slow indicators where you only expect 1-3 frames.
 
 Example
 ==================
 
+See the demo parameters script at the root of this repository.
+
 Here is a look at all of the parameters you can provide to CNMF:
 
-.. code-block:: MATLAB
+.. code-block:: json
 
-    options = CNMFSetParms(...
         'd1',d1,'d2',d2,...                         % dimensionality of the FOV
         'deconv_method','constrained_foopsi',...    % neural activity deconvolution method
         'temporal_iter',3,...                       % number of block-coordinate descent steps
@@ -150,7 +168,6 @@ Here is a look at all of the parameters you can provide to CNMF:
         'refine_flag',0,...
         'rolling_length',ceil(FrameRate*5),...
         'fr', FrameRate ...
-    );
 
 When running :func:`segmentPlane`, check the command window for reports that match the number of files you expect to be processed:
 
@@ -209,8 +226,6 @@ Output
 .. important::
 
    The optional output YrA is equal to Y-C, representing the original raw trace.
-
-
 
 Results
 ===========================
@@ -278,7 +293,6 @@ Output Variables
     ans =
 
         583 528
-
 
 .. thumbnail:: ../_images/seg_cn.png
    :width: 800

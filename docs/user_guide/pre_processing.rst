@@ -4,12 +4,6 @@ Pre-Processing
 
 Function for this step: :func:`convertScanImageTiffToVolume`
 
-Utility functions for this step:
-
-:func:`planeToH5`: Quickly view a movie of any plane.
-:func:`read_H5_metadata`: View metadata associated with an extracted file.
-:func:`get_center_indices`: Get the Y,X index of a box of size `pixels` created around the center point of an image.
-
 Before beginning pre-processing, follow setup steps in :ref:`first steps` started` to make sure the pipeline and dependencies are installed properly.
 After that, review :ref:`parameters` to understand the general usage of each function going foreward.
 
@@ -66,6 +60,25 @@ will improve the correlation between adjacent rows and if not, will do nothing.
 
     Checking for a scan-phase offset correction is computationally cheap, so it is recommended to keep this to true.
 
+
+When every other row of our image if shifted by N pixels, adjacent rows that *are not* shifted now have a N number of 0's padded in between the rows that were shifted.
+
+When this shift happens, the pipeline automatically trims those pixels because they longer contain valid calcium signal.
+
+Consider this image which was processed without trimming any ROI pixels and without applying any offset correction:
+
+.. thumbnail:: ../_images/ex_no_trim_no_offset.png
+    :width: 800
+    :align: center
+
+Compare that to an image where an offset correction was applied:
+
+.. thumbnail:: ../_images/ex_no_trim_with_offset.png
+    :width: 800
+    :align: center
+
+You'll see the decreased gap between ROI's for the scan-offset corrected image, showing the 2 pixels removed from each edge accounting for the padded 0's.
+
 Extraction Input
 ****************************************************************
 
@@ -103,6 +116,9 @@ roughly 20um in parallel, so attempting to process multiple time-series will dra
 After successfully running :func:`convertScanImageTiffToVolume`, there will be a single `.h5` file containing extracted data.
 
 You can use :code:`h5info(h5path)` in the MATLAB command window to reveal some helpful information about our data.
+
+HDF5 Groups
+***************
 
 The following is an example structure of the HDF5 file at the outermost level:
 
@@ -183,28 +199,4 @@ We can see that our plane quality changes with depth:
     :title: ScanImage Objective Resolution
     :align: center
     :group: finish
-
-Further Validation
-**********************
-
-You should do some checks to make sure data was written properly before continuing. There are a few convenience functions
-to view a movie provided in the pipeline. Below is an example:
-
-.. code-block:: MATLAB
-
-    %% View info about your newly extracted dataset
-    h5files = dir([extraction_path '*.h5']);
-    h5name = fullfile(extraction_path, h5files(1).name);
-    dataset_path = sprintf('/extraction/plane_%d', plane);
-    has_mc(h5name)
-    data = h5read( ...
-        h5name, ... % filename
-        dataset_path, ... % dataset location
-        );
-
-     figure;
-     for x = 1:size(data, 3)
-         imshow(data(236:408, 210:377, x), []);
-         title(sprintf('Frame %d', start_frame + x - 1));
-     end
 
