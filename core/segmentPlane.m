@@ -71,14 +71,11 @@ function segmentPlane(data_path, save_path, varargin)
 % :code:`acm`
 % :  sum of component pixels for each neuron [1, Km]. :code:`single`
 
-%
-% See also ADDPATH, FULLFILE, DIR, LOAD, SAVEFAST
-
 p = inputParser;
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
 addOptional(p, 'save_path', data_path, @(x) ischar(x) || isstring(x));
-addParameter(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
-addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
+addOptional(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
+addOptional(p, 'debug_flag', 0, @(x) isscalar(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x));
@@ -321,7 +318,7 @@ for plane_idx = start_plane:end_plane
 
     %% Convert sparse A matrix to full 3D matrix
     t_sparse = tic;
-    [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2, fid);  % Ac_keep has dims. [2*tau+1,2*tau+1,K] where each element Ki is a 2D map centered on centroid of component acx(Ki),axy(Ki), and acm(Ki) = sum(sum(Ac_keep(:,:,Ki))
+    [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2);  % Ac_keep has dims. [2*tau+1,2*tau+1,K] where each element Ki is a 2D map centered on centroid of component acx(Ki),axy(Ki), and acm(Ki) = sum(sum(Ac_keep(:,:,Ki))
     log_message(fid, 'Created sparse component matrix. Process took: %.2f seconds.\nSaving data ...',toc(t_sparse));
     log_message(fid, "--------------------------------------------------\n");
     
@@ -334,18 +331,18 @@ for plane_idx = start_plane:end_plane
     % Save data
     t_save = tic;
     log_message(fid, "Writing data to disk to:\n\n %s\n", plane_name_save);
-    write_frames(plane_name_save, T_keep,'/T_keep');
-    write_frames(plane_name_save, Ac_keep,'/Ac_keep');
-    write_frames(plane_name_save, C_keep,'/C_keep');
-    write_frames(plane_name_save, Km,'/Km');
-    write_frames(plane_name_save, rVals,'/rVals');
-    write_frames(plane_name_save, single(mean(data,3)),'/Ym');
-    write_frames(plane_name_save, Cn,'/Cn');
-    write_frames(plane_name_save, b, '/b');
-    write_frames(plane_name_save, f,'/f');
-    write_frames(plane_name_save, acx,'/acx');
-    write_frames(plane_name_save, acy,'/acy');
-    write_frames(plane_name_save, acm,'/acm');
+    write_frames_3d(plane_name_save, T_keep,'/T_keep',0,0);
+    write_frames_3d(plane_name_save, Ac_keep,'/Ac_keep',0,0);
+    write_frames_3d(plane_name_save, C_keep,'/C_keep',0,0);
+    write_frames_3d(plane_name_save, Km,'/Km',0,0);
+    write_frames_3d(plane_name_save, rVals,'/rVals',0,0);
+    write_frames_3d(plane_name_save, single(mean(data,3)),'/Ym',0,0);% store again so its easier to find
+    write_frames_3d(plane_name_save, Cn,'/Cn',0,0);
+    write_frames_3d(plane_name_save, b, '/b',0,0);
+    write_frames_3d(plane_name_save, f,'/f',0,0);
+    write_frames_3d(plane_name_save, acx,'/acx',0,0);
+    write_frames_3d(plane_name_save, acy,'/acy',0,0);
+    write_frames_3d(plane_name_save, acm,'/acm',0,0);
 
     write_metadata_h5(metadata, plane_name_save, '/');
     log_message(fid, "Data saved. Elapsed time: %.2f seconds.\n",toc(t_save)/60);
@@ -357,7 +354,7 @@ end
 fprintf(fid, 'Routine complete for %d planes. Total Completion time: %.2f hours.\n',((end_plane-start_plane)+1),toc(t_all)./3600);
 end
 
-function [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2,fid)
+function [Ac_keep,acx,acy,acm] = AtoAc(A_keep,tau,d1,d2)
 %% Convert the sparse matrix A_keep to a full 3D matrix that can be saved to hdf5
 tau = tau(1);
 x = 1:d2;
@@ -369,9 +366,7 @@ acx = zeros(1,size(A_keep,2));
 acy = acx;
 acm = acx;
 sd = size(A_keep, 2);
-tack = tic;
 parfor ijk = 1:sd
-    tijk = tic;
     AOI = reshape(single(full(A_keep(:,ijk))),d1,d2);
     cx = round(trapz(trapz(X.*AOI))./trapz(trapz(AOI)));
     cy = round(trapz(trapz(Y.*AOI))./trapz(trapz(AOI)));
