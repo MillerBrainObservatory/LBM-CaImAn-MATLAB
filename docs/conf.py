@@ -86,7 +86,7 @@ html_context = {
 # theme-dependent options make uploading
 # an MBO theme-option set confusing
 sphinx_book_options = {
-    "path_to_docs": "docs",
+    # "path_to_docs": "docs",
     # "repository_url": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
     "external_links": [
         {"name": "MBO.edu", "url": "https://mbo.rockefeller.edu/"},
@@ -101,13 +101,13 @@ sphinx_book_options = {
             "type": "local",
         },
     ],
-    "repository_branch": "master",
+    # "repository_branch": "master",
     # "use_source_button": True,
     # "use_issues_button": True,
     # "use_repository_button": True,
     # "use_download_button": True,
-    "use_sidenotes": True,
-    "use_fullscreen_button": True,
+    # "use_sidenotes": True,
+    # "use_fullscreen_button": True,
 }
 
 html_theme_options = sphinx_book_options
