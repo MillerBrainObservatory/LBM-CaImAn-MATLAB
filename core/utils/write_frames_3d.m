@@ -1,4 +1,4 @@
-function write_frames_3d(file, Y_in, varargin)
+function write_frames_3d(file,Y_in,ds,append,chunk_mb)
 % Write in-memory 3D or 4D data to an HDF5 file in chunks.
 %
 % This function writes a multidimensional array `Y_in` to an HDF5 file specified
@@ -14,17 +14,16 @@ function write_frames_3d(file, Y_in, varargin)
 %     The multidimensional array to be written to the HDF5 file.
 % ds : char, optional
 %     The name of the dataset group within the HDF5 file. Default is '/Y'.
-% target_chunk_mb : int, optional
-%     In MB, the chunk_size to include in each HDF5 write. Default is 4MB.
 % append : logical, optional
 %     Whether to append to an existing HDF5 dataset. Dims must match.
 %     Default is false.
+% chunk_mb : int, optional
+%     In MB, the chunk_size to include in each HDF5 write. Default is 4MB.
 %
 % Notes
 % -----
-% The function handles 3D or 4D arrays and writes them incrementally to the HDF5
-% file to manage memory usage efficiently. It also trims the last frame of each
-% chunk if the chunk size exceeds the remaining data size.
+% This function trims the last frame of each chunk if the chunk size
+% exceeds the remaining data size.
 %
 % Examples
 % --------
@@ -38,23 +37,19 @@ function write_frames_3d(file, Y_in, varargin)
 %
 % Write a 3D array to an HDF5 file with a specified dataset name:
 %
-%     write_frames('data.h5', my_data, '/Y');
+%     write_frames('data.h5', my_data, '/Y', 2, true, false);
 
 p = inputParser;
 p.addRequired('file', @(x) validateattributes(x, {'char', 'string'}, {'nonempty', 'scalartext'}, '', 'file'));
 p.addRequired('Y_in', @(x) validateattributes(x, {'numeric'}, {'nonempty'}, '', 'Y_in'));
-p.addOptional('ds', '/Y', @(x) is_valid_group(convertStringsToChars(x)));
-p.addOptional('target_chunk_mb', 4, @(x) validateattributes(x, {'numeric', 'scalar'}, {'positive'}));
-p.addOptional('overwrite', false, @(x) validateattributes(x, {'logical'}, {'scalar'}));
-p.addOptional('append', false, @(x) validateattributes(x, {'logical'}, {'scalar'}));
+p.addRequired('ds', @(x) is_valid_group(convertStringsToChars(x)));
+p.addOptional('append', 0);
+p.addOptional('chunk_mb', 4);
 
-p.parse(file, Y_in, varargin{:});
-target_chunk_mb = p.Results.target_chunk_mb;
+p.parse(file,Y_in,ds,append,chunk_mb);
+chunk_mb = p.Results.chunk_mb;
 ds = p.Results.ds;
 append = p.Results.append;
-overwrite = p.Results.overwrite;
-
-assert(~(overwrite && append), "Cannot append AND overwrite frames. Please choose one argument to set to true.")
 
 %% Setup Arguments ------
 
@@ -81,15 +76,18 @@ nd = ndY-1;
 
 num_elements_per_image = prod(sizY(1:nd));
 imageSizeBytes = num_elements_per_image * element_size;
+target_chunk_size = chunk_mb * 1024 * 1024; % 4 MB
 
-target_chunk_size = target_chunk_mb * 1024 * 1024; % 4 MB
 num_images_per_chunk = round(target_chunk_size / imageSizeBytes);
 
 % at least one image per chunk, at most the largest dim size
 num_images_per_chunk = max(1,  min(max(sizY), num_images_per_chunk));
 num_images_per_chunk = min(max(sizY), num_images_per_chunk);
-
+num_images_per_chunk = findClosestDivisor(num_images_per_chunk, size(Y_in, ndY)); %make it even
+% make sure we have an even number of images so our dimensions match
+% i.e. we avoid writing a 2D image to a 3D dataset. 
 chunk_size = [sizY(1:nd), num_images_per_chunk];
+disp(chunk_size)
 
 try
     h5info(file, ds);
@@ -103,28 +101,59 @@ if ~valid_ds % if there is no dataset, none of the other checks matter
     current_position = 0;
     prev_size = 0;
 elseif append
-    prev_size = h5info(file, ds).Dataspace.Size;
-    if ~isequal(prev_size(1:end-1), sizY(1:end-1))
-        error('Dataset dimensions do not align.');
+    if ~isempty(prev_ind)
+        current_position=prev_ind;
+    else
+        prev_size = h5info(file, ds).Dataspace.Size;
+        if ~isequal(prev_size(1:end-1), sizY(1:end-1))
+            error('Dataset dimensions do not align.');
+        end
+        current_position = prev_size(end);
     end
-    current_position = prev_size(end);
-elseif overwrite
-    current_position = 0;
-    prev_size = 0;
 else
-    disp("Overwrite and append set to false but the dataset exists, skipping this dataset.");
+    disp("User set append=false, but the dataset exists, skipping this dataset.");
     return
 end
 
 while current_position < prev_size(end) + sizY(end)
     chunk_end = min(current_position + num_images_per_chunk, prev_size(end) + sizY(end));
-    if ndY == 3
-        chunk_data = Y_in(:, :, current_position - prev_size(end) + 1:chunk_end - prev_size(end));
-    elseif ndY == 2
-        chunk_data = Y_in(:, current_position - prev_size(end) + 1:chunk_end - prev_size(end));
-    end
+    chunk_data = Y_in(:, :, current_position - prev_size(end) + 1:chunk_end - prev_size(end));
     start = [ones(1, nd), current_position + 1];
     h5write(file, ds, chunk_data, start, size(chunk_data));
     current_position = chunk_end;
 end
 end
+function closestDivisor = findClosestDivisor(N, M, minThreshold)
+    if ~exist('minThreshold', 'var');minThreshold=2;end
+    closestDivisor = 1;
+    minDifference = inf;
+
+    % iterate over possible divisors
+    for i = 1:M
+        if mod(M, i) == 0
+            % calculate chunk size for this divisor
+            chunkSize = M / i;
+            if chunkSize >= minThreshold
+                difference = abs(N - i);
+                if difference < minDifference
+                    closestDivisor = i;
+                    minDifference = difference;
+                end
+            end
+        end
+    end
+
+    % if no valid divisor was found, use the closest divisor without threshold
+    if closestDivisor == 1
+        for i = 1:M
+            if mod(M, i) == 0
+                difference = abs(N - i);
+                if difference < minDifference
+                    closestDivisor = i;
+                    minDifference = difference;
+                end
+            end
+        end
+    end
+end
+

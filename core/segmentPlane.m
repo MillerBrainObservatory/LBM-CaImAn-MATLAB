@@ -6,15 +6,13 @@ function segmentPlane(data_path, save_path, varargin)
 % The processing is conducted for specified planes, and the results
 % are saved to disk.
 %
-% MOTIONCORRECTPLANE Perform rigid and non-rigid motion correction on imaging data.
-%
 % Parameters
 % ----------
 % data_path : char
 %     Path to the directory containing the files extracted via convertScanImageTiffToVolume.
 % save_path : char
 %     Path to the directory to save the motion vectors.
-% dataset_name : string, optional
+% ds : string, optional
 %     Group path within the hdf5 file that contains raw data.
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
@@ -29,6 +27,9 @@ function segmentPlane(data_path, save_path, varargin)
 % end_plane : double, integer, positive
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
+% do_figures : double, integer, positive
+%     The ending plane index for processing. Must be greater than or equal to
+%     start_plane.
 % cnmf_options : dictionary, mapping
 %     key:value pairs of all of your CNMF parameters.
 %     See the example parameters in the LBM_demo_pipeline.
@@ -39,20 +40,37 @@ function segmentPlane(data_path, save_path, varargin)
 %
 % Notes
 % -----
-% - Outputs are saved to disk, including:
-% - T_keep: neuronal time series [Km, T] (single)
-% - Ac_keep: neuronal footprints [2*tau+1, 2*tau+1, Km] (single)
-% - C_keep: denoised time series [Km, T] (single)
-% - Km: number of neurons found (single)
-% - Cn: correlation image [x, y] (single)
-% - b: background spatial components [x*y, 3] (single)
-% - f: background temporal components [3, T] (single)
-% - acx: centroid in x direction for each neuron [1, Km] (single)
-% - acy: centroid in y direction for each neuron [1, Km] (single)
-% - acm: sum of component pixels for each neuron [1, Km] (single)
-% - The function handles large datasets by processing each plane serially.
-% - The segmentation settings are based on the assumption of 9.2e4 neurons/mm^3
-%   density in the imaged volume.
+% 
+% :code:`T_keep`
+% :  neuronal time series [Km, T]. :code:`single`
+% 
+% :code:`Ac_keep`
+% :  neuronal footprints [2*tau+1, 2*tau+1, Km]. :code:`single`
+% 
+% :code:`C_keep`
+% :  denoised time series [Km, T]. :code:`single`
+% 
+% :code:`Km`
+% :  number of neurons found. :code:`single`
+% 
+% :code:`Cn`
+% :  correlation image [x, y]. :code:`single`
+% 
+% :code:`b`
+% :  background spatial components [x*y, 3]. :code:`single`
+% 
+% :code:`f`
+% :  background temporal components [3, T]. :code:`single`
+% 
+% :code:`acx`
+% :  centroid in x direction for each neuron [1, Km]. :code:`single`
+% 
+% :code:`acy`
+% :  centroid in y direction for each neuron [1, Km]. :code:`single`
+% 
+% :code:`acm`
+% :  sum of component pixels for each neuron [1, Km]. :code:`single`
+
 %
 % See also ADDPATH, FULLFILE, DIR, LOAD, SAVEFAST
 

@@ -31,7 +31,7 @@ Motion correction relies on _`NoRMCorre` for piecewise-rigid motion correction r
 .. thumbnail:: ../_images/reg_patches.png
    :width: 1440
 
-To run registration, call :ref:`motionCorrectPlane`:
+To run registration, call :func:`motionCorrectPlane` like so:
 
 .. code-block:: MATLAB
 
@@ -42,21 +42,22 @@ To run registration, call :ref:`motionCorrectPlane`:
     % use 23 CPU cores to process z-planes 1-27
     motionCorrectPlane(extract_path, mcpath, 23, 1, 27);
 
+See the demo pipeline at the root of this repository or the the API for more examples.
+
 .. note::
 
    Each z-plane in between start_plane and end_plane will be processed.
    In the future we may want to provide a way to give an array of indices to correct e.g. if the user wants to throw out z-planes 16 and 18.
 
-
 Registration Output
 *********************
 
-The output `h5` files are saved to the path entered in the :code:`save_path` :ref:`parameter`. There will be a single file for each z-plane in the volume.
+The output `h5` files are saved to the path entered in the :code:`save_path` :ref:`parameters`. There will be a single file for each z-plane in the volume.
 
 This file has the following groups:
 
 `/Y` or `/<param>`
-: This group contains the 3D planar timeseries and the default `'/Y'` name can be changed via the `'ds'` :ref:`parameter` to :ref:`convertScanImageTiffToVolume`.
+: This group contains the 3D planar timeseries and the default `'/Y'` name can be changed via the `'ds'` :ref:`parameters` to :func:`convertScanImageTiffToVolume`.
 
 `/Ym`
 : The mean image of the motion-corrected movie. Each image is averaged over time to produce the mean pixel intensity. This is your

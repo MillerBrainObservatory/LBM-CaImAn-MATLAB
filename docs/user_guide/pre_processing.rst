@@ -29,22 +29,14 @@ Pre-processing LBM datasets consists of 2 main processing steps:
 Assemble Volumetric Time-Series
 ================================================================
 
-For a more in-depth look at the LBM datasets, see the MBO user documentation
+For a more in-depth look at the LBM datasets, see the :ref:`LBM Datasets` guide on the MBO user documentation.
 
-.. image:: ../_images/ex_diagram.png
+.. thumbnail:: ../_images/ex_diagram.png
+   :title:  Step 1: Image Extraction and Assembly
 
 | A: In the above image, represents vertically concatenated **ROI** of our image.
 | B: ROI's are cut and horizontally concatenated.
 | C: After a scan-phase correction, lines between each ROI become unnoticable (ideally)
-
-**If you were to open up a raw ScanImage .tiff file in ImageJ, you would see a very long, thin bar as is shown in A.**
-
-- Each Z-Plane is written before moving onto the next timestep
-- z-plane 1 @ timepoint 1, z-plane 2 @ timepoint 1, z-plane 3 @ timepoint 1, etc.
-
-Thus, another task :func:`convertScanImageTiffToVolume` accomplishes are reordering this tiff stack to be:
-
-- z-plane 1 @ timepont 1, z-plane 1 @ timepoint 2, etc ..
 
 The output `volumetric time-series` has dimensions `[Y,X,Z,T]`.
 
@@ -61,7 +53,7 @@ of a suffix appended to the filename: `_000N`, where n=number of files chosen by
 Scan Phase
 -------------
 
-The :ref:`parameter` :code:`fix_scan_phase` is a very important parameter: it attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
+The :code:`fix_scan_phase` argument is particularly important: it attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
 
 This example shows that shifting every *other* row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.
 
@@ -86,11 +78,10 @@ First, we set up our directory paths. You can chain the output of one function t
     extract_path = [ parent_path 'extracted\'];
     mkdir(extract_path); mkdir(raw_path);
 
-
 This is all you need to start processing your data. Actually, it's quite more than you need.
 
-`raw_path` is where your raw `.tiff` files will be stored and is the first parameter of :func:`convertScanImageTiffToVolume`.
-`extract_path` is where our data will be saved, and is the second parameter.
+`raw_path` is where your raw `.tiff` files will be stored and is the first argument of :func:`convertScanImageTiffToVolume`.
+`extract_path` is where our data will be saved, and is the second argument.
 - Your raw and extract path can be in any folder you wish without worry of file-name conflicts.
 - All future pipeline steps will automatically exclude these files as they will not have the characters `_plane_` in the filename.
 
@@ -156,10 +147,12 @@ We see that there are 30 datasets corresponding to each of our Z-planes, but no 
 Evaluate output
 ======================
 
+For more examples of loading and manipulating data, see :ref:`exploring datasets`
+
 In your `save_path`, you will see a newly created `figures` folder. This contains an image for each [X,Y,T] plane and checks for proper tiling.
 
 Offset and Z Plane Quality
-***********************************
+-----------------------------
 
 In this folder is a close-up of the brightest image in every plane for a random frame. Each
 image shoes the neuron before and after scan-correction. This lets you compare planes, validate the correct
