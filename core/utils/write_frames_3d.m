@@ -83,10 +83,11 @@ num_images_per_chunk = round(target_chunk_size / imageSizeBytes);
 % at least one image per chunk, at most the largest dim size
 num_images_per_chunk = max(1,  min(max(sizY), num_images_per_chunk));
 num_images_per_chunk = min(max(sizY), num_images_per_chunk);
-
+num_images_per_chunk = findClosestDivisor(num_images_per_chunk, size(Y_in, ndY)); %make it even
 % make sure we have an even number of images so our dimensions match
 % i.e. we avoid writing a 2D image to a 3D dataset. 
-chunk_size = [sizY(1:nd), findClosestDivisor(num_images_per_chunk, size(Y_in, ndY))];
+chunk_size = [sizY(1:nd), num_images_per_chunk];
+disp(chunk_size)
 
 try
     h5info(file, ds);
@@ -110,7 +111,7 @@ elseif append
         current_position = prev_size(end);
     end
 else
-    disp("User set: Overwrite=false & append=false, but the dataset exists, skipping this dataset.");
+    disp("User set append=false, but the dataset exists, skipping this dataset.");
     return
 end
 
@@ -122,19 +123,37 @@ while current_position < prev_size(end) + sizY(end)
     current_position = chunk_end;
 end
 end
-function closestDivisor = findClosestDivisor(N, M)
-    % initialize the closest divisor
+function closestDivisor = findClosestDivisor(N, M, minThreshold)
+    if ~exist('minThreshold', 'var');minThreshold=2;end
     closestDivisor = 1;
-    minDifference = abs(M - round(M / N) * N);
-    
+    minDifference = inf;
+
     % iterate over possible divisors
     for i = 1:M
         if mod(M, i) == 0
-            difference = abs(N - i);
-            if difference < minDifference
-                closestDivisor = i;
-                minDifference = difference;
+            % calculate chunk size for this divisor
+            chunkSize = M / i;
+            if chunkSize >= minThreshold
+                difference = abs(N - i);
+                if difference < minDifference
+                    closestDivisor = i;
+                    minDifference = difference;
+                end
+            end
+        end
+    end
+
+    % if no valid divisor was found, use the closest divisor without threshold
+    if closestDivisor == 1
+        for i = 1:M
+            if mod(M, i) == 0
+                difference = abs(N - i);
+                if difference < minDifference
+                    closestDivisor = i;
+                    minDifference = difference;
+                end
             end
         end
     end
 end
+
