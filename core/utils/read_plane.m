@@ -1,4 +1,4 @@
-function Y_out = read_plane(varargin)
+function Y_out = read_plane(path, ds,varargin)
 % Read a specific plane from an HDF5 or MAT file and return the data. If
 % input is a MAT file, a matfile object is returned.
 % 
@@ -44,9 +44,9 @@ function Y_out = read_plane(varargin)
 p = inputParser;
 addOptional(p, 'path', '', @(x) (ischar(x) || isstring(x)));
 addOptional(p, 'ds', '', @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
-addParameter(p, 'plane', 0, @isnumeric);
-addParameter(p, 'frames', 'all', @(x) (ischar(x) || isstring(x)) || isscalar(x));
-parse(p, varargin{:});
+addOptional(p, 'plane', 0, @isnumeric);
+addOptional(p, 'frames', 'all', @(x) (ischar(x) || isstring(x)) || isscalar(x) || ismatrix(x));
+parse(p, path, ds, varargin{:});
 
 path = p.Results.path;
 ds = p.Results.ds;
@@ -116,20 +116,24 @@ end
 data_size = data_info.Dataspace.Size;
 if ischar(frames) || isstring(frames)
     if convertCharsToStrings(frames) == "all"
+        str = fprintf("All %d frames loaded.\n", frames);
         frames = data_size(end);
         slice_start = [ones(1, numel(data_size) - 1), 1];
         slice_count = [data_size(1:end-1), data_size(end)];
     else
         warning("Given argument for n_frames, if character/string, must be 'all', not: %s\n Try again!", frames);
         frames = input(sprintf('Please enter the frames to read as a number (i.e. 4), slice (i.e. 1:%d) or "all": ', data_size(end)));
+        str = fprintf("All %d frames loaded.\n", frames);
         if max(frames) > data_size(end)
             error('Frames exceed the available range.');
         end
     end
 elseif isscalar(frames)
+    str = fprintf("Frame %d loaded.\n", frames);
     slice_start = [ones(1, numel(data_size) - 1), 1];
     slice_count = [data_size(1:end-1), frames];
-elseif isvector(frames) && numel(frames) == 2
+elseif ismatrix(frames)
+    str = fprintf("%d frames loaded.\n", numel(frames));
     slice_start = [ones(1, numel(data_size) - 1), frames(1)];
     slice_count = [data_size(1:end-1), frames(2) - frames(1) + 1];
 else
