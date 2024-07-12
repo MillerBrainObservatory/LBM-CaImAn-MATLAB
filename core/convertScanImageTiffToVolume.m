@@ -179,17 +179,12 @@ data_type = metadata.sample_format;
 
 metadata.dataset_name = ds;
 metadata.num_files = num_files;
-log_message(fid, "------- Metadata ------------");
+log_message(fid, "------- Metadata ------------\n");
 log_struct(fid,metadata,'Metadata',log_full_path);
-log_message(fid, "-----------------------------");
+log_message(fid, "-----------------------------\n");
 log_message(fid, "Aggregating data from %d file(s) with %d plane(s).\n",num_files, num_planes);
 
 if save_temp
-    if multifile
-        append=true;
-    else
-        append=false;
-    end
     offset_file = 0;
     % Aout = zeros(metadata.tiff_length, metadata.tiff_width, num_planes, num_frames*num_files, data_type);
     for file_idx = 1:num_files
@@ -218,7 +213,8 @@ if save_temp
                     continue
                 end
             end
-            write_frames_3d(full_name,hTif(:,:,pi,:),ds,append,4);
+            write_frames_3d(full_name,hTif(:,:,pi,:),ds,multifile,4);
+            write_metadata_h5(metadata,full_name, '/');
             log_message(fid, 'Plane %d saved in %.2f seconds.\n',pi,toc(tps));
         end
         log_message(fid, 'File %d loaded and saved in %.2f seconds.\n',pi,toc(tpf));
@@ -260,9 +256,11 @@ for plane_idx = 1:num_planes
 
         % new_min_size = (1+(abs(plane_offset)):osv-abs(plane_offset));
         vol = fixScanPhase(vol,plane_offset,1,data_type);
-        log_message(fid, "Post-offset corrected movie contains %d x pixels....", size(vol, 2));
-
+        log_message(fid, "Post-offset corrected movie contains %d x pixels...\n", size(vol, 2));
         vol = vol(:,trimmed_xslice,:);
+        log_message(fid, "Post-offset corrected and trimmed movie contains %d x pixels...\n", size(vol, 2));
+    else
+        log_message(fid, "fix_scan_phase set to false, skipping scan-phase correction.\nThis is a cheap process, consider setting 'fix_scan_phase' to true.\n", size(vol, 2));
     end
 
     cnt = 1;
@@ -310,7 +308,6 @@ for plane_idx = 1:num_planes
                 'save_name', roi_savename ...
                 );
         end
-
         cnt = cnt + 1;
     end
 
@@ -339,7 +336,7 @@ for plane_idx = 1:num_planes
             'save_name', plane_save_path ...
             );
     end
-    write_frames_3d(frame_name, z_timeseries,ds,append,4);
+    write_frames_3d(frame_name, z_timeseries,ds,multifile,4);
     try
         h5create(frame_name,"/Ym",size(mean_img));
     catch

@@ -230,7 +230,7 @@ for plane_idx = start_plane:end_plane
         close(f);
     end
 
-    write_frames(plane_name_save,M2,'ds','/Y','overwrite',true);
+    write_frames_3d(plane_name_save,M2,'/Y',true,4);
 
     h5create(plane_name_save,"/shifts",size(shifts2));
     h5create(plane_name_save,"/Ym",size(mM2));
