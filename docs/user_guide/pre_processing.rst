@@ -38,15 +38,6 @@ For a more in-depth look at the LBM datasets, see the :ref:`LBM Datasets` guide 
 | B: ROI's are cut and horizontally concatenated.
 | C: After a scan-phase correction, lines between each ROI become unnoticable (ideally)
 
-**If you were to open up a raw ScanImage .tiff file in ImageJ, you would see a very long, thin bar as is shown in A.**
-
-- Each Z-Plane is written before moving onto the next timestep
-- z-plane 1 @ timepoint 1, z-plane 2 @ timepoint 1, z-plane 3 @ timepoint 1, etc.
-
-Thus, another task :func:`convertScanImageTiffToVolume` accomplishes are reordering this tiff stack to be:
-
-- z-plane 1 @ timepont 1, z-plane 1 @ timepoint 2, etc ..
-
 The output `volumetric time-series` has dimensions `[Y,X,Z,T]`.
 
 If the user chooses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order

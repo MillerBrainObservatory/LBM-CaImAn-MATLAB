@@ -31,7 +31,7 @@ Motion correction relies on _`NoRMCorre` for piecewise-rigid motion correction r
 .. thumbnail:: ../_images/reg_patches.png
    :width: 1440
 
-To run registration, call :func:`motionCorrectPlane()` like so:
+To run registration, call :func:`motionCorrectPlane` like so:
 
 .. code-block:: MATLAB
 
@@ -48,7 +48,6 @@ See the demo pipeline at the root of this repository or the the API for more exa
 
    Each z-plane in between start_plane and end_plane will be processed.
    In the future we may want to provide a way to give an array of indices to correct e.g. if the user wants to throw out z-planes 16 and 18.
-
 
 Registration Output
 *********************

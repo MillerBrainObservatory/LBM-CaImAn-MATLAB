@@ -101,7 +101,7 @@ sphinx_book_options = {
             "type": "local",
         },
     ],
-    # "repository_branch": "master",
+    # "repository_branch": "master",2
     # "use_source_button": True,
     # "use_issues_button": True,
     # "use_repository_button": True,
