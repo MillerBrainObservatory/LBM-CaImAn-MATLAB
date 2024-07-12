@@ -1,4 +1,4 @@
-function write_mean_images_to_png(directory, ds)
+function write_mean_images_to_png(directory)
 % Create a grid of mean-images from HDF5 datasets in the specified directory.
 %
 % This function reads HDF5 files from a specified directory, extracts the '/Ym'
