@@ -17,7 +17,7 @@ There are 4 core steps in this pipeline:
 1. :func:`convertScanImageTiffToVolume()`
 2. :func:`motionCorrectPlane()`
 3. :func:`segmentPlane()`
-4. :func:`collatePlane()`
+4. :func:`calculateZOffset()`
 
 .. note::
 

@@ -39,6 +39,10 @@ The CNMF algorithm works by:
 Inputs (covered in :ref:`parameters`) are consistent with registration, however with only a single :code:`options` input struct.
 
 
+.. hint::
+
+    See the demo parameters script at the root of this repository.
+
 Definitions
 ============
 
@@ -134,50 +138,6 @@ P
 This is the autoregressive order of the system. It is a measure of how the signal changes with respect to time. This value will always be 1 or 2, depending on the frame rate of the video and the dynamics of the calcium indicator.
 
 
-Example
-==================
-
-See the demo parameters script at the root of this repository.
-
-Here is a look at all of the parameters you can provide to CNMF:
-
-.. code-block:: json
-
-        'd1',d1,'d2',d2,...                         % dimensionality of the FOV
-        'deconv_method','constrained_foopsi',...    % neural activity deconvolution method
-        'temporal_iter',3,...                       % number of block-coordinate descent steps
-        'maxIter',15,...                            % number of NMF iterations during initialization
-        'spatial_method','regularized',...          % method for updating spatial components
-        'df_prctile',20,...                         % take the median of background fluorescence to compute baseline fluorescence
-        'p',p,...                                   % order of AR dynamics
-        'gSig',tau,...                              % half size of neuron
-        'merge_thr',merge_thresh,...                % merging threshold
-        'nb',1,...                                  % number of background components
-        'gnb',3,...
-        'min_SNR',min_SNR,...                       % minimum SNR threshold
-        'space_thresh',space_thresh ,...            % space correlation threshold
-        'decay_time',0.5,...                        % decay time of transients, GCaMP6s
-        'size_thr', sz, ...
-        'search_method','ellipse',...
-        'min_size', round(tau), ...                 % minimum size of ellipse axis (default: 3)
-        'max_size', 2*round(tau), ...               % maximum size of ellipse axis (default: 8)
-        'dist', dist, ...                           % expansion factor of ellipse (default: 3)
-        'max_size_thr',mx,...                       % maximum size of each component in pixels (default: 300)
-        'time_thresh',time_thresh,...
-        'min_size_thr',mn,...                       % minimum size of each component in pixels (default: 9)
-        'refine_flag',0,...
-        'rolling_length',ceil(FrameRate*5),...
-        'fr', FrameRate ...
-
-When running :func:`segmentPlane`, check the command window for reports that match the number of files you expect to be processed:
-
-.. code-block:: MATLAB
-
-    Processing 30 files found in directory C:\Users\<username>\Documents\data\bi_hemisphere\registration\...  %% our data_path
-    Beginning calculations for plane 1 of 30...  %% check this matches the number of Z-Planes you expect
-    Data loaded in. This process takes 0.024489 minutes.
-    Beginning patched, volumetric CNMF...
-
 
 AtoAc
 ====================================
@@ -232,7 +192,7 @@ Results
 
 The output of the analysis includes several key variables that describe the segmented neuronal components and their corresponding activities. Below is a description of each output variable, along with an example of how to use them and what they represent.
 
-Output Variables
+Segmentation Outputs
 *************************
 
 1. :code:`T_all`: Neuronal time-series

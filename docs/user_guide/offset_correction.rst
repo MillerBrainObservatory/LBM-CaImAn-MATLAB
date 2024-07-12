@@ -3,7 +3,7 @@
 Axial-Offset Correction
 =======================
 
-Core function(s): :func:`calculateZOffset` and :func:`collatePlanes`
+Core function(s): :func:`calculateZOffset`
 
 Before the session being processed, you should have aquired a cailbration file that conforms to scanimage naming convention. A file named something like `pollen_calibration_00001.tif`.
 
@@ -54,7 +54,14 @@ further refinement step which prompts a graphical interface for z-plane(n) and z
 Depending on your axial field-of-view, there is likely neuronal contamination between z-planes.
 We can use this to select a feature, and the same feature in n+1.
 
-.. thumbnail:: ../_images/ex_compare_planes.png
+.. thumbnail:: ../_images/corr_left.jpg
+   :width: 600
+
+The image you should be clicking on will be highighted red.
+Once the selection is made, the right image will now zoom into the corresponding region in the next z-plane.
+Now, you can select the same feature in this plane:
+
+.. thumbnail:: ../_images/corr_right.jpg
    :width: 600
 
 This makes a few assumptions about the axial distance between z-planes.
@@ -65,6 +72,14 @@ Axial Correction Outputs
 
 - .fig files showing neuron distributions in z and radial directions.
 - A :code:`.mat` file: `caiman_collated_output_plane_N` with collated and processed imaging data.
+
+
+This final ``caiman_collated_output_plane_N.m`` file is the same as was discussed in :ref:`segmentation outputs`.
+The difference being now, all of our z-planes are collated into a single file.
+
+.. hint::
+
+    In the filename, you'll see _min_snr_ followed by a number. This is also stored in the metadata and is the primary variable dictating the threshold of detection.
 
 Axial Correction Examples
 ------------------------------
