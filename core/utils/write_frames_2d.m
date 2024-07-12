@@ -69,7 +69,7 @@ else
 end
 
 while current_position < prev_size(end) + sizY(end)
-    chunk_end = min(current_position + num_images_per_chunk, prev_size(end) + sizY(end));
+    chunk_end = min(current_position + size(Y_in, 2), prev_size(end) + sizY(end));
     chunk_data = Y_in(:, :, current_position - prev_size(end) + 1:chunk_end - prev_size(end));
     start = [ones(1, ndims(Y_in)-1), current_position + 1];
     if ismatrix(chunk_data)
