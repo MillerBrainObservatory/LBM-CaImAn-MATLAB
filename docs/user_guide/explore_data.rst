@@ -66,7 +66,7 @@ Mean images are a good way to see small artifacts that may appear in sparse area
 
 Quickly view a grid of mean images with :func:`write_mean_images_to_png`:
 
-.. thumbnail:: _images/util_mean_images.png
+.. thumbnail:: _images/gen_mean_images.png
 
 Making Gifs
 ==============

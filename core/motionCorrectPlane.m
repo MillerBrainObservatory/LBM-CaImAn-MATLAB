@@ -218,11 +218,11 @@ for plane_idx = start_plane:end_plane
         title('correlation coefficients','fontsize',8,'fontweight','bold')
                 set(gca,'Xtick',[])
         ax2 = subplot(312);
-        plot(shifts_x); hold on; plot(shifts1(:,1),'--r','linewidth',2);
+        plot(shifts_x); hold on; plot(shifts1(:,1),'--ro','linewidth',2);
         title('displacements along x','fontsize',8,'fontweight','bold')
                 set(gca,'Xtick',[])
         ax3 = subplot(313);
-        plot(shifts_y); hold on; plot(shifts1(:,2),'--r','linewidth',2);
+        plot(shifts_y); hold on; plot(shifts1(:,2),'--ro','linewidth',2);
         title('displacements along y','fontsize',8,'fontweight','bold')
                 xlabel('timestep','fontsize',8,'fontweight','bold')
         linkaxes([ax1,ax2,ax3],'x')
