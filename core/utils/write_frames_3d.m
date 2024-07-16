@@ -73,21 +73,21 @@ end
 sizY = size(Y_in);
 ndY = numel(sizY);
 nd = ndY-1;
-
-num_elements_per_image = prod(sizY(1:nd));
-imageSizeBytes = num_elements_per_image * element_size;
-target_chunk_size = chunk_mb * 1024 * 1024; % 4 MB
-
-num_images_per_chunk = round(target_chunk_size / imageSizeBytes);
-
-% at least one image per chunk, at most the largest dim size
-num_images_per_chunk = max(1,  min(max(sizY), num_images_per_chunk));
-num_images_per_chunk = min(max(sizY), num_images_per_chunk);
-num_images_per_chunk = findClosestDivisor(num_images_per_chunk, size(Y_in, ndY)); %make it even
-% make sure we have an even number of images so our dimensions match
-% i.e. we avoid writing a 2D image to a 3D dataset. 
-chunk_size = [sizY(1:nd), num_images_per_chunk];
-disp(chunk_size)
+if ndY == 3
+    num_elements_per_image = prod(sizY(1:nd));
+    imageSizeBytes = num_elements_per_image * element_size;
+    target_chunk_size = chunk_mb * 1024 * 1024; % 4 MB
+    
+    num_images_per_chunk = round(target_chunk_size / imageSizeBytes);
+    
+    % at least one image per chunk, at most the largest dim size
+    num_images_per_chunk = max(1,  min(max(sizY), num_images_per_chunk));
+    num_images_per_chunk = min(max(sizY), num_images_per_chunk);
+    num_images_per_chunk = findClosestDivisor(num_images_per_chunk, size(Y_in, ndY)); %make it even
+    % make sure we have an even number of images so our dimensions match
+    % i.e. we avoid writing a 2D image to a 3D dataset. 
+    chunk_size = [sizY(1:nd), num_images_per_chunk];
+end
 
 try
     h5info(file, ds);
@@ -97,10 +97,17 @@ catch
 end
 
 if ~valid_ds % if there is no dataset, none of the other checks matter
-    h5create(file, ds, [sizY(1:nd), Inf], 'ChunkSize', chunk_size, 'Datatype', cl);
-    current_position = 0;
+    if ndY == 3
+        h5create(file, ds, [sizY(1:nd), Inf], 'ChunkSize', chunk_size, 'Datatype', cl);
+    elseif ndY == 2
+        h5create(file, ds, sizY, 'Datatype', cl);
+    end
     prev_size = 0;
+    current_position = 0;
 elseif append
+    if ndY == 2
+        error("Appending on 2d datasets is not yet supported by this pipeline.")
+    end
     if ~isempty(prev_ind)
         current_position=prev_ind;
     else
@@ -115,12 +122,16 @@ else
     return
 end
 
-while current_position < prev_size(end) + sizY(end)
-    chunk_end = min(current_position + num_images_per_chunk, prev_size(end) + sizY(end));
-    chunk_data = Y_in(:, :, current_position - prev_size(end) + 1:chunk_end - prev_size(end));
-    start = [ones(1, nd), current_position + 1];
-    h5write(file, ds, chunk_data, start, size(chunk_data));
-    current_position = chunk_end;
+if ndY == 2
+    h5write(file, ds, Y_in);
+else
+    while current_position < prev_size(end) + sizY(end)
+        chunk_end = min(current_position + num_images_per_chunk, prev_size(end) + sizY(end));
+        chunk_data = Y_in(:, :, current_position - prev_size(end) + 1:chunk_end - prev_size(end));
+        start = [ones(1, nd), current_position + 1];
+        h5write(file, ds, chunk_data, start, size(chunk_data));
+        current_position = chunk_end;
+    end
 end
 end
 function closestDivisor = findClosestDivisor(N, M, minThreshold)
