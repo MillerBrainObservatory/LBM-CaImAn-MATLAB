@@ -29,8 +29,8 @@ function motionCorrectPlane(data_path, save_path, ds, debug_flag, varargin)
 % Notes
 % -----
 % Each motion-corrected plane is saved as a .h5 group containing the 2D
-%   shift vectors in x and y. The raw movie is saved in '/Y' and the 
-%   
+%   shift vectors in x and y. The raw movie is saved in '/Y' and the
+%
 % - Only .h5 files containing processed volumes should be in the file_path.
 
 p = inputParser;
@@ -85,7 +85,7 @@ else
 end
 
 num_cores = max(num_cores, 23);
-tall=tic; log_message(fid, 'Beginning registration with %d cores...\n', num_cores); 
+tall=tic; log_message(fid, 'Beginning registration with %d cores...\n', num_cores);
 for plane_idx = start_plane:end_plane
     tplane=tic;
 
@@ -107,7 +107,7 @@ for plane_idx = start_plane:end_plane
             delete(plane_name_save)
         end
     end
-   
+
     poolobj = gcp("nocreate"); % If no pool, do not create new one.
     if isempty(poolobj)
         log_message(fid, "Initializing parallel cluster with %d workers.\n", num_cores);
@@ -132,7 +132,7 @@ for plane_idx = start_plane:end_plane
             'max_shift', round(20/pixel_resolution),...        % Max shift in px
             'us_fac',20,...                   % upsample factor
             'init_batch',200,...              % #frames used to create template
-            'correct_bidir', false... % DONT Correct bidirectional scanning
+            'correct_bidir', false...         % DONT Correct bidirectional scanning
             );
     end
 
@@ -164,14 +164,14 @@ for plane_idx = start_plane:end_plane
             'iter', 1, ...
             'plot_flag', true, ...
             'correct_bidir', false...
-        );
+            );
     end
 
     % DFT subpixel registration - results used in CNMF
-    t_nonrigid=tic; log_message(fid, "Template creation complete. Beginning non-rigid registration...\n");    
+    t_nonrigid=tic; log_message(fid, "Template creation complete. Beginning non-rigid registration...\n");
     [M2, shifts2, ~, ~] = normcorre_batch(Y, options_nonrigid, template_good);
     log_message(fid, "Non-rigid registration complete. Elapsed time: %.3f minutes.\n",toc(t_nonrigid)/60);
-    
+
     log_message(fid, "Calculating registration metrics...\n");
 
     [cY,mY,~] = motion_metrics(Y,10);
@@ -181,26 +181,27 @@ for plane_idx = start_plane:end_plane
     if do_figures
 
         log_message(fid, "Plotting registration metrics...\n");
-    
+
         fig_plane_name = sprintf("%s/plane_%d", fig_save_path, plane_idx);
-        metrics_name = sprintf("%s_metrics.png", fig_plane_name);
+        metrics_name_png = sprintf("%s_metrics.png", fig_plane_name);
+
         f = figure('Visible', 'off', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
-        
-        ax1 = subplot(2, 2, 1); imagesc(mY); axis equal; axis tight; axis off; 
+
+        ax1 = subplot(2, 2, 1); imagesc(mY); axis equal; axis tight; axis off;
         title('mean raw data', 'fontsize', 10, 'fontweight', 'bold');
-        
-        % ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off; 
+
+        % ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off;
         % title('mean rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
 
-        ax2 = subplot(2, 2, 2); imagesc(mM2); axis equal; axis tight; axis off; 
+        ax2 = subplot(2, 2, 2); imagesc(mM2); axis equal; axis tight; axis off;
         title('mean corrected', 'fontsize', 10, 'fontweight', 'bold');
-        subplot(2, 2, 3); plot(1:T, cY, 1:T, cM2); legend('raw data', 'corrected'); 
+        subplot(2, 2, 3); plot(1:T, cY, 1:T, cM2); legend('raw data', 'corrected');
         title('correlation coefficients', 'fontsize', 10, 'fontweight', 'bold');
-        subplot(2, 2, 4); scatter(cY, cM2); hold on; 
+        subplot(2, 2, 4); scatter(cY, cM2); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM2)], [0.9 * min(cY), 1.05 * max(cM2)], '--r'); axis square;
         xlabel('raw data', 'fontsize', 10, 'fontweight', 'bold'); ylabel('corrected', 'fontsize', 10, 'fontweight', 'bold');
         linkaxes([ax1, ax2], 'xy');
-        exportgraphics(f,metrics_name,'Resolution',600,'BackgroundColor','k');
+        exportgraphics(f,metrics_name_png,'Resolution',600,'BackgroundColor','k');
         close(f);
     end
 
@@ -212,28 +213,44 @@ for plane_idx = start_plane:end_plane
     shifts_y = squeeze(shifts2(:,2,:))';
     if do_figures
         log_message(fid, "Plotting registration shifts...\n");
-        shifts_name = sprintf("%s_shifts.png", fig_plane_name);
-        f = figure("Visible","off");
+
+        shifts_name_png = sprintf("%s_shifts.png", fig_plane_name);
+        f = figure("Visible","off"); % changed to "on" for debugging
 
         ax1 = subplot(311);
-        plot(1:T,cY, ':r',1:T,cM1,'--',1:T, cM2); legend('raw data','rigid','non-rigid');
-        title('correlation coefficients','fontsize',8,'fontweight','bold')
-        set(gca,'Xtick',[])
+        plot(1:T, cY, 'LineWidth', 2); hold on;
+        plot(1:T, cM1, 'LineWidth', 2,  'LineStyle', '--');
+        plot(1:T, cM2, 'LineWidth', 2, 'LineStyle', '--');
+        legend('raw data', 'rigid', 'non-rigid');
+        title('correlation coefficients', 'fontsize', 8, 'fontweight', 'bold');
+        set(gca, 'Xtick', []);
 
         ax2 = subplot(312);
-        plot(shifts_x); hold on;
-        plot(shifts1(:,1),'--r','linewidth',1); hold on;
-        plot(shifts2(:,1),'--r','linewidth',1);
-        title('displacements along x','fontsize',8,'fontweight','bold')
-        set(gca,'Xtick',[])
+        plot(shifts_x, 'LineWidth', 2, 'Marker', 'none');
+        hold on;
+        plot(shifts2(:,1), '--r', 'LineWidth', .5);
+        title('displacements along x', 'fontsize', 8, 'fontweight', 'bold');
+        set(gca, 'Xtick', []);
+        xlim([81 1678]);
+        ylim([-1.88 3.84]);
 
         ax3 = subplot(313);
-        plot(shifts_y, ':'); hold on;
-        plot(shifts2(:,2),'--r','linewidth',1);
-        title('displacements along y','fontsize',8,'fontweight','bold')
-                xlabel('timestep','fontsize',8,'fontweight','bold')
-        linkaxes([ax1,ax2,ax3],'x')
-        exportgraphics(f,shifts_name, 'Resolution', 600, 'BackgroundColor', 'k');
+        plot(shifts_y, 'LineWidth', 2, 'Marker', 'none');
+        hold on;
+        plot(squeeze(shifts2(:,2)), '--r', 'LineWidth', .5);
+        title('displacements along y','fontsize',8,'fontweight','bold');
+        xlabel('timestep','fontsize',8,'fontweight','bold');
+
+        set(f, 'Position', [1.0000 64.0000 1270.0000 883.0000]);
+        set(ax1, 'Position', [0.1300 0.6739 0.7750 0.2157]);
+        set(ax2, 'Position', [0.1300 0.4096 0.7750 0.2157]);
+        set(ax3, 'Position', [0.1300 0.1453 0.7750 0.2157]);
+        set(ax1, 'Box', 'off');
+        set(ax2, 'Box', 'off');
+
+        % Link axes
+        linkaxes([ax1, ax2, ax3], 'x');
+        exportgraphics(f,shifts_name_png, 'Resolution', 600, 'BackgroundColor', 'k');
         close(f);
     end
 
