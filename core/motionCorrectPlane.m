@@ -35,8 +35,8 @@ function motionCorrectPlane(data_path, save_path, ds, debug_flag, varargin)
 
 p = inputParser;
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
-addRequired(p, 'save_path', @(x) ischar(x) || isstring(x));
-addOptional(p, 'ds', '/Y', @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
+addOptional(p, 'save_path', @(x) ischar(x) || isstring(x));
+addOptional(p, 'ds', '/Y', @(x) (ischar(x) || isstring(x)));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
@@ -157,10 +157,12 @@ for plane_idx = start_plane:end_plane
         options_nonrigid = NoRMCorreSetParms(...
             'd1', d1,...
             'd2', d2,...
-            'bin_width', 200,...
+            'bin_width', 10,...
             'max_shift', round(20/pixel_resolution),...
             'us_fac', 20,...
-            'init_batch', 120,...
+            'init_batch', 200,...
+            'iter', 1, ...
+            'plot_flag', true, ...
             'correct_bidir', false...
         );
     end
@@ -183,22 +185,21 @@ for plane_idx = start_plane:end_plane
         fig_plane_name = sprintf("%s/plane_%d", fig_save_path, plane_idx);
         metrics_name = sprintf("%s_metrics.png", fig_plane_name);
         f = figure('Visible', 'off', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
-        ax1 = subplot(2, 3, 1); imagesc(mY); axis equal; axis tight; axis off; 
+        
+        ax1 = subplot(2, 2, 1); imagesc(mY); axis equal; axis tight; axis off; 
         title('mean raw data', 'fontsize', 10, 'fontweight', 'bold');
         
-        ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off; 
-        title('mean rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
-        ax3 = subplot(2, 3, 3); imagesc(mM2); axis equal; axis tight; axis off; 
-        title('mean non-rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
-        subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid'); 
+        % ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off; 
+        % title('mean rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
+
+        ax2 = subplot(2, 2, 2); imagesc(mM2); axis equal; axis tight; axis off; 
+        title('mean corrected', 'fontsize', 10, 'fontweight', 'bold');
+        subplot(2, 2, 3); plot(1:T, cY, 1:T, cM2); legend('raw data', 'corrected'); 
         title('correlation coefficients', 'fontsize', 10, 'fontweight', 'bold');
-        subplot(2, 3, 5); scatter(cY, cM1); hold on; 
-        plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        xlabel('raw data', 'fontsize', 10, 'fontweight', 'bold'); ylabel('rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
-        subplot(2, 3, 6); scatter(cM1, cM2); hold on; 
-        plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        xlabel('rigid corrected', 'fontsize', 10, 'fontweight', 'bold'); ylabel('non-rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
-        linkaxes([ax1, ax2, ax3], 'xy');
+        subplot(2, 2, 4); scatter(cY, cM2); hold on; 
+        plot([0.9 * min(cY), 1.05 * max(cM2)], [0.9 * min(cY), 1.05 * max(cM2)], '--r'); axis square;
+        xlabel('raw data', 'fontsize', 10, 'fontweight', 'bold'); ylabel('corrected', 'fontsize', 10, 'fontweight', 'bold');
+        linkaxes([ax1, ax2], 'xy');
         exportgraphics(f,metrics_name,'Resolution',600,'BackgroundColor','k');
         close(f);
     end
@@ -213,16 +214,22 @@ for plane_idx = start_plane:end_plane
         log_message(fid, "Plotting registration shifts...\n");
         shifts_name = sprintf("%s_shifts.png", fig_plane_name);
         f = figure("Visible","off");
+
         ax1 = subplot(311);
-        plot(1:T,cY,1:T,cM1,1:T,cM2); legend('raw data','rigid','non-rigid');
+        plot(1:T,cY, ':r',1:T,cM1,'--',1:T, cM2); legend('raw data','rigid','non-rigid');
         title('correlation coefficients','fontsize',8,'fontweight','bold')
-                set(gca,'Xtick',[])
+        set(gca,'Xtick',[])
+
         ax2 = subplot(312);
-        plot(shifts_x); hold on; plot(shifts1(:,1),'--ro','linewidth',2);
+        plot(shifts_x); hold on;
+        plot(shifts1(:,1),'--r','linewidth',1); hold on;
+        plot(shifts2(:,1),'--r','linewidth',1);
         title('displacements along x','fontsize',8,'fontweight','bold')
-                set(gca,'Xtick',[])
+        set(gca,'Xtick',[])
+
         ax3 = subplot(313);
-        plot(shifts_y); hold on; plot(shifts1(:,2),'--ro','linewidth',2);
+        plot(shifts_y, ':'); hold on;
+        plot(shifts2(:,2),'--r','linewidth',1);
         title('displacements along y','fontsize',8,'fontweight','bold')
                 xlabel('timestep','fontsize',8,'fontweight','bold')
         linkaxes([ax1,ax2,ax3],'x')
