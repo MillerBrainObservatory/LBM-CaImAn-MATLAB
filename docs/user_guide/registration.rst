@@ -1,21 +1,15 @@
-Piecewise-Rigid Motion-Correction
-================================================================
+Registration
+================
 
 Function for this step: :func:`motionCorrectPlane`
-
-For a quick demo on how to run motion correction, see the demo_registration.m script.
 
 .. note::
 
    The terms motion-correction and registration are often used interchangably.
 
+Now that we have isolated each z-plane into its own timeseries, we can use `image registration <https://en.wikipedia.org/wiki/Image_registration>`_ to make sure that our neuron in the first frame is in the same spatial location as in frame N throughout the time-series.
 
-The goal of motion correction is to make sure that our neuron in the first frame is in the same spatial location as in frame N throughout the time-series.
-Natural movement by the animal during experimental tasks can cause our images spatial potition varying slightly frame by frame. The extent of this movement can also vary widely depending
-on the type of task the animal is performing.
-
-For this reason, it is *very* important for the researcher to verify that any motion artifacts in the movie are removed before moving onto any subsequent computations.
-
+Which varient of motion correction you use depends on the amount/degree of motion in your timeseries.
 
 Rigid vs Non-Rigid
 *******************
