@@ -20,3 +20,4 @@ dependencies:
   - myst_nb
   - sphinx-copybutton
   - sphinx-togglebutton
+  - sphinx-hoverxref
