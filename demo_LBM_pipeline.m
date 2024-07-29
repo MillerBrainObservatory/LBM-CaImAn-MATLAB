@@ -77,7 +77,7 @@ if compute
         );
 
     motionCorrectPlane( ...
-        save_path, ... % we used this to save extracted data
+        parent_path, ... % we used this to save extracted data
         mc_path, ... % save registered data here
         'dataset_name', '/Y', ... % where we saved the last step in h5
         'debug_flag', 0, ...

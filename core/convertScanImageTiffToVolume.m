@@ -70,7 +70,7 @@ p = inputParser;
 % Define the parameters
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
 addOptional(p, 'save_path', data_path, @(x) ischar(x) || isstring(x));
-addOptional(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
+addOptional(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)));
 addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addOptional(p, 'do_figures', 0, @(x) isnumeric(x) || islogical(x));
 addOptional(p, 'overwrite', true, @(x) isnumeric(x) || islogical(x));
@@ -91,18 +91,18 @@ overwrite = p.Results.overwrite;
 fix_scan_phase = p.Results.fix_scan_phase;
 trim_pixels = p.Results.trim_pixels;
 do_figures = p.Results.do_figures;
-sav_temp = p.Results.save_temp;
 
 if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", fullfile(data_path)); end
 if debug_flag == 1; dir([data_path, '*.tif']); return; end
 
-if isempty(save_path)
+raw_files = []; extracted_files = [];
+if ~isfolder(save_path)
     warning("No save_path given. Saving data in data_path: %s\n", fullfile(data_path));
     save_path = data_path;
 else
     % save path exists; display whats there with the size
     contents = dir([save_path, '*.h5']);
-    raw_files = [];
+    
     extracted_files = [];
     for i = 1:length(contents)
         if contains(contents(i).name, 'raw_plane_')
@@ -257,6 +257,11 @@ for plane_idx = 1:num_planes
         % new_min_size = (1+(abs(plane_offset)):osv-abs(plane_offset));
         vol = fixScanPhase(vol,plane_offset,1,data_type);
         log_message(fid, "Post-offset corrected movie contains %d x pixels...\n", size(vol, 2));
+
+        vol_size = size(vol, 2);
+        
+        % resize if our array had pixels trimmed
+        trimmed_xslice = trimmed_xslice(trimmed_xslice <= vol_size);
         vol = vol(:,trimmed_xslice,:);
         log_message(fid, "Post-offset corrected and trimmed movie contains %d x pixels...\n", size(vol, 2));
     else

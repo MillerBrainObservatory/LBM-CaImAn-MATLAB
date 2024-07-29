@@ -14,6 +14,5 @@ Be sure to review this section thoroughly before proceeding with the analysis.
     :caption: First Steps
 
     install
-    semantics
     setup
 
