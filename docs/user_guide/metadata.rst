@@ -16,52 +16,38 @@ returning to you a set of `key-value pairs <https://stackoverflow.com/questions/
 
     ans =
 
-      struct with fields:
-
-                objective_resolution: 157.5000
-                           center_xy: [-15.2381 0]
-                             size_xy: [3.8095 38.0952]
-                        num_pixel_xy: [144 1200]
-                        %%
-                        image_length: 11008
-                         image_width: 145
-        num_lines_between_scanfields: 24
-                     lines_per_frame: 144
-                     pixels_per_line: 128
-                          num_planes: 30
-                            num_rois: 9
-                    num_frames_total: 1176
-                     num_frames_file: 392
-                           num_files: 3
-                          frame_rate: 2.1797
-                                 fov: [600 6000]
-                    pixel_resolution: 4.5833
-                       sample_format: 'int16'
-                       base_filename: "MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001"
-                       base_filepath: "C:/<username>/Documents/data/raw/"
+      metadata contents:
+             tiff_length = 2478
+             tiff_width = 145
+             roi_width_px = 144
+             roi_height_px = 600
+             num_rois = 4
+             num_frames = 1730
+             num_planes = 30A  % stored as scanimage channels
+             num_files = 1
+             frame_rate = 9.60806
+             fov = [600;600]
+             pixel_resolution = 1.02083
+             sample_format = int16
+             raw_filename = high_res
+             raw_filepath = C:\Users\RBO\caiman_data
+             raw_fullfile = C:\Users\RBO\caiman_data\high_res.tif
+             dataset_name = /Y
+             trim_pixels = [6;6;17;0]
+             % below used internally
+             num_pixel_xy = [144;600]
+             center_xy = [-1.428571429;0]
+             line_period = 4.15652e-05
+             scan_frame_period = 0.104079
+             size_xy = [0.9523809524;3.80952381]
+             objective_resolution = 157.5
+             num_lines_between_scanfields = 24
 
 Image Size
 ************
 
 ScanImage multi-ROI .tiff outputs are made up of individual sections called that ScanImage calls `ROIs`. These `ROIs` collectively form a
-ScanImage `ScanField`. The ScanField is measured in optical degrees. We use the `objective_resolution`, that gives the ratio of distance (in microns) between pixel
-poxitions after the stage movement and the distance (in optical degrees) of the same movement. This is a direct conversion factor for the field distance to physical microns.
-
-This is essentially a scale factor, converting the size / location from units of degrees to microns.
-
-.. thumbnail:: ../_images/si-objective-resolution.png
-    :width: 800
-    :title: ScanImage Objective Resolution
-    :align: center
-
-`num_pixel_xy` are the number of pixels in each `ROI`. With there being 9 ROIs, we know our image is :math:`144x8=1296` pixels wide.
-
-So that explains why is our `image_length` is so high compared to our `image_width`.
-
-However, you'll notice :math:`1200x9=10800` is significanly less than our `image_height`.
-
-This is because the scanner is actually moving to the next ROI, so we stop collecting data for that period of time.
-`num_lines_between_scanfields` is calculated using this amount of time and is stripped during the horizontal concatenation.
+ScanImage `ScanField`. 
 
 Image Frames
 ***************
