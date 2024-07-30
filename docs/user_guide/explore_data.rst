@@ -1,176 +1,96 @@
-# Exploring LBM Datasets
+Exploring Datasets
+######################
 
-Light-beads microscopy is a 2-photon imaging paradigm based on [ScanImage](https://docs.scanimage.org) acquisition software.
+There are several helper functions located in ``core/utils``.
 
----
+Reading Data
+=============
 
-ScanImage [mROI (Multi Region Of Interest)](https://docs.scanimage.org/Premium+Features/Multiple+Region+of+Interest+(MROI).html) outputs raw `.tiff` files made up of individual `Regions of Interest (ROI's)`.
-In the raw output, these `ROIs` are vertically concatenated independent of their actual scan locations.
-The location of each ROI is stored as a pixel coordinate used internally by the respective pipeline to orient each strip.
+:func:`read_plane` is helper function that lets you quickly load a HDF5 plane without dealing with matlabs `h5read <https://www.mathworks.com/help/matlab/ref/h5read.html>`_ function.
 
-## Metadata
+You can use it using prompts:
 
-:::{dropdown} Metadata (primary)
-:chevron: down-up
-:animate: fade-in-slide-down
-:name: primary_metadata
+.. code-block:: MATLAB
 
-These are the critical metadata needed to interpret results:
+     Use dialog and prompts only:
+         Y_out = read_plane();
 
-| Name                  | Value            | Unit   | Description                                       |
-|-----------------------|------------------|--------|---------------------------------------------------|
-| num_pixel_xy          | [144, 1200]      | px^2   | Number of pixels in the *each scanimage ROI*.     |
-| tiff_length           | 2478             | px     | Width of the raw-scanimage tiff.                  |
-| tiff_width            | 145              | px     | Width of the raw-scanimage tiff.                  |
-| roi_width_px          | 144              | px     | Width of the region of interest (ROI).            |
-| roi_height_px         | 600              | px     | Height of the region of interest (ROI).           |
-| num_planes            | 30               | -      | Total number of recording z-planes.               |
-| num_rois              | 4                | -      | Number of ScanImage regions of interest (ROIs).   |
-| frame_rate            | 9.608            | Hz     | How many frames recorded / second.                |
-| fov                   | [600, 600]       | um^2   | Area of full field of view.                       |
-| pixel_resolution      | 1.0208           | um/px  | Each pixel corresponds to this many microns.      |
+.. warning::
 
-:::
+   Make you you include the semi-colon ; after you call read_plane(), otherwise your command window will print every value in the dataset to the command window.
 
-:::{dropdown} Metadata (secondary)
-:chevron: down-up
-:animate: fade-in-slide-down
-:name: secondary_metadata
+You can give it a folder containing H5 files, and you will be prompted for the plane and frames:
 
-There are additional metadata values used internally to locate files and to calculate the above values:
+.. code-block:: MATLAB
 
-| Name                  | Value            | Unit     | Description                                       |
-|-----------------------|------------------|----------|---------------------------------------------------|
-| raw_filename          | 'high_res'       | -      | Raw data filename, without the extension.           |
-| raw_filepath          | 'C:\Users\RBO\caiman_data' | -      | Raw data directory.                       |
-| raw_fullfile          | 'C:\Users\RBO\caiman_data\high_res.tif' | -      | Full path to the raw data file |
-| dataset_name          | '/Y'                      | -      | For heirarchical data formats (HDF5, Zarr), the name of the dataset. |
-| objective_resolution  | 157.5000         | degree/px| Scale factor to convert pixels to microns.        |
-| center_xy             | [-15.2381, 0]    | deg^2     | Center coordinates for each ROI in the XY plane.  |
-| size_xy               | [3.8095, 38.0952]| deg^2 | Size of each ROI, in units of resonant scan angle.|
-| line_period           | 4.1565e-05       | s        | Time period for resonant scanner to scan a full line (row). |
-| scan_frame_period     | 0.1041           | s        | Time period for resonant scanner to scan a full frame/image              |
-| sample_format         | 'int16'          | -        | Data type holding the nubmer of bits per sample.  |
+    >> Y_out = read_plane('path/to/h5');
 
-:::
+    Which plane do you want to read? Enter a number (e.g. 4)
 
-> **Note:**
-> With multi-ROI tiffs, the size of your tiff given by `image_size` will be dfferent from the number of pixels in x and y.
-> This is due to the time it takes the scanner to move onto subsequent ROI's not being accounted for in `num_pixel_xy`.
-> Internally, each pipeline checks for these metadata attributes and adjusts the final image accordingly.
+    >> 4
 
-## Terms
+    Which frames do you want to read? enter a slice, vector with start/stop or 'all':
 
+    >> [1 15]
 
-In its raw form, data is saved as a 3-dimensional multi-page tiff file. Each image within this tiff file represents a page of the original document.
+If you already know which plane you want to load, use that as a `key-value pair` (hence why you need to include `plane` before the value):
 
-| Dimension | Description |
-|-----------|-------------|
-| [X, Y] | Image / 2D Plane / Frame |
-| [X, Y, Z] | 3D-Stack, Z-Stack |
-| [X, Y, T] | Time-Series of a 2D Plane, Planar-timeseries, Movie |
-| [X, Y, Z, T] | Volumetric Timeseries, Volume |
+.. code-block:: MATLAB
 
-## Frame Ordering
+     Y_out = read_plane('C:/data/extracted_files', 'plane', 4);
 
-ScanImage saves the 4D volume with each plane interleaved, e.g.
+Or just give a path to the fully qualified filename of the plane you wish to read (so you no longer need the 'plane':
 
-- frame0 = time0_plane1
-- frame1 = time0_plane2
-- frame2 = time0_plane3
-- frame3 = time1_plane1
-- frame4 = time1_plane2
+.. code-block:: MATLAB
 
-... and so on.
+    Y_out = read_plane('C:/data/extracted_files/data.h5');
 
-```{admonition} Note on Frames
-:class: tip
+Pick how many frames you want to load in a similar manner:
 
-Before beginning the recording session, users have the option to split frames in the recording across multiple `.tiff` files. This option is helpful as it requires less work in post-processing to ensure there isn't too much computer memory being used.
+.. code-block:: MATLAB
 
-![ScanImage Data Log GUI](../_images/si-data-log-gui.png)
+     Y_out = read_plane('data.h5', 'frames', 1:10);
 
-```
+Or :code:`all` for everything:
 
-## ScanImage metadata
+.. code-block:: MATLAB
 
-Each pipeline comes stocked with methods to retrieve imaging metadata.
+     Y_out = read_plane('data.h5', 4, 'all');
 
-::::{tab-set}
+Mean Images
+=============
 
-:::{tab-item} Python Metadata
-Python metadata is stored in the {ref}`scanreader` class.
+Mean images are a good way to see small artifacts that may appear in sparse areas.
 
-```python
-objective_resolution: 157.5000
-center_xy: [-15.2381 0]
-size_xy: [3.8095 38.0952]
-num_pixel_xy: [144 1200]
-image_length: 11008
-image_width: 145
-num_planes: 30
-num_rois: 9
-num_frames: 1176
-frame_rate: 2.1797
-fov: [600 6000]
-pixel_resolution: 4.5833
-sample_format: 'int16'
-```
+Quickly view a grid of mean images with :func:`write_mean_images_to_png`:
 
-:::
+.. thumbnail:: ../_images/gen_mean_images.png
+   :align: center
 
-:::{tab-item} MATLAB Metadata
+Making Gifs
+==============
 
-MATLAB metadata can be retrieved with the {ref} get_metadata() utility funciton.
+:func:`write_frames_to_gif` lets you visualize your movie quickly at any stage.
 
-```MATLAB
+.. code-block:: MATLAB
 
-   >> get_metadata(fullfile(extract_path, "MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.tiff"))
+    array = rand(100, 100, 500)
+    write_frames_to_gif(array, 'output.gif', 45)
 
-    ans =
+You want your input array to have dimensions :code:`height x width x frames`. For very large movies, use the :code:`size_mb` parameter to limit the resulting gif to that many megabytes.
 
-      metadata contents:
-             tiff_length = 2478
-             tiff_width = 145
-             roi_width_px = 144
-             roi_height_px = 600
-             num_rois = 4
-             num_frames = 1730
-             num_planes = 30A  % stored as scanimage channels
-             num_files = 1
-             frame_rate = 9.60806
-             fov = [600;600]
-             pixel_resolution = 1.02083
-             sample_format = int16
-             raw_filename = high_res
-             raw_filepath = C:\Users\RBO\caiman_data
-             raw_fullfile = C:\Users\RBO\caiman_data\high_res.tif
-             dataset_name = /Y
-             trim_pixels = [6;6;17;0]
-             % below used internally
-             num_pixel_xy = [144;600]
-             center_xy = [-1.428571429;0]
-             line_period = 4.15652e-05
-             scan_frame_period = 0.104079
-             size_xy = [0.9523809524;3.80952381]
-             objective_resolution = 157.5
-             num_lines_between_scanfields = 24
-```
+Quick-play Movies
+=========================
 
-:::
+:func:`play_movie()`: Quickly view a movie of any plane.
 
-::::
+.. code-block:: MATLAB
 
-`num_pixel_xy`
-: The number of pixels in each `ROI`. This can very from the actual tiff image size.
+    % read in a motion-corrected plane
+    y_extracted = read_plane('C:/data/extraction/', 'plane', 4);
+    y_corrected = read_plane('C:/data/registration/', 'plane', 4);
+    play_movie({y_extracted, y_corrected}, {'Raw', 'Corrected'}, 0, 255)
 
-`fov`
-: The total image size, in micron (`um`).
-
-`image_length`/`image_width`
-: The total **tiff** size, in pixels (`px`).
-
-`pixel_resolution`
-: The size, in micron, of each pixel.
-
+.. thumbnail:: ../_images/plane_1.gif
+   :align: center
 
