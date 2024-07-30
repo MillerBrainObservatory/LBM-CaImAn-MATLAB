@@ -29,13 +29,11 @@ Scan-phase diagram
 ```
 
 ```{figure} ./_images/ex_retile.svg
-:scale: 50 %
 :alt: ex_retile
 :name: ex_retile
 ```
 
 ```{figure} ./_images/ex_diagram.svg
-:scale: 50 %
 :alt: ex_diagram
 :name: ex_diagram
 ```
@@ -53,7 +51,6 @@ Scan-phase diagram
 ```
 
 ```{figure} ./_images/ex_deinterleave.svg
-:scale: 50 %
 :alt: ex_deinterleave
 :name: ex_deinterleave
 ```
@@ -91,3 +88,4 @@ Scan-phase diagram
 :alt: reg_correlation_rnr
 :name: reg_correlation_rnr
 ```
+
