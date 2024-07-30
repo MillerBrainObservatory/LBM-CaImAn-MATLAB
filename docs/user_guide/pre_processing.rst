@@ -10,7 +10,7 @@ After that, review :ref:`parameters` to understand the general usage of each fun
 See :ref:`troubleshooting` for common issues you may encounter along the way.
 
 Extraction Overview
-=======================
+*********************************
 
 Pre-processing LBM datasets consists of 2 main processing steps:
 
@@ -22,7 +22,7 @@ Pre-processing LBM datasets consists of 2 main processing steps:
 
 For a more in-depth look at the LBM datasets and accompanying metadata, see the :ref:`ScanImage Metadata` guide on the MBO user documentation.
 
-The output `volumetric time-series` has dimensions `[Y,X,Z,T]`.
+The output :ref:`volumetric time-series <terms>` has dimensions `[Y,X,Z,T]`.
 
 .. important::
 
@@ -41,7 +41,7 @@ This example follows a directory structure shown in :ref:`Directory Structure`. 
     extract_path = [ parent_path 'extracted\'];
     mkdir(extract_path); mkdir(raw_path);
 
-:func:`convertScanImageTiffToVolume()` takes the standard :ref:`parameter` inputs. The most useful of which are:
+:func:`convertScanImageTiffToVolume()` takes the standard :ref:`parameters` inputs. The most useful of which are:
 
 `raw_path`
 : This is where your raw `.tiff` files will be stored and is the first argument of :func:`convertScanImageTiffToVolume`.
@@ -137,7 +137,7 @@ We see that there are 30 datasets corresponding to each of our Z-planes, but no 
 - **Attributes**: Attributes are special "tags" attached to a group. This is where we store metadata associated with each group and dataset. The result of calling `get_metadata(raw_path)` (see :ref:`scanimage metadata` for more information about the magic behind the scenes here).
 
 Evaluate output
-======================
+*************************
 
 For more examples of loading and manipulating data, see :ref:`exploring datasets`
 

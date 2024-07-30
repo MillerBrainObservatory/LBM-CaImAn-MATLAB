@@ -39,10 +39,10 @@ See the demo pipeline at the root of this repository or the the API for more exa
 
 .. note::
 
-   Each z-plane in between start_plane and end_plane will be processed.
+   Each z-plane in between :code:`start_plane` and :code:`end_plane` will be processed.
    In the future we may want to provide a way to give an array of indices to correct e.g. if the user wants to throw out z-planes 16 and 18.
 
-Registration Inutputs
+Registration Inputs
 **********************
 
 In addition to those referenced in :ref:`parameters`, registration has a few important additional parameters.
@@ -74,14 +74,16 @@ Additionally, there is an example parameters struct at the root of this reposito
 
    Avoid the :code:`bidir` options as we correct for bi-directional scaling ourselves.
 
-The most important values to keep in mind:
+The most important parameter names to keep in mind:
 
-1. grid-size
-2. max-shift
-3. fr (frame rate)
+1. :code:`grid-size`
+2. :code:`max-shift`
+3. :code:`fr` (frame rate)
 
 `grid-size` determines how many patches your image is split into. The smaller the patch, the **more precise the registration**, with a tradeoff being **increased compute times**.
+
 `max-shift` determines the maximum number of pixels that your movie will be translated in X/Y. 
+
 `fr` expects the frame rate of our movie, which is likely different than the 30hz default.
 
 .. hint:: 
@@ -94,9 +96,9 @@ Rigid-Only Registration
 With movies that exibit little sub-cellular movement over the course of a timeseries, non-rigid registration is often overkill as rigid-registration will do a good enough job.
 Rigid registration is accomplished by giving NoRMCorre no variable for grid-size, so it defaults to the size of your image and thus only processing a single patch encompassing the entire field-of-view.
 
-You can use :ref:`ScanImage <metadata>` to physically interpretable values. 
+You can use :ref:`ScanImage <advanced_metadata>` to physically interpretable values. 
 
-Here, we use the pixel-resolution (how many microns each pixel represents) to express a **max shift of 20 micron**:
+Here, we use the :ref:`pixel resolution <pixel_resolution>` (how many microns each pixel represents) to express a **max shift of 20 micron**:
 
 .. code-block:: MATLAB
 
@@ -106,7 +108,7 @@ Here, we use the pixel-resolution (how many microns each pixel represents) to ex
    max_shift = 20/metadata.pixel_resolution
 
 
-We can then use this value in our own parameters struct with the help of :ref:`read_plane()`:
+We can then use this value in our own parameters struct with the help of :func:`read_plane()`:
 
 .. code-block:: MATLAB
 
@@ -140,16 +142,16 @@ You can use :code:`h5info(h5path)` in the MATLAB command window to reveal some h
 
 This file has the following groups:
 
-`/<param>`
-: Takes the name of the :ref:`ds` :ref:`parameter <parameters>`_. This group contains the 3D planar timeseries. Default `'/Y'`.
+:code:`/<param>`
+: Takes the name of the :code:`ds` parameter. This group contains the 3D planar timeseries. Default `'/Y'`.
 
-`/Ym`
+:code:`/Ym`
 : The mean image of the motion-corrected movie. Each image is averaged over time to produce the mean pixel intensity.
 
-`/template`
+:code:`/template`
 : The mean image [X, Y] used to align each frame in the timeseries. This image is calculated to correlate the most with each frame in the image.
 
-`/shifts`
+:code:`/shifts`
 : A :code:`2xN` column vector containing the number of pixels in X and Y that each frame was shifted.
 
 .. hint::
@@ -161,7 +163,7 @@ This file has the following groups:
         x_shifts = shifts(:,1) % represent pixel-shifts in *x*
         y_shifts = shifts(:,2) % represent pixel-shifts in *y*
 
-Evaluating Results
+Registration Results
 ***********************
 
 These will be placed in the same directory as your save_path, `figures/registration_metrics_plane_N`.
@@ -187,21 +189,20 @@ There is very little improvement gained by performing non-rigid motion correctio
 
 These metrics are provided for you alongside the mean images and X/Y shifts to help assess the contribution of movement in the X and Y directions.
 
+Particularly helpful is directly comparing pixel correlations between :ref:`3D timeseries <terms>`:
+
+.. thumbnail:: ../_images/reg_corr_solo.svg
+
 .. thumbnail:: ../_images/reg_metrics.png
-   :download: true
 
 .. thumbnail:: ../_images/reg_shifts.png
-   :download: true
 
 .. tip::
 
    A quick way to see if registration was effective is to compare the two mean images,
    looking for differences in the "blurryness" between them. 
 
-.. thumbnail:: ../_images/reg_raw_mean.png
-   :title: Mean Raw
-
-.. thumbnail:: ../_images/reg_rigid_mean.png
-   :title: Mean Rigid Corrected
+.. thumbnail:: ../_images/reg_blurry.svg
+   :title: Raw vs Registered Movie
 
 See the previous section for an examples of viewing two outputs side-by-side.
