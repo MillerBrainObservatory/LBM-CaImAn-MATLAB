@@ -74,9 +74,11 @@ myst_enable_extensions = [
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3.9", None),
-    "mbo": ("https://millerbrainobservatory.github.io/", None),
+    "mbo": (
+        "/home/flynn/repos/work/millerbrainobservatory.github.io/docs/build/html/",
+        ("https://millerbrainobservatory.github.io/", None),
+    ),
     "lbmpy": ("https://millerbrainobservatory.github.io/LBM-CaImAn-Python/", None),
-    "wiki-reg": ("https://en.wikipedia.org/wiki/Image_registration/", None),
 }
 
 templates_path = ["_templates"]
