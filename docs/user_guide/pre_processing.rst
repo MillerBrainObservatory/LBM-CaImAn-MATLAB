@@ -23,7 +23,7 @@ Pre-processing LBM datasets consists of 2 main processing steps:
 Assemble Volumetric Time-Series
 ================================================================
 
-For a more in-depth look at the LBM datasets, see the :ref:`LBM Datasets` guide on the MBO user documentation.
+For a more in-depth look at the LBM datasets, see the :ref:`ScanImage Metadata` guide on the MBO user documentation.
 
 .. thumbnail:: ../_images/ex_diagram.png
    :title:  Step 1: Image Extraction and Assembly

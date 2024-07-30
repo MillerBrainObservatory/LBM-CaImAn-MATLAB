@@ -11,3 +11,4 @@ sphinx_gallery
 pydata_sphinx_theme
 sphinx_book_theme
 sphinx_design
+sphinx_tippy

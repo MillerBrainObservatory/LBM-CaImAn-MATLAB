@@ -10,7 +10,6 @@ This section covers each step in the pipeline, parameters and metadata in more d
     :caption: Usage
 
     parameters
-    metadata
     pre_processing
     Data Exploration <explore_data>
     registration
