@@ -42,18 +42,109 @@ See the demo pipeline at the root of this repository or the the API for more exa
    Each z-plane in between start_plane and end_plane will be processed.
    In the future we may want to provide a way to give an array of indices to correct e.g. if the user wants to throw out z-planes 16 and 18.
 
-Registration Output
+Registration Inutputs
+**********************
+
+In addition to those referenced in :ref:`parameters`, registration has a few important additional parameters.
+
+`start_plane` 
+: The plane to start registration.
+
+`end_plane` 
+: The plane to end registration.
+
+`options` 
+: NormCorre Params Object
+
+.. note::
+
+   All planes in between :code:`start_plane` and `end_plane` will undergo registration `sequentially <https://www.merriam-webster.com/dictionary/sequential>`_.
+
+NoRMCorre Parameters
+-----------------------
+
+The last parameter for this step is a NoRMCorre parameters object.
+This is just a `MATLAB structured array <https://www.mathworks.com/help/matlab/ref/struct.html>`_ that expects specific values. 
+`NoRMCorre <https://github.com/flatironinstitute/NoRMCorre>`_ provides the algorithm for registration and dictates the values in that struct.
+
+To see all possible values possible for registration, see `here <https://github.com/flatironinstitute/NoRMCorre/blob/master/NoRMCorreSetParms.m`>_.
+Additionally, there is an example parameters struct at the root of this repository, :scpt:`here`_.
+
+.. warning::
+
+   Avoid the :code:`bidir` options as we correct for bi-directional scaling ourselves.
+
+The most important values to keep in mind:
+
+1. grid-size
+2. max-shift
+3. fr (frame rate)
+
+`grid-size` determines how many patches your image is split into. The smaller the patch, the **more precise the registration**, with a tradeoff being **increased compute times**.
+`max-shift` determines the maximum number of pixels that your movie will be translated in X/Y. 
+`fr` expects the frame rate of our movie, which is likely different than the 30hz default.
+
+.. hint:: 
+
+   If you see single frame, large shifts (e.g. > 20% of your neuron size), try decreasing the :code:`max-shift` parameter.
+
+Rigid-Only Registration
+---------------------------
+
+With movies that exibit little sub-cellular movement over the course of a timeseries, non-rigid registration is often overkill as rigid-registration will do a good enough job.
+Rigid registration is accomplished by giving NoRMCorre no variable for grid-size, so it defaults to the size of your image and thus only processing a single patch encompassing the entire field-of-view.
+
+You can use :ref:`ScanImage <metadata>` to physically interpretable values. 
+
+Here, we use the pixel-resolution (how many microns each pixel represents) to express a **max shift of 20 micron**:
+
+.. code-block:: MATLAB
+
+   plane_name = fullfile("path/to/raw_tif"); 
+   metadata = read_metadata(plane_name);
+
+   max_shift = 20/metadata.pixel_resolution
+
+
+We can then use this value in our own parameters struct with the help of :ref:`read_plane()`:
+
+.. code-block:: MATLAB
+
+   % default dataset name
+   % depends on your input for the `ds` parameter in subsequent steps
+   dataset_name = '/Y'; 
+   plane_number = 1;
+
+   Y = read_plane(plane_name, 'ds', dataset_name, 'plane', plane_number);
+
+   % empty grid-size results in rigid-registration
+   options_rigid = NoRMCorreSetParms(...
+      'd1',size(Y, 1),... 
+      'd2',size(Y, 2),...
+      'bin_width',200,...   % number of frames to initialze the template
+      'max_shift', round(20/pixel_resolution), ... % still useful in non-rigid
+   );
+
+Registration Outputs
 *********************
 
-The output `h5` files are saved to the path entered in the :code:`save_path` :ref:`parameters`. There will be a single file for each z-plane in the volume.
+Format
+-------------
+
+Output data are saved in `.h5` format, with the following characteristics:
+- one file per plane
+- named "registration_plane_N.h5"
+- metadata saved as attributes
+
+You can use :code:`h5info(h5path)` in the MATLAB command window to reveal some helpful information about our data.
 
 This file has the following groups:
 
-`/Y` or `/<param>`
-: This group contains the 3D planar timeseries and the default `'/Y'` name can be changed via the `'ds'` :ref:`parameters` to :func:`convertScanImageTiffToVolume`.
+`/<param>`
+: Takes the name of the :ref:`ds` :ref:`parameter <parameters>`_. This group contains the 3D planar timeseries. Default `'/Y'`.
 
 `/Ym`
-: The mean image of the motion-corrected movie. Each image is averaged over time to produce the mean pixel intensity. This is your
+: The mean image of the motion-corrected movie. Each image is averaged over time to produce the mean pixel intensity.
 
 `/template`
 : The mean image [X, Y] used to align each frame in the timeseries. This image is calculated to correlate the most with each frame in the image.

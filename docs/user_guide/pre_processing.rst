@@ -9,8 +9,8 @@ After that, review :ref:`parameters` to understand the general usage of each fun
 
 See :ref:`troubleshooting` for common issues you may encounter along the way.
 
-Overview
-==============
+Extraction Overview
+=======================
 
 Pre-processing LBM datasets consists of 2 main processing steps:
 
