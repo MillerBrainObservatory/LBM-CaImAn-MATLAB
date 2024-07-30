@@ -3,9 +3,12 @@
 Axial-Offset Correction
 =======================
 
-Core function(s): :func:`calculateZOffset`
+Core function(s): :func:`calculateZOffset()`
 
-Before the session being processed, you should have aquired a cailbration file that conforms to scanimage naming convention. A file named something like `pollen_calibration_00001.tif`.
+Before the session being processed, you should have aquired a cailbration file named something like `pollen_calibration_00001.tif`.
+
+Background
+---------------
 
 Light beads traveling to our sample need to be temporally distinct relative to our sensor
 so that the aquisition system knows the origin and subsequent depth of each bead.
@@ -37,7 +40,6 @@ Before proceeding:
 :code:`pollen_calibration_Z_vs_N.mat`
 :code:`pollen_calibration_x_y_offsets.fig`
 
-
 .. important::
 
     These files hold data used to align each z-plane depth around the same [Y, X] coordinates.
@@ -50,6 +52,9 @@ First, the [Y, X] offsets (in microns) are used for an initial, dirty axial alig
 
 This alignment should improve the spatial consistency between z-planes, but there is a
 further refinement step which prompts a graphical interface for z-plane(n) and z-plane(n+1).
+
+The user will be prompted to select the same **feature** / **region-of-interest** / **neuron**.
+After selecting 3 neurons for each plane, you are done with the LBM pipeline.
 
 Depending on your axial field-of-view, there is likely neuronal contamination between z-planes.
 We can use this to select a feature, and the same feature in n+1.
@@ -73,26 +78,12 @@ Axial Correction Outputs
 - .fig files showing neuron distributions in z and radial directions.
 - A :code:`.mat` file: `caiman_collated_output_plane_N` with collated and processed imaging data.
 
-
 This final ``caiman_collated_output_plane_N.m`` file is the same as was discussed in :ref:`segmentation outputs`.
 The difference being now, all of our z-planes are collated into a single file.
 
 .. hint::
 
     In the filename, you'll see _min_snr_ followed by a number. This is also stored in the metadata and is the primary variable dictating the threshold of detection.
-
-Axial Correction Examples
-------------------------------
-
-collatePlanes('C:/data/images/', '', struct('r_thr':0.4, 'pixel_resolution':2, 'min_snr':1.5, 'frame_rate':9.61, 'fovx':1200, 'fovy':1164), 100);
-This example processes data from 'C:/data/images/', starting at a depth of 100 microns,
-with specified metadata parameters.
-
-See also load, inputdlg, struct, fullfile, exist
-
-The user will be prompted to select the same **feature** / **region-of-interest** / **neuron**:
-
-After selecting 3 neurons for each plane, you are done with the LBM pipeline.
 
 In the resulting filename you will see the collated :code:`minSNR` value. This new file
 holds a concatenated, centered and thresholded master copy of all neurons, footprints and traces.

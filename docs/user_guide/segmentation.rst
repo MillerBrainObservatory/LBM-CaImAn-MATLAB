@@ -10,7 +10,7 @@ Function for this step: :func:`segmentPlane()`
 
 .. warning::
 
-   :func:`segmentPlane` will take significantly longer than the previous steps.
+   :func:`segmentPlane()` will take significantly longer than the previous steps.
 
     Much of work is about separating "good activity", the flourescence changes that we can attribute to a single cell, vs "noise, which is everything else (including signal from other neurons).
     To do this, we take advantage of the fact that the slow calcium signal is typically very similar between adjacent frames.
@@ -140,7 +140,8 @@ This is the autoregressive order of the system.
 
 .. tip::
 
-    In general, **If your indicator takes >1 frame to rise/decay, P=2**
+    In general, **If your indicator takes >1 frame to rise/decay, P=2 (slow)**
+    otherwise, P=1 (fast)
 
 .. AtoAc
 .. ====================================
@@ -149,10 +150,10 @@ This is the autoregressive order of the system.
 .. - Standardizes the size of each neuron's footprint to a uniform (4*tau+1, 4*tau+1) matrix, centered on the neuron's centroid [acx x acy].
 
 
-Component Validation
-====================================
+Theory Underlying Component Validation
+===========================================
 
-Following completion of :ref:`segmentPlanes()`
+Following completion of :ref:`segmentPlane()`
 
 .. thumbnail:: ../_images/seg_sparse_rep.png
    :width: 600

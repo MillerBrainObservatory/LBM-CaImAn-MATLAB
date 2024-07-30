@@ -1,6 +1,12 @@
-
 Tips and Tricks
 ###############
+
+Fullfile
+==============
+
+Matlabs `fullfile <https://www.mathworks.com/help/matlab/ref/fullfile.html>`_ function makes it easy to search for a filename:
+
+.. image:: ../_images/gen_fullfile.png
 
 .. _help_functions:
 
