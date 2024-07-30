@@ -2,87 +2,37 @@
 Pre-Processing
 #############################
 
-Function for this step: :func:`convertScanImageTiffToVolume`
+Function for this step: :func:`convertScanImageTiffToVolume()`
 
 Before beginning pre-processing, follow setup steps in :ref:`first steps` started` to make sure the pipeline and dependencies are installed properly.
 After that, review :ref:`parameters` to understand the general usage of each function going foreward.
 
 See :ref:`troubleshooting` for common issues you may encounter along the way.
 
+Overview
+==============
+
 Pre-processing LBM datasets consists of 2 main processing steps:
 
-1. Assemble our images
-
-    - reshape vertically stacked strips into horizontally concatenated strips.
-    - deinterleave our images into 3D time-series.
-
-2. Correcting for scan-phase alignment inconsistencies
-
-.. _assembly:
-
-Assemble Volumetric Time-Series
-================================================================
-
-For a more in-depth look at the LBM datasets, see the :ref:`ScanImage Metadata` guide on the MBO user documentation.
+1. :ref:`Deinterleave <ex_deinterleave>` z-planes and timesteps.
+2. :ref:`Retile <ex_retile>` vertically concatenated ROI's horizontally.
 
 .. thumbnail:: ../_images/ex_diagram.png
    :title:  Step 1: Image Extraction and Assembly
 
-| A: In the above image, represents vertically concatenated **ROI** of our image.
-| B: ROI's are cut and horizontally concatenated.
-| C: After a scan-phase correction, lines between each ROI become unnoticable (ideally)
+For a more in-depth look at the LBM datasets and accompanying metadata, see the :ref:`ScanImage Metadata` guide on the MBO user documentation.
 
 The output `volumetric time-series` has dimensions `[Y,X,Z,T]`.
-
-If the user chooses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order
-of a suffix appended to the filename: `_000N`, where n=number of files chosen by the user.
 
 .. important::
 
     All output .tiff files for a single imaging session should be placed in the same directory.
     No other .tiff files should be in this directory. If this happens, an error will throw.
 
-.. _scan_phase:
+Extraction Inputs
+****************************************
 
-Scan Phase
--------------
-
-The :code:`fix_scan_phase` argument is particularly important: it attempts to maximize the phase-correlation between each line (row) of each strip, as shown below.
-
-This example shows that shifting every *other* row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.
-
-.. thumbnail:: ../_images/ex_phase.png
-
-Newer versions (2019+) of ScanImage do this correction for you, but it won't hurt. Before any image manipulations, the routine first checks if any lateral (x) shift
-will improve the correlation between adjacent rows and if not, will do nothing.
-
-.. important::
-
-    Checking for a scan-phase offset correction is computationally cheap, so it is recommended to keep this to true.
-
-
-When every other row of our image if shifted by N pixels, adjacent rows that *are not* shifted now have a N number of 0's padded in between the rows that were shifted.
-
-When this shift happens, the pipeline automatically trims those pixels because they longer contain valid calcium signal.
-
-Consider this image which was processed without trimming any ROI pixels and without applying any offset correction:
-
-.. thumbnail:: ../_images/ex_no_trim_no_offset.png
-    :width: 800
-    :align: center
-
-Compare that to an image where an offset correction was applied:
-
-.. thumbnail:: ../_images/ex_no_trim_with_offset.png
-    :width: 800
-    :align: center
-
-You'll see the decreased gap between ROI's for the scan-offset corrected image, showing the 2 pixels removed from each edge accounting for the padded 0's.
-
-Extraction Input
-****************************************************************
-
-First, we set up our directory paths. You can chain the output of one function to the input of another. Note the path names match :ref:`Directory Structure`:
+This example follows a directory structure shown in :ref:`Directory Structure`. Inputs and outputs can be anywhere the user wishes.
 
 .. code-block:: MATLAB
 
@@ -91,34 +41,60 @@ First, we set up our directory paths. You can chain the output of one function t
     extract_path = [ parent_path 'extracted\'];
     mkdir(extract_path); mkdir(raw_path);
 
-This is all you need to start processing your data. Actually, it's quite more than you need.
+:func:`convertScanImageTiffToVolume()` takes the standard :ref:`parameter` inputs. The most useful of which are:
 
-`raw_path` is where your raw `.tiff` files will be stored and is the first argument of :func:`convertScanImageTiffToVolume`.
-`extract_path` is where our data will be saved, and is the second argument.
-- Your raw and extract path can be in any folder you wish without worry of file-name conflicts.
-- All future pipeline steps will automatically exclude these files as they will not have the characters `_plane_` in the filename.
+`raw_path`
+: This is where your raw `.tiff` files will be stored and is the first argument of :func:`convertScanImageTiffToVolume`.
+
+`extract_path`
+: is where our processed timeseries will be saved.
 
 .. note::
 
-   Don't put the characters `_plane_` together in your raw/extracted filenames!
+    - Your raw and extract path can be in any folder you wish without worry of file-name conflicts.
+    - All future pipeline steps will automatically exclude these files as they will not have the characters `_plane_` in the filename.
+    - Don't put the characters `_plane_` together in your raw/extracted filenames!
 
-`debug_flag` is the next parameter, setting this to 1, '1', or true will display the detected files that would be processed, and stop. This is helpful for controlling which files are processed.
+Scan Phase
+-------------
 
-`overwrite`, similar to diagnostic flag, can be set to 1, '1', or true to enable overwriting any previously extracted data. Otherwise, a warning will show and no data will be saved.
+In addition to the standard parameters, users should be aware of the implications that bidirectional scan offset correction has on your dataset.
 
+The :code:`fix_scan_phase` parameter attempts to maximize the phase-correlation between each line (row) of each vertically concatenated strip.
 
-Extraction Output
+This example shows that shifting every *other* row of pixels +2 (to the right) in our 2D reconstructed image will maximize the correlation between adjacent rows.
+
+.. thumbnail:: ../_images/ex_phase.png
+
+.. important::
+
+    Checking for a scan-phase offset correction is computationally cheap, so it is recommended to keep this to true.
+
+When every other row of our image if shifted by N pixels, adjacent rows that *are not* shifted now have a N number of 0's padded in between the rows that were shifted.
+
+When this shift happens, the pipeline **automatically trims** those pixels because they longer contain valid calcium signal.
+
+.. thumbnail:: ../_images/ex_scanphase_gif.gif
+    :width: 800
+    :align: center
+
+You'll see the decreased gap between ROI's for the scan-offset corrected image, showing the 2 pixels removed from each edge accounting for the padded 0's.
+
+Extraction Outputs
 ****************************************************************
 
-Our data are now saved as a single h5 file separated by file and by plane. This storage format
-makes it easy to motion correct each 3D planar time-series individually. We will be processing small patches of the total image,
-roughly 20um in parallel, so attempting to process multiple time-series will drastically slow down NormCorre.
-After successfully running :func:`convertScanImageTiffToVolume`, there will be a single `.h5` file containing extracted data.
+Format
+-------------
+
+Output data are saved in `.h5` format, with the following characteristics:
+- one file per plane
+- named "extraction_plane_N.h5"
+- metadata saved as attributes
 
 You can use :code:`h5info(h5path)` in the MATLAB command window to reveal some helpful information about our data.
 
-HDF5 Groups
-***************
+H5 Groups
+----------------
 
 The following is an example structure of the HDF5 file at the outermost level:
 
@@ -175,24 +151,6 @@ image shoes the neuron before and after scan-correction. This lets you compare p
 scan-phase offset value (usually 1, 2 or 3 pixels).
 
 We can see that our plane quality changes with depth:
-
-.. thumbnail:: ../_images/ex_plane_1.png
-    :title: Plane 1
-    :width: 800
-    :align: center
-    :group: planes
-
-.. thumbnail:: ../_images/ex_plane_1.png
-    :title: Plane 10
-    :width: 800
-    :align: center
-    :group: planes
-
-.. thumbnail:: ../_images/ex_plane_30.png
-    :title: Plane 30
-    :width: 800
-    :align: center
-    :group: planes
 
 .. thumbnail:: ../_images/ex_offset.svg
     :width: 800
