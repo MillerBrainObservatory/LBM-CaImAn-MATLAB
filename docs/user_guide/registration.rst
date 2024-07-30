@@ -113,4 +113,4 @@ These metrics are provided for you alongside the mean images and X/Y shifts to h
 .. thumbnail:: ../_images/reg_rigid_mean.png
    :title: Mean Rigid Corrected
 
-See :ref:`quick play movies` for an example of viewing two outputs side-by-side.
+See the previous section for an examples of viewing two outputs side-by-side.

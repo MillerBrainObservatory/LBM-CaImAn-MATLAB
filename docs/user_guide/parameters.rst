@@ -39,7 +39,6 @@ Set to 1 to overwrite or delete pre-existing data. Setting to 0 will simply retu
 :code:`num_cores` :
 Set to the number of CPU cores to use for parallel computing.
 
-
 .. note::
 
     Though :code:`num_cores` is an option in pre-processing, there is actually no parallel computations during this step so the value will be ignored.
