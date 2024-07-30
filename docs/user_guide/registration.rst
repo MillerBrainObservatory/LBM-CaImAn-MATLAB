@@ -205,4 +205,7 @@ Particularly helpful is directly comparing pixel correlations between :ref:`3D t
 .. thumbnail:: ../_images/reg_blurry.svg
    :title: Raw vs Registered Movie
 
+.. thumbnail:: ../_images/reg_rigid_mean.png
+   :title: Mean Rigid Corrected
+
 See the previous section for an examples of viewing two outputs side-by-side.
