@@ -3,10 +3,10 @@
 Source Extraction
 ################################
 
-Overview
-============
+Segmentation Overview
+========================
 
-Function for this step: :func:`segmentPlane`
+Function for this step: :func:`segmentPlane()`
 
 .. warning::
 
@@ -16,6 +16,9 @@ Function for this step: :func:`segmentPlane`
     To do this, we take advantage of the fact that the slow calcium signal is typically very similar between adjacent frames.
     See `this blog post <https://gcamp6f.com/2024/04/24/why-your-two-photon-images-are-noisier-than-you-expect/>`_ for a nice discussion on shot noise calculations and poisson processes.
 
+Background
+===================
+
 The *speed of transients*, or the time it takes for the neuron to fully glow (rise time) and unglow (decay time), is a very important metric used to calculate several of the parameters for CNMF.
 
 In particular, speed of transients relative to the frame rate can be thought of in terms of "how many frames does it take my calcium indicator to undergo a complete transients cycle".
@@ -23,20 +26,20 @@ In particular, speed of transients relative to the frame rate can be thought of 
 The flourescence of the proteins in our neurons is **correlated** with how active the neuron is.
 Turning this flourescence into "spikes" relies on several mathmatical operations to:
 
-- isolate neuronal activity from background activity (:ref:`source extraction`).
-- infer the times of action potentials from the fluorescence traces (:ref:`deconvolution`).
+- isolate neuronal activity from background activity (segmentation).
+- infer the times of action potentials from the fluorescence traces (deconvolution).
 
 The CNMF algorithm works by:
 
-1. breaking the full FOV into **patches** of :code:`patch_size` with a set :code:`overlap` in each direction
-2. looking for K components in each patch
-3. Filter false positives
-4. Combine resulting neuron coordinates **(spatial components)** for each patch into a single structure: :code:`A_keep` and :code:`C_keep`
-5. The time traces **(temporal components)** in the original resolution are computed from :code:`A_keep` and :code:`C_keep`
+1. breaking the full FOV into **patches** of :code:`patch_size` with a set :code:`overlap` in each direction.
+2. looking for K components in each patch.
+3. Filter false positives.
+4. Combine resulting neuron coordinates **(spatial components)** for each patch into a single structure: :code:`A_keep` and :code:`C_keep`.
+5. The time traces **(temporal components)** in the original resolution are computed from :code:`A_keep` and :code:`C_keep`.
 6. Detrended DF/F values are computed.
 7. These detrended values are deconvolved.
 
-Inputs (covered in :ref:`parameters`) are consistent with registration, however with only a single :code:`options` input struct.
+.. image:: ../_images/seg_traces.png
 
 
 .. hint::
@@ -47,28 +50,22 @@ Definitions
 ============
 
 `segmentation`
-
-    simply refers to dividing an image based on the contents of that image, in our case, based on neuron location.
+: The general process of dividing an image based on the contents of that image, in our case, based on neuron location.
 
 `source-extraction`
-
-    is more an umbrella term for all of the individual processes that produce a segmented image.
+: Umbrella term for all of the individual processes that produce a segmented image.
 
 `deconvolution`
-
-    The process performed after segmentation to the resulting traces to infer spike times from flourescence values.
+: The process performed after segmentation to the resulting traces to infer spike times from flourescence values.
 
 `CNMF`
-
-    The name for a set of algorithms within the flatironinstitute's `CaImAn Pipeline <https://github.com/flatironinstitute/CaImAn-MATLAB>`_ that
-    initialize parameters and run source extraction.
+: The name for a set of algorithms within the flatironinstitute's `CaImAn Pipeline <https://github.com/flatironinstitute/CaImAn-MATLAB>`_ that initialize parameters and run source extraction.
 
 Before running segmentation, make sure you:
 
 - Understand the parameters and how they effect the output.
 - Confirmed no stitching artifacts or bad frames.
 - Validate your movie is accurately motion corrected.
-
 
 Tuning CNMF
 ====================
@@ -77,7 +74,7 @@ Tuning CNMF
 
    There is an example file describing CNMF parameters at the root of this project. :scpt:`demo_CNMF_params`.
 
-All of the parameters and options fed into the `CNMF` pipeline are contained within a single `MATLAB struct <https://www.mathworks.com/help/matlab/ref/struct.html>`_
+All of the parameters and options fed into the `CNMF` pipeline are contained within a single `MATLAB struct <https://www.mathworks.com/help/matlab/ref/struct.html>`_.
 
 To get an idea of the default parameters (what happens if you use :code:`CNMFSetParams()` with no arguments),
 you can run the following code to see the defaults:
@@ -89,7 +86,7 @@ you can run the following code to see the defaults:
 - If this parameter is not included, they will be calculated for you based on the pixel resolution, frame rate and image size in the metadata.
 - For example, `Tau` is a widely talked about parameter being the half-size of your neuron.
 
-This is calculated by default as :math:`(7.5/pixel_resolution, 7.5/pixelresolution)`. This only makes sense if we assume an ~neuron size of `14um`.
+This is calculated by default as :math:`(7.5/pixel-resolution, 7.5/pixel-resolution)`. This only makes sense if we assume an ~neuron size of `14um`.
 
 There are several different thresholds, indicating correlation coefficients as barriers for whether to perform a process or not, discussed in the following sections.
 
@@ -100,6 +97,9 @@ A correlation coefficient determining the amount of correlation between pixels i
 
 - The lower your resolution, the more "difficult" it is for CNMF to distinguish between two tight neurons, thus use a lower merge threshold.
 - This parameter heavily effects the number of neurons processed. It's always better to have to many neurons vs too few, as you can never get a lost neuron back, but you can invalidate neurons in post-processing.
+
+.. image:: ../_images/seg_traces_highcorr.svg
+   :title: Example of highly correlated traces
 
 min_SNR
 ************************************
@@ -122,8 +122,6 @@ This value is used for an event exceptionality test, which tests the probabilty 
 
 This probability is used to order the components according to "most likely to be exceptional".
 
-:func:`compareZPlanes()` is primarily used to tune this value.
-
 Tau
 ************************************
 
@@ -131,25 +129,33 @@ Half-size of your neurons.
 
 - Tau is the `half-size` of a neuron. If a neuron is 10 micron, tau will be a 5 micron.
 - In general, round up.
+- This changes depending on the area of the brain you're in and should be adjusted to match the ~cell size of the brain region.
 
 P
 ************************************
 
-This is the autoregressive order of the system. It is a measure of how the signal changes with respect to time. This value will always be 1 or 2, depending on the frame rate of the video and the dynamics of the calcium indicator.
+This is the autoregressive order of the system.
+- It is a measure of how the signal changes with respect to time.
+- This value will always be 1 or 2, depending on the frame rate of the video and the dynamics of the calcium indicator. 
 
+.. tip::
 
+    In general, **If your indicator takes >1 frame to rise/decay, P=2**
 
-AtoAc
-====================================
+.. AtoAc
+.. ====================================
+..
+.. Turn the CaImAn output A (sparse, spatial footprints for entire FOV) into Ac (sparse, spatial footprints localized around each neuron).
+.. - Standardizes the size of each neuron's footprint to a uniform (4*tau+1, 4*tau+1) matrix, centered on the neuron's centroid [acx x acy].
 
-Turn the CaImAn output A (sparse, spatial footprints for entire FOV) into Ac (sparse, spatial footprints localized around each neuron).
-- Standardizes the size of each neuron's footprint to a uniform (4*tau+1, 4*tau+1) matrix, centered on the neuron's centroid [acx x acy].
-
-.. thumbnail:: ../_images/seg_sparse_rep.png
-   :width: 600
 
 Component Validation
 ====================================
+
+Following completion of :ref:`segmentPlanes()`
+
+.. thumbnail:: ../_images/seg_sparse_rep.png
+   :width: 600
 
 .. note::
 
@@ -175,8 +181,15 @@ And thus the general process of validating neuronal components is as follows:
 - Normal Cumulative Distribution function, input = -min_SNR.
 - Evaluate the likelihood of observing traces given the distribution of noise.
 
-Output
-==============
+Segmentation Inputs
+=========================
+
+Inputs (covered in :ref:`parameters`) are consistent with :ref:`registration`, substituting::
+
+    NoRMCorreSetParams -> CNMFSetParams
+
+Segmentation Outputs
+============================
 
 - The CNMF output yields "raw" traces ("y"). These raw traces are noisy and jagged and must be denoised/deconvolved.
 - Another term for this is "detrending", removing non-stationary variability from the signal
@@ -259,8 +272,9 @@ Segmentation Outputs
 
 .. _deconvolution:
 
-Note on Deconvolution
-==============================
+
+Developers note on Deconvolution
+===================================
 
 .. note::
 
