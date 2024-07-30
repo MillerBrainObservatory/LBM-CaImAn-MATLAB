@@ -173,3 +173,4 @@ MATLAB metadata can be retrieved with the {ref} get_metadata() utility funciton.
 `pixel_resolution`
 : The size, in micron, of each pixel.
 
+

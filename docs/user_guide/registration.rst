@@ -1,7 +1,7 @@
 Registration
 ================
 
-Function for this step: :func:`motionCorrectPlane`
+Function for this step: :func:`motionCorrectPlane()`
 
 .. note::
 
@@ -20,7 +20,6 @@ The entire 2D image is shifted by a number of pixels in the x direction and y di
 
 Non-rigid artifacts are much more complex as one region of the 2D image requires shifts that another region does not.
 
-Motion correction relies on _`NoRMCorre` for piecewise-rigid motion correction resulting in shifts for each patch.
 
 .. thumbnail:: ../_images/reg_patches.png
    :width: 1440
@@ -57,10 +56,10 @@ This file has the following groups:
 : The mean image of the motion-corrected movie. Each image is averaged over time to produce the mean pixel intensity. This is your
 
 `/template`
-: The mean image used to adjust each frame. Each frame in the 3D planar timeseries is displaced to align with this image, thus you want it to most accurately represent your mean-image.
+: The mean image [X, Y] used to align each frame in the timeseries. This image is calculated to correlate the most with each frame in the image.
 
 `/shifts`
-: A :code:`2xN` column vector containing X and Y shifts in px.
+: A :code:`2xN` column vector containing the number of pixels in X and Y that each frame was shifted.
 
 .. hint::
 
@@ -71,71 +70,47 @@ This file has the following groups:
         x_shifts = shifts(:,1) % represent pixel-shifts in *x*
         y_shifts = shifts(:,2) % represent pixel-shifts in *y*
 
-
-Registration Metrics
+Evaluating Results
 ***********************
 
-NormCORRe provides some useful metrics to determine the effectiveness of registration. These will be placed in the same directory as your save_path, `figures/registration_metrics_plane_N`.
+These will be placed in the same directory as your save_path, `figures/registration_metrics_plane_N`.
 
-First, lets look at the mean-image for our raw, rigid and non-rigid images:
+Pixels that are highly correlated over the timecourse of an experiment are stationary in the image. Proper registration should **increase the correlation between neighboring pixels**.
+
+.. thumbnail:: ../_images/reg_correlation.png
+   :title: Correlation Metrics
+
+The above shows the correlation coefficient for raw, rigid and peicewise-rigid (non-rigid) timesieres. Closer to 1 indicates improved motion correction. 
+
+Immediately obvious is the sharp decrease in correlation present in the blue raw data that was corrected in the rigid/non-ridid datapoints.
+
+.. thumbnail:: ../_images/reg_correlation_zoom.png
+   :title: Correlation Metrics
+
+If not for the legend however, you'd never know that two separate instances of registration were performed.
+
+.. thumbnail:: ../_images/reg_correlation_rnr.png
+   :title: Correlation Metrics
+
+There is very little improvement gained by performing non-rigid motion correction, which is a very computationally demanding task.
+
+These metrics are provided for you alongside the mean images and X/Y shifts to help assess the contribution of movement in the X and Y directions.
 
 .. thumbnail:: ../_images/reg_metrics.png
    :download: true
 
-We are looking for differences in the "blurryness" differences between the top row of 3 images.
-In the above example, our raw image isn't easily distinguished from the corrected images.
-
-.. thumbnail:: ../_images/reg_template.png
-    :title: Template Image
-    :download: true
-
-This image is your "ground truth" per-se, it is the image you want to most accurately represent the movement in your video.
-
-Compared with the below frame:
-
-.. _storage:
-
-.. thumbnail:: ../_images/reg_quickview_blue.png
-   :group: ck
-   :align: center
-
-Next, we look at the bottom 3 images showing the correlation betwene pixels. Proper registration should **increase the correlation between neighboring pixels**.
-We see in our example session that the last iteration of rigid registration leads to the highest correlation.
-
-Registration Shifts
-***********************
-
-Next, we take a look at the transformations that occur between rigid and non-ridid shifts.
-
 .. thumbnail:: ../_images/reg_shifts.png
    :download: true
 
-To view the video, use the function :func:`play_movie()`.
+.. tip::
 
-Storage (WIP)
-******************
+   A quick way to see if registration was effective is to compare the two mean images,
+   looking for differences in the "blurryness" between them. 
 
-.. thumbnail:: ../_images/gen_storage_rec.png
-    :title: Recommended Data Storage Paradigm
-    :download: true
+.. thumbnail:: ../_images/reg_raw_mean.png
+   :title: Mean Raw
 
-We want to minimize the amount of storage space, so rather than saving 2 versions of a video that differ by simply shifting some pixels, we can instead save only the shift vectors
-and reconstruct the video afterwards. :func:`translateFrames` will accomplish this:
+.. thumbnail:: ../_images/reg_rigid_mean.png
+   :title: Mean Rigid Corrected
 
-.. code-block:: MATLAB
-
-   >> help translateFrames
-
-     translateFrames Translate image frames based on provided translation vectors.
-
-      This function applies 2D translations to an image time series based on
-      a series of translation vectors, one per frame. Each frame is translated
-      independently, and the result is returned as a 3D stack of
-      (Height x Width x num_frames) translated frames.
-
-      Inputs:
-        Y - A 3D time series of image frames (Height x Width x Number of Frames).
-        t_shifts - An Nx2 matrix of translation vectors for each frame (N is the number of frames).
-
-      Output:
-        translatedFrames - A 3D array of translated image frames, same size and type as Y.
+See :ref:`quick play movies` for an example of viewing two outputs side-by-side.
