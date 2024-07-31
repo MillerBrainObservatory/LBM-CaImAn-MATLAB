@@ -1,3 +1,5 @@
+.. _utility_api:
+
 Utility
 ==========
 
@@ -43,6 +45,8 @@ Validation
 
 Internals
 ***********
+
+.. _internals_api:
 
 .. currentmodule:: internal
 

@@ -108,7 +108,10 @@ You can make sure all of the requirements for the package are in the path with t
         disp('Proceeding with execution...');
     end
 
-It is helpful to first set-up directories where youd like your results to go. Each core function in this pipeline takes a "data" path and a "save" path as arguments. Following the :ref:`Directory Structure`:
+It is helpful to first set-up directories where youd like your results to go.
+Each core function in this pipeline takes a "data" path and a "save" path as arguments.
+
+Following the :ref:`Directory Structure <directory_structure>`:
 
 .. thumbnail:: ../_images/gen_output_paths.png
    :download: true

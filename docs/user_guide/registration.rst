@@ -9,14 +9,16 @@ Function for this step: :func:`motionCorrectPlane()`
 
    The terms motion-correction and registration are often used interchangably.
 
-Now that we have isolated each z-plane into its own timeseries, we can use `image registration <https://en.wikipedia.org/wiki/Image_registration>`_ to make sure that our neuron in the first frame is in the same spatial location as in frame N throughout the time-series.
+Overview
+****************
 
-Which varient of motion correction you use depends on the amount/degree of motion in your timeseries.
+Now that we have isolated each z-plane into its own timeseries, we can use `image registration <https://en.wikipedia.org/wiki/Image_registration>`_ to make sure that our neuron in the first frame is in the same spatial location as in frame N throughout the time-series.
 
 Rigid vs Non-Rigid
 *******************
 
 The motion artifacts present in a movie also come in two flavors, `rigid` and `non-rigid`.
+
 Purely rigid motion is simple, straightforeward movement that applies to each-and-every pixel equally.
 The entire 2D image is shifted by a number of pixels in the x direction and y direction.
 
@@ -42,7 +44,7 @@ See the demo pipeline at the root of this repository or the the API for more exa
 Registration Inputs
 **********************
 
-In addition to those referenced in :ref:`parameters`, registration has a few important additional parameters.
+In addition to the default function inputs described in section :ref:`parameters`, registration has a few important additional parameters.
 
 `start_plane` 
 : The plane to start registration.
@@ -55,7 +57,7 @@ In addition to those referenced in :ref:`parameters`, registration has a few imp
 
 .. note::
 
-   All planes in between :code:`start_plane` and `end_plane` will undergo registration `sequentially <https://www.merriam-webster.com/dictionary/sequential>`_.
+   All planes in between :code:`start_plane` and :code:`end_plane` will undergo registration `sequentially <https://www.merriam-webster.com/dictionary/sequential>`_.
 
 NoRMCorre Parameters
 -----------------------
@@ -73,7 +75,7 @@ Additionally, there is an example parameters struct at the root of this reposito
 
    Avoid the :code:`bidir` options as we correct for bi-directional scaling ourselves.
 
-The most important parameter names to keep in mind:
+The most important NoRMCorre parameters are:
 
 1. :code:`grid-size`
 2. :code:`max-shift`
