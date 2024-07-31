@@ -5,7 +5,7 @@ Pre-Processing
 Function for this step: :func:`convertScanImageTiffToVolume()`
 
 Before beginning pre-processing, follow setup steps in :ref:`first steps` started` to make sure the pipeline and dependencies are installed properly.
-After that, review :ref:`parameters` to understand the general usage of each function going foreward.
+After that, review :ref:`parameters` to understand the general usage of each function going forward.
 
 See :ref:`troubleshooting` for common issues you may encounter along the way.
 
@@ -14,8 +14,9 @@ Extraction Overview
 
 Pre-processing LBM datasets consists of 2 main processing steps:
 
-1. :ref:`Deinterleave <ex_deinterleave>` z-planes and timesteps.
-2. :ref:`Retile <ex_retile>` vertically concatenated ROI's horizontally.
+1. :ref:`De-interleave <ex_deinterleave>` z-planes and timesteps.
+2. :ref:`Correct Scan-Phase <ex_scanphase>` alignment for each ROI.
+3. :ref:`Re-tile <ex_retile>` vertically concatenated ROI's horizontally.
 
 .. thumbnail:: ../_images/ex_diagram.png
    :title:  Step 1: Image Extraction and Assembly
@@ -79,6 +80,14 @@ When this shift happens, the pipeline **automatically trims** those pixels becau
     :align: center
 
 You'll see the decreased gap between ROI's for the scan-offset corrected image, showing the 2 pixels removed from each edge accounting for the padded 0's.
+
+Trim Pixels off ROI's
+-------------------------
+
+There are times when the seam between re-tiled ROI's is still present.
+
+Sometimes, this seam may not appear when frames are viewed individually, but are present in the :ref:`mean image <ex_meanimage>`.
+
 
 Extraction Outputs
 ****************************************************************
