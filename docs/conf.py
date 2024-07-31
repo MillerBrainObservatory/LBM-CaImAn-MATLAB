@@ -37,7 +37,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    "sphinx.ext.autosectionlabel",
+    # "sphinx.ext.autosectionlabel",
     "sphinx_togglebutton",
     "sphinx_design",
     "sphinx_tippy",
@@ -73,11 +73,7 @@ myst_enable_extensions = [
 ]
 
 intersphinx_mapping = {
-    "mbo": (
-        "/home/flynn/repos/work/millerbrainobservatory.github.io/docs/build/html/",
-        ("https://millerbrainobservatory.github.io/", None),
-    ),
-    "lbmpy": ("https://millerbrainobservatory.github.io/LBM-CaImAn-Python/", None),
+    "mbo": ("../../millerbrainobservatory.github.io/docs/build/html/", None),
 }
 
 templates_path = ["_templates"]
