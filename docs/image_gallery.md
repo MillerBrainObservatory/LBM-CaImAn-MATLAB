@@ -1,3 +1,4 @@
+(image_gallery_matlab)=
 # Image Gallery
 
 <!-- Extraction -->
