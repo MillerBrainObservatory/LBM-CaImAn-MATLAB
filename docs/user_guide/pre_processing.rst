@@ -37,28 +37,26 @@ The output :ref:`volumetric time-series <terms>` has dimensions `[Y,X,Z,T]`.
 Extraction Inputs
 ****************************************
 
-This example follows a directory structure shown in :ref:`Directory Structure`. Inputs and outputs can be anywhere the user wishes.
+This example follows a directory structure shown in :ref:`the first steps guide <directory_structure>`.
+
+Inputs and outputs can be (almost) anywhere you wish.
 
 .. code-block:: MATLAB
 
-    parent_path = 'C:\Users\<username>\Documents\data\bi_hemisphere\'; %
+    parent_path = 'C:\Users\<username>\Documents\data\high_res\';
+
     raw_path = [ parent_path 'raw\']; % where our raw .tiffs go
-    extract_path = [ parent_path 'extracted\'];
-    mkdir(extract_path); mkdir(raw_path);
+    extract_path = [ parent_path 'extracted\']; % where results are saved
 
-:func:`convertScanImageTiffToVolume()` takes the standard :ref:`parameters <params>` inputs. The most useful of which are:
+:code:`data_path`
+: This is where your raw `.tiff` files are located.
 
-`raw_path`
-: This is where your raw `.tiff` files will be stored and is the first argument of :func:`convertScanImageTiffToVolume`.
-
-`extract_path`
+:code:`save_path`
 : is where our processed timeseries will be saved.
 
 .. note::
 
-    - Your raw and extract path can be in any folder you wish without worry of file-name conflicts.
-    - All future pipeline steps will automatically exclude these files as they will not have the characters `_plane_` in the filename.
-    - Don't put the characters `_plane_` together in your raw/extracted filenames!
+    - Files are saved with the string '_plane_' appended automatically, don't put the characters `_plane_` together in your raw/extracted filenames!
 
 .. _scan_phase:
 
@@ -95,6 +93,12 @@ Trim Pixels off ROI's
 There are times when the seam between re-tiled ROI's is still present.
 
 Sometimes, this seam may not appear when frames are viewed individually, but are present in the :ref:`mean image <ex_meanimage>`.
+
+The :code:`trim_pixels` parameter takes an array of 4 values as input corresponding to the number of pixels to trim on the left, right, top and bottom of each ROI.
+
+.. code-block:: MATLAB
+
+    trim_pixels = [4,4,8,0]
 
 .. _extraction_outputs:
 

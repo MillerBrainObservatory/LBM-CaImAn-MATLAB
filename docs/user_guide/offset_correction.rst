@@ -29,8 +29,8 @@ look at our recording quality:
 .. thumbnail:: ../_images/pollen/pollen_frame.png
    :width: 600
 
-Setup
------------
+Axial Correction Inputs
+---------------------------
 
 Before proceeding:
 

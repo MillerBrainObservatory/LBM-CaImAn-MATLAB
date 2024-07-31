@@ -23,7 +23,7 @@ There are 4 core steps in this pipeline:
 .. note::
 
     The core functions used to initiate this pipeline are `camelCase` (lowerUpperCase).
-    Every **non-core** function you may use, such as :func:`play_movie`, is `snake_case`.
+    Every **non-core (helper/utility)** function you may use, such as :func:`play_movie()`, is `snake_case`.
 
 .. thumbnail:: _images/ex_diagram.png
    :width: 800
@@ -32,7 +32,6 @@ There are 4 core steps in this pipeline:
 ----------------
 
 For up-to-date pipeline requirements and algorithms, see the github `repository readme <https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB>`_
-
 
 Documentation Contents
 ========================

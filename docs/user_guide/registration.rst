@@ -9,21 +9,26 @@ Function for this step: :func:`motionCorrectPlane()`
 
    The terms motion-correction and registration are often used interchangably.
 
-Overview
-****************
+Registration Overview
+***********************
 
 Now that we have isolated each z-plane into its own timeseries, we can use `image registration <https://en.wikipedia.org/wiki/Image_registration>`_ to make sure that our neuron in the first frame is in the same spatial location as in frame N throughout the time-series.
+
+The motion artifacts present in a movie come in two flavors, `rigid` and `non-rigid`.
 
 Rigid vs Non-Rigid
 *******************
 
-The motion artifacts present in a movie also come in two flavors, `rigid` and `non-rigid`.
+Rigid motion
+: The object is moved with its shape and size preserved.
 
-Purely rigid motion is simple, straightforeward movement that applies to each-and-every pixel equally.
+Non-Rigid motion
+: The object is moved and transforms shape or size.
+
+Purely rigid motion is simple, straightforeward movement that applies to each pixel equally.
 The entire 2D image is shifted by a number of pixels in the x direction and y direction.
 
 Non-rigid artifacts are much more complex as one region of the 2D image requires shifts that another region does not.
-
 
 .. thumbnail:: ../_images/reg_patches.png
    :width: 1440

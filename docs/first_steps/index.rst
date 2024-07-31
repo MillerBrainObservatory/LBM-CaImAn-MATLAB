@@ -16,7 +16,6 @@ Parameters describe the common interface shared by each of the :ref:`core` funct
     :maxdepth: 2
     :caption: First Steps
 
-    install
     setup
-    parameters
+    overview
 

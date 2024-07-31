@@ -8,8 +8,11 @@
 
 .. _arguments:
 
-0.3. Parameters
-###################
+0.2. Pipeline Usage
+#######################
+
+0.2.1 Core Parameters
+==========================
 
 For the :ref:`Core` functions in this pipeline, the initial parameters are always the same.
 
