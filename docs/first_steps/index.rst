@@ -12,7 +12,7 @@ Parameters describe the common interface shared by each of the :ref:`core` funct
 
 .. toctree::
     :maxdepth: 2
-    :caption: Contents
+    :caption: First Steps
 
     install
     setup
