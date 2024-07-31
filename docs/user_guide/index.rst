@@ -9,9 +9,7 @@ This section covers each step in the pipeline, parameters and metadata in more d
     :maxdepth: 2
     :caption: Usage
 
-    parameters
     pre_processing
-    Data Exploration <explore_data>
     registration
     segmentation
     offset_correction

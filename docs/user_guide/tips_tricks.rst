@@ -1,6 +1,103 @@
 Tips and Tricks
 ###############
 
+Exploring Datasets
+=======================
+
+There are several helper functions located in ``core/utils``.
+
+Loading Data
+-----------------------
+
+:func:`read_plane` is helper function that lets you quickly load a HDF5 plane without dealing with matlabs `h5read <https://www.mathworks.com/help/matlab/ref/h5read.html>`_ function.
+
+You can use it using prompts:
+
+.. code-block:: MATLAB
+
+     Use dialog and prompts only:
+         Y_out = read_plane();
+
+.. warning::
+
+   Make you you include the semi-colon ; after you call read_plane(), otherwise your command window will print every value in the dataset to the command window.
+
+You can give it a folder containing H5 files, and you will be prompted for the plane and frames:
+
+.. code-block:: MATLAB
+
+    >> Y_out = read_plane('path/to/h5');
+
+    Which plane do you want to read? Enter a number (e.g. 4)
+
+    >> 4
+
+    Which frames do you want to read? enter a slice, vector with start/stop or 'all':
+
+    >> [1 15]
+
+If you already know which plane you want to load, use that as a `key-value pair` (hence why you need to include `plane` before the value):
+
+.. code-block:: MATLAB
+
+     Y_out = read_plane('C:/data/extracted_files', 'plane', 4);
+
+Or just give a path to the fully qualified filename of the plane you wish to read (so you no longer need the 'plane':
+
+.. code-block:: MATLAB
+
+    Y_out = read_plane('C:/data/extracted_files/data.h5');
+
+Pick how many frames you want to load in a similar manner:
+
+.. code-block:: MATLAB
+
+     Y_out = read_plane('data.h5', 'frames', 1:10);
+
+Or :code:`all` for everything:
+
+.. code-block:: MATLAB
+
+     Y_out = read_plane('data.h5', 4, 'all');
+
+Mean Images
+-----------------------
+
+Mean images are a good way to see small artifacts that may appear in sparse areas.
+
+Quickly view a grid of mean images with :func:`write_mean_images_to_png`:
+
+.. thumbnail:: ../_images/gen_mean_images.png
+   :align: center
+
+Making Gifs
+-----------------------
+
+:func:`write_frames_to_gif` lets you visualize your movie quickly at any stage.
+
+.. code-block:: MATLAB
+
+    array = rand(100, 100, 500)
+    write_frames_to_gif(array, 'output.gif', 45)
+
+You want your input array to have dimensions :code:`height x width x frames`. For very large movies, use the :code:`size_mb` parameter to limit the resulting gif to that many megabytes.
+
+Quick-play Movies
+------------------------------
+
+:func:`play_movie()`: Quickly view a movie of any plane.
+
+.. code-block:: MATLAB
+
+    % read in a motion-corrected plane
+    y_extracted = read_plane('C:/data/extraction/', 'plane', 4);
+    y_corrected = read_plane('C:/data/registration/', 'plane', 4);
+    play_movie({y_extracted, y_corrected}, {'Raw', 'Corrected'}, 0, 255)
+
+.. thumbnail:: ../_images/plane_1.gif
+   :align: center
+
+
 Fullfile
 ==============
 
@@ -58,40 +155,25 @@ Learn about Functions
 
       See also fileparts, addpath, genpath, isfolder, dir, fullfile, error, regexp, savefast
 
-MATLAB and Python
-=======================
-
-Transitioning data pipelines between MATLAB and Python can be tricky. The two primary reasons for this are the indexing and row/column major array operations.
-
-Indexing
----------------------------
-
-In modern-day computer science, most programming languages such as Python, Ruby, PHP, and Java have array indices starting at zero.
-A big reason for this is that it provides a clear distinction that ordinal forms (e.g. first, second, third) has a well-established meaning that the zeroth derivative of a function.
-
-Matlab, like Julia, was created for scientific computing tailored to beginners and thus adopted the more intuitive 1 based indexing.
-
-Row/Column Operations
----------------------------
-
-In terms of practically transfering data between programming languages,
-0 or 1 based indexing can be managed by single `enumerating <https://stackoverflow.com/a/7233597/12953787>`_ for loops.
 
 .. _num_cores:
 
 Parallel Processing
----------------------
+==============================
 
-By default, Matlab creates as many workers as logical CPU cores. On Intel CPUs, the OS reports two logical cores per each physical core due to hyper-threading, for a total of 4 workers on a dual-core machine. However, in many situations, hyperthreading does not improve the performance of a program and may even degrade it (I deliberately wish to avoid the heated debate over this: you can find endless discussions about it online and decide for yourself). Coupled with the non-negligible overhead of starting, coordinating and communicating with twice as many Matlab instances (workers are headless [=GUI-less] Matlab processes after all), we reach a conclusion that it may actually be better in many cases to use only as many workers as physical (not logical) cores.
-I know the documentation and configuration panel seem to imply that parpool uses the number of physical cores by default, but in my tests I have seen otherwise (namely, logical cores). Maybe this is system-dependent, and maybe there is a switch somewhere that controls this, I don’t know. I just know that in many cases I found it beneficial to reduce the number of workers to the actual number of physical cores:
+I know the documentation and configuration panel seem to imply that parpool uses the number of physical cores by default, but in my tests I have seen otherwise (namely, logical cores).
+You can avoid many parallel-processing related issues by **reducing the number of workers to the actual number of physical cores**:
 
 .. code-block:: MATLAB
 
     p = parpool;     % NOT RECOMMENDED, CaImAn will very likely run out of resources error
     p = parpool(2);  % use only 2 parallel workers
 
-This can vary greatly across programs and platforms, so you should first ensure the pipeline will run using <1/2 available cores before increasing the compute demands.
-It would of course be better to dynamically retrieve the number of physical cores, rather than hard-coding a constant value (number of workers) into our program.
+This can vary greatly across programs and platforms. 
+
+.. tip::
+
+    You should first ensure the pipeline will run using <1/2 available cores before increasing the compute demands.
 
 We can get this value in Matlab using the undocumented feature(‘numcores’) function:
 
