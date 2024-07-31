@@ -1,8 +1,8 @@
 Tips and Tricks
-###############
+######################
 
 Exploring Datasets
-=======================
+===========================
 
 There are several helper functions located in ``core/utils``.
 
@@ -210,3 +210,49 @@ You can use this return value to decide how how much of your computers total pro
 
 This is equally valid for parfor/eval loops and spmd blocks, since both of them use the pool of workers started by parpool.
 
+
+Find MATLAB Install Location
+========================================
+
+The location of the installation is often in `~/Documents/MATLAB/`.
+If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI.
+
+Modern versions of MATLAB (2017+) solve most Linux/Windows filesystem conflicts.
+
+Generally, the main difference in matlab installations on unix vs windows systems is nothing more than the install path::
+
+    Windows (64-bit):
+    - C:\Program Files\MATLAB\R20XXx (64-bit MATLAB)
+    - C:\Program Files (x86)\MATLAB\R20XXx (32-bit MATLAB)
+    Windows (32-bit):
+    - C:\Program Files\MATLAB\R20XXx
+    Linux:
+    - /usr/local/MATLAB/R20XXx
+    Mac:
+    - /Applications/MATLAB_R20XXx.app
+
+To find your install location:
+
+.. code-block:: MATLAB
+
+    >> matlabroot
+        ans =
+            'C:\Program Files\MATLAB\R2023b'
+
+Generally, MATLAB code should be stored in your `userpath`:
+
+.. code-block:: MATLAB
+
+   >> userpath
+   ans =
+       'C:\Users\RBO\Documents\MATLAB'
+
+
+You can add the path programmatically from within matlab:
+
+.. code-block:: MATLAB
+
+   >> addpath(genpath("path/to/caiman_matlab"))
+
+Otherwise, you can simply navigate to that directory within the matlab GUI or add the path to this repository as
+shown in the :ref:`install with source` section.

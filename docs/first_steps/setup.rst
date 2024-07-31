@@ -1,9 +1,9 @@
 
-Project Setup
-#################
+0.2. Project Setup
+#########################
 
-Dependencies
-============
+0.2.1. Dependencies
+====================
 
 Before running your first dataset, you should ensure that all dependencies of the pipeline are satisfied.
 
@@ -40,8 +40,8 @@ of an suffix appended to the filename: `_000N`, where n=number of files chosen b
     All output .tiff files for a single imaging session should be placed in the same directory.
     No other .tiff files should be in this directory. If this happens, an error will throw.
 
-Directory Structure
-===================
+0.2.2. Directory Structure
+================================
 
 The following is an example of the directory hierarchy
 used for the demo.
@@ -75,9 +75,7 @@ used for the demo.
     │   └── segmented_plane_2.h5
     │   └── segmented_plane_NN.h5
     └── axial_correction/
-    │   └── segmented_plane_1.h5
-    │   └── segmented_plane_2.h5
-    │   └── segmented_plane_NN.h5
+        └── collated_caiman_minSNR_1.h5
 
 - `N` = the number of `[Y, X, T]` planar time-series.
 - `R` = the number of `[Y, X, T]` ROI's per scanfield.

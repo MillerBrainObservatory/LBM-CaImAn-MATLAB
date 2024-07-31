@@ -97,7 +97,7 @@ html_context = {
     "doc_path": "docs",
 }
 
-sphinx_book_options = {
+html_theme_options = {
     "external_links": [
         {
             "name": "MBO.io",
@@ -113,5 +113,3 @@ sphinx_book_options = {
         },
     ],
 }
-
-html_theme_options = sphinx_book_options

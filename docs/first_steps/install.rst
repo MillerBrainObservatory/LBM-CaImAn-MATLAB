@@ -1,9 +1,8 @@
-################
-Installation
-################
+0.1 Installation
+################################
 
-Install with source
-========================
+0.1.1. Download from Github
+===============================
 
 userpath
 --------------
@@ -44,7 +43,7 @@ You can create a `startup.m`_ file located in this same `userpath` directory: `~
    % note "fullfile" isnt needed, but helpfully provides directory autocompletion
    addpath(genpath(fullfile("path/to/caiman_matlab")))
 
-Install with git
+0.1.2. Install with git
 ==========================
 
 Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.
@@ -83,65 +82,6 @@ In Linux, WSL or mysys, clone this repository with the pre-installed git client:
     $ git clone https://github.com/ru-rbo/caiman_matlab.git
     $ cd caiman_matlab
     $ matlab
-
-
-Find MATLAB Install Location
-==============================
-
-The location of the installation is often in `~/Documents/MATLAB/`.
-If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI.
-
-Modern versions of MATLAB (2017+) solve most Linux/Windows filesystem conflicts.
-
-Generally, the main difference in matlab installations on unix vs windows systems is nothing more than the install path::
-
-    Windows (64-bit):
-    - C:\Program Files\MATLAB\R20XXx (64-bit MATLAB)
-    - C:\Program Files (x86)\MATLAB\R20XXx (32-bit MATLAB)
-    Windows (32-bit):
-    - C:\Program Files\MATLAB\R20XXx
-    Linux:
-    - /usr/local/MATLAB/R20XXx
-    Mac:
-    - /Applications/MATLAB_R20XXx.app
-
-To find your install location:
-
-.. code-block:: MATLAB
-
-    >> matlabroot
-        ans =
-            'C:\Program Files\MATLAB\R2023b'
-
-Generally, MATLAB code should be stored in your `userpath`:
-
-.. code-block:: MATLAB
-
-   >> userpath
-   ans =
-       'C:\Users\RBO\Documents\MATLAB'
-
-
-You can add the path programmatically from within matlab:
-
-.. code-block:: MATLAB
-
-   >> addpath(genpath("path/to/caiman_matlab"))
-
-Otherwise, you can simply navigate to that directory within the matlab GUI or add the path to this repository as
-shown in the :ref:`install with source` section.
-
-Post-Install
-=================
-
-After installation, there a few helpful things you can do.
-
-.. topic:: Preferences
-
-    Prevent `.asv` files, which are essentially copies of the scripts you run. I just find these annoying.
-
-    .. thumbnail:: ../_images/gen_matlab_preferences.png
-       :width: 1440
 
 .. _startup.m: https://www.mathworks.com/help/matlab/matlab_env/matlab-startup-folder.html
 .. _GITHUB_: https://github.com/ru-rbo/rbo-lbm'_

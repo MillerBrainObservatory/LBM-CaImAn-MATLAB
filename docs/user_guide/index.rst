@@ -8,6 +8,7 @@ This section covers each step in the pipeline, parameters and metadata in more d
 .. toctree::
     :maxdepth: 2
     :caption: Usage
+    :numbered: 3
 
     pre_processing
     registration

@@ -1,5 +1,5 @@
 
-Parameters
+0.3. Parameters
 ###################
 
 For the :ref:`Core` functions in this pipeline, the initial parameters are always the same.
@@ -17,9 +17,6 @@ For the :ref:`Core` functions in this pipeline, the initial parameters are alway
     show to you and describe the parameters of that function. The terms are used interchangably.
 
     .. thumbnail:: ../_images/gen_param_v_arg.png
-
-Parameter Descriptions
-==========================
 
 :code:`data_path`
 : A filepath leading to the directory that contains the input files.
