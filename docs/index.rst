@@ -26,6 +26,9 @@ There are 4 core steps in this pipeline:
 
 .. thumbnail:: _images/ex_diagram.png
    :width: 800
+   :align: center
+
+----------------
 
 For up-to-date pipeline requirements and algorithms, see the github `repository readme <https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB>`_
 
