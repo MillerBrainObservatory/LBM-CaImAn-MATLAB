@@ -37,11 +37,6 @@ To run registration, call :func:`motionCorrectPlane` like so:
 
 See the demo pipeline at the root of this repository or the the API for more examples.
 
-.. note::
-
-   Each z-plane in between :code:`start_plane` and :code:`end_plane` will be processed.
-   In the future we may want to provide a way to give an array of indices to correct e.g. if the user wants to throw out z-planes 16 and 18.
-
 Registration Inputs
 **********************
 
@@ -65,10 +60,12 @@ NoRMCorre Parameters
 
 The last parameter for this step is a NoRMCorre parameters object.
 This is just a `MATLAB structured array <https://www.mathworks.com/help/matlab/ref/struct.html>`_ that expects specific values. 
-`NoRMCorre <https://github.com/flatironinstitute/NoRMCorre>`_ provides the algorithm for registration and dictates the values in that struct.
+NoRMCorre provides the algorithm for registration and dictates the values in that struct.
 
-To see all possible values possible for registration, see `here <https://github.com/flatironinstitute/NoRMCorre/blob/master/NoRMCorreSetParms.m`>_.
-Additionally, there is an example parameters struct at the root of this repository, :scpt:`here`_.
+To see all possible values possible for registration,
+see `here <https://github.com/flatironinstitute/NoRMCorre/blob/master/NoRMCorreSetParms.m`>_.
+
+Additionally, there is an example parameters struct at the root of this repository, :scpt`here`_.
 
 .. warning::
 
@@ -84,7 +81,7 @@ The most important parameter names to keep in mind:
 
 `max-shift` determines the maximum number of pixels that your movie will be translated in X/Y. 
 
-`fr` expects the frame rate of our movie, which is likely different than the 30hz default.
+`fr` expects the frame rate of our movie, which is likely different than the 30Hz default.
 
 .. hint:: 
 
@@ -205,7 +202,3 @@ Particularly helpful is directly comparing pixel correlations between :ref:`3D t
 .. thumbnail:: ../_images/reg_blurry.svg
    :title: Raw vs Registered Movie
 
-.. thumbnail:: ../_images/reg_rigid_mean.png
-   :title: Mean Rigid Corrected
-
-See the previous section for an examples of viewing two outputs side-by-side.
