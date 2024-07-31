@@ -67,8 +67,8 @@ For up-to-date pipeline requirements and algorithms, see the github `repository 
     :alt: Repo Link
     :target: https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB
 
-Contents
-=================
+Documentation Contents
+========================
 
 .. toctree::
     :maxdepth: 3
