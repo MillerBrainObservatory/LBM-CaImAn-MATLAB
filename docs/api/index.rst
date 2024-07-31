@@ -1,4 +1,3 @@
-
 API
 #####
 
@@ -10,6 +9,7 @@ There are two forms of functions to know for this pipeline:
 
 .. toctree::
     :maxdepth: 3
+    :numbered: 2
 
     Core Functions <core>
     Utility Functions <utility>
