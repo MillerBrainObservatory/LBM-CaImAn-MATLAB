@@ -161,7 +161,8 @@ Learn about Functions
 Parallel Processing
 ==============================
 
-I know the documentation and configuration panel seem to imply that parpool uses the number of physical cores by default, but in my tests I have seen otherwise (namely, logical cores).
+The MATLAB `parpool documentation <https://www.mathworks.com/help/parallel-computing/parpool.html>`_ and imply that parpool uses the **number of physical cores** (rather than logical) by default.
+However, there are instances where the parpool shuts down due to requesting "too many logical cores", suggesting the contrary to the documentation.
 You can avoid many parallel-processing related issues by **reducing the number of workers to the actual number of physical cores**:
 
 .. code-block:: MATLAB
