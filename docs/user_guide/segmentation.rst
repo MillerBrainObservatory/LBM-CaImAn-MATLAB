@@ -84,9 +84,10 @@ you can run the following code to see the defaults:
    >> opts = CNMFSetParams()
 
 - If this parameter is not included, they will be calculated for you based on the pixel resolution, frame rate and image size in the metadata.
+
 - For example, `Tau` is a widely talked about parameter being the half-size of your neuron.
 
-This is calculated by default as :math:`(7.5/pixel-resolution, 7.5/pixel-resolution)`. This only makes sense if we assume an ~neuron size of `14um`.
+This is calculated by default as :math:`7.5/pixelresolution`. This only makes sense if we assume an ~neuron size of `14um`.
 
 There are several different thresholds, indicating correlation coefficients as barriers for whether to perform a process or not, discussed in the following sections.
 
@@ -116,10 +117,6 @@ This value is used for an event exceptionality test, which tests the probabilty 
 
 - The function first estimates the noise distribution by considering the dispersion around the mode.
 
-- This is done only using values lower than the mode. The estimation of the noise std is made robust by using the approximation std=iqr/1.349.
-
-- Then, the probavility of having N consecutive eventsis estimated.
-
 This probability is used to order the components according to "most likely to be exceptional".
 
 Tau
@@ -143,13 +140,6 @@ This is the autoregressive order of the system.
     In general, **If your indicator takes >1 frame to rise/decay, P=2 (slow)**
     otherwise, P=1 (fast)
 
-.. AtoAc
-.. ====================================
-..
-.. Turn the CaImAn output A (sparse, spatial footprints for entire FOV) into Ac (sparse, spatial footprints localized around each neuron).
-.. - Standardizes the size of each neuron's footprint to a uniform (4*tau+1, 4*tau+1) matrix, centered on the neuron's centroid [acx x acy].
-
-
 Theory Underlying Component Validation
 ===========================================
 
@@ -171,9 +161,9 @@ That is, our calcium indicator (in this example: GCaMP-6s):
 - rise-time of 250ms
 - decay-time of 500ms
 - total transient time = 750ms
-- Frame rate = 4.7 frames/second
+- Frame rate = 4.7Hz
 
-4.7hz * (0.2+0.55) = 3 frames per transient.
+:math:`4.7Hz * (0.2+0.55) = 3` frames per transient.
 
 And thus the general process of validating neuronal components is as follows:
 
@@ -270,35 +260,6 @@ Segmentation Outputs
 
 .. thumbnail:: ../_images/seg_cn.png
    :width: 800
-
-.. _deconvolution:
-
-
-Developers note on Deconvolution
-===================================
-
-.. note::
-
-   This section is more of a developer note into the code used for deconvolution. General users can skip this section. TODO: Refactor to devs/.
-
-FOOPSI (Fast OOPSI) is originally from “Fast Nonnegative Deconvolution for Spike Train Inference From Population Calcium Imaging” by Vogelstein et al. (2010). OASIS was introduced in “Fast Active Set Methods for Online Spike Inference from Calcium Imaging” by Friedrich & Paninski (2016). Most of the CAIMAN-MATLAB code uses OASIS, not FOOPSI, despite some functions being named “foopsi_oasis.”
-
-Branches
-****************
-
-1. **oasis branches**: Despite some being named “foopsi_oasis,” they use OASIS math.
-
-- foopsi_oasisAR1
-- foopsi_oasisAR2
-- constrained_oasisAR1
-- thresholded_oasisAR1
-- thresholded_oasisAR2
-
-2. **constrained_foopsi branch**: Used if ``method="constrained"`` and model type is not “ar1” (e.g., ar2).
-
-- Optimization methods: CVX (external), SPGL1 (external), LARS, dual.
-
-3. **onnls branch**: Used if ``method="foopsi"`` or ``method="thresholded"`` with model type=”exp2” or “kernel.” Based on OASIS.
 
 .. _NoRMCorre: https://github.com/flatironinstitute/NoRMCorre/
 .. _constrained-foopsi: https://github.com/epnev/constrained-foopsi/
