@@ -11,7 +11,7 @@ matlab_auto_link = "basic"
 matlab_short_links = True
 
 project = "LBM-CaImAn-MATLAB"
-copyright = "2024, Elizabeth R. Miller Brain Observatory (MBO) | The Rockefeller University. All Rights Reserved."
+copyright = "2024, Elizabeth R. Miller Brain Observatory | The Rockefeller University. All Rights Reserved."
 
 
 myst_enable_extensions = [
@@ -85,7 +85,7 @@ templates_path = ["_templates"]
 html_theme = "pydata_sphinx_theme"
 
 html_logo = "_static/CaImAn-MATLAB_logo.svg"
-html_short_title = "CaImAn Pipeline"
+html_short_title = "LBM CaImAn Pipeline"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 html_favicon = "_static/mbo_icon_dark.ico"

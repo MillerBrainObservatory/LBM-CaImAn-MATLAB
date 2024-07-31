@@ -54,7 +54,7 @@ This pipeline is unique only in the routines to extract raw data from [ScanImage
 
 ![Extraction Diagram]( docs/_images/ex_diagram.png)
 
-Once data is extracted to an intermediate filetype `h5`, `.tiff`, `.memmap`, registration, segmentation and deconvolution can all be performed as described in the pipelines documentation.
+Once data is extracted to an intermediate `.h5` filetype, registration, segmentation and deconvolution can all be performed as described in the pipelines documentation.
 
 Follow the root `demo_LBM_pipeline.m` file for an example pipeline, or the root `/notebooks` folder for more in-depth exploration of individual pipeline steps.
 
