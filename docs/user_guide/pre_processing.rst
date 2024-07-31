@@ -1,3 +1,4 @@
+.. _pre_processing:
 
 Pre-Processing
 #############################
@@ -21,7 +22,7 @@ Pre-processing LBM datasets consists of 2 main processing steps:
 .. thumbnail:: ../_images/ex_diagram.png
    :title:  Step 1: Image Extraction and Assembly
 
-For a more in-depth look at the LBM datasets and accompanying metadata, see the :ref:`ScanImage Metadata` guide on the MBO user documentation.
+For a more in-depth look at the LBM datasets and accompanying metadata, see the :ref:`LBM metadata` guide on the MBO user documentation.
 
 The output :ref:`volumetric time-series <terms>` has dimensions `[Y,X,Z,T]`.
 
@@ -29,6 +30,8 @@ The output :ref:`volumetric time-series <terms>` has dimensions `[Y,X,Z,T]`.
 
     All output .tiff files for a single imaging session should be placed in the same directory.
     No other .tiff files should be in this directory. If this happens, an error will throw.
+
+.. _extraction_inputs:
 
 Extraction Inputs
 ****************************************
@@ -42,7 +45,7 @@ This example follows a directory structure shown in :ref:`Directory Structure`. 
     extract_path = [ parent_path 'extracted\'];
     mkdir(extract_path); mkdir(raw_path);
 
-:func:`convertScanImageTiffToVolume()` takes the standard :ref:`parameters` inputs. The most useful of which are:
+:func:`convertScanImageTiffToVolume()` takes the standard :ref:`parameters <params>` inputs. The most useful of which are:
 
 `raw_path`
 : This is where your raw `.tiff` files will be stored and is the first argument of :func:`convertScanImageTiffToVolume`.
@@ -55,6 +58,8 @@ This example follows a directory structure shown in :ref:`Directory Structure`. 
     - Your raw and extract path can be in any folder you wish without worry of file-name conflicts.
     - All future pipeline steps will automatically exclude these files as they will not have the characters `_plane_` in the filename.
     - Don't put the characters `_plane_` together in your raw/extracted filenames!
+
+.. _scan_phase:
 
 Scan Phase
 -------------
@@ -81,6 +86,8 @@ When this shift happens, the pipeline **automatically trims** those pixels becau
 
 You'll see the decreased gap between ROI's for the scan-offset corrected image, showing the 2 pixels removed from each edge accounting for the padded 0's.
 
+.. _trim_pixels:
+
 Trim Pixels off ROI's
 -------------------------
 
@@ -88,9 +95,12 @@ There are times when the seam between re-tiled ROI's is still present.
 
 Sometimes, this seam may not appear when frames are viewed individually, but are present in the :ref:`mean image <ex_meanimage>`.
 
+.. _extraction_outputs:
 
 Extraction Outputs
 ****************************************************************
+
+.. _extraction_format:
 
 Format
 -------------
@@ -145,7 +155,9 @@ We see that there are 30 datasets corresponding to each of our Z-planes, but no 
 - **Groups**: h5 files can be thought of like directories where a 3D time-series is self contained within its own folder (or group).
 - **Attributes**: Attributes are special "tags" attached to a group. This is where we store metadata associated with each group and dataset. The result of calling `get_metadata(raw_path)` (see :ref:`scanimage metadata` for more information about the magic behind the scenes here).
 
-Evaluate output
+.. _eval_outputs:
+
+Evaluate outputs
 *************************
 
 For more examples of loading and manipulating data, see :ref:`exploring datasets`
@@ -163,7 +175,7 @@ We can see that our plane quality changes with depth:
 
 .. thumbnail:: ../_images/ex_offset.svg
     :width: 800
-    :title: ScanImage Objective Resolution
+    :title: Phase-Offset
     :align: center
     :group: finish
 

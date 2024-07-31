@@ -99,7 +99,7 @@ A correlation coefficient determining the amount of correlation between pixels i
 - The lower your resolution, the more "difficult" it is for CNMF to distinguish between two tight neurons, thus use a lower merge threshold.
 - This parameter heavily effects the number of neurons processed. It's always better to have to many neurons vs too few, as you can never get a lost neuron back, but you can invalidate neurons in post-processing.
 
-.. image:: ../_images/seg_traces_highcorr.svg
+.. thumbnail:: ../_images/seg_traces_highcorr.svg
    :title: Example of highly correlated traces
 
 min_SNR
@@ -143,7 +143,7 @@ This is the autoregressive order of the system.
 Theory Underlying Component Validation
 ===========================================
 
-Following completion of :ref:`segmentPlane()`
+Following completion of :func:`segmentPlane()`
 
 .. thumbnail:: ../_images/seg_sparse_rep.png
    :width: 600
@@ -175,7 +175,7 @@ And thus the general process of validating neuronal components is as follows:
 Segmentation Inputs
 =========================
 
-Inputs (covered in :ref:`parameters`) are consistent with :ref:`registration`, substituting::
+Inputs (covered in :ref:`params`) are consistent with :ref:`registration`, substituting::
 
     NoRMCorreSetParams -> CNMFSetParams
 

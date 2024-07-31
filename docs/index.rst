@@ -1,3 +1,4 @@
+.. _docs_home:
 
 ################################
 LBM-CaImAn-MATLAB Documentation

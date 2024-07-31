@@ -1,3 +1,5 @@
+.. _registration:
+
 Registration
 ================
 
@@ -24,7 +26,7 @@ Non-rigid artifacts are much more complex as one region of the 2D image requires
 .. thumbnail:: ../_images/reg_patches.png
    :width: 1440
 
-To run registration, call :func:`motionCorrectPlane` like so:
+To run registration, call :func:`motionCorrectPlane()` like so:
 
 .. code-block:: MATLAB
 
@@ -202,3 +204,4 @@ Particularly helpful is directly comparing pixel correlations between :ref:`3D t
 .. thumbnail:: ../_images/reg_blurry.svg
    :title: Raw vs Registered Movie
 
+:math:`{\mu}`

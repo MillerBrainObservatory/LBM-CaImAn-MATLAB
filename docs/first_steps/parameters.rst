@@ -1,14 +1,17 @@
+.. _params:
+
+.. _parameters:
+
+.. _parameter:
+
+.. _argument:
+
+.. _arguments:
 
 0.3. Parameters
 ###################
 
 For the :ref:`Core` functions in this pipeline, the initial parameters are always the same.
-
-.. _params:
-
-.. _argument:
-
-.. _arguments:
 
 .. note::
 

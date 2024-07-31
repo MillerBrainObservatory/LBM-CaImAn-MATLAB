@@ -1,3 +1,4 @@
+.. _setup:
 
 0.2. Project Setup
 #########################
@@ -39,6 +40,8 @@ of an suffix appended to the filename: `_000N`, where n=number of files chosen b
 
     All output .tiff files for a single imaging session should be placed in the same directory.
     No other .tiff files should be in this directory. If this happens, an error will throw.
+
+.. _directory_structure:
 
 0.2.2. Directory Structure
 ================================

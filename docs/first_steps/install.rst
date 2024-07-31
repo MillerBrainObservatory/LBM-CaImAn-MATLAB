@@ -1,5 +1,9 @@
+.. _installation:
+
 0.1 Installation
 ################################
+
+.. _installation_gh:
 
 0.1.1. Download from Github
 ===============================
@@ -32,6 +36,8 @@ Here, `/core` and `/packages` are both bright in the files window, this indicate
 These two folders contain all of the code the pipeline needs to run and are the only two folders that **must** be on the path.
 If either of these folders is not bright, right-click on the folder and "Add to path -> Selected Folders and Subfolders"
 
+.. _startup:
+
 Startup
 --------------
 
@@ -42,6 +48,8 @@ You can create a `startup.m`_ file located in this same `userpath` directory: `~
    % <HOME>/Documents/MATLAB/startum.m
    % note "fullfile" isnt needed, but helpfully provides directory autocompletion
    addpath(genpath(fullfile("path/to/caiman_matlab")))
+
+.. _installation_git:
 
 0.1.2. Install with git
 ==========================
