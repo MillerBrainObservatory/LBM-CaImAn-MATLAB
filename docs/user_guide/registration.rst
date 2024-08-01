@@ -30,6 +30,8 @@ The entire 2D image is shifted by a number of pixels in the x direction and y di
 
 Non-rigid artifacts are much more complex as one region of the 2D image requires shifts that another region does not.
 
+Correcting for non-rigid motion requires dividing the field-of-view into patches, and performing *rigid* motion correction on each patch.
+
 .. thumbnail:: ../_images/reg_patches.png
    :width: 1440
 
@@ -71,8 +73,7 @@ The last parameter for this step is a NoRMCorre parameters object.
 This is just a `MATLAB structured array <https://www.mathworks.com/help/matlab/ref/struct.html>`_ that expects specific values. 
 NoRMCorre provides the algorithm for registration and dictates the values in that struct.
 
-To see all possible values possible for registration,
-see `here <https://github.com/flatironinstitute/NoRMCorre/blob/master/NoRMCorreSetParms.m`>_.
+To see all possible values possible for NoRMCorre parameters, see `here <https://github.com/flatironinstitute/NoRMCorre/blob/master/NoRMCorreSetParms.m`>_.
 
 Additionally, there is an example parameters struct at the root of this repository, :scpt`here`_.
 

@@ -14,7 +14,7 @@
 0.2.1 Core Parameters
 ==========================
 
-For the :ref:`Core` functions in this pipeline, the initial parameters are always the same.
+For the :ref:`Core <core_api>` functions in this pipeline, the initial parameters are always the same.
 
 .. note::
 
@@ -48,6 +48,4 @@ Set to the number of CPU cores to use for parallel computing.
 
 The recommended method for saving data is to save each step in a separate HDF5 file and name the group after the step being executed.
 This is demonstrated in the :scpt:`demo_LBM_pipeline` at the root of this repository.
-
-For information about the parameters unique to each function, see the :ref:`Core` API or the help documentation for that individual function.
 

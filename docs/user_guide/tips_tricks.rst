@@ -1,10 +1,16 @@
+.. _tips_and_tricks:
+
 Tips and Tricks
 ######################
 
-Exploring Datasets
-===========================
+.. _explore_data_matlab:
+
+Exploring Datasets in MATLAB
+=================================
 
 There are several helper functions located in ``core/utils``.
+
+.. _tnt_loading_data:
 
 Loading Data
 -----------------------
@@ -60,6 +66,8 @@ Or :code:`all` for everything:
 
      Y_out = read_plane('data.h5', 4, 'all');
 
+.. _tnt_mean_images:
+
 Mean Images
 -----------------------
 
@@ -69,6 +77,8 @@ Quickly view a grid of mean images with :func:`write_mean_images_to_png`:
 
 .. thumbnail:: ../_images/gen_mean_images.png
    :align: center
+
+.. _tnt_making_gifs:
 
 Making Gifs
 -----------------------
@@ -81,6 +91,8 @@ Making Gifs
     write_frames_to_gif(array, 'output.gif', 45)
 
 You want your input array to have dimensions :code:`height x width x frames`. For very large movies, use the :code:`size_mb` parameter to limit the resulting gif to that many megabytes.
+
+.. _tnt_quickplay:
 
 Quick-play Movies
 ------------------------------
@@ -98,6 +110,8 @@ Quick-play Movies
    :align: center
 
 
+.. _tnt_fullfile:
+
 Fullfile
 ==============
 
@@ -106,6 +120,8 @@ Matlabs `fullfile <https://www.mathworks.com/help/matlab/ref/fullfile.html>`_ fu
 .. image:: ../_images/gen_fullfile.png
 
 .. _help_functions:
+
+.. _tnt_functions:
 
 Learn about Functions
 ============================
@@ -155,6 +171,8 @@ Learn about Functions
 
       See also fileparts, addpath, genpath, isfolder, dir, fullfile, error, regexp, savefast
 
+
+.. _tnt_num_cores:
 
 .. _num_cores:
 
@@ -210,6 +228,7 @@ You can use this return value to decide how how much of your computers total pro
 
 This is equally valid for parfor/eval loops and spmd blocks, since both of them use the pool of workers started by parpool.
 
+.. _tnt_matlab_install_path:
 
 Find MATLAB Install Location
 ========================================
@@ -255,4 +274,4 @@ You can add the path programmatically from within matlab:
    >> addpath(genpath("path/to/caiman_matlab"))
 
 Otherwise, you can simply navigate to that directory within the matlab GUI or add the path to this repository as
-shown in the :ref:`install with source` section.
+shown in the :ref:`install from source <from_source>` section.

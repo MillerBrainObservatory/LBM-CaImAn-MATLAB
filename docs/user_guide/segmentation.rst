@@ -3,10 +3,10 @@
 Source Extraction
 ################################
 
+Function for this step: :func:`segmentPlane()`
+
 Segmentation Overview
 ========================
-
-Function for this step: :func:`segmentPlane()`
 
 .. warning::
 
@@ -15,9 +15,6 @@ Function for this step: :func:`segmentPlane()`
     Much of work is about separating "good activity", the flourescence changes that we can attribute to a single cell, vs "noise, which is everything else (including signal from other neurons).
     To do this, we take advantage of the fact that the slow calcium signal is typically very similar between adjacent frames.
     See `this blog post <https://gcamp6f.com/2024/04/24/why-your-two-photon-images-are-noisier-than-you-expect/>`_ for a nice discussion on shot noise calculations and poisson processes.
-
-Background
-===================
 
 The *speed of transients*, or the time it takes for the neuron to fully glow (rise time) and unglow (decay time), is a very important metric used to calculate several of the parameters for CNMF.
 
@@ -29,10 +26,15 @@ Turning this flourescence into "spikes" relies on several mathmatical operations
 - isolate neuronal activity from background activity (segmentation).
 - infer the times of action potentials from the fluorescence traces (deconvolution).
 
-The CNMF algorithm works by:
+.. _seg_cnmf:
 
-1. breaking the full FOV into **patches** of :code:`patch_size` with a set :code:`overlap` in each direction.
-2. looking for K components in each patch.
+Constrained Non-Negative Matrix Factorization (CNMF)
+-------------------------------------------------------------
+
+At a high-level, the CNMF algorithm works by:
+
+1. Breaking the full FOV into **patches** of :code:`patch_size` with a set :code:`overlap` in each direction.
+2. Looking for K components in each patch.
 3. Filter false positives.
 4. Combine resulting neuron coordinates **(spatial components)** for each patch into a single structure: :code:`A_keep` and :code:`C_keep`.
 5. The time traces **(temporal components)** in the original resolution are computed from :code:`A_keep` and :code:`C_keep`.
@@ -41,13 +43,10 @@ The CNMF algorithm works by:
 
 .. image:: ../_images/seg_traces.png
 
-
-.. hint::
-
-    See the demo parameters script at the root of this repository.
+.. _seg_definitions:
 
 Definitions
-============
+-------------------
 
 `segmentation`
 : The general process of dividing an image based on the contents of that image, in our case, based on neuron location.
@@ -67,14 +66,26 @@ Before running segmentation, make sure you:
 - Confirmed no stitching artifacts or bad frames.
 - Validate your movie is accurately motion corrected.
 
-Tuning CNMF
-====================
+.. _seg_inputs:
+
+Segmentation Inputs
+=========================
+
+Inputs (covered in :ref:`params`) are consistent with :ref:`registration`, substituting::
+
+    NoRMCorreSetParams -> CNMFSetParams
+
+
+All of the parameters and options fed into the `CNMF` pipeline are contained within a single `MATLAB struct <https://www.mathworks.com/help/matlab/ref/struct.html>`_.
 
 .. note::
 
    There is an example file describing CNMF parameters at the root of this project. :scpt:`demo_CNMF_params`.
 
-All of the parameters and options fed into the `CNMF` pipeline are contained within a single `MATLAB struct <https://www.mathworks.com/help/matlab/ref/struct.html>`_.
+.. _seg_tuning:
+
+Tuning CNMF
+------------------------
 
 To get an idea of the default parameters (what happens if you use :code:`CNMFSetParams()` with no arguments),
 you can run the following code to see the defaults:
@@ -83,13 +94,9 @@ you can run the following code to see the defaults:
 
    >> opts = CNMFSetParams()
 
-- If this parameter is not included, they will be calculated for you based on the pixel resolution, frame rate and image size in the metadata.
+There are several different thresholds that correlation coefficients must cross to be considered a "valid" neuron or a "valid" transient signal. Below are the `CNMF` parameters that control these thresholds and allow tuning the algorithm to your dataset.
 
-- For example, `Tau` is a widely talked about parameter being the half-size of your neuron.
-
-This is calculated by default as :math:`7.5/pixelresolution`. This only makes sense if we assume an ~neuron size of `14um`.
-
-There are several different thresholds, indicating correlation coefficients as barriers for whether to perform a process or not, discussed in the following sections.
+.. _seg_merge_thresh:
 
 merge_thresh
 ************************************
@@ -101,6 +108,8 @@ A correlation coefficient determining the amount of correlation between pixels i
 
 .. thumbnail:: ../_images/seg_traces_highcorr.svg
    :title: Example of highly correlated traces
+
+.. _seg_minsnr:
 
 min_SNR
 ************************************
@@ -119,14 +128,26 @@ This value is used for an event exceptionality test, which tests the probabilty 
 
 This probability is used to order the components according to "most likely to be exceptional".
 
+.. _seg_tau:
+
 Tau
 ************************************
 
 Half-size of your neurons.
 
-- Tau is the `half-size` of a neuron. If a neuron is 10 micron, tau will be a 5 micron.
+- Tau is the `half-size` of a neuron. If a neuron is 10 :math:`/mu`, tau will be a 5 micron.
 - In general, round up.
 - This changes depending on the area of the brain you're in and should be adjusted to match the ~cell size of the brain region.
+
+.. note::
+
+    If this parameter is not included, they will be calculated for you based on the pixel resolution, frame rate and image size in the metadata.
+
+- For example, `Tau` is a widely talked about parameter being the half-size of your neuron.
+
+This is calculated by default as :math:`7.5/pixelresolution`. This only makes sense if we assume an ~neuron size of `14um`.
+
+.. _seg_p:
 
 P
 ************************************
@@ -140,64 +161,14 @@ This is the autoregressive order of the system.
     In general, **If your indicator takes >1 frame to rise/decay, P=2 (slow)**
     otherwise, P=1 (fast)
 
-Theory Underlying Component Validation
-===========================================
-
-Following completion of :func:`segmentPlane()`
-
-.. thumbnail:: ../_images/seg_sparse_rep.png
-   :width: 600
-
-.. note::
-
-   Although it is important to understand the process governing validating neurons, this process is
-   fully performed for you with no extra steps needed.
-
-The key idea for validating our neurons is that **we know how long the
-brightness indicating neurons activity should stay bright** as a function
-of the *number of frames*.
-
-That is, our calcium indicator (in this example: GCaMP-6s):
-- rise-time of 250ms
-- decay-time of 500ms
-- total transient time = 750ms
-- Frame rate = 4.7Hz
-
-:math:`4.7Hz * (0.2+0.55) = 3` frames per transient.
-
-And thus the general process of validating neuronal components is as follows:
-
-- Use the decay time (0.5s) multiplied by the number of frames to estimate the number of samples expected in the movie.
-- Calculate the likelihood of an unexpected event (e.g., a spike) and return a value metric for the quality of the components.
-- Normal Cumulative Distribution function, input = -min_SNR.
-- Evaluate the likelihood of observing traces given the distribution of noise.
-
-Segmentation Inputs
-=========================
-
-Inputs (covered in :ref:`params`) are consistent with :ref:`registration`, substituting::
-
-    NoRMCorreSetParams -> CNMFSetParams
+.. _seg_outputs:
 
 Segmentation Outputs
 ============================
 
-- The CNMF output yields "raw" traces ("y"). These raw traces are noisy and jagged and must be denoised/deconvolved.
-- Another term for this is "detrending", removing non-stationary variability from the signal
-- Each raw trace is deconvolved via "constrained foopsi," which yields the decay (and for p=2, rise) coefficients ("g") and the vector of "spiking" activity ("S") that best explain the raw trace. S should ideally be ~90% zeros.
-- :code:`S` and :code:`g` are then used to produce :code:`C` (deconvolved traces), which looks like the raw trace :code:`Y`, but much cleaner and smoother.
+The output of the analysis includes several key variables that describe the segmented neuronal components and their corresponding activities.
 
-.. important::
-
-   The optional output YrA is equal to Y-C, representing the original raw trace.
-
-Results
-===========================
-
-The output of the analysis includes several key variables that describe the segmented neuronal components and their corresponding activities. Below is a description of each output variable, along with an example of how to use them and what they represent.
-
-Segmentation Outputs
-*************************
+Below is a description of each output variable, along with an example of how to use them and what they represent.
 
 1. :code:`T_all`: Neuronal time-series
     - The fluorescence time-series data for each detected neuronal component. Each row corresponds to a different neuron, and each column corresponds to a different time point.

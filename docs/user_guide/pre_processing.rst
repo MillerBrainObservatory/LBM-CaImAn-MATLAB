@@ -158,14 +158,15 @@ We see that there are 30 datasets corresponding to each of our Z-planes, but no 
     Attributes: [30×1 struct]
 
 - **Groups**: h5 files can be thought of like directories where a 3D time-series is self contained within its own folder (or group).
-- **Attributes**: Attributes are special "tags" attached to a group. This is where we store metadata associated with each group and dataset. The result of calling `get_metadata(raw_path)` (see :ref:`scanimage metadata` for more information about the magic behind the scenes here).
+- **Attributes**: Attributes are special "tags" attached to a group. This is where we store metadata associated with each group and dataset. The result of calling `get_metadata(raw_path)` (see :ref:`scanimage metadata <advanced_metadata>` for more information about the magic behind the scenes here).
 
 .. _eval_outputs:
 
 Evaluate outputs
 *************************
 
-For more examples of loading and manipulating data, see :ref:`exploring datasets`
+For more examples of reading, viewing and creating graphics for your data,
+see tips and tricks on :ref:`exploring datasets in MATLAB <explore_data_matlab>`
 
 In your `save_path`, you will see a newly created `figures` folder. This contains an image for each [X,Y,T] plane and checks for proper tiling.
 

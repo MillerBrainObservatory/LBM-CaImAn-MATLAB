@@ -1,5 +1,9 @@
+.. _troubleshooting:
+
 Troubleshooting
 ===============
+
+.. _ts_memory:
 
 Memory
 ***************************************
@@ -15,6 +19,7 @@ Memory
   a single 3D-planar time-series being too large to fit in memory, in which case you can prevent caiman from processing the image patches
   in parallel. Keep in mind this will be noticably slower than the parallel counterpart.
 
+.. _ts_mex:
 
 Missing Compiled Binary (Windows)
 ***************************************
@@ -35,6 +40,8 @@ Missing Compiled Binary (Windows)
 .. note::
 
    Newest version 0.2.0+ include both precompiled binaries.
+
+.. _ts_matlab_server:
 
 Matlab Server Issues
 ***********************
@@ -59,6 +66,7 @@ Here is the general fix for all of them:
 - Run `which -all pathdef.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\pathdef.m`.
 - Run `which -all matlabrc.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\matlabrc.m`.
 
+.. _ts_win_filepaths:
 
 Windows Filepaths
 ***********************

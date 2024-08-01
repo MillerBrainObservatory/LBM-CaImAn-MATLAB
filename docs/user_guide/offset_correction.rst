@@ -78,7 +78,7 @@ Axial Correction Outputs
 - .fig files showing neuron distributions in z and radial directions.
 - A :code:`.mat` file: `caiman_collated_output_plane_N` with collated and processed imaging data.
 
-This final ``caiman_collated_output_plane_N.m`` file is the same as was discussed in :ref:`segmentation outputs`.
+This final ``caiman_collated_output_plane_N.m`` file is the same as was discussed in :ref:`seg_outputs`.
 The difference being now, all of our z-planes are collated into a single file.
 
 .. hint::

@@ -4,11 +4,10 @@
 0.1 Project Setup
 ################################
 
-.. _installation_gh:
-
-
 0.1.1. Installation
 ===============================
+
+.. _from_source:
 
 From Source
 --------------------
@@ -50,6 +49,8 @@ Alternatively, you can create a `startup.m`_ file located in this same :code:`us
    addpath(genpath(fullfile("path/to/caiman_matlab")))
 
 There is a sample setup.m file located at the root of this repository.
+
+.. _with_git:
 
 .. _installation_git:
 
