@@ -7,9 +7,10 @@ Function for this step: :func:`convertScanImageTiffToVolume()`
 
 .. hint::
 
-    Before beginning pre-processing, follow setup steps in :ref:`first steps` started` to make sure the pipeline and dependencies are installed properly.
+    Before beginning pre-processing, be sure to review :ref:`parameters` as they are the same for each step
+    in the pipeline and will not be covered in detail here.
 
-    See :ref:`troubleshooting` for common issues you may encounter along the way.
+    ..See :ref:`troubleshooting` for common issues you may encounter along the way.
 
 .. _pp_overview:
 
