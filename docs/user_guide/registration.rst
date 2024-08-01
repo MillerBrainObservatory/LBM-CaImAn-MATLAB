@@ -9,6 +9,17 @@ Function for this step: :func:`motionCorrectPlane()`
 
    The terms motion-correction and registration are often used interchangably.
 
+To run registration with the default parameters, call :func:`motionCorrectPlane()` like so:
+
+.. code-block:: MATLAB
+
+    % recall our directory structure, chaining the output path from the
+    % tiff reconstruction step
+    mcpath = 'C:\Users\RBO\Documents\data\bi_hemisphere\registration';
+
+    % use 23 CPU cores to process z-planes 1-27
+    motionCorrectPlane(extract_path, mcpath, 23, 1, 27);
+
 Registration Overview
 ***********************
 
@@ -22,31 +33,20 @@ Rigid vs Non-Rigid
 Rigid motion
 : The object is moved with its shape and size preserved.
 
+- simple
+- applies to each pixel equally
+- The entire 2D image is shifted by a number of pixels in the x direction and y direction.
+
 Non-Rigid motion
 : The object is moved and transforms shape or size.
 
-Purely rigid motion is simple, straightforeward movement that applies to each pixel equally.
-The entire 2D image is shifted by a number of pixels in the x direction and y direction.
-
-Non-rigid artifacts are much more complex as one region of the 2D image requires shifts that another region does not.
+- complex
+- region A requires more shift than region B
 
 Correcting for non-rigid motion requires dividing the field-of-view into patches, and performing *rigid* motion correction on each patch.
 
 .. thumbnail:: ../_images/reg_patches.png
    :width: 1440
-
-To run registration, call :func:`motionCorrectPlane()` like so:
-
-.. code-block:: MATLAB
-
-    % recall our directory structure, chaining the output path from the
-    % tiff reconstruction step
-    mcpath = 'C:\Users\RBO\Documents\data\bi_hemisphere\registration';
-
-    % use 23 CPU cores to process z-planes 1-27
-    motionCorrectPlane(extract_path, mcpath, 23, 1, 27);
-
-See the demo pipeline at the root of this repository or the the API for more examples.
 
 Registration Inputs
 **********************
@@ -73,9 +73,9 @@ The last parameter for this step is a NoRMCorre parameters object.
 This is just a `MATLAB structured array <https://www.mathworks.com/help/matlab/ref/struct.html>`_ that expects specific values. 
 NoRMCorre provides the algorithm for registration and dictates the values in that struct.
 
-To see all possible values possible for NoRMCorre parameters, see `here <https://github.com/flatironinstitute/NoRMCorre/blob/master/NoRMCorreSetParms.m`>_.
+To see all possible values possible for NoRMCorre parameters, see `here <https://github.com/flatironinstitute/NoRMCorre/blob/master/NoRMCorreSetParms.m>`_.
 
-Additionally, there is an example parameters struct at the root of this repository, :scpt`here`_.
+Additionally, there is an example parameters struct at the root of this repository, `here <https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/blob/master/demo_CNMF_params.m>`_.
 
 .. warning::
 
@@ -86,12 +86,15 @@ The most important NoRMCorre parameters are:
 1. :code:`grid-size`
 2. :code:`max-shift`
 3. :code:`fr` (frame rate)
+4. :code:`correct_bidir`
 
 `grid-size` determines how many patches your image is split into. The smaller the patch, the **more precise the registration**, with a tradeoff being **increased compute times**.
 
 `max-shift` determines the maximum number of pixels that your movie will be translated in X/Y. 
 
 `fr` expects the frame rate of our movie, which is likely different than the 30Hz default.
+
+`correct_bidir` attempts to correct for bi-directional scan offsets, a step that was performed :ref:`in pre-processing <scan_phase>`.
 
 .. hint:: 
 
@@ -114,7 +117,6 @@ Here, we use the :ref:`pixel resolution <pixel_resolution>` (how many microns ea
 
    max_shift = 20/metadata.pixel_resolution
 
-
 We can then use this value in our own parameters struct with the help of :func:`read_plane()`:
 
 .. code-block:: MATLAB
@@ -134,8 +136,17 @@ We can then use this value in our own parameters struct with the help of :func:`
       'max_shift', round(20/pixel_resolution), ... % still useful in non-rigid
    );
 
+Non-rigid Registration
+---------------------------
+
+.. note::
+
+   Non-rigid registration and peicewise rigid registration are used interchangably. Peicewise-rigid registration is a **method** to correct for non-rigid motion.
+
+.. _registration_outputs:
+
 Registration Outputs
-*********************
+========================
 
 Format
 -------------
