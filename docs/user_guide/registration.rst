@@ -1,7 +1,7 @@
 .. _registration:
 
 Registration
-================
+#####################
 
 Function for this step: :func:`motionCorrectPlane()`
 
@@ -18,17 +18,22 @@ To run registration with the default parameters, call :func:`motionCorrectPlane(
     mcpath = 'C:\Users\RBO\Documents\data\bi_hemisphere\registration';
 
     % use 23 CPU cores to process z-planes 1-27
+    % no "options" given, so use default NoRMCorreParams
     motionCorrectPlane(extract_path, mcpath, 23, 1, 27);
 
-Registration Overview
-***********************
+.. _reg_overview:
+
+Overview
+====================
 
 Now that we have isolated each z-plane into its own timeseries, we can use `image registration <https://en.wikipedia.org/wiki/Image_registration>`_ to make sure that our neuron in the first frame is in the same spatial location as in frame N throughout the time-series.
 
 The motion artifacts present in a movie come in two flavors, `rigid` and `non-rigid`.
 
+.. _r_vs_nr:
+
 Rigid vs Non-Rigid
-*******************
+====================
 
 Rigid motion
 : The object is moved with its shape and size preserved.
@@ -48,8 +53,10 @@ Correcting for non-rigid motion requires dividing the field-of-view into patches
 .. thumbnail:: ../_images/reg_patches.png
    :width: 1440
 
-Registration Inputs
-**********************
+.. _reg_inputs:
+
+Inputs
+====================
 
 In addition to the default function inputs described in section :ref:`parameters`, registration has a few important additional parameters.
 
@@ -73,9 +80,7 @@ The last parameter for this step is a NoRMCorre parameters object.
 This is just a `MATLAB structured array <https://www.mathworks.com/help/matlab/ref/struct.html>`_ that expects specific values. 
 NoRMCorre provides the algorithm for registration and dictates the values in that struct.
 
-To see all possible values possible for NoRMCorre parameters, see `here <https://github.com/flatironinstitute/NoRMCorre/blob/master/NoRMCorreSetParms.m>`_.
-
-Additionally, there is an example parameters struct at the root of this repository, `here <https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/blob/master/demo_CNMF_params.m>`_.
+There is an example parameters struct at the root of this repository, :scpt:`https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/blob/master/demo_CNMF_params.m`.
 
 .. warning::
 
@@ -104,6 +109,7 @@ Rigid-Only Registration
 ---------------------------
 
 With movies that exibit little sub-cellular movement over the course of a timeseries, non-rigid registration is often overkill as rigid-registration will do a good enough job.
+
 Rigid registration is accomplished by giving NoRMCorre no variable for grid-size, so it defaults to the size of your image and thus only processing a single patch encompassing the entire field-of-view.
 
 You can use :ref:`ScanImage <advanced_metadata>` to physically interpretable values. 
@@ -148,7 +154,11 @@ Non-rigid Registration
 Registration Outputs
 ========================
 
-Format
+Just like :ref:`pre-processing <extraction_inputs>`, registration outputs in `.h5` format.
+
+.. _registration_format:
+
+File-Format
 -------------
 
 Output data are saved in `.h5` format, with the following characteristics:
@@ -162,6 +172,7 @@ This file has the following groups:
 
 :code:`/<param>`
 : Takes the name of the :code:`ds` parameter. This group contains the 3D planar timeseries. Default `'/Y'`.
+: :code:`h5read()`
 
 :code:`/Ym`
 : The mean image of the motion-corrected movie. Each image is averaged over time to produce the mean pixel intensity.
@@ -181,8 +192,10 @@ This file has the following groups:
         x_shifts = shifts(:,1) % represent pixel-shifts in *x*
         y_shifts = shifts(:,2) % represent pixel-shifts in *y*
 
+.. _reg_results:
+
 Registration Results
-***********************
+-------------------------
 
 These will be placed in the same directory as your save_path, `figures/registration_metrics_plane_N`.
 
@@ -223,4 +236,4 @@ Particularly helpful is directly comparing pixel correlations between :ref:`3D t
 .. thumbnail:: ../_images/reg_blurry.svg
    :title: Raw vs Registered Movie
 
-:math:`{\mu}`
+

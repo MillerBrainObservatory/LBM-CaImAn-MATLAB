@@ -100,3 +100,4 @@ Indices and tables
 .. |Repository| image:: https://img.shields.io/badge/Repository-black?style=flat-square&logo=github&logoColor=white&link=https%3A%2F%2Fmillerbrainobservatory.github.io%2FLBM-CaImAn-MATLAB%2F
     :alt: Repo Link
     :target: https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB
+

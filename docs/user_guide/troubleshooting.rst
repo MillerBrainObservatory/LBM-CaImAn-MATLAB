@@ -9,7 +9,7 @@ Memory
 ***************************************
 
 - Number of Workers/Cores > 100: There a a known bug in MATLAB R2023a for cases when the number of workers is more than 100.
-  Refer to the following `bug report <https://www.mathworks.com/support/bugreports/details/2968710.html>`_ for a workaround to resolve the issue. Additionally, steps taken in :ref:`matlab server issues` can help to solve this problem.
+  Refer to the following `bug report <https://www.mathworks.com/support/bugreports/details/2968710.html>`_ for a workaround to resolve the issue. Additionally, steps taken in :ref:`matlab server issues <ts_matlab_server>` can help to solve this problem.
 
 - Out of Memory during deserialization
 
@@ -45,7 +45,6 @@ Missing Compiled Binary (Windows)
 
 Matlab Server Issues
 ***********************
-.. _server_issues:
 
 These come in many flavors and are mostly `windows` issues due to their background serrvice.
 

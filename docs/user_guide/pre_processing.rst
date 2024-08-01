@@ -11,8 +11,10 @@ Function for this step: :func:`convertScanImageTiffToVolume()`
 
     See :ref:`troubleshooting` for common issues you may encounter along the way.
 
-Extraction Overview
-*********************************
+.. _pp_overview:
+
+Overview
+===================
 
 Pre-processing LBM datasets consists of 2 main processing steps:
 
@@ -34,8 +36,8 @@ The output :ref:`volumetric time-series <terms>` has dimensions `[Y,X,Z,T]`.
 
 .. _extraction_inputs:
 
-Extraction Inputs
-****************************************
+Inputs
+=====================
 
 This example follows a directory structure shown in :ref:`the first steps guide <directory_structure>`.
 
@@ -102,13 +104,10 @@ The :code:`trim_pixels` parameter takes an array of 4 values as input correspond
 
 .. _extraction_outputs:
 
-Extraction Outputs
-****************************************************************
+Outputs
+=====================
 
 .. _extraction_format:
-
-Format
--------------
 
 Output data are saved in `.h5` format, with the following characteristics:
 - one file per plane
@@ -163,19 +162,15 @@ We see that there are 30 datasets corresponding to each of our Z-planes, but no 
 .. _eval_outputs:
 
 Evaluate outputs
-*************************
+-------------------
 
-For more examples of reading, viewing and creating graphics for your data,
-see tips and tricks on :ref:`exploring datasets in MATLAB <explore_data_matlab>`
+In your :code:`save_path`, you will see a newly created :code:`figures` folder. This contains an image for each [X,Y,T] plane and checks for proper tiling.
 
-In your `save_path`, you will see a newly created `figures` folder. This contains an image for each [X,Y,T] plane and checks for proper tiling.
+In this folder is a close-up of the brightest image in every plane for a random frame.
 
-Offset and Z Plane Quality
------------------------------
+Each image shoes the neuron before and after scan-correction.
 
-In this folder is a close-up of the brightest image in every plane for a random frame. Each
-image shoes the neuron before and after scan-correction. This lets you compare planes, validate the correct
-scan-phase offset value (usually 1, 2 or 3 pixels).
+This lets you compare planes, validate the correct scan-phase offset value (usually 1, 2 or 3 pixels).
 
 We can see that our plane quality changes with depth:
 
@@ -183,5 +178,6 @@ We can see that our plane quality changes with depth:
     :width: 800
     :title: Phase-Offset
     :align: center
-    :group: finish
+
+For more examples of reading, viewing and creating graphics for your data, see tips and tricks on :ref:`exploring datasets in MATLAB <explore_data_matlab>`
 
