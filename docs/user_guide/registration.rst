@@ -18,10 +18,12 @@ Overview
 
 Disturbances or movement in our timeseries cause variations in pixel locations between frames called **motion artifacts**.
 
-The motion artifacts present in our sample come in two flavors, `rigid` and `non-rigid`. See :ref:`Types of Registration <tut_types_of_reg>` to become familiar with rigid vs non-rigid motion artifacts.
+The motion artifacts present in our sample come in two flavors, `rigid` and `non-rigid`. See :ref:`Types of Registration <tut_types_of_reg>` for more information.
 
 .. thumbnail:: ../_images/reg_patches.png
    :width: 1440
+
+-----
 
 First, a template image is created by averaging the first 200 frames. This image is used to align each and every frame in the timeseries. As frames are aligned, the template is updated to more closely match the pixel locations of the previous frames.
 
@@ -54,7 +56,7 @@ The last parameter for this step is a NoRMCorre parameters object.
 This is just a `MATLAB structured array <https://www.mathworks.com/help/matlab/ref/struct.html>`_ that expects specific values. 
 NoRMCorre provides the algorithm for registration and dictates the values in that struct.
 
-There is an example parameters struct at the root of this repository, :scpt:`https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/blob/master/demo_CNMF_params.m`.
+There is an example parameters struct at the root of this project (`Github <https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/blob/master/demo_CNMF_params.m>`_).
 
 .. warning::
 
@@ -189,7 +191,7 @@ Validate Outputs
 
 .. hint::
 
-   Figures of the below validation metrics are placed in your save_path as `figures/registration_metrics_plane_N`:
+   Figures of the below validation metrics are placed in your :code:`save_path` as :code:`figures/registration_metrics_plane_N`:
 
    .. thumbnail:: ../_images/reg_figure_output.png
       :title: Figure Output
@@ -213,7 +215,7 @@ The above image shows these correlations. Closer to 1 (the top of the graph) ind
 
 The high degree of overlap between rigid/non-rigid registration indicates our movie did not benefit from non-rigid motion correction.
 
-This could be due to too large of a grid size or a general lack of non-uniform motion.
+This could be due to too large of a :code:`grid_size` or a general lack of non-uniform motion.
 
 .. thumbnail:: ../_images/reg_correlation_zoom.png
    :title: Correlation Metrics
