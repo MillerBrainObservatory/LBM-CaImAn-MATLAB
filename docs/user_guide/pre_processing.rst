@@ -184,5 +184,20 @@ We can see that our plane quality changes with depth:
     :title: Phase-Offset
     :align: center
 
-For more examples of reading, viewing and creating graphics for your data, see tips and tricks on :ref:`exploring datasets in MATLAB <explore_data_matlab>`
+Additionally, you can use this images to get an idea of values you want to use for registration.
+
+For example, consider the below image:
+
+.. thumbnail:: ../_images/ex_brightest_feature.png
+    :width: 800
+    :title: Brightest Feature
+    :align: center
+
+Taking the :ref:`pixel resolution <pixel_resolution>` of 
+
+3μm from our metadata, we see this neuron is ~10μm wide.
+
+We may then want to limit our :ref:`NoRMCorre Parameters <normcorre_params>` to only allow shifts of this size with :code:`max_shift=10/metadata.pixel_resolution`.
+
+To get a sense of how much motion is present in your timeseries, see :ref:`tips and tricks: exploring datasets in MATLAB <explore_data_matlab>`
 

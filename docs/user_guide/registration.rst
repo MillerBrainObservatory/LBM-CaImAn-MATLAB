@@ -11,90 +11,21 @@ Registration
 
 We use `Image registration <https://en.wikipedia.org/wiki/Image_registration>`_ to make sure that our neuron in the first frame is in the same spatial location as in frame N throughout the time-series.
 
-Disturbances, or movement, causing variations in pixel locations between frames are called motion artifacts.
+.. _reg_overview:
 
-The motion artifacts present in our sample come in two flavors, `rigid` and `non-rigid`.
+Overview
+============
 
-.. _r_vs_nr:
+Disturbances or movement in our timeseries cause variations in pixel locations between frames called **motion artifacts**.
 
-Rigid vs Non-Rigid
-====================
-
-Rigid motion
-: The object is moved with its shape and size preserved.
-
-- simple
-- applies to each pixel equally
-- The entire 2D image is shifted by a number of pixels in the x direction and y direction.
-
-Non-Rigid motion
-: The object is moved and transforms shape or size.
-
-- complex
-- region A requires more shift than region B
-
-Correcting for non-rigid motion requires dividing the field-of-view into patches, and performing *rigid* motion correction on each patch.
+The motion artifacts present in our sample come in two flavors, `rigid` and `non-rigid`. See :ref:`Types of Registration <tut_types_of_reg>` to become familiar with rigid vs non-rigid motion artifacts.
 
 .. thumbnail:: ../_images/reg_patches.png
    :width: 1440
 
-With movies that exibit little sub-cellular movement over the course of a timeseries, non-rigid registration is often overkill as rigid-registration will do a good enough job.
+First, a template image is created by averaging the first 200 frames. This image is used to align each and every frame in the timeseries. As frames are aligned, the template is updated to more closely match the pixel locations of the previous frames.
 
-Rigid Registration
----------------------------
-
-Rigid registration is accomplished by giving NoRMCorre no variable for :code:`grid-size`, so it defaults to the size of your image and thus only processing a single patch encompassing the entire field-of-view.
-
-Ideally, you want registration parameters in units of real-world values.
-
-For example, rather than specifying a max-shift of 5 pixels, use the :ref:`pixel_resolution` metadata to calculate a :code:`max-shift` of ~1/2 size of the neuron:
-
-.. code-block:: MATLAB
-
-   % assuming a typical cortical neuron size of 15 micron
-   max_shift = 7.5/metadata.pixel_resolution
-
-Here, we use the :ref:`pixel resolution <pixel_resolution>` (how many microns each pixel represents) to express a **max shift of 20 micron**:
-
-.. code-block:: MATLAB
-
-   plane_name = fullfile("path/to/raw_tif"); 
-   metadata = read_metadata(plane_name);
-
-   max_shift = 20/metadata.pixel_resolution
-
-We can then use this value in our own parameters struct with the help of :func:`read_plane()`:
-
-.. code-block:: MATLAB
-
-   % default dataset name
-   % depends on your input for the `ds` parameter in subsequent steps
-   dataset_name = '/Y'; 
-   plane_number = 1;
-
-   Y = read_plane(plane_name, 'ds', dataset_name, 'plane', plane_number);
-
-   % empty grid-size results in rigid-registration
-   options_rigid = NoRMCorreSetParms(...
-      'd1',size(Y, 1),... 
-      'd2',size(Y, 2),...
-      'bin_width',200,...   % number of frames to initialze the template
-      'max_shift', round(20/pixel_resolution), ... % still useful in non-rigid
-   );
-
-Non-rigid Registration
----------------------------
-
-.. code-block:: MATLAB
-
-   options_rigid = NoRMCorreSetParms(...
-      'd1',size(Y, 1),... 
-      'd2',size(Y, 2),...
-      'bin_width',200,...   % number of frames to initialze the template
-      'max_shift', round(20/pixel_resolution), ... % still useful in non-rigid
-   );
-
-.. _reg_inputs:
+A well motion-corrected movie will show that each frame is highly correlated with the mean image.
 
 Inputs
 ====================
@@ -113,6 +44,8 @@ In addition to the default function inputs described in section :ref:`parameters
 .. note::
 
    All planes in between :code:`start_plane` and :code:`end_plane` will undergo registration `sequentially <https://www.merriam-webster.com/dictionary/sequential>`_.
+
+.. _normcorre_params:
 
 NoRMCorre Parameters
 -----------------------
@@ -141,9 +74,69 @@ The most important NoRMCorre parameters are:
 4. :code:`correct_bidir`
 : Attempts to correct for bi-directional scan offsets, a step that was performed :ref:`in pre-processing <scan_phase>`.
 
-.. hint:: 
+.. hint:: MAX SHIFT PARAMETER
 
-   If you see single frame, large shifts (e.g. > 20% of your neuron size), try decreasing the :code:`max-shift` parameter.
+   For timeseries where the FOV is sparsely labeled or a frame is corrupted, the registration process of two neighboring patches can produce very different shifts, which can lead to corrupted registered frames. we limit the allowed shift.
+
+   If you see large single-frame spikes, try decreasing the :code:`max-shift` parameter.
+
+.. _rigid_registration:
+
+Rigid Registration
+---------------------------
+
+Rigid registration is accomplished by giving NoRMCorre no variable for :code:`grid-size`, so it defaults to the size of your image and thus only processing a single patch encompassing the entire field-of-view.
+
+Ideally, you want registration parameters in units of *real-world values*.
+
+For example, rather than specifying a max-shift in units of pixels, use the :ref:`pixel_resolution` metadata to calculate a :code:`max-shift` of ~1/2 size of the neuron:
+
+.. code-block:: MATLAB
+
+   plane_name = fullfile("path/to/raw_tif"); 
+   metadata = read_metadata(plane_name);
+
+   % assuming a typical cortical neuron size of 15 micron
+   max_shift = 7.5/metadata.pixel_resolution
+
+We can then use this value in our own parameters struct with the help of :func:`read_plane()`:
+
+.. code-block:: MATLAB
+
+   % default dataset name
+   % depends on your input for the `ds` parameter in subsequent steps
+   dataset_name = '/Y'; 
+   plane_number = 1;
+
+   Y = read_plane(plane_name, 'ds', dataset_name, 'plane', plane_number);
+
+   % empty grid-size results in rigid-registration
+   options_rigid = NoRMCorreSetParms(...
+      'd1',size(Y, 1),... 
+      'd2',size(Y, 2),...
+      'bin_width',200,...   % number of frames to initialze the template
+      'max_shift', round(7.5/pixel_resolution), ... % still useful in non-rigid
+   );
+
+.. _nonrigid_registration:
+
+Non-rigid Registration
+---------------------------
+
+To perform non-rigid registration, you must specify the size of the patches you want to split the FOV into.
+
+Typical patch sizes for :code:`512x512` movies are :code:`32x32`, which would lead to :code:`512/32=16` blocks that will be motion-corrected in parallel.
+
+.. code-block:: MATLAB
+
+   options_rigid = NoRMCorreSetParms(...
+      'd1',size(Y, 1),... 
+      'd2',size(Y, 2),...
+      'bin_width',200,...   % number of frames to initialze the template
+      'max_shift', round(20/pixel_resolution), ... % still useful in non-rigid
+   );
+
+.. _reg_inputs:
 
 
 .. _registration_outputs:
@@ -151,14 +144,14 @@ The most important NoRMCorre parameters are:
 Outputs
 ========================
 
-Just like :ref:`pre-processing <extraction_inputs>`, registration outputs in `.h5` format.
+Just like :ref:`pre-processing <extraction_inputs>`, registration outputs in :code:`.h5` format.
 
 .. _registration_format:
 
 File-Format
 -------------
 
-Output data are saved in `.h5` format, with the following characteristics:
+Output data are saved in :code:`.h5` format, with the following characteristics:
 - one file per plane
 - named "registration_plane_N.h5"
 - metadata saved as attributes
@@ -194,45 +187,36 @@ This file has the following groups:
 Validate Outputs
 -------------------------
 
-.. note::
+.. hint::
 
-   Figures of the below validation metrics are placed in your save_path as `figures/registration_metrics_plane_N`.
+   Figures of the below validation metrics are placed in your save_path as `figures/registration_metrics_plane_N`:
 
-The primary method to evaluate registration are with correlation images.
+   .. thumbnail:: ../_images/reg_figure_output.png
+      :title: Figure Output
+      :align: center
+      :width: 50%
 
 Internally, the pipeline first create a "template" using :ref:`rigid registration <tut_rigid>`. Each frame of the timeseries is aligned to this frame.
 
-The distance to shift these pixels is computed by locating the maximum of the cross-correlation between the each and every frame and the template.
+The distance needed to shift these pixels to most closely align with the template is computed by locating the maximum of the cross-correlation between the each and every frame and the template.
 
 .. thumbnail:: ../_images/reg_correlation.png
    :title: Correlation Metrics
 
-The above image shows these correlations.
-
 Pixels that are highly correlated over the timecourse of an experiment are stationary in the image. Proper registration should **increase the correlation between neighboring pixels**.
 
-The above shows the correlation coefficient for the raw image, template image created with rigid registration, and peicewise-rigid registration.
+------
 
-Values closer to 1 indicate a frame that is more correlated with the mean image.
+.. thumbnail:: ../_images/reg_corr_with_mean.svg
 
-Immediately obvious is the sharp decrease in correlation present in the blue raw data that was corrected in the rigid/non-ridid datapoints.
+The above image shows these correlations. Closer to 1 (the top of the graph) indicates high correlation and a more stationary image.
+
+The high degree of overlap between rigid/non-rigid registration indicates our movie did not benefit from non-rigid motion correction.
+
+This could be due to too large of a grid size or a general lack of non-uniform motion.
 
 .. thumbnail:: ../_images/reg_correlation_zoom.png
    :title: Correlation Metrics
-
-.. TODO
-
-There is very little improvement gained by performing non-rigid motion correction, which is a very computationally demanding task.
-
-These metrics are provided for you alongside the mean images and X/Y shifts to help assess the contribution of movement in the X and Y directions.
-
-Particularly helpful is directly comparing pixel correlations between :ref:`3D timeseries <terms>`:
-
-.. thumbnail:: ../_images/reg_corr_solo.svg
-
-.. thumbnail:: ../_images/reg_metrics.png
-
-.. thumbnail:: ../_images/reg_shifts.png
 
 .. tip::
 

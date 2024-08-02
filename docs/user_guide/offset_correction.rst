@@ -7,29 +7,6 @@ Core function(s): :func:`calculateZOffset()`
 
 Before the session being processed, you should have aquired a cailbration file named something like `pollen_calibration_00001.tif`.
 
-Background
----------------
-
-Light beads traveling to our sample need to be temporally distinct relative to our sensor
-so that the aquisition system knows the origin and subsequent depth of each bead.
-
-The current LBM design incoorperates 2 cavities, hereby named `Cavity A` and `Cavity B`.
-These two cavities are non-overlapping areas where light beads travel. If we plot
-a sample pollen grain through each z-depth, we can see these cavities manifest:
-
-.. thumbnail:: ../_images/z_pollen_depth.svg
-   :width: 600
-   :align: center
-
-We see a bi-modal distribution of Signal (Y) vs z-depth.
-
-This pollen grain is sampled just like a brain would be sampled. We can
-preview the time-series resulting from this pollen to get a preliminary
-look at our recording quality:
-
-.. thumbnail:: ../_images/pollen/pollen_frame.png
-   :width: 600
-
 Axial Correction Inputs
 ---------------------------
 
@@ -48,13 +25,14 @@ Before proceeding:
 
 First, the [Y, X] offsets (in microns) are used for an initial, dirty axial alignment:
 
-.. thumbnail:: ../_images/pollen/pollen_shifts.png
-   :width: 600
+.. .. thumbnail:: ../_images/pollen/pollen_shifts.png
+..    :width: 600
 
 This alignment should improve the spatial consistency between z-planes, but there is a
 further refinement step which prompts a graphical interface for z-plane(n) and z-plane(n+1).
 
-The user will be prompted to select the same **feature** / **region-of-interest** / **neuron**.
+You will be prompted to select the same **feature** / **region-of-interest** / **neuron**.
+
 After selecting 3 neurons for each plane, you are done with the LBM pipeline.
 
 Depending on your axial field-of-view, there is likely neuronal contamination between z-planes.
