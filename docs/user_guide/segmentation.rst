@@ -1,6 +1,6 @@
 .. _source_extraction:
 
-Source Extraction
+Segmentation
 ################################
 
 Function for this step: :func:`segmentPlane()`
@@ -68,7 +68,7 @@ Before running segmentation, make sure you:
 
 .. _seg_inputs:
 
-Segmentation Inputs
+Inputs
 =========================
 
 Inputs (covered in :ref:`params`) are consistent with :ref:`registration`, substituting::
@@ -166,6 +166,9 @@ This is the autoregressive order of the system.
 Segmentation Outputs
 ============================
 
+H5 Groups
+------------
+
 The output of the analysis includes several key variables that describe the segmented neuronal components and their corresponding activities.
 
 Below is a description of each output variable, along with an example of how to use them and what they represent.
@@ -207,6 +210,7 @@ Below is a description of each output variable, along with an example of how to 
 .. code-block:: MATLAB
 
     >> figure; imagesc(Ac_keep(:,:,1)); axis image; axis tight; axis off; colormap gray; title("Single Spatial Component");
+
     >> size(Ac_keep)
 
     ans =
