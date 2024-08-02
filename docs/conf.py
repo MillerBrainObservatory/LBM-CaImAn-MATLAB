@@ -72,7 +72,10 @@ myst_enable_extensions = [
 ]
 
 intersphinx_mapping = {
-    "mbo": ("../../millerbrainobservatory.github.io/docs/build/html/", None),
+    "mbo": (
+        "/home/flynn/repos/work/millerbrainobservatory.github.io/docs/build/html/",
+        None,
+    ),
 }
 
 templates_path = ["_templates"]
