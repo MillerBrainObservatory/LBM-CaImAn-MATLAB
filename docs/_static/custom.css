@@ -106,3 +106,8 @@ span.label {
 .toctree-l2 {
     font-size: 0.8rem;
 }
+
+pre {
+  background-color: #0F111A;
+}
+
