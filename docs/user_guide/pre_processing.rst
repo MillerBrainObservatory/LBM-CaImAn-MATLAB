@@ -110,23 +110,27 @@ Outputs
 
 .. _extraction_format:
 
-Output data are saved in `.h5` format, with the following characteristics:
-- one file per plane
+Output data are saved in :code:`.h5` format, with the following characteristics:
+
+- one file-per-plane
+
 - named "extraction_plane_N.h5"
+
 - metadata saved as attributes
 
-You can use :code:`h5info(h5path)` in the MATLAB command window to reveal some helpful information about our data.
 
 H5 Groups
 ----------------
 
-The following is an example structure of the HDF5 file at the outermost level:
+You can use :code:`h5info(h5path)` in the MATLAB command window to reveal some helpful information about our data.
+
+For example, the following is an example structure of the :code:`.h5` file at the outermost level:
 
 .. code-block:: MATLAB
 
     h5info(extract_path, '/extraction')
 
-    Filename: 'C:\Users\<username>\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5'
+    Filename: 'C:\Users\<username>\high_res_dataset.h5'
     Name: '/extraction'
     Groups:
         /plane_1
@@ -162,7 +166,7 @@ We see that there are 30 datasets corresponding to each of our Z-planes, but no 
 
 .. _eval_outputs:
 
-Evaluate outputs
+Validate Outputs
 -------------------
 
 In your :code:`save_path`, you will see a newly created :code:`figures` folder. This contains an image for each [X,Y,T] plane and checks for proper tiling.
