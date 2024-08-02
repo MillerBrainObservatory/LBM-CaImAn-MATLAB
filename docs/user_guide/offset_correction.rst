@@ -17,8 +17,9 @@ The current LBM design incoorperates 2 cavities, hereby named `Cavity A` and `Ca
 These two cavities are non-overlapping areas where light beads travel. If we plot
 a sample pollen grain through each z-depth, we can see these cavities manifest:
 
-.. thumbnail:: ../_images/pollen/pollen_depth.svg
+.. thumbnail:: ../_images/z_pollen_depth.svg
    :width: 600
+   :align: center
 
 We see a bi-modal distribution of Signal (Y) vs z-depth.
 
