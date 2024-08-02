@@ -9,7 +9,7 @@ Registration
    Similary, non-rigid and peicewise-rigid are often used interchangably.
    Here, peicewise-rigid registration is the **method** to correct for non-rigid motion.
 
-We use `Image registration <https://en.wikipedia.org/wiki/Image_registration>`_ to make sure that our neuron in the first frame is in the same spatial location as in frame N throughout the time-series.
+We use `image registration <https://en.wikipedia.org/wiki/Image_registration>`_ to make sure that our neuron in the first frame is in the same spatial location as in frame N throughout the time-series.
 
 .. _reg_overview:
 
