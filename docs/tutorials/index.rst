@@ -9,7 +9,7 @@ This section coveres theory underlying pipeline processes.
 .. toctree::
     :maxdepth: 2
     :caption: Tutorials
-    :numbered: 3
+    :numbered: 4
 
     registration_tutorial
     segmentation_tutorial
