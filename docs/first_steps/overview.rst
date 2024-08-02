@@ -13,11 +13,11 @@
 
 The bare-minimum to use this pipeline involves calling four functions which have sensible default values for LBM recordings.
 
-The only _required_ input to the pipeline functions are a path where your data lives.
+The only *required* inputs to the pipeline are a path where your raw/previously processed data lives.
 
 This common interface is described here with the goal of avoiding redundancy through the rest of the documentation.
 
-0.2.1 Core Parameters
+0.2.1. Core Parameters
 ==========================
 
 For the :ref:`Core <core_api>` functions in this pipeline, the initial parameters are always the same.
