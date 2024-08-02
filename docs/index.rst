@@ -6,9 +6,8 @@ LBM-CaImAn-MATLAB Documentation
 
 |Repository| |Release| |Issues|
 
-Currently, inputs to this pipeline are limited to `ScanImage`_ `tiff` files. However, only the
-first step of this pipeline which converts the multi-ROI .tiff into a 4D volumetric time-series
-requires scanimage `.tiff` files.
+Currently, inputs to this pipeline are limited to `ScanImage`_ `tiff` files.
+However, only the first step of this pipeline which converts the multi-ROI .tiff into a 4D volumetric time-series requires scanimage `.tiff` files.
 
 Pipeline Steps
 *****************
