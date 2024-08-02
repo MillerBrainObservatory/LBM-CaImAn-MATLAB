@@ -87,3 +87,52 @@ Optional parameters must be given a name for the function to parse:
 
 See the included script :scpt:`demo_LBM_pipeline` at the root of this repository for a working example.
 
+0.2.2. Logging
+==================
+
+To File
+-----------
+
+A log file will be saved with every processing step.
+
+This logs the start time and duration of each computation, as well as storing metadata and function parameters.
+
+The pipeline step is prepended to the function name, followed by the data and time of the run.
+
+To Command Window
+------------------------
+
+Additionally, you will see metadata printed to the command window when a processing step is started:
+
+.. code-block:: MATLAB
+   
+    Log file created: save_path\2024_08_02_11_21_05_segmentation.log
+    Beginning registration with 23 cores...
+    Beginning plane: 13
+    metadata contents:
+           num_planes = 28
+           num_rois = 2
+           num_frames = 3000
+           frame_rate = 10.5903059418262
+           fov = [1360;2200]
+           pixel_resolution = 3.0205893832943
+           sample_format = int16
+           num_pixel_xy = [224;732]
+           roi_width_px = 224
+           roi_height_px = 732
+           tiff_length = 1480
+           tiff_width = 224
+           raw_filename = mk717_3umpx_10p59hz_224pxby732px_2mroi_350mw_50to550umdeep_00001
+           raw_filepath = D:\DATA\2024-07-31_GCaMP8s_mk717\mk717_3umpx_10p59hz_224pxby732px_2mroi_350mw_50to550umdeep_00001
+           raw_fullfile = D:\DATA\2024-07-31_GCaMP8s_mk717\mk717_3umpx_10p59hz_224pxby732px_2mroi_350mw_50to550umdeep_00001\mk717_3umpx_10p59hz_224pxby732px_2mroi_350mw_50to550umdeep_00001.tif
+           num_lines_between_scanfields = 16
+           center_xy = [-3.779761905;0]
+           line_period = 6.31189695116301e-05
+           scan_frame_period = 0.0944259783893986
+           size_xy = [7.792803117;25.21201008]
+           objective_resolution = 87.26
+           trim_pixels = [0;0;0;0]
+           multifile = 0
+           num_files = 1
+           dataset_name = /Y
+
