@@ -12,6 +12,8 @@ Segmentation Overview
 
    :func:`segmentPlane()` will take significantly longer than the previous steps.
 
+.. note::
+
     Much of work is about separating "good activity", the flourescence changes that we can attribute to a single cell, vs "noise, which is everything else (including signal from other neurons).
     To do this, we take advantage of the fact that the slow calcium signal is typically very similar between adjacent frames.
     See `this blog post <https://gcamp6f.com/2024/04/24/why-your-two-photon-images-are-noisier-than-you-expect/>`_ for a nice discussion on shot noise calculations and poisson processes.
@@ -27,7 +29,6 @@ Turning this flourescence into "spikes" relies on several mathmatical operations
 - infer the times of action potentials from the fluorescence traces (deconvolution).
 
 .. _seg_cnmf:
-
 
 .. image:: ../_images/seg_traces.png
 
