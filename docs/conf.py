@@ -80,7 +80,7 @@ intersphinx_mapping = {
 
 templates_path = ["_templates"]
 
-html_theme = "pydata_sphinx_theme"
+html_theme = "sphinx_book_theme"
 
 html_logo = "_static/CaImAn-MATLAB_logo.svg"
 html_short_title = "LBM CaImAn Pipeline"
