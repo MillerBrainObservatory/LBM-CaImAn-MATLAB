@@ -21,6 +21,7 @@ myst_enable_extensions = [
     "dollarmath",
     "html_image",
 ]
+
 myst_url_schemes = ("http", "https", "mailto")
 
 templates_path = ["_templates"]
@@ -31,7 +32,8 @@ extensions = [
     "sphinxcontrib.images",
     "sphinxcontrib.video",
     "sphinxcontrib.matlab",
-    "myst_nb",
+    # "myst_nb",
+    "myst_parser",
     "sphinx_copybutton",
     "numpydoc",
     "sphinx.ext.intersphinx",
@@ -53,9 +55,10 @@ images_config = dict(
 # suppress_warnings = ["myst.domains", "ref.ref"]
 source_suffix = {
     ".rst": "restructuredtext",
-    ".ipynb": "myst-nb",
-    ".md": "myst-nb",
+    # ".ipynb": "myst-nb",
+    ".md": "markdown",
 }
+
 myst_enable_extensions = [
     "amsmath",
     "attrs_inline",

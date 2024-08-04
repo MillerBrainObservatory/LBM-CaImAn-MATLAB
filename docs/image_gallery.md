@@ -2,6 +2,18 @@
 # Image Gallery
 
 <!-- Extraction -->
+## Pre-Processing / Extraction
+
+[Back to Guide](https://cerodell.github.io/sphinx-quickstart-guide/build/html/addtoindx.html)
+
+
+```{figure} https://github.com/MillerBrainObservatory/static-assets/blob/master/_images/ex_diagram.svg
+---
+alt: ex_diagram_remote
+name: ex_diagram_remote
+---
+Scan-phase diagram (Remote)
+```
 
 ```{figure} ./_images/ex_scanphase.svg
 :scale: 50 %
@@ -90,3 +102,17 @@ Scan-phase diagram
 :name: reg_correlation_rnr
 ```
 
+```{figure} ./_images/pollen/pollen_frame.png
+---
+width: 600
+align: center
+---
+```
+
+```{thumbnail} ./_images/z_pollen_depth.svg
+---
+width: 600
+align: center
+---
+
+```
