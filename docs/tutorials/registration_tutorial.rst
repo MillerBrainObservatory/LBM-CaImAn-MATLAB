@@ -1,7 +1,6 @@
 .. _tut_registration:
 
-Explained: Registration
-###########################
+# Explained: Registration
 
 .. note::
 
@@ -9,19 +8,15 @@ Explained: Registration
    Similary, non-rigid and peicewise-rigid are often used interchangably.
    Here, peicewise-rigid registration is the **method** to correct for non-rigid motion.
 
-.. _tut_types_of_reg:
-
-Types of Registration
-==========================
+(tut_types_of_reg)=
+## Types of Registration
 
 `Image registration <https://en.wikipedia.org/wiki/Image_registration>`_  can often improve the quality of cellular traces obtained during the later segmentation step. 
 
 The motion artifacts present in a 3D timeseries come in two flavors, `rigid` and `non-rigid`.
 
-.. _tut_rigid:
-
-Rigid
----------------------------
+(tut_rigid)=
+### Rigid
 
 Rigid motion
 : The object is moved with its shape and size preserved.
@@ -34,10 +29,8 @@ With timeseries that exibit little sub-cellular movement over the course of a ti
 
 Correcting for non-rigid motion occurs via giving NoRMCorre default parameters, leading to patches the same size as the image.
 
-.. _tut_nonrigid:
-
-Non-rigid
----------------------------
+(tut_nonrigid)=
+### Non-rigid
 
 Non-Rigid motion
 : The object is moved and transforms shape or size.

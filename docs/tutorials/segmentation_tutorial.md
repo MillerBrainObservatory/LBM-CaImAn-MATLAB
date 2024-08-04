@@ -1,12 +1,4 @@
-(tut_source_extraction)=
-
-## Explained: Source Extraction
-
-{.glossary}
-my term
-: Definition of the term
-
-{term}`my term`
+# Explained: Source Extraction
 
 This section details background information helpful with {ref}`Step 3: Segmentation <ug_source_extraction>`}
 
@@ -20,23 +12,9 @@ Subsequent processing would then involve cell identification, classification (as
 
 This pipeline centers around the segmentation algorithm **`Constrained Non-Negative Matrix Factorization (CNMF)`**
 
-### Definitions
+## Constrained Non-Negative Matrix Factorization (CNMF)
 
-`segmentation`
-: The general process of dividing an image based on the contents of that image, in our case, based on neuron location.
-
-`source-extraction`
-: Umbrella term for all of the individual processes that produce a segmented image.
-
-`deconvolution`
-: The process performed after segmentation to the resulting traces to infer spike times from flourescence values.
-
-`CNMF`
-: The name for a set of algorithms within the flatironinstitute's [CaImAn Pipeline](https://github.com/flatironinstitute/CaImAn-MATLAB) that initialize parameters and run source extraction.
-
-### Constrained Non-Negative Matrix Factorization (CNMF)
-
-At a high-level, the CNMF algorithm works by:
+At a high-level, the {term}`CNMF` algorithm works by:
 
 1. Breaking the full FOV into **patches** of {code}`grid_size` with a set {code}`overlap` in each direction.
 2. Looking for K components in each patch.
