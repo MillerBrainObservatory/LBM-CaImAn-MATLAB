@@ -10,5 +10,5 @@ numbered: 3
 ---
 segmentation_tutorial
 axial_correction_tutorial
-
+registration_tutorial
 ```

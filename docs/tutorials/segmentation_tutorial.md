@@ -1,12 +1,12 @@
 # Explained: Source Extraction
 
-This section details background information helpful with {ref}`Step 3: Segmentation <ug_source_extraction>`}
+This section details background information helpful with {ref}`Step 3: Segmentation <ug_source_extraction>`
 
 Source extraction is the umbrella term for a sequence of steps designed to distinguish neurons from background signal calculate the properties and characteristics of these neurons relative to the background.
 
 The first step to source extraction is often the most computationally expensive step of calcium imaging pipelines: Segmentation.
 
-Segmentation is the process of distinguishing between two spatially or temporally correlated neurons using object boundries and regions.
+Segmentation is the process of distinguishing between two spatially or temporally correlated neurons using objec boundries and regions.
 
 Subsequent processing would then involve cell identification, classification (assign labels), and extraction.
 
@@ -17,12 +17,13 @@ This pipeline centers around the segmentation algorithm **`Constrained Non-Negat
 At a high-level, the {term}`CNMF` algorithm works by:
 
 1. Breaking the full FOV into **patches** of {code}`grid_size` with a set {code}`overlap` in each direction.
-2. Looking for K components in each patch.
+2. Looking for {code}`K` number of components in each patch.
 3. Filter false positives.
-4. Combine resulting neuron coordinates **(spatial components)** for each patch into a single structure: :code:`A_keep` and :code:`C_keep`.
-5. The time traces **(temporal components)** in the original resolution are computed from {code:`A_keep` and :code:`C_keep`.
+4. Combine resulting neuron coordinates **(spatial components)** for each patch into a single structure: {code}`A_keep` and {code}`C_keep`.
+5. The time traces **(temporal components)** in the original resolution are computed from {code}`A_keep` and {code}`C_keep`.
 6. Detrended DF/F values are computed.
 7. These detrended values are deconvolved.
+
 <!---->
 <!-- ----- -->
 <!---->
