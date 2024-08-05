@@ -32,14 +32,12 @@ extensions = [
     "sphinxcontrib.images",
     "sphinxcontrib.video",
     "sphinxcontrib.matlab",
-    # "myst_nb",
     "myst_parser",
     "sphinx_copybutton",
     "numpydoc",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    # "sphinx.ext.autosectionlabel",
     "sphinx_togglebutton",
     "sphinx_design",
     "sphinx_tippy",
@@ -52,10 +50,8 @@ images_config = dict(
     default_group="default",
 )
 
-# suppress_warnings = ["myst.domains", "ref.ref"]
 source_suffix = {
     ".rst": "restructuredtext",
-    # ".ipynb": "myst-nb",
     ".md": "markdown",
 }
 
@@ -75,9 +71,17 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
+current_filepath = (
+    Path().home()
+    / "repos"
+    / "work"
+    / "millerbrainobservatory.github.io/docs/build/html/"
+)
+# print(current_filepath.is_dir())
+
 intersphinx_mapping = {
     "mbo": (
-        "/home/flynn/repos/work/millerbrainobservatory.github.io/docs/build/html/",
+        str(current_filepath),
         None,
     ),
 }
@@ -90,7 +94,7 @@ html_logo = "_static/CaImAn-MATLAB_logo.svg"
 html_short_title = "LBM CaImAn Pipeline"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
-html_js_files = ["subtoc.js"]
+# html_js_files = ["subtoc.js"]
 html_favicon = "_static/mbo_icon_dark.ico"
 html_copy_source = True
 
