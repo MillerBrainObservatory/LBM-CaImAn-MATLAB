@@ -193,7 +193,7 @@ For example, consider the below image:
     :title: Brightest Feature
     :align: center
 
-Taking the :ref:`pixel resolution <pixel_resolution>` of 
+Taking the :ref:`pixel resolution <pixel resolution>` of 
 
 3μm from our metadata, we see this neuron is ~10μm wide.
 
