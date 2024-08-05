@@ -1,7 +1,25 @@
+---
+myst:
+  substitutions:
+    key1: "I'm a **substitution**"
+    key2: |
+      ```{note}
+      {{ key1 }}
+      ```
+    key3: |
+      ```{image} https://github.com/MillerBrainObservatory/static-assets/blob/master/_images/MillerBrainObservatory_logo.svg
+      :alt: mbo
+      :width: 200px
+      ```
+    key4: example
+---
 # LBM-CaImAn-MATLAB Documentation
 
-Currently, inputs to this pipeline are limited to {ref}`ScanImage` {code}`.tiff` files.
-However, only the first step of this pipeline which converts the multi-ROI .tiff into a 4D volumetric time-series requires scanimage `.tiff` files.
+Currently, inputs to this pipeline are limited to ScanImage {code}`.tiff` files.
+
+```{note} 
+Only the first step of this pipeline which converts the multi-ROI {code}`.tiff` into a {code}`.h5` files separate volumetric time-series requires scanimage {code}`.tiff` files.
+```
 
 ## Pipeline Overview
 
@@ -28,7 +46,7 @@ align: center
 
 ----------------
 
-For up-to-date pipeline requirements and algorithms, see the github [repository readme](https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB)
+For up-to-date pipeline requirements and algorithms, see the github [repository readme](https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/tree/master?tab=readme-ov-file#light-beads-microscopy-lbm-pipeline-caiman-matlab).
 
 ## Documentation Contents
 
@@ -42,5 +60,6 @@ tutorials/index
 api/index
 image_gallery
 glossary
+links
 
 ```

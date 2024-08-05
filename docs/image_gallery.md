@@ -13,6 +13,13 @@ alt: ex_diagram_remote
 name: ex_diagram_remote
 ---
 Scan-phase diagram (Remote)
+:scale: 50 %
+
+This is the caption of the figure (a simple paragraph).
+
+The legend consists of all elements after the caption.  In this
+case, the legend consists of this paragraph and the following table
+
 ```
 
 ```{figure} ./_images/ex_scanphase.svg
