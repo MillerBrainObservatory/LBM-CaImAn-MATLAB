@@ -1,7 +1,8 @@
-.. _core_api:
+(core_api)=
 
-Core
-======
+# Core
+
+```{eval-rst}
 
 Core functions used to run the pipeline.
 
@@ -13,3 +14,4 @@ Core functions used to run the pipeline.
 .. autofunction:: collatePlanes
 .. autofunction:: calculateZOffset
 
+```
