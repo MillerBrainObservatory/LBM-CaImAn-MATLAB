@@ -1,7 +1,7 @@
 function convertScanImageTiffToVolume(data_path, save_path, ds, debug_flag, do_figures, overwrite, fix_scan_phase, save_temp, varargin)
 % Convert ScanImage .tif files into a 4D volume.
 %
-% Convert raw `ScanImage`_ multi-roi .tif files from a single session
+% Convert raw scanimage multi-roi .tif files from a single session
 % into a single 4D volumetric time-series (x, y, z, t). It's designed to process files for the
 % ScanImage Version: 2016 software.
 %
@@ -54,8 +54,6 @@ function convertScanImageTiffToVolume(data_path, save_path, ds, debug_flag, do_f
 % likes to hang onto the file nice and tight. You may need to restart
 % MATLAB (in some cases your entire computer) to be able to delete a
 % logfile you don't want.
-%
-% .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
 
 % Add necessary paths
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath')));
