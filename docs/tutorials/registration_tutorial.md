@@ -1,22 +1,22 @@
-.. _tut_registration:
-
 # Explained: Registration
 
-.. note::
-
-   The terms motion-correction and registration are often used interchangably.
-   Similary, non-rigid and peicewise-rigid are often used interchangably.
-   Here, peicewise-rigid registration is the **method** to correct for non-rigid motion.
+````{note}
+The terms motion-correction and registration are often used interchangably.
+Similary, non-rigid and peicewise-rigid are often used interchangably.
+Here, peicewise-rigid registration is the **method** to correct for non-rigid motion.
+````
 
 (tut_types_of_reg)=
 ## Types of Registration
 
-`Image registration <https://en.wikipedia.org/wiki/Image_registration>`_  can often improve the quality of cellular traces obtained during the later segmentation step. 
+[Image registration](https://en.wikipedia.org/wiki/Image_registration) can often improve the quality of cellular traces obtained during the later segmentation step. 
 
 The motion artifacts present in a 3D timeseries come in two flavors, `rigid` and `non-rigid`.
 
 (tut_rigid)=
 ### Rigid
+
+{term}`Rigid motion <rigid registration>`
 
 Rigid motion
 : The object is moved with its shape and size preserved.
@@ -42,6 +42,8 @@ Correcting for non-rigid motion requires dividing the field-of-view into patches
 
 Non-rigid registration requires performing rigid registration on small subsections of our image.
 
-.. thumbnail:: ../_images/reg_patches.png
-   :width: 1440
-
+```{thumbnail} ../_images/reg_patches.png
+---
+width: 1440
+---
+```
