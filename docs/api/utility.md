@@ -1,20 +1,23 @@
-.. _utility_api:
-
-Utility
-==========
+(utility_api)=
+# Utility
 
 Functions used by the pipeline that users can take advantage of to further process LBM datasets.
 
+## Readers
+
+```{eval-rst}
+
 .. currentmodule:: utils
 
-Readers
-*********
 .. autofunction:: read_h5_metadata
 .. autofunction:: read_plane
 .. autofunction:: get_metadata
 
-Writers
-*********
+```
+
+## Writers
+
+```{eval-rst}
 
 .. autofunction:: write_frames_2d
 .. autofunction:: write_frames_3d
@@ -27,8 +30,11 @@ Writers
 .. autofunction:: write_mean_images_to_png
 .. autofunction:: reorder_h5_files
 
-Visualization
-****************
+```
+
+## Visualization
+
+```{eval-rst}
 
 .. autofunction:: play_movie
 .. autofunction:: set_caxis
@@ -37,23 +43,13 @@ Visualization
 .. autofunction:: get_segmentation_metrics
 .. autofunction:: translate_frames
 
-Validation
-***********
+```
+
+## Validation
+
+```{eval-rst}
 
 .. autofunction:: validate_toolboxes
 .. autofunction:: display_dataset_names
 
-Internals
-***********
-
-.. _internals_api:
-
-.. currentmodule:: internal
-
-Functions that are meant for use within the pipeline, not for public use.
-
-.. autofunction:: is_valid_group
-.. autofunction:: write_metadata_h5
-.. autofunction:: is_valid_dataset
-.. autofunction:: log_struct
-.. autofunction:: log_message
+```
