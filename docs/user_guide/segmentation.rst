@@ -1,4 +1,4 @@
-.. _source_extraction:
+.. _ug_source_extraction:
 
 Segmentation
 ################################

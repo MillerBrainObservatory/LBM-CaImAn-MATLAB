@@ -18,7 +18,7 @@ Overview
 
 Disturbances or movement in our timeseries cause variations in pixel locations between frames called **motion artifacts**.
 
-The motion artifacts present in our sample come in two flavors, `rigid` and `non-rigid`. See :ref:`Types of Registration <tut_types_of_reg>` for more information.
+The motion artifacts present in our sample come in two flavors, `rigid` and `non-rigid`. See :ref:`Types of Registration <types_of_reg>` for more information.
 
 .. thumbnail:: ../_images/reg_patches.png
    :width: 1440
