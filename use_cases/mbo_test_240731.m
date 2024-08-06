@@ -29,6 +29,7 @@ set(groot, 'DefaultAxesTickDirMode', 'manual');
 
 %% UPDATE: RUN THIS WITH THE PLAY BUTTON, NOT "RUN SECTION"
 % To get eveything added to your path
+
 clc, clear;
 [fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
 addpath(genpath(fullfile(fpath, 'core')));
@@ -46,9 +47,12 @@ end
 
 parent_path = fullfile('D:\DATA\2024-07-31_GCaMP8s_mk717\mk717_1umpx_7p72hz_224pxby668px_3mroi_350mw_50to550umdeep_00001');
 data_path = fullfile(parent_path);
-save_path = fullfile(parent_path, sprintf('extraction_0806'));
-registration_path = fullfile(parent_path, 'registration_0806');
-segmentation_path = fullfile(parent_path, 'segmentation_0806');
+results_path = fullfile(parent_path, "results_0806"); mkdir(results_path);
+save_path = fullfile(results_path, sprintf('extraction')); mkdir(save_path);
+registration_path = fullfile(parent_path, 'registration'); mkdir(registration_path);
+segmentation_path = fullfile(parent_path, 'segmentation'); mkdir(segmentation_path);
+
+%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Extraction %%%%%%%%
@@ -56,8 +60,8 @@ convertScanImageTiffToVolume( ...
     data_path, ...
     'save_path', save_path, ...
     'ds','/Y', ... % default
-    'debug_flag', 1, ...
-    'trim_pixels', [2 2 0 0], ... % default, num pixels to trim for each roi
+    'debug_flag', 0, ...
+    'trim_pixels', [145 145 0 0], ... % default, num pixels to trim for each roi
     'overwrite', 1, ...
     'fix_scan_phase', 0 ...
 );
@@ -76,10 +80,10 @@ motionCorrectPlane( ...
 );
 
 segmentPlane( ...
-    registration_path, ... % we used this to save extracted data
-    'save_path', segmentation_path, ... % save registered data here
+    fullfile(registration_path), ... % we used this to save extracted data
+    'save_path', fullfile(segmentation_path), ... % save registered data here
     'ds', '/Y', ... % where we saved the last step in h5
-    'debug_flag', 1, ...
+    'debug_flag', 0, ...
     'overwrite', 1, ...
     'num_cores', 23, ...
     'start_plane', 14, ...
