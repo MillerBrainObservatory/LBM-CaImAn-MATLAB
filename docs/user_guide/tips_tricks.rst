@@ -174,8 +174,6 @@ Learn about Functions
 
 .. _tnt_num_cores:
 
-.. _num_cores:
-
 Parallel Processing
 ==============================
 

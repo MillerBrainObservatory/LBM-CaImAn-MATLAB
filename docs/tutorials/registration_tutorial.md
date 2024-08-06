@@ -16,7 +16,7 @@ The motion artifacts present in a 3D timeseries come in two flavors, `rigid` and
 (tut_rigid)=
 ### Rigid
 
-{term}`Rigid motion <rigid registration>`
+{term}`Rigid motion <rigid-registration>`
 
 Rigid motion
 : The object is moved with its shape and size preserved.
