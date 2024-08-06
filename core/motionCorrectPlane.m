@@ -35,16 +35,15 @@ function motionCorrectPlane(data_path, save_path, ds, debug_flag, varargin)
 
 p = inputParser;
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
-addOptional(p, 'save_path', @(x) ischar(x) || isstring(x));
-addOptional(p, 'ds', '/Y', @(x) (ischar(x) || isstring(x)));
-addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'save_path', @(x) ischar(x) || isstring(x));
+addParameter(p, 'ds', '/Y', @(x) (ischar(x) || isstring(x)));
+addParameter(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
 addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
 addParameter(p, 'do_figures', 1, @(x) isnumeric(x) && isPositiveIntegerValuedNumeric(x));
-addParameter(p, 'options_rigid', {}, @(x) isstruct(x));
-addParameter(p, 'options_nonrigid', {}, @(x) isstruct(x));
+addParameter(p, 'options', {}, @(x) isstruct(x));
 parse(p,data_path,save_path,ds,debug_flag,varargin{:});
 
 data_path = p.Results.data_path;
@@ -56,8 +55,7 @@ num_cores = p.Results.num_cores;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
 do_figures = p.Results.do_figures;
-options_rigid = p.Results.options_rigid;
-options_nonrigid = p.Results.options_nonrigid;
+options = p.Results.options;
 
 if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", data_path); end
 if debug_flag == 1; dir([data_path, '*.tif']); return; end
@@ -117,6 +115,7 @@ for plane_idx = start_plane:end_plane
     end
 
     Y = read_plane(plane_name,'ds',ds,'plane',plane_idx);
+    Y=Y(:,:,1:600);
     if ~isa(Y,'single');Y = single(Y);end  % we want float32
 
     volume_size = size(Y);
@@ -124,17 +123,15 @@ for plane_idx = start_plane:end_plane
     d2 = volume_size(2);
     pixel_resolution = metadata.pixel_resolution;
 
-    if numel(options_rigid) < 3
-        options_rigid = NoRMCorreSetParms(...
-            'd1',d1,...
-            'd2',d2,...
-            'bin_width',200,...
-            'max_shift', round(20/pixel_resolution),...        % Max shift in px
-            'us_fac',20,...                   % upsample factor
-            'init_batch',200,...              % #frames used to create template
-            'correct_bidir', false...         % DONT Correct bidirectional scanning
-            );
-    end
+    options_rigid = NoRMCorreSetParms(...
+        'd1',d1,...
+        'd2',d2,...
+        'bin_width',200,...
+        'max_shift', round(20/pixel_resolution),...        % Max shift in px
+        'us_fac',20,...                   % upsample factor
+        'init_batch',200,...              % #frames used to create template
+        'correct_bidir', false...         % DONT Correct bidirectional scanning
+        );
 
     % start timer for registration after parpool to avoid inconsistent
     % pool startup times.
@@ -145,19 +142,21 @@ for plane_idx = start_plane:end_plane
     log_message(fid, "Rigid registration complete. Elapsed time: %.3f minutes\n",toc(t_rigid)/60);
 
     % create the template using X/Y shift displacements
+    % with the least variance
     log_message(fid, "Calculating template...\n");
-    shifts1 = squeeze(cat(3,shifts1(:).shifts));
-    shifts_v = movvar(shifts1, 24, 1);
+    shifts_r = squeeze(cat(3,shifts1(:).shifts));
+    shifts_v = movvar(shifts_r, 24, 1);
     [~, minv_idx] = sort(shifts_v, 120);
     best_idx = unique(reshape(minv_idx, 1, []));
     template_good = mean(M1(:,:,best_idx), 3);
 
     % % Non-rigid motion correction using the good template from the rigid
-    if numel(options_nonrigid) < 3
-        options_nonrigid = NoRMCorreSetParms(...
+    if numel(options) < 3
+        options = NoRMCorreSetParms(...
             'd1', d1,...
             'd2', d2,...
             'bin_width', 10,...
+            'grid_size', [64,64], ...
             'max_shift', round(20/pixel_resolution),...
             'us_fac', 20,...
             'init_batch', 200,...
@@ -169,88 +168,67 @@ for plane_idx = start_plane:end_plane
 
     % DFT subpixel registration - results used in CNMF
     t_nonrigid=tic; log_message(fid, "Template creation complete. Beginning non-rigid registration...\n");
-    [M2, shifts2, ~, ~] = normcorre_batch(Y, options_nonrigid, template_good);
+    [M2, shifts2, ~, ~] = normcorre_batch(Y, options, template_good);
     log_message(fid, "Non-rigid registration complete. Elapsed time: %.3f minutes.\n",toc(t_nonrigid)/60);
 
     log_message(fid, "Calculating registration metrics...\n");
 
-    [cY,mY,~] = motion_metrics(Y,10);
-    [cM1,mM1,~] = motion_metrics(M1,10);
-    [cM2,mM2,~] = motion_metrics(M2,10);
-    T = length(cY);
     if do_figures
 
         log_message(fid, "Plotting registration metrics...\n");
 
         fig_plane_name = sprintf("%s/plane_%d", fig_save_path, plane_idx);
         metrics_name_png = sprintf("%s_metrics.png", fig_plane_name);
+        metrics_name_fig = sprintf("%s_metrics.fig", fig_plane_name);
 
-        f = figure('Visible', 'off', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
+        [cY,mY,~] = motion_metrics(Y,10);
+        [cM1,mM1,~] = motion_metrics(M1,10);
+        [cM2,mM2,~] = motion_metrics(M2,10);
+        T = length(cY);
 
-        ax1 = subplot(2, 2, 1); imagesc(mY); axis equal; axis tight; axis off;
+        f = figure('Visible', 'on', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
+        ax1 = subplot(2, 3, 1); imagesc(mY); axis equal; axis tight; axis off;
         title('mean raw data', 'fontsize', 10, 'fontweight', 'bold');
 
-        % ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off;
-        % title('mean rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
-
-        ax2 = subplot(2, 2, 2); imagesc(mM2); axis equal; axis tight; axis off;
-        title('mean corrected', 'fontsize', 10, 'fontweight', 'bold');
-        subplot(2, 2, 3); plot(1:T, cY, 1:T, cM2); legend('raw data', 'corrected');
+        ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off;
+        title('mean rigid template', 'fontsize', 10, 'fontweight', 'bold');
+        ax3 = subplot(2, 3, 3); imagesc(mM2); axis equal; axis tight; axis off;
+        title('mean non-rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
+        subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid');
         title('correlation coefficients', 'fontsize', 10, 'fontweight', 'bold');
-        subplot(2, 2, 4); scatter(cY, cM2); hold on;
-        plot([0.9 * min(cY), 1.05 * max(cM2)], [0.9 * min(cY), 1.05 * max(cM2)], '--r'); axis square;
-        xlabel('raw data', 'fontsize', 10, 'fontweight', 'bold'); ylabel('corrected', 'fontsize', 10, 'fontweight', 'bold');
-        linkaxes([ax1, ax2], 'xy');
-        exportgraphics(f,metrics_name_png,'Resolution',600,'BackgroundColor','k');
+        subplot(2, 3, 5); scatter(cY, cM1); hold on;
+        plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
+        xlabel('raw data', 'fontsize', 10, 'fontweight', 'bold'); ylabel('rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
+        subplot(2, 3, 6); scatter(cM1, cM2); hold on;
+        plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
+        xlabel('rigid template', 'fontsize', 10, 'fontweight', 'bold'); ylabel('non-rigid correlation', 'fontsize', 10, 'fontweight', 'bold');
+        linkaxes([ax1, ax2, ax3], 'xy');
+        savefig(metrics_name_fig)
+        exportgraphics(f, metrics_name_png, 'Resolution', 600);
         close(f);
     end
 
     log_message(fid, "Calculating registration shifts...\n");
 
-    shifts2 = cat(ndims(shifts2(1).shifts)+1,shifts2(:).shifts);
-    shifts2 = reshape(shifts2,[],ndims(Y)-1,T);
-    shifts_x = squeeze(shifts2(:,1,:))';
-    shifts_y = squeeze(shifts2(:,2,:))';
+    shifts_nr = cat(ndims(shifts2(1).shifts)+1,shifts2(:).shifts);
+    shifts_nr = reshape(shifts_nr,[],ndims(Y)-1,T);
+    shifts_x = squeeze(shifts_nr(:,1,:))';
+    shifts_y = squeeze(shifts_nr(:,2,:))';
     if do_figures
         log_message(fid, "Plotting registration shifts...\n");
 
         shifts_name_png = sprintf("%s_shifts.png", fig_plane_name);
-        f = figure("Visible","off"); % changed to "on" for debugging
+        shifts_name_fig = sprintf("%s_shifts.fig", fig_plane_name);
 
-        ax1 = subplot(311);
-        plot(1:T, cY, 'LineWidth', 2); hold on;
-        plot(1:T, cM1, 'LineWidth', 2,  'LineStyle', '--');
-        plot(1:T, cM2, 'LineWidth', 2, 'LineStyle', '--');
-        legend('raw data', 'rigid', 'non-rigid');
-        title('correlation coefficients', 'fontsize', 8, 'fontweight', 'bold');
-        set(gca, 'Xtick', []);
-
-        ax2 = subplot(312);
-        plot(shifts_x, 'LineWidth', 2, 'Marker', 'none');
-        hold on;
-        plot(shifts2(:,1), '--r', 'LineWidth', .5);
-        title('displacements along x', 'fontsize', 8, 'fontweight', 'bold');
-        set(gca, 'Xtick', []);
-        xlim([81 1678]);
-        ylim([-1.88 3.84]);
-
-        ax3 = subplot(313);
-        plot(shifts_y, 'LineWidth', 2, 'Marker', 'none');
-        hold on;
-        plot(squeeze(shifts2(:,2)), '--r', 'LineWidth', .5);
-        title('displacements along y','fontsize',8,'fontweight','bold');
-        xlabel('timestep','fontsize',8,'fontweight','bold');
-
-        set(f, 'Position', [1.0000 64.0000 1270.0000 883.0000]);
-        set(ax1, 'Position', [0.1300 0.6739 0.7750 0.2157]);
-        set(ax2, 'Position', [0.1300 0.4096 0.7750 0.2157]);
-        set(ax3, 'Position', [0.1300 0.1453 0.7750 0.2157]);
-        set(ax1, 'Box', 'off');
-        set(ax2, 'Box', 'off');
-
-        % Link axes
-        linkaxes([ax1, ax2, ax3], 'x');
-        exportgraphics(f,shifts_name_png, 'Resolution', 600, 'BackgroundColor', 'k');
+        ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2); legend('raw data','rigid','non-rigid'); title('correlation coefficients','fontsize',14,'fontweight','bold')
+        set(gca,'Xtick',[])
+        ax2 = subplot(312); plot(shifts_x, 'LineWidth',.2); title('displacements along x','fontsize',14,'fontweight','bold')
+        set(gca,'Xtick',[])
+        ax3 = subplot(313); plot(shifts_y); title('displacements along y','fontsize',14,'fontweight','bold')
+        xlabel('timestep','fontsize',14,'fontweight','bold')
+        linkaxes([ax1,ax2,ax3],'x')
+        exportgraphics(f,shifts_name_png, 'Resolution', 600);
+        savefig(shifts_name_fig);
         close(f);
     end
 
