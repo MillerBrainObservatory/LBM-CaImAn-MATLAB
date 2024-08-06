@@ -67,11 +67,11 @@ p = inputParser;
 
 % Define the parameters
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
-addOptional(p, 'save_path', data_path, @(x) ischar(x) || isstring(x));
-addOptional(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)));
-addOptional(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
-addOptional(p, 'do_figures', 0, @(x) isnumeric(x) || islogical(x));
-addOptional(p, 'overwrite', true, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'save_path', '', @(x) ischar(x) || isstring(x));
+addParameter(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)));
+addParameter(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'do_figures', 1, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'overwrite', true, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'fix_scan_phase', true, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'trim_pixels', [0 0 0 0], @isnumeric);
 addParameter(p, 'save_temp', true, @(x) isnumeric(x) || islogical(x));
@@ -80,8 +80,8 @@ addParameter(p, 'save_temp', true, @(x) isnumeric(x) || islogical(x));
 parse(p, data_path, save_path, ds, debug_flag, do_figures, overwrite, fix_scan_phase, save_temp, varargin{:});
 
 % Retrieve the parsed input arguments
-data_path = fullfile(p.Results.data_path);
-save_path = fullfile(p.Results.save_path);
+data_path = convertStringsToChars(p.Results.data_path);
+save_path = convertStringsToChars(p.Results.save_path);
 
 ds = p.Results.ds;
 debug_flag = p.Results.debug_flag;
@@ -94,7 +94,8 @@ if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", fullfile(da
 if debug_flag == 1; dir([data_path, '*.tif']); return; end
 
 raw_files = []; extracted_files = [];
-if ~isfolder(save_path)
+if ~isempty(save_path) % if empty, use data_path, otherwise create it
+    % TODO: we should use fileparts to check that the parent folder exists
     warning("No save_path given. Saving data in data_path: %s\n", fullfile(data_path));
     save_path = data_path;
 else
@@ -161,12 +162,6 @@ metadata = get_metadata(firstFileFullPath);
 
 [t_left, t_right, t_top, t_bottom] = deal(trim_pixels(1), trim_pixels(2), trim_pixels(3), trim_pixels(4));
 metadata.trim_pixels = [t_left, t_right, t_top, t_bottom]; % store the number of pixels to trim
-raw_x = metadata.num_pixel_xy(1);
-raw_x = min(raw_x, metadata.tiff_width);
-raw_y = metadata.num_pixel_xy(2);
-raw_y = min(raw_y, metadata.tiff_length);
-trimmed_yslice = (t_top+1:raw_y-t_bottom);
-trimmed_xslice = (t_left+1:raw_x-t_right);
 
 metadata.multifile=multifile;
 metadata.num_files=num_files;
@@ -174,6 +169,18 @@ num_planes = metadata.num_planes;
 num_rois = metadata.num_rois;
 num_frames = metadata.num_frames;
 data_type = metadata.sample_format;
+tiff_width = metadata.tiff_width;
+
+raw_x_roi = metadata.num_pixel_xy(1);
+raw_x_roi = min(raw_x_roi, tiff_width);
+raw_x = raw_x_roi * num_rois;
+
+raw_y_roi = metadata.num_pixel_xy(2);
+raw_y_roi = min(raw_y_roi, metadata.tiff_length);
+raw_y = raw_y_roi * num_rois;
+
+trimmed_yslice = (t_top+1:raw_y_roi-t_bottom);
+trimmed_xslice = (t_left+1:raw_x_roi-t_right);
 
 metadata.dataset_name = ds;
 metadata.num_files = num_files;
@@ -201,7 +208,7 @@ if save_temp
         for pi = 1:num_planes
             tps = tic;
             plane_name = sprintf("raw_plane_%d.h5", pi);
-            full_name = fullfile(save_path, plane_name);
+            full_name = fullfile(data_path, plane_name);
             if isfile(full_name)
                 if overwrite
                     log_message(fid, "File %s exists, deleting...\n", full_name);
@@ -220,7 +227,7 @@ if save_temp
     clear hTif size_y plane_name
 end
 tfile = tic;
-z_timeseries = zeros(raw_y, raw_x * metadata.num_rois, num_frames, data_type);
+z_timeseries = zeros(raw_y, raw_x, num_frames, data_type);
 for plane_idx = 1:num_planes
     tplane = tic;
 
@@ -272,11 +279,11 @@ for plane_idx = 1:num_planes
     for roi_idx = 1:metadata.num_rois
         log_message(fid, "Processing ROI: %d/%d...\n", roi_idx, num_rois);
         if cnt > 1
-            raw_offset_y = raw_offset_y + raw_y + metadata.num_lines_between_scanfields;
+            raw_offset_y = raw_offset_y + raw_y_roi + metadata.num_lines_between_scanfields;
         end
 
         % use the **untrimmed** roi in the phase offset correction
-        raw_yslice = (raw_offset_y + 1):(raw_offset_y + raw_y);
+        raw_yslice = (raw_offset_y + 1):(raw_offset_y + raw_y_roi);
         roi_arr = vol(raw_yslice, :, :);
 
         % pre-trim this roi
@@ -302,7 +309,7 @@ for plane_idx = 1:num_planes
             labels = {'Pre-Corrected/Trimmed', 'Phase-Corrected/Trimmed'};
 
             roi_savename = fullfile(fig_save_path, sprintf('plane_%d_roi_%d.png',plane_idx,roi_idx));
-            write_tiled_figure( ...
+            write_images_to_tile( ...
                 images, ...
                 metadata, ...
                 'fig_title', sprintf('ROI %d', roi_idx), ...
@@ -331,7 +338,7 @@ for plane_idx = 1:num_planes
         scales = {scale_full, scale_full, scale_roi};
         plane_save_path = fullfile(fig_save_path, sprintf('plane_%d_mean_frame.png', plane_idx));
 
-        write_tiled_figure( ...
+        write_images_to_tile( ...
             images, ...
             metadata, ...
             'titles', labels, ...
