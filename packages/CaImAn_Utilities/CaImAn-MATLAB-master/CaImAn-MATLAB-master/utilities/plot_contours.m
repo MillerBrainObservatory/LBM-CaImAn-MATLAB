@@ -83,7 +83,7 @@ fontname = 'helvetica';
             if size(Coor{i},2) > 1
                 cont = medfilt1(Coor{i}')';
                 cont = [cont,cont(:,2)];
-                plot(cont(1,2:end),cont(2,2:end),'Color',ln_cl, 'linewidth', 2); hold on;
+                plot(cont(1,2:end),cont(2,2:end),'linewidth', .5); hold on;
             end            
         end
     else
@@ -99,7 +99,7 @@ fontname = 'helvetica';
                 temp =  cumsum(temp);
                 ff = find(temp > (1-thr)*temp(end),1,'first');
                 if ~isempty(ff)
-                    CC{i} = contour(reshape(A_temp,d1,d2),[0,0]+A_temp(ind(ff)),'LineColor',ln_cl, 'linewidth', 2);
+                    CC{i} = contour(reshape(A_temp,d1,d2),[0,0]+A_temp(ind(ff)),'LineColor','m', 'linewidth', 2);
                     fp = find(A_temp >= A_temp(ind(ff)));
                     [ii,jj] = ind2sub([d1,d2],fp);
                     CR{i,1} = [ii,jj]';
