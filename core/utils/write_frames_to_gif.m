@@ -43,19 +43,13 @@ sizY = size(array_3D);
 ndY = numel(sizY);
 nd = ndY-1;
 
-samples_per_frame = prod(sizY(1:nd));
-bytes_per_sample = get_bytes_per_sample(array_3D(:,:,1));
-bytes_per_frame = samples_per_frame * bytes_per_sample;
-
-num_frames = min(sizY(end), floor((size_mb * 1e6) / bytes_per_frame));
-
+% num_frames = min(sizY(end), floor((size_mb * 1e6) / bytes_per_frame));
+num_frames = size(array_3D, 3);
 fprintf("Gif size: %.2f Mb\n", get_mb(array_3D(:,:,1:num_frames)));
 
-min_mov = min(array_3D(:));
-max_mov = max(array_3D(:));
 for t = 1:num_frames
     fprintf('Saving frame %d/%d\r', t, num_frames);
-    frame = (array_3D(:, :, t) - min_mov) / (max_mov - min_mov);
+    frame = array_3D(:, :, t);
     [imind, cm] = gray2ind(frame, 256);
     if t == 1
         imwrite(imind, cm, gif_filename, 'gif', 'Loopcount', inf, 'DelayTime', 0.01);
