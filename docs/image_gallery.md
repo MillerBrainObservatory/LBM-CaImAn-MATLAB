@@ -123,3 +123,14 @@ align: center
 ---
 
 ```
+
+```{figure} ./_images/gh_download.png
+:scale: 50%
+:name: gh_download
+:alt: gh_download
+
+Download project source code.
+
+Navigate to the github repository site and download the source code via "Download ZIP".
+Extract this somewhere on your matlab userpath.
+```

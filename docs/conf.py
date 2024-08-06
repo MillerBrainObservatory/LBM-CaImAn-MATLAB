@@ -32,7 +32,8 @@ extensions = [
     "sphinxcontrib.images",
     "sphinxcontrib.video",
     "sphinxcontrib.matlab",
-    "myst_parser",
+    # "myst_parser",
+    "myst_nb",
     "sphinx_copybutton",
     "numpydoc",
     "sphinx.ext.intersphinx",
@@ -52,7 +53,8 @@ images_config = dict(
 
 source_suffix = {
     ".rst": "restructuredtext",
-    ".md": "markdown",
+    ".md": "myst-nb",
+    ".myst": "myst-nb",
 }
 
 myst_enable_extensions = [
@@ -101,10 +103,10 @@ html_copy_source = True
 html_context = {
     "github_user": "https://github.com/MillerBrainObservatory/",
     "github_repo": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
-    "doc_path": "docs",
 }
 
 html_theme_options = {
+    "path_to_docs": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/tree/master/docs",
     "external_links": [
         {
             "name": "MBO.io",
