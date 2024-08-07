@@ -30,13 +30,10 @@ function segmentPlane(data_path, save_path, varargin)
 % do_figures : double, integer, positive
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
-% cnmf_options : dictionary, mapping
+% options : dictionary, mapping
 %     key:value pairs of all of your CNMF parameters.
 %     See the example parameters in the LBM_demo_pipeline.
 %
-% Returns
-% -------
-% None
 %
 % Notes
 % -----
@@ -154,6 +151,7 @@ for plane_idx = start_plane:end_plane
     %% Load in data
     data = h5read(plane_name, ds);
     if ~isa(data, 'single'); data=single(data); end
+    metadata.movie_path = plane_name;
 
     t_start = tic;
     pixel_resolution = metadata.pixel_resolution;
@@ -182,11 +180,11 @@ for plane_idx = start_plane:end_plane
     % overlap = [10,10];
     % patches = construct_patches(sizY(1:end-1),patch_size,overlap);
     % K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2);
-    patch_size = [40,40];                   % size of each patch along each dimension (optional, default: [32,32])
-    overlap = [8,8];                        % amount of overlap in each dimension (optional, default: [4,4])
+    patch_size = [64,64];                   % size of each patch along each dimension (optional, default: [32,32])
+    overlap = [16,16];                        % amount of overlap in each dimension (optional, default: [4,4])
     
     patches = construct_patches(sizY(1:end-1),patch_size,overlap);
-    K = 7;                                            % number of components to be found
+    K = 7;                                            % number of components to be found / patch
     tau = 8;                                          % std of gaussian kernel (half size of neuron) 
     p = 2;                                            % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
 
@@ -229,24 +227,15 @@ for plane_idx = start_plane:end_plane
             'min_size_thr',mn,...                       % minimum size of each component in pixels (default: 9)
             'refine_flag',0,...
             'rolling_length',ceil(frame_rate*5),...
-            'fr', frame_rate ...
+            'fr', frame_rate, ...
+            'plot_df', 1, ...
+            'make_gif', 1, ...
+            'save_avi', 1, ...
+            'name', fullfile(fig_save_path, 'segmented.avi') ...
         );
-        % options = CNMFSetParms( ...
-        % 'd1',sizY(1),'d2',sizY(2),...
-        % 'nb',1,...                                  % number of background components per patch
-        % 'gnb',3,...                                 % number of global background components
-        % 'ssub',2,...
-        % 'tsub',1,...
-        % 'p',p,...                                   % order of AR dynamics
-        % 'merge_thr',merge_thresh,...                   % merging threshold
-        % 'gSig',tau,... 
-        % 'spatial_method','regularized',...
-        % 'patch_space_thresh',0.25,...
-        % 'rolling_length',ceil(frame_rate*5),...
-        % 'fr', frame_rate, ...
-        % 'min_SNR',2 ...
-        % );
     end
+    h5create(plane_name_save, '/cnmf', size(options));
+    write_metadata_h5(options, plane_name_save, '/opts');
 
     log_message(fid, "Data loaded in. This process took: %0.2f seconds... Beginning CNMF.\n\n", toc(t_start));
     log_message(fid, "--------------------------------------------------\n");
@@ -362,6 +351,7 @@ for plane_idx = start_plane:end_plane
     h5write(plane_name_save,"/acm",acm);
 
     write_metadata_h5(metadata, plane_name_save, '/');
+    write_metadata_h5(options, plane_name_save, '/opts');
     log_message(fid, "Data saved. Elapsed time: %.2f seconds.\n",toc(t_save)/60);
     % savefast(fullfile(save_path, ['caiman_output_plane_' num2str(plane_idx) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')
 end
