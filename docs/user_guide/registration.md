@@ -135,14 +135,13 @@ options_rigid = NoRMCorreSetParms(...
 
 :::
 
-(registration_outputs)=
+(reg_output)=
 ## Outputs
 
 Just like {ref}`pre-processing <extraction_inputs>`, registration outputs in {code}`.h5` format.
 
 (file_format)=
-File-Format
--------------
+### File-Format
 
 Output data are saved in {code}`.h5` format, with the following characteristics:
 - one file per plane
@@ -154,7 +153,7 @@ You can use {code}`h5info(h5path)` in the MATLAB command window to reveal some h
 This file has the following groups:
 
 {code}`/<param>`
-: Takes the name of the {code}`ds` parameter. This group contains the 3D planar timeseries. Default `'/Y'`.
+: Takes the name of the {code}`ds` parameter. This group contains the 3D planar timeseries. Default {code}`'/Y'`}.
 : {code}`h5read()`
 
 {code}`/Ym`
