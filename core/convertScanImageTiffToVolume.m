@@ -1,4 +1,4 @@
-function convertScanImageTiffToVolume(data_path, save_path, ds, debug_flag, do_figures, overwrite, fix_scan_phase, save_temp, varargin)
+function convertScanImageTiffToVolume(data_path, varargin)
 % Convert ScanImage .tif files into a 4D volume.
 %
 % Convert raw `ScanImage`_ multi-roi .tif files from a single session
@@ -26,36 +26,16 @@ function convertScanImageTiffToVolume(data_path, save_path, ds, debug_flag, do_f
 % overwrite : logical, optional
 %     Whether to overwrite existing files. In many instances, entire file
 %     will be deleted. Default is 1.
-% trim_pixels : double, optional
-%     Pixels to trim from [left, right, top, bottom] of each **individual ROI** before
-%     horizontally concatenating the ROI's within an image. Default is
-%     [0 0 0 0]. Only applies to ScanImage multi-ROI recordings.
 % fix_scan_phase : logical, optional
 %     Whether to correct for bi-directional scan artifacts. Default is true.
-% save_temp : logical, optional
-%     Whether to save each raw plane as a temporary hdf5 file. Default is
-%     true.
-%
-% Examples
-% --------
-% % Print all files in the data folder '/data' and exit without processing.
-% convertScanImageTiffToVolume('data/', 'output/', '/Y', 1);
-%
-% % Convert ScanImage TIFF files to 4D volume
-% convertScanImageTiffToVolume('data/', 'output/', '/Y', 0, 0, 1);
-%
-% % Trim 5 pixels from the left and right of each ROI, 10 on the top, none
-% % on the bottom.
-% convertScanImageTiffToVolume('data/', 'output/', '/Y', 0, 1, 1, 'fix_scan_phase', true, 'trim_pixels', [5 5 10 0]);
-%
-% Warnings
-% --------
-% A logfile will accompany each time this function is ran. Sometimes MATLAB
-% likes to hang onto the file nice and tight. You may need to restart
-% MATLAB (in some cases your entire computer) to be able to delete a
-% logfile you don't want.
-%
-% .. _ScanImage: https://www.mbfbioscience.com/products/scanimage/
+% trim_roi : double, optional
+%     Pixels to trim from [left, right, top, bottom] edge of each **INDIVIDUAL ROI** before
+%     horizontally concatenating the ROI's within an image. Default is
+%     [0 0 0 0]. Only applies to ScanImage multi-ROI recordings.
+% trim_image : double, optional
+%     Pixels to trim from [left, right, top, bottom] edge of each **TILED IMAGE** before
+%     horizontally concatenating the ROI's within an image. Default is
+%     [0 0 0 0]. Only applies to ScanImage multi-ROI recordings.
 
 % Add necessary paths
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath')));
@@ -75,42 +55,100 @@ addParameter(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'do_figures', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', true, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'fix_scan_phase', true, @(x) isnumeric(x) || islogical(x));
-addParameter(p, 'trim_pixels', [0 0 0 0], @isnumeric);
-addParameter(p, 'save_temp', true, @(x) isnumeric(x) || islogical(x));
-
+addParameter(p, 'trim_roi', [0 0 0 0], @isnumeric);
+addParameter(p, 'trim_image', [0 0 0 0], @isnumeric);
 % Parse the input arguments
-parse(p, data_path, save_path, ds, debug_flag, do_figures, overwrite, fix_scan_phase, save_temp, varargin{:});
+parse(p,data_path, varargin{:});
 
 % Retrieve the parsed input arguments
 data_path = convertStringsToChars(p.Results.data_path);
 save_path = convertStringsToChars(p.Results.save_path);
 
+% Make the save path in data_path/extracted, if not given
+if isempty(save_path)
+    save_path = fullfile(data_path, 'extracted');
+    if ~isfolder(save_path); mkdir(save_path);
+        warning('Creating save path since one was not provided, located: %s', save_path);
+    end
+end
+
 ds = p.Results.ds;
 debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
 fix_scan_phase = p.Results.fix_scan_phase;
-trim_pixels = p.Results.trim_pixels;
 do_figures = p.Results.do_figures;
+trim_roi = p.Results.trim_roi;
+trim_image = p.Results.trim_image;
 
 if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", fullfile(data_path)); end
 if debug_flag == 1; dir([data_path, '*.tif']); return; end
 
-raw_files = []; extracted_files = [];
-if ~isempty(save_path) % if empty, use data_path, otherwise create it
-    % TODO: we should use fileparts to check that the parent folder exists
-    warning("No save_path given. Saving data in data_path: %s\n", fullfile(data_path));
-    save_path = data_path;
+files = dir(fullfile(data_path, '*.tif*'));
+if isempty(files)
+    error('No suitable tiff files found in: \n  %s', data_path);
+end
+
+log_file_name = sprintf("%s_extraction.log", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
+log_full_path = fullfile(save_path, log_file_name);
+fid = fopen(log_full_path, 'w');
+if fid == -1
+    error('Cannot create or open log file: %s', log_full_path);
 else
-    % save path exists; display whats there with the size
-    contents = dir([save_path, '*.h5']);
-    
-    extracted_files = [];
-    for i = 1:length(contents)
-        if contains(contents(i).name, 'raw_plane_')
-            raw_files = [raw_files; contents(i)];
-        elseif contains(contents(i).name, 'extracted_plane_')
-            extracted_files = [extracted_files; contents(i)];
-        end
+    fprintf('Log file created: %s\n', log_full_path);
+end
+
+if do_figures
+    fig_save_path = fullfile(save_path, "figures");
+    if ~isfolder(fig_save_path); mkdir(fig_save_path); end
+end
+
+num_files=length(files);
+if num_files > 1
+    multifile=true;
+else
+    multifile=false;
+end
+
+firstFileFullPath = fullfile(files(1).folder, files(1).name);
+metadata = get_metadata(firstFileFullPath);
+
+[t_left, t_right, t_top, t_bottom] = deal(trim_roi(1), trim_roi(2), trim_roi(3), trim_roi(4));
+[t_left_image, t_right_image, t_top_image, t_bottom_image] = deal(trim_roi(1), trim_roi(2), trim_roi(3), trim_roi(4));
+
+metadata.trim_roi = [t_left, t_right, t_top, t_bottom]; % store the number of pixels to trim
+metadata.trim_edge = [t_left_image, t_right_image, t_top_image, t_bottom_image]; % store the number of pixels to trim
+
+metadata.multifile=multifile;
+metadata.num_files=num_files;
+num_planes = metadata.num_planes;
+num_rois = metadata.num_rois;
+num_frames = metadata.num_frames;
+data_type = metadata.sample_format;
+tiff_width = metadata.tiff_width;
+
+% Calculate ROI dims and Image dims
+raw_x_roi = metadata.num_pixel_xy(1);
+raw_x_roi = min(raw_x_roi, tiff_width);
+raw_x = raw_x_roi * num_rois;
+
+raw_y_roi = metadata.num_pixel_xy(2);
+raw_y_roi = min(raw_y_roi, metadata.tiff_length);
+
+% ROI slices
+trimmed_yslice = (t_top+1:raw_y_roi-t_bottom); % used to slice roi_arr, which already is separated as an individual roi
+trimmed_xslice = (t_left+1:raw_x-t_right);
+
+%% File structure setup
+raw_files = []; extracted_files = [];
+
+% Case 2: Save path given
+% display whats there with the size
+contents = dir([save_path, '*.h5']);
+for i = 1:length(contents)
+    if contains(contents(i).name, 'raw_plane_')
+        raw_files = [raw_files; contents(i)];
+    elseif contains(contents(i).name, 'extracted_plane_')
+        extracted_files = [extracted_files; contents(i)];
     end
 end
 if ~isempty(raw_files)
@@ -130,60 +168,6 @@ if ~isempty(extracted_files)
     end
 end
 
-log_file_name = sprintf("%s_extraction.log", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
-log_full_path = fullfile(save_path, log_file_name);
-fid = fopen(log_full_path, 'w');
-if fid == -1
-    error('Cannot create or open log file: %s', log_full_path);
-else
-    fprintf('Log file created: %s\n', log_full_path);
-end
-
-if do_figures
-    fig_save_path = fullfile(save_path, "figures");
-    if ~isfolder(fig_save_path); mkdir(fig_save_path); end
-end
-
-files = dir(fullfile(data_path, '*.tif*'));
-if isempty(files)
-    error('No suitable tiff files found in: \n  %s', data_path);
-end
-
-num_files=length(files);
-if num_files > 1
-    multifile=true;
-else
-    multifile=false;
-end
-
-firstFileFullPath = fullfile(files(1).folder, files(1).name);
-
-% We add some values to the metadata to attach to H5 attributes and
-% make file access / parameter access easier down the pipeline.
-metadata = get_metadata(firstFileFullPath);
-
-[t_left, t_right, t_top, t_bottom] = deal(trim_pixels(1), trim_pixels(2), trim_pixels(3), trim_pixels(4));
-metadata.trim_pixels = [t_left, t_right, t_top, t_bottom]; % store the number of pixels to trim
-
-metadata.multifile=multifile;
-metadata.num_files=num_files;
-num_planes = metadata.num_planes;
-num_rois = metadata.num_rois;
-num_frames = metadata.num_frames;
-data_type = metadata.sample_format;
-tiff_width = metadata.tiff_width;
-
-raw_x_roi = metadata.num_pixel_xy(1);
-raw_x_roi = min(raw_x_roi, tiff_width);
-raw_x = raw_x_roi * num_rois;
-
-raw_y_roi = metadata.num_pixel_xy(2);
-raw_y_roi = min(raw_y_roi, metadata.tiff_length);
-raw_y = raw_y_roi * num_rois;
-
-trimmed_yslice = (t_top+1:raw_y_roi-t_bottom);
-trimmed_xslice = (t_left+1:raw_x_roi-t_right);
-
 metadata.dataset_name = ds;
 metadata.num_files = num_files;
 log_message(fid, "------- Metadata ------------\n");
@@ -191,45 +175,48 @@ log_struct(fid,metadata,'Metadata',log_full_path);
 log_message(fid, "-----------------------------\n");
 log_message(fid, "Aggregating data from %d file(s) with %d plane(s).\n",num_files, num_planes);
 
-if save_temp
-    offset_file = 0;
-    % Aout = zeros(metadata.tiff_length, metadata.tiff_width, num_planes, num_frames*num_files, data_type);
-    for file_idx = 1:num_files
-        if file_idx > 1; offset_file = offset_file + num_frames; end
-        tpf = tic;
-        raw_file = fullfile(data_path, files(file_idx).name);
-        log_message(fid, 'Loading file %d of %d...\n', file_idx, num_files);
+offset_file = 0;
 
-        hTif=ScanImageTiffReader(raw_file);
-        hTif=hTif.data();
-        size_y=size(hTif);
-        hTif=reshape(hTif, [size_y(1), size_y(2), num_planes, num_frames]);
-        hTif=permute(hTif, [2 1 3 4]);
+% Aout = zeros(metadata.tiff_length, metadata.tiff_width, num_planes, num_frames*num_files, data_type);
+for file_idx = 1:num_files
+    if file_idx > 1; offset_file = offset_file + num_frames; end
+    tpf = tic;
+    raw_file = fullfile(data_path, files(file_idx).name);
+    log_message(fid, 'Loading file %d of %d...\n', file_idx, num_files);
 
-        log_message(fid, '%.2f Gb tiff data loaded. Saving data to file...\n', whos('hTif').bytes / 1e9);
-        for pi = 1:num_planes
-            tps = tic;
-            plane_name = sprintf("raw_plane_%d.h5", pi);
-            full_name = fullfile(data_path, plane_name);
-            if isfile(full_name)
-                if overwrite
-                    log_message(fid, "File %s exists, deleting...\n", full_name);
-                    delete(full_name)
-                else
-                    log_message(fid, 'Raw data for plane %d exists, but user chose not to overwrite. Skipping.\n',pi);
-                    continue
-                end
+    hTif=ScanImageTiffReader(raw_file);
+    hTif=hTif.data();
+    size_y=size(hTif);
+    hTif=reshape(hTif, [size_y(1), size_y(2), num_planes, num_frames]);
+    hTif=permute(hTif, [2 1 3 4]);
+
+    log_message(fid, '%.2f Gb tiff data loaded. Saving data to file...\n', whos('hTif').bytes / 1e9);
+    for pi = 1:num_planes
+        tps = tic;
+        raw_full_path = sprintf("raw_plane_%d.h5", pi);
+        full_name = fullfile(save_path, raw_full_path);
+        if isfile(full_name)
+            if overwrite
+                log_message(fid, "File %s exists, deleting...\n", full_name);
+                delete(full_name)
+            else
+                log_message(fid, 'Raw data for plane %d exists, but user chose not to overwrite. Skipping.\n',pi);
+                continue
             end
-            write_frames_3d(full_name,hTif(:,:,pi,:),ds,multifile,4);
-            write_metadata_h5(metadata,full_name, '/');
-            log_message(fid, 'Plane %d saved in %.2f seconds.\n',pi,toc(tps));
         end
-        log_message(fid, 'File %d loaded and saved in %.2f seconds.\n',pi,toc(tpf));
+        write_frames_3d(full_name,hTif(:,:,pi,:),ds,multifile,4);
+        write_metadata_h5(metadata,full_name, '/');
+        log_message(fid, 'Plane %d saved in %.2f seconds.\n',pi,toc(tps));
     end
-    clear hTif size_y plane_name
+    log_message(fid, 'File %d loaded and saved in %.2f seconds.\n',pi,toc(tpf));
 end
+clear hTif size_y raw_full_path
 tfile = tic;
-z_timeseries = zeros(raw_y, raw_x, num_frames, data_type);
+
+% Initialize a container to hold our final, re-tiled image
+% - Should have the height of a single ROI
+% - Should have the width of a single ROI * num_rois (variable held by raw_x)
+z_timeseries = zeros(raw_y_roi, raw_x, num_frames, data_type);
 for plane_idx = 1:num_planes
     tplane = tic;
 
@@ -238,19 +225,25 @@ for plane_idx = 1:num_planes
     p_str = sprintf("plane_%d", plane_idx);
     raw_p_str = sprintf("raw_%s", p_str);
     extracted_p_str = sprintf("extracted_%s", p_str);
-    plane_name = sprintf("%s.h5",fullfile(data_path,raw_p_str));
-    frame_name = sprintf("%s.h5",fullfile(data_path,extracted_p_str));
+    raw_full_path = sprintf("%s.h5",fullfile(data_path,raw_p_str));
+    extracted_full_path = sprintf("%s.h5",fullfile(data_path,extracted_p_str));
 
-    if isfile(frame_name)
-        if overwrite
-            log_message(fid, "File %s exists, deleting...\n", frame_name);
-            delete(frame_name)
-        else
+    if isfile(raw_full_path)
+        % raw file exists, re-tiled does not
+        if ~isfile(extracted_full_path)
             continue
+        else
+            if overwrite
+                log_message(fid, "File %s exists, deleting...\n", extracted_full_path);
+                delete(extracted_full_path)
+            else
+                continue
+            end
         end
+
     end
 
-    vol = h5read(plane_name,'/Y');
+    vol = h5read(raw_full_path,'/Y');
 
     if fix_scan_phase
 
@@ -263,17 +256,14 @@ for plane_idx = 1:num_planes
 
         % new_min_size = (1+(abs(plane_offset)):osv-abs(plane_offset));
         vol = fixScanPhase(vol,plane_offset,1,data_type);
-        log_message(fid, "Post-offset corrected movie contains %d x pixels...\n", size(vol, 2));
 
-        vol_size = size(vol, 2);
-        
-        % resize if our array had pixels trimmed
-        trimmed_xslice = trimmed_xslice(trimmed_xslice <= vol_size);
-        vol = vol(:,trimmed_xslice,:);
-        log_message(fid, "Post-offset corrected and trimmed movie contains %d x pixels...\n", size(vol, 2));
-    else
-        log_message(fid, "fix_scan_phase set to false, skipping scan-phase correction.\nThis is a cheap process, consider setting 'fix_scan_phase' to true.\n", size(vol, 2));
+        log_message(fid, "Post-offset corrected movie contains %d x pixels...\n", size(vol, 2));
     end
+
+    % resize if our array had pixels trimmed
+    trimmed_xslice = trimmed_xslice(trimmed_xslice <= osv);
+    vol = vol(:,trimmed_xslice,:);
+    log_message(fid, "Post-offset corrected and trimmed movie contains %d x pixels...\n", size(vol, 2));
 
     cnt = 1;
     offset_x = 0;
@@ -348,17 +338,17 @@ for plane_idx = 1:num_planes
             'save_name', plane_save_path ...
             );
     end
-    write_frames_3d(frame_name, z_timeseries,ds,multifile,4);
+    write_frames_3d(extracted_full_path, z_timeseries,ds,multifile,4);
     try
-        h5create(frame_name,"/Ym",size(mean_img));
+        h5create(extracted_full_path,"/Ym",size(mean_img));
     catch
     end
     try
-        h5write(frame_name, '/Ym', mean_img);
+        h5write(extracted_full_path, '/Ym', mean_img);
     catch ME
         warning(ME.identifier, '%s\n', ME.message)
     end
-    write_metadata_h5(metadata, frame_name, '/');
+    write_metadata_h5(metadata, extracted_full_path, '/');
     if getenv("OS") == "Windows_NT"
         mem = memory;
         max_avail = mem.MemAvailableAllArrays / 1e9;
