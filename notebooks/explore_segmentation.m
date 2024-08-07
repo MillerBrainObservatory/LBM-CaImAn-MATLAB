@@ -189,7 +189,7 @@ figure;plot(1:T,F_dff(i,:),'--k'); hold all; plot(1:T,C_dec(i,:),'r','linewidth'
 %%
 % Create a figure
 figure;
-imshow(Cn);
+imshow(data.Cn);
 hold on;
 
 for k = 1:length(patches)
