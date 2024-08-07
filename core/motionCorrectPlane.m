@@ -1,4 +1,4 @@
-function motionCorrectPlane(data_path, save_path, ds, debug_flag, varargin)
+function motionCorrectPlane(data_path, varargin)
 % MOTIONCORRECTPLANE Perform piecewise-rigid motion correction on imaging data.
 %
 % Parameters
@@ -32,22 +32,48 @@ function motionCorrectPlane(data_path, save_path, ds, debug_flag, varargin)
 %   shift vectors in x and y. The raw movie is saved in '/Y' and the
 %
 % - Only .h5 files containing processed volumes should be in the file_path.
+% (groot is the default figure object).
+set(groot, ...
+'DefaultFigureColor', 'w', ...
+'DefaultAxesLineWidth', 0.5, ...
+'DefaultAxesXColor', 'k', ...
+'DefaultAxesYColor', 'k', ...
+'DefaultAxesFontUnits', 'points', ...
+'DefaultAxesFontSize', 8, ...
+'DefaultAxesFontName', 'Helvetica', ...
+'DefaultLineLineWidth', 1, ...
+'DefaultTextFontUnits', 'Points', ...
+'DefaultTextFontSize', 8, ...
+'DefaultTextFontName', 'Helvetica', ...
+'DefaultAxesBox', 'off', ...
+'DefaultAxesTickLength', [0.02 0.025]);
+ 
+% set the tickdirs to go out - need this specific order
+set(groot, 'DefaultAxesTickDir', 'out');
+set(groot, 'DefaultAxesTickDirMode', 'manual');
 
 p = inputParser;
+
+% Define the parameters
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
-addParameter(p, 'save_path', @(x) ischar(x) || isstring(x));
-addParameter(p, 'ds', '/Y', @(x) (ischar(x) || isstring(x)));
+addParameter(p, 'save_path', '', @(x) ischar(x) || isstring(x));
+addParameter(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)));
 addParameter(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
-addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'do_figures', 1, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'overwrite', true, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
+
+%% additional parameters for motion correction
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
 addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
-addParameter(p, 'do_figures', 1, @(x) isnumeric(x) && isPositiveIntegerValuedNumeric(x));
 addParameter(p, 'options', {}, @(x) isstruct(x));
-parse(p,data_path,save_path,ds,debug_flag,varargin{:});
 
-data_path = p.Results.data_path;
-save_path = p.Results.save_path;
+parse(p,data_path,varargin{:});
+
+% Retrieve the parsed input arguments
+data_path = convertStringsToChars(p.Results.data_path);
+save_path = convertStringsToChars(p.Results.save_path);
+
 ds = p.Results.ds;
 debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
@@ -58,17 +84,20 @@ do_figures = p.Results.do_figures;
 options = p.Results.options;
 
 if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", data_path); end
-if debug_flag == 1; dir([data_path, '*.tif']); return; end
 
+% Make the save path in data_path/extracted, if not given
 if isempty(save_path)
-    warning("No save_path given. Saving data in data_path: %s\n", data_path);
-    save_path = data_path;
+    save_path = fullfile(data_path, 'extracted');
+    if ~isfolder(save_path); mkdir(save_path);
+        warning('Creating save path since one was not provided, located: %s', save_path);
+    end
+elseif ~isfolder(save_path)
+    mkdir(save_path);
 end
 
-fig_save_path = fullfile(save_path, "figures");
-if ~isfolder(fig_save_path); mkdir(fig_save_path); end
+if debug_flag == 1; dir([data_path '/' '*.h*']); return; end
 
-files = dir(fullfile(data_path, '*.h*'));
+files = dir(fullfile(data_path, '*extracted_plane_*.h*'));
 if isempty(files)
     error('No suitable data files found in: \n  %s', data_path);
 end
@@ -80,6 +109,11 @@ if fid == -1
     error('Cannot create or open log file: %s', log_full_path);
 else
     fprintf('Log file created: %s\n', log_full_path);
+end
+
+if do_figures
+    fig_save_path = fullfile(save_path, "figures");
+    if ~isfolder(fig_save_path); mkdir(fig_save_path); end
 end
 
 num_cores = max(num_cores, 23);
@@ -115,8 +149,6 @@ for plane_idx = start_plane:end_plane
     end
 
     Y = read_plane(plane_name,'ds',ds,'plane',plane_idx);
-    Y=Y(:,:,1:600);
-    if ~isa(Y,'single');Y = single(Y);end  % we want float32
 
     volume_size = size(Y);
     d1 = volume_size(1);
@@ -156,7 +188,7 @@ for plane_idx = start_plane:end_plane
             'd1', d1,...
             'd2', d2,...
             'bin_width', 10,...
-            'grid_size', [64,64], ...
+            'grid_size', [128,128], ...
             'max_shift', round(20/pixel_resolution),...
             'us_fac', 20,...
             'init_batch', 200,...
@@ -188,20 +220,20 @@ for plane_idx = start_plane:end_plane
 
         f = figure('Visible', 'on', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
         ax1 = subplot(2, 3, 1); imagesc(mY); axis equal; axis tight; axis off;
-        title('mean raw data', 'fontsize', 10, 'fontweight', 'bold');
+        title('mean raw data');
 
         ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off;
-        title('mean rigid template', 'fontsize', 10, 'fontweight', 'bold');
+        title('mean rigid template');
         ax3 = subplot(2, 3, 3); imagesc(mM2); axis equal; axis tight; axis off;
-        title('mean non-rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
+        title('mean non-rigid corrected');
         subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid');
-        title('correlation coefficients', 'fontsize', 10, 'fontweight', 'bold');
+        title('correlation coefficients');
         subplot(2, 3, 5); scatter(cY, cM1); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        xlabel('raw data', 'fontsize', 10, 'fontweight', 'bold'); ylabel('rigid corrected', 'fontsize', 10, 'fontweight', 'bold');
+        xlabel('raw data'); ylabel('rigid corrected');
         subplot(2, 3, 6); scatter(cM1, cM2); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        xlabel('rigid template', 'fontsize', 10, 'fontweight', 'bold'); ylabel('non-rigid correlation', 'fontsize', 10, 'fontweight', 'bold');
+        xlabel('rigid template'); ylabel('non-rigid correlation');
         linkaxes([ax1, ax2, ax3], 'xy');
         savefig(metrics_name_fig)
         exportgraphics(f, metrics_name_png, 'Resolution', 600);
@@ -219,25 +251,28 @@ for plane_idx = start_plane:end_plane
 
         shifts_name_png = sprintf("%s_shifts.png", fig_plane_name);
         shifts_name_fig = sprintf("%s_shifts.fig", fig_plane_name);
-
-        ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2); legend('raw data','rigid','non-rigid'); title('correlation coefficients','fontsize',14,'fontweight','bold')
+        f = figure;
+        ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2); title('correlation coefficients'); legend('raw data','rigid','non-rigid');
         set(gca,'Xtick',[])
-        ax2 = subplot(312); plot(shifts_x, 'LineWidth',.2); title('displacements along x','fontsize',14,'fontweight','bold')
+        ax2 = subplot(312); plot(shifts_x, 'LineWidth',.2); title('displacements along x')
         set(gca,'Xtick',[])
-        ax3 = subplot(313); plot(shifts_y); title('displacements along y','fontsize',14,'fontweight','bold')
-        xlabel('timestep','fontsize',14,'fontweight','bold')
+        ax3 = subplot(313); plot(shifts_y); title('displacements along y')
+        xlabel('timestep')
         linkaxes([ax1,ax2,ax3],'x')
         exportgraphics(f,shifts_name_png, 'Resolution', 600);
         savefig(shifts_name_fig);
         close(f);
     end
 
-    write_frames_3d(plane_name_save,M2,'/Y',true,4);
+    write_frames_3d(plane_name_save, M2,'/Y',true,4);
 
-    h5create(plane_name_save,"/shifts",size(shifts2));
-    h5create(plane_name_save,"/Ym",size(mM2));
-    h5write(plane_name_save, '/shifts', shifts2);
-    h5write(plane_name_save, '/Ym', mM2);
+    h5create(plane_name_save,"/shifts_x",  size(shifts_x));
+    h5create(plane_name_save,"/shifts_y",  size(shifts_y));
+    h5create(plane_name_save,"/Ym",        size(mM2));
+    
+    h5write(plane_name_save, '/shifts_x',  shifts_x);
+    h5write(plane_name_save, '/shifts_y',  shifts_y);
+    h5write(plane_name_save, '/Ym',        mM2);
 
     write_metadata_h5(metadata, plane_name_save, '/');
     log_message(fid, "Plane %d finished, data saved. Elapsed time: %.2f minutes\n",plane_idx,toc(tplane)/60);

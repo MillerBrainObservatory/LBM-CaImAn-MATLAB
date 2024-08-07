@@ -54,15 +54,20 @@ addParameter(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)));
 addParameter(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'do_figures', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', true, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
+
+%% additional parameters for extraction/pre-proccessing
 addParameter(p, 'fix_scan_phase', true, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'trim_roi', [0 0 0 0], @isnumeric);
 addParameter(p, 'trim_image', [0 0 0 0], @isnumeric);
-% Parse the input arguments
+
 parse(p,data_path, varargin{:});
 
 % Retrieve the parsed input arguments
 data_path = convertStringsToChars(p.Results.data_path);
 save_path = convertStringsToChars(p.Results.save_path);
+
+if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", fullfile(data_path)); end
 
 % Make the save path in data_path/extracted, if not given
 if isempty(save_path)
@@ -70,6 +75,8 @@ if isempty(save_path)
     if ~isfolder(save_path); mkdir(save_path);
         warning('Creating save path since one was not provided, located: %s', save_path);
     end
+elseif ~isfolder(save_path)
+    mkdir(save_path);
 end
 
 ds = p.Results.ds;
@@ -77,15 +84,25 @@ debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
 fix_scan_phase = p.Results.fix_scan_phase;
 do_figures = p.Results.do_figures;
+% num_cores = p.Results.num_cores;
 trim_roi = p.Results.trim_roi;
 trim_image = p.Results.trim_image;
 
-if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", fullfile(data_path)); end
-if debug_flag == 1; dir([data_path, '*.tif']); return; end
+
+if debug_flag == 1; dir([data_path '/' '*.tif']); return; end
 
 files = dir(fullfile(data_path, '*.tif*'));
 if isempty(files)
     error('No suitable tiff files found in: \n  %s', data_path);
+end
+
+% Until a firm scanimage metadata value can be used for the number of files
+% in a recording session, just count them.
+num_files=length(files);
+if num_files > 1
+    multifile=true;
+else
+    multifile=false;
 end
 
 log_file_name = sprintf("%s_extraction.log", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
@@ -102,21 +119,9 @@ if do_figures
     if ~isfolder(fig_save_path); mkdir(fig_save_path); end
 end
 
-num_files=length(files);
-if num_files > 1
-    multifile=true;
-else
-    multifile=false;
-end
-
+% Use the first tiff file to pull out metadata
 firstFileFullPath = fullfile(files(1).folder, files(1).name);
 metadata = get_metadata(firstFileFullPath);
-
-[t_left, t_right, t_top, t_bottom] = deal(trim_roi(1), trim_roi(2), trim_roi(3), trim_roi(4));
-[t_left_image, t_right_image, t_top_image, t_bottom_image] = deal(trim_roi(1), trim_roi(2), trim_roi(3), trim_roi(4));
-
-metadata.trim_roi = [t_left, t_right, t_top, t_bottom]; % store the number of pixels to trim
-metadata.trim_edge = [t_left_image, t_right_image, t_top_image, t_bottom_image]; % store the number of pixels to trim
 
 metadata.multifile=multifile;
 metadata.num_files=num_files;
@@ -125,6 +130,12 @@ num_rois = metadata.num_rois;
 num_frames = metadata.num_frames;
 data_type = metadata.sample_format;
 tiff_width = metadata.tiff_width;
+
+[t_left, t_right, t_top, t_bottom] = deal(trim_roi(1), trim_roi(2), trim_roi(3), trim_roi(4));
+[t_left_image, t_right_image, t_top_image, t_bottom_image] = deal(trim_image(1), trim_image(2), trim_image(3), trim_image(4));
+
+metadata.trim_roi = [t_left, t_right, t_top, t_bottom]; % store the number of pixels to trim
+metadata.trim_edge = [t_left_image, t_right_image, t_top_image, t_bottom_image]; % store the number of pixels to trim
 
 % Calculate ROI dims and Image dims
 raw_x_roi = metadata.num_pixel_xy(1);
@@ -143,7 +154,7 @@ raw_files = []; extracted_files = [];
 
 % Case 2: Save path given
 % display whats there with the size
-contents = dir([save_path, '*.h5']);
+contents = dir([save_path '/' '*.h5']);
 for i = 1:length(contents)
     if contains(contents(i).name, 'raw_plane_')
         raw_files = [raw_files; contents(i)];
@@ -175,42 +186,64 @@ log_struct(fid,metadata,'Metadata',log_full_path);
 log_message(fid, "-----------------------------\n");
 log_message(fid, "Aggregating data from %d file(s) with %d plane(s).\n",num_files, num_planes);
 
-offset_file = 0;
+% Part 1) Pull tiff file data into temporary h5 store
 
 % Aout = zeros(metadata.tiff_length, metadata.tiff_width, num_planes, num_frames*num_files, data_type);
-for file_idx = 1:num_files
-    if file_idx > 1; offset_file = offset_file + num_frames; end
-    tpf = tic;
-    raw_file = fullfile(data_path, files(file_idx).name);
-    log_message(fid, 'Loading file %d of %d...\n', file_idx, num_files);
-
-    hTif=ScanImageTiffReader(raw_file);
-    hTif=hTif.data();
-    size_y=size(hTif);
-    hTif=reshape(hTif, [size_y(1), size_y(2), num_planes, num_frames]);
-    hTif=permute(hTif, [2 1 3 4]);
-
-    log_message(fid, '%.2f Gb tiff data loaded. Saving data to file...\n', whos('hTif').bytes / 1e9);
-    for pi = 1:num_planes
-        tps = tic;
-        raw_full_path = sprintf("raw_plane_%d.h5", pi);
-        full_name = fullfile(save_path, raw_full_path);
-        if isfile(full_name)
-            if overwrite
-                log_message(fid, "File %s exists, deleting...\n", full_name);
-                delete(full_name)
-            else
-                log_message(fid, 'Raw data for plane %d exists, but user chose not to overwrite. Skipping.\n',pi);
-                continue
-            end
-        end
-        write_frames_3d(full_name,hTif(:,:,pi,:),ds,multifile,4);
-        write_metadata_h5(metadata,full_name, '/');
-        log_message(fid, 'Plane %d saved in %.2f seconds.\n',pi,toc(tps));
-    end
-    log_message(fid, 'File %d loaded and saved in %.2f seconds.\n',pi,toc(tpf));
+if numel(raw_files) == num_planes
+    extract_raw = false;
 end
-clear hTif size_y raw_full_path
+
+if numel(extracted_files) == num_planes
+    if overwrite
+        log_message(fid, 'Save path contains extracted data. Overwrite = true, deleting extracted files...');
+        for di=1:num_planes
+            pstr=sprintf("extracted_plane_%d", di);
+            delete(fullfile(save_path,pstr));
+        end
+    else
+        log_message(fid, 'Save path contains extracted data. Overwrite = false, returning...');
+        return
+    end
+end
+
+if extract_raw
+    offset_file = 0;
+    for file_idx = 1:num_files
+        if file_idx > 1; offset_file = offset_file + num_frames; end
+        tpf = tic;
+        raw_tiff_file = fullfile(save_path, files(file_idx).name);
+
+        log_message(fid, 'Loading file %d of %d...\n', file_idx, num_files);
+
+        hTif=ScanImageTiffReader(raw_tiff_file);
+        hTif=hTif.data();
+        size_y=size(hTif);
+        hTif=reshape(hTif, [size_y(1), size_y(2), num_planes, num_frames]);
+        hTif=permute(hTif, [2 1 3 4]);
+
+        log_message(fid, '%.2f Gb tiff data loaded. Saving data to file...\n', whos('hTif').bytes / 1e9);
+        for pi = 1:num_planes
+            tps = tic;
+            raw_full_path = sprintf("raw_plane_%d.h5", pi);
+            full_name = fullfile(save_path, raw_full_path);
+            if isfile(full_name)
+                if overwrite
+                    log_message(fid, "File %s exists, deleting...\n", full_name);
+                    delete(full_name)
+                else
+                    log_message(fid, 'Raw data for plane %d exists, but user chose not to overwrite. Skipping.\n',pi);
+                    continue
+                end
+            end
+            write_frames_3d(full_name,hTif(:,:,pi,:),ds,multifile,4);
+            write_metadata_h5(metadata,full_name, '/');
+            log_message(fid, 'Plane %d saved in %.2f seconds.\n',pi,toc(tps));
+        end
+        log_message(fid, 'File %d loaded and saved in %.2f seconds.\n',pi,toc(tpf));
+    end
+    clear hTif size_y raw_full_path
+end
+
 tfile = tic;
 
 % Initialize a container to hold our final, re-tiled image
@@ -218,6 +251,7 @@ tfile = tic;
 % - Should have the width of a single ROI * num_rois (variable held by raw_x)
 z_timeseries = zeros(raw_y_roi, raw_x, num_frames, data_type);
 for plane_idx = 1:num_planes
+
     tplane = tic;
 
     log_message(fid, 'Processing z-plane %d/%d...\n', plane_idx, num_planes);
@@ -225,43 +259,36 @@ for plane_idx = 1:num_planes
     p_str = sprintf("plane_%d", plane_idx);
     raw_p_str = sprintf("raw_%s", p_str);
     extracted_p_str = sprintf("extracted_%s", p_str);
-    raw_full_path = sprintf("%s.h5",fullfile(data_path,raw_p_str));
-    extracted_full_path = sprintf("%s.h5",fullfile(data_path,extracted_p_str));
+    raw_full_path = sprintf("%s.h5",fullfile(save_path,raw_p_str));
+    extracted_full_path = sprintf("%s.h5",fullfile(save_path,extracted_p_str));
 
-    if isfile(raw_full_path)
-        % raw file exists, re-tiled does not
-        if ~isfile(extracted_full_path)
-            continue
+    if ~isfile(raw_full_path)
+        error("Processing stopped due to missing temporary file. Try re-processing with overwrite=True to delete a corrupted file.")
+    end
+
+    if isfile(extracted_full_path)
+        warning("File:\n%s\n...already exists.")
+        if overwrite
+            log_message(fid, "Overwrite set to true, deleting...\n", extracted_full_path);
+            delete(extracted_full_path)
         else
-            if overwrite
-                log_message(fid, "File %s exists, deleting...\n", extracted_full_path);
-                delete(extracted_full_path)
-            else
-                continue
-            end
+            continue
         end
-
     end
 
     vol = h5read(raw_full_path,'/Y');
-
     if fix_scan_phase
 
-        osv = size(vol,2);
         log_message(fid, "Correcting for scan phase...\n")
-        log_message(fid, "Original movie contains %d x pixels.\n", osv)
-
         plane_offset = returnScanOffset(vol,1,data_type);
         log_message(fid, "Optimal phase: %d px shift.\n", abs(plane_offset));
 
         % new_min_size = (1+(abs(plane_offset)):osv-abs(plane_offset));
         vol = fixScanPhase(vol,plane_offset,1,data_type);
-
-        log_message(fid, "Post-offset corrected movie contains %d x pixels...\n", size(vol, 2));
     end
 
     % resize if our array had pixels trimmed
-    trimmed_xslice = trimmed_xslice(trimmed_xslice <= osv);
+    trimmed_xslice = trimmed_xslice(trimmed_xslice <= size(vol, 2));
     vol = vol(:,trimmed_xslice,:);
     log_message(fid, "Post-offset corrected and trimmed movie contains %d x pixels...\n", size(vol, 2));
 
@@ -274,16 +301,17 @@ for plane_idx = 1:num_planes
             raw_offset_y = raw_offset_y + raw_y_roi + metadata.num_lines_between_scanfields;
         end
 
-        % use the **untrimmed** roi in the phase offset correction
+        % extract the **UNTRIMMED ROI**
         raw_yslice = (raw_offset_y + 1):(raw_offset_y + raw_y_roi);
         roi_arr = vol(raw_yslice, :, :);
 
-        % pre-trim this roi
+        % apply trim
         roi_arr = squeeze(roi_arr(trimmed_yslice, :, :));
         if cnt > 1 % wait until the new array size is calculated
             offset_x = offset_x + size(roi_arr, 2);
         end
 
+        % place this ROI in the final image
         z_timeseries( ...
             1: size(roi_arr,1), ...
             (offset_x + 1):(offset_x + size(roi_arr,2)), ...
@@ -293,9 +321,9 @@ for plane_idx = 1:num_planes
         %% Figures
         if do_figures
             [yind, xind] = get_central_indices(roi_arr(:,:,2), 40);
-            [yindr, xindr] = get_central_indices(roi_arr(:,:,2), 40);
+            [yindr, xindr] = get_central_indices(vol(trimmed_yslice,:,2), 40);
 
-            images = {roi_arr(yind,xind,2), roi_arr(yindr, xindr, 2)};
+            images = {roi_arr(yind,xind,2), vol(yindr, xindr, 2)};
             zoomed_scale = calculate_scale(size(images{1},2),metadata.pixel_resolution);
             roi_scales = {zoomed_scale,zoomed_scale};
             labels = {'Pre-Corrected/Trimmed', 'Phase-Corrected/Trimmed'};
@@ -310,25 +338,31 @@ for plane_idx = 1:num_planes
                 'save_name', roi_savename ...
                 );
         end
+
         cnt = cnt + 1;
     end
-
     % remove padded 0's
     z_timeseries = z_timeseries( ...
         any(z_timeseries, [2, 3]), ...
         any(z_timeseries, [1, 3]), ...
         :);
 
+    fsize = size(z_timeseries);
+    z_timeseries=z_timeseries( ...
+        1+t_top_image:fsize(1)-t_bottom_image, ...
+        1+t_left_image:fsize(2)-t_right_image, ...
+        : ...
+        );
+
     mean_img = mean(z_timeseries, 3);
     if do_figures
         img_frame = z_timeseries(:,:,2);
         [yind, xind] = get_central_indices(mean_img, 30); % 30 pixels around the center of the brightest part of an image frame
-        images = {img_frame, mean_img, mean_img(yind, xind)};
-        labels = {'Second Frame', 'Mean Image', 'Mean Image(Zoom)'};
+        images = {img_frame, mean_img};
+        labels = {'Second Frame', 'Mean Image'};
         scale_full = calculate_scale(size(img_frame, 2), metadata.pixel_resolution);
-        scale_roi = calculate_scale( size(img_frame(yind, xind),2), metadata.pixel_resolution);
-        scales = {scale_full, scale_full, scale_roi};
-        plane_save_path = fullfile(fig_save_path, sprintf('plane_%d_mean_frame.png', plane_idx));
+        scales = {scale_full, scale_full};
+        plane_save_path = fullfile(fig_save_path, sprintf('plane_%d.png', plane_idx));
 
         write_images_to_tile( ...
             images, ...
@@ -384,10 +418,7 @@ if dim == 1
     end
 end
 if offset ~= 0
-    d = size(dataOut,2);
-    di = size(dataOut(:, 1+abs(offset):end-abs(offset), :, :),2);
-    dif = d - di;
-    dataOut = dataOut(:, 1+dif/2:end-dif/2, :, :);
+    dataOut = dataOut(:, 1+(abs(offset)/2):end-(abs(offset)/2), :, :);
 end
 end
 
