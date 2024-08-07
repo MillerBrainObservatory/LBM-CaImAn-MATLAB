@@ -2,7 +2,7 @@ function make_patch_video(A,C,b,f,Y,cont,options)
 
 defoptions = CNMFSetParms;
 if nargin < 7
-    options = [];
+    options = defoptions;
 end
 
 if isfield(options,'ind');  % indeces of components to be shown
@@ -56,7 +56,7 @@ end
 d1 = options.d1;
 d2 = options.d2;
 
-if isempty(cont) || nargin < 6; sc = 0; end
+sc = 0;
 
 T = size(C,2);
 
