@@ -97,7 +97,7 @@ html_short_title = "LBM CaImAn Pipeline"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 # html_js_files = ["subtoc.js"]
-html_favicon = "_static/mbo_hub_saph.svg"
+html_favicon = "./_static/lbm_caiman_mat.svg"
 html_copy_source = True
 
 html_context = {
