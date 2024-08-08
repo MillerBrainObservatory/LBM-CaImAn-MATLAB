@@ -36,7 +36,7 @@ if ~exist('loc', 'var'); loc = '/'; end
 try
     h5_data = h5info(h5_fullfile, loc);
 catch
-    % error("File %s does not exist with group %s. ", h5_fullfile, loc);
+    error("File %s does not exist with group %s. ", h5_fullfile, loc);
 end
 metadata = struct();
 % find valid dataset if empty

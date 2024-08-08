@@ -30,13 +30,10 @@ function segmentPlane(data_path, save_path, varargin)
 % do_figures : double, integer, positive
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
-% cnmf_options : dictionary, mapping
+% options : dictionary, mapping
 %     key:value pairs of all of your CNMF parameters.
 %     See the example parameters in the LBM_demo_pipeline.
 %
-% Returns
-% -------
-% None
 %
 % Notes
 % -----
@@ -73,9 +70,9 @@ function segmentPlane(data_path, save_path, varargin)
 
 p = inputParser;
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
-addOptional(p, 'save_path', data_path, @(x) ischar(x) || isstring(x));
-addOptional(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
-addOptional(p, 'debug_flag', 0, @(x) isscalar(x) || islogical(x));
+addParameter(p, 'save_path', '', @(x) ischar(x) || isstring(x));
+addParameter(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)));
+addParameter(p, 'debug_flag', 0, @(x) isscalar(x) || islogical(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x));
@@ -154,6 +151,7 @@ for plane_idx = start_plane:end_plane
     %% Load in data
     data = h5read(plane_name, ds);
     if ~isa(data, 'single'); data=single(data); end
+    metadata.movie_path = plane_name;
 
     t_start = tic;
     pixel_resolution = metadata.pixel_resolution;
@@ -182,11 +180,11 @@ for plane_idx = start_plane:end_plane
     % overlap = [10,10];
     % patches = construct_patches(sizY(1:end-1),patch_size,overlap);
     % K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2);
-    patch_size = [40,40];                   % size of each patch along each dimension (optional, default: [32,32])
-    overlap = [8,8];                        % amount of overlap in each dimension (optional, default: [4,4])
+    patch_size = [64,64];                   % size of each patch along each dimension (optional, default: [32,32])
+    overlap = [16,16];                        % amount of overlap in each dimension (optional, default: [4,4])
     
     patches = construct_patches(sizY(1:end-1),patch_size,overlap);
-    K = 7;                                            % number of components to be found
+    K = 7;                                            % number of components to be found / patch
     tau = 8;                                          % std of gaussian kernel (half size of neuron) 
     p = 2;                                            % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
 
@@ -205,48 +203,39 @@ for plane_idx = start_plane:end_plane
     if isempty(options)
         % Set caiman parameters
         log_message(fid, "Using default CNMF parameters.\n")
-        % options = CNMFSetParms(...
-        %     'd1',d1,'d2',d2,...                         % dimensionality of the FOV
-        %     'deconv_method','constrained_foopsi',...    % neural activity deconvolution method
-        %     'temporal_iter',3,...                       % number of block-coordinate descent steps
-        %     'maxIter',15,...                            % number of NMF iterations during initialization
-        %     'spatial_method','regularized',...          % method for updating spatial components
-        %     'df_prctile',20,...                         % take the median of background fluorescence to compute baseline fluorescence
-        %     'p',p,...                                   % order of AR dynamics
-        %     'gSig',tau,...                              % half size of neuron
-        %     'merge_thr',merge_thresh,...                % merging threshold
-        %     'nb',1,...                                  % number of background components
-        %     'gnb',3,...
-        %     'min_SNR',min_SNR,...                       % minimum SNR threshold
-        %     'space_thresh',space_thresh ,...            % space correlation threshold
-        %     'decay_time',0.5,...                        % decay time of transients, GCaMP6s
-        %     'size_thr', sz, ...
-        %     'min_size', round(tau), ...                 % minimum size of ellipse axis (default: 3)
-        %     'max_size', 2*round(tau), ...               % maximum size of ellipse axis (default: 8)
-        %     'dist', dist, ...                           % expansion factor of ellipse (default: 3)
-        %     'max_size_thr',mx,...                       % maximum size of each component in pixels (default: 300)
-        %     'time_thresh',time_thresh,...
-        %     'min_size_thr',mn,...                       % minimum size of each component in pixels (default: 9)
-        %     'refine_flag',0,...
-        %     'rolling_length',ceil(frame_rate*5),...
-        %     'fr', frame_rate ...
-        % );
-        options = CNMFSetParms( ...
-        'd1',sizY(1),'d2',sizY(2),...
-        'nb',1,...                                  % number of background components per patch
-        'gnb',3,...                                 % number of global background components
-        'ssub',2,...
-        'tsub',1,...
-        'p',p,...                                   % order of AR dynamics
-        'merge_thr',merge_thresh,...                   % merging threshold
-        'gSig',tau,... 
-        'spatial_method','regularized',...
-        'patch_space_thresh',0.25,...
-        'rolling_length',ceil(frame_rate*5),...
-        'fr', frame_rate, ...
-        'min_SNR',2 ...
+        options = CNMFSetParms(...
+            'd1',d1,'d2',d2,...                         % dimensionality of the FOV
+            'deconv_method','constrained_foopsi',...    % neural activity deconvolution method
+            'temporal_iter',3,...                       % number of block-coordinate descent steps
+            'maxIter',15,...                            % number of NMF iterations during initialization
+            'spatial_method','regularized',...          % method for updating spatial components
+            'df_prctile',20,...                         % take the median of background fluorescence to compute baseline fluorescence
+            'p',p,...                                   % order of AR dynamics
+            'gSig',tau,...                              % half size of neuron
+            'merge_thr',merge_thresh,...                % merging threshold
+            'nb',1,...                                  % number of background components
+            'gnb',3,...
+            'min_SNR',min_SNR,...                       % minimum SNR threshold
+            'space_thresh',space_thresh ,...            % space correlation threshold
+            'decay_time',0.5,...                        % decay time of transients, GCaMP6s
+            'size_thr', sz, ...
+            'min_size', round(tau), ...                 % minimum size of ellipse axis (default: 3)
+            'max_size', 2*round(tau), ...               % maximum size of ellipse axis (default: 8)
+            'dist', dist, ...                           % expansion factor of ellipse (default: 3)
+            'max_size_thr',mx,...                       % maximum size of each component in pixels (default: 300)
+            'time_thresh',time_thresh,...
+            'min_size_thr',mn,...                       % minimum size of each component in pixels (default: 9)
+            'refine_flag',0,...
+            'rolling_length',ceil(frame_rate*5),...
+            'fr', frame_rate, ...
+            'plot_df', 1, ...
+            'make_gif', 1, ...
+            'save_avi', 1, ...
+            'name', fullfile(fig_save_path, 'segmented.avi') ...
         );
     end
+    h5create(plane_name_save, '/cnmf', size(options));
+    write_metadata_h5(options, plane_name_save, '/opts');
 
     log_message(fid, "Data loaded in. This process took: %0.2f seconds... Beginning CNMF.\n\n", toc(t_start));
     log_message(fid, "--------------------------------------------------\n");
@@ -331,20 +320,38 @@ for plane_idx = start_plane:end_plane
     % Save data
     t_save = tic;
     log_message(fid, "Writing data to disk to:\n\n %s\n", plane_name_save);
-    write_frames_3d(plane_name_save, T_keep,'/T_keep',0,0);
-    write_frames_3d(plane_name_save, Ac_keep,'/Ac_keep',0,0);
-    write_frames_3d(plane_name_save, C_keep,'/C_keep',0,0);
-    write_frames_3d(plane_name_save, Km,'/Km',0,0);
-    write_frames_3d(plane_name_save, rVals,'/rVals',0,0);
-    write_frames_3d(plane_name_save, single(mean(data,3)),'/Ym',0,0);% store again so its easier to find
-    write_frames_3d(plane_name_save, Cn,'/Cn',0,0);
-    write_frames_3d(plane_name_save, b, '/b',0,0);
-    write_frames_3d(plane_name_save, f,'/f',0,0);
-    write_frames_3d(plane_name_save, acx,'/acx',0,0);
-    write_frames_3d(plane_name_save, acy,'/acy',0,0);
-    write_frames_3d(plane_name_save, acm,'/acm',0,0);
+
+    % write frames. Filename, dataset, dataset_name, overwrite, append
+    h5create(plane_name_save,"/T_keep",size(T_keep));
+    h5create(plane_name_save,"/Ac_keep",size(Ac_keep));
+    h5create(plane_name_save,"/C_keep",size(C_keep));
+    h5create(plane_name_save,"/Km",size(Km));
+
+    h5create(plane_name_save,"/rVals",size(rVals));
+    h5create(plane_name_save,"/Cn",size(Cn));
+    h5create(plane_name_save,"/b",size(b));
+
+    h5create(plane_name_save,"/f",size(f));
+    h5create(plane_name_save,"/acx",size(acx));
+    h5create(plane_name_save,"/acy",size(acy));
+    h5create(plane_name_save,"/acm",size(acm));
+
+    h5write(plane_name_save,"/T_keep",T_keep);
+    h5write(plane_name_save,"/Ac_keep",Ac_keep);
+    h5write(plane_name_save,"/C_keep",C_keep);
+    h5write(plane_name_save,"/Km",Km);
+
+    h5write(plane_name_save,"/rVals",rVals);
+    h5write(plane_name_save,"/Cn",Cn);
+    h5write(plane_name_save,"/b",b);
+
+    h5write(plane_name_save,"/f",f);
+    h5write(plane_name_save,"/acx",acx);
+    h5write(plane_name_save,"/acy",acy);
+    h5write(plane_name_save,"/acm",acm);
 
     write_metadata_h5(metadata, plane_name_save, '/');
+    write_metadata_h5(options, plane_name_save, '/opts');
     log_message(fid, "Data saved. Elapsed time: %.2f seconds.\n",toc(t_save)/60);
     % savefast(fullfile(save_path, ['caiman_output_plane_' num2str(plane_idx) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')
 end
