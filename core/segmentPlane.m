@@ -234,9 +234,12 @@ for plane_idx = start_plane:end_plane
             'name', fullfile(fig_save_path, 'segmented.avi') ...
         );
     end
-    h5create(plane_name_save, '/cnmf', size(options));
-    write_metadata_h5(options, plane_name_save, '/opts');
-
+   
+    try
+        h5create(plane_name_save, '/cnmf', size(options));
+    catch ME
+        write_metadata_h5(options, plane_name_save, '/cnmf');
+    end
     log_message(fid, "Data loaded in. This process took: %0.2f seconds... Beginning CNMF.\n\n", toc(t_start));
     log_message(fid, "--------------------------------------------------\n");
     log_struct(fid,options,'CNMF Parameters', log_full_path);
