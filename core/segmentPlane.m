@@ -67,6 +67,7 @@ function segmentPlane(data_path, save_path, varargin)
 % 
 % :code:`acm`
 % :  sum of component pixels for each neuron [1, Km]. :code:`single`
+clc;
 
 p = inputParser;
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
@@ -187,59 +188,57 @@ for plane_idx = start_plane:end_plane
     K = 7;                                            % number of components to be found / patch
     tau = 8;                                          % std of gaussian kernel (half size of neuron) 
     p = 2;                                            % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
-
-    poolobj = gcp('nocreate'); % create a parallel pool
-    if isempty(poolobj)
-        disp('Starting the parallel pool...')
-        poolobj = parpool('local',num_cores);
-        tmpDir = tempname();
-        mkdir(tmpDir);
-        poolobj.Cluster.JobStorageLocation = tmpDir;
-    else
-        numworkers = poolobj.NumWorkers;
-        disp(['Continuing with existing pool of ' num2str(numworkers) '.'])
-    end
-
-    if isempty(options)
-        % Set caiman parameters
-        log_message(fid, "Using default CNMF parameters.\n")
-        options = CNMFSetParms(...
-            'd1',d1,'d2',d2,...                         % dimensionality of the FOV
-            'deconv_method','constrained_foopsi',...    % neural activity deconvolution method
-            'temporal_iter',3,...                       % number of block-coordinate descent steps
-            'maxIter',15,...                            % number of NMF iterations during initialization
-            'spatial_method','regularized',...          % method for updating spatial components
-            'df_prctile',20,...                         % take the median of background fluorescence to compute baseline fluorescence
-            'p',p,...                                   % order of AR dynamics
-            'gSig',tau,...                              % half size of neuron
-            'merge_thr',merge_thresh,...                % merging threshold
-            'nb',1,...                                  % number of background components
-            'gnb',3,...
-            'min_SNR',min_SNR,...                       % minimum SNR threshold
-            'space_thresh',space_thresh ,...            % space correlation threshold
-            'decay_time',0.5,...                        % decay time of transients, GCaMP6s
-            'size_thr', sz, ...
-            'min_size', round(tau), ...                 % minimum size of ellipse axis (default: 3)
-            'max_size', 2*round(tau), ...               % maximum size of ellipse axis (default: 8)
-            'dist', dist, ...                           % expansion factor of ellipse (default: 3)
-            'max_size_thr',mx,...                       % maximum size of each component in pixels (default: 300)
-            'time_thresh',time_thresh,...
-            'min_size_thr',mn,...                       % minimum size of each component in pixels (default: 9)
-            'refine_flag',0,...
-            'rolling_length',ceil(frame_rate*5),...
-            'fr', frame_rate, ...
-            'plot_df', 1, ...
-            'make_gif', 1, ...
-            'save_avi', 1, ...
-            'name', fullfile(fig_save_path, 'segmented.avi') ...
-        );
-    end
-   
-    try
-        h5create(plane_name_save, '/cnmf', size(options));
-    catch ME
-        write_metadata_h5(options, plane_name_save, '/cnmf');
-    end
+    % 
+    % poolobj = gcp('nocreate'); % create a parallel pool
+    % if isempty(poolobj)
+    %     disp('Starting the parallel pool...')
+    %     poolobj = parpool('local',num_cores);
+    %     tmpDir = tempname();
+    %     mkdir(tmpDir);
+    %     poolobj.Cluster.JobStorageLocation = tmpDir;
+    % else
+    %     numworkers = poolobj.NumWorkers;
+    %     disp(['Continuing with existing pool of ' num2str(numworkers) '.'])
+    % end
+    
+    % Set caiman parameters
+    log_message(fid, "Using default CNMF parameters.\n")
+    options = CNMFSetParms(...
+        'd1',d1,'d2',d2,...                         % dimensionality of the FOV
+        'deconv_method','constrained_foopsi',...    % neural activity deconvolution method
+        'temporal_iter',3,...                       % number of block-coordinate descent steps
+        'maxIter',15,...                            % number of NMF iterations during initialization
+        'spatial_method','regularized',...          % method for updating spatial components
+        'df_prctile',20,...                         % take the median of background fluorescence to compute baseline fluorescence
+        'p',p,...                                   % order of AR dynamics
+        'gSig',tau,...                              % half size of neuron
+        'merge_thr',merge_thresh,...                % merging threshold
+        'nb',1,...                                  % number of background components
+        'gnb',3,...
+        'min_SNR',min_SNR,...                       % minimum SNR threshold
+        'space_thresh',space_thresh ,...            % space correlation threshold
+        'decay_time',0.5,...                        % decay time of transients, GCaMP6s
+        'size_thr', sz, ...
+        'min_size', round(tau), ...                 % minimum size of ellipse axis (default: 3)
+        'max_size', 2*round(tau), ...               % maximum size of ellipse axis (default: 8)
+        'dist', dist, ...                           % expansion factor of ellipse (default: 3)
+        'max_size_thr',mx,...                       % maximum size of each component in pixels (default: 300)
+        'time_thresh',time_thresh,...
+        'min_size_thr',mn,...                       % minimum size of each component in pixels (default: 9)
+        'refine_flag',0,...
+        'rolling_length',ceil(frame_rate*5),...
+        'fr', frame_rate, ...
+        'plot_df', 1, ...
+        'make_gif', 1, ...
+        'save_avi', 1, ...
+        'name', fullfile(fig_save_path, 'segmented.avi') ...
+    );
+    % 
+    % try
+    %     h5create(plane_name_save, '/cnmf', size(options));
+    % catch ME
+    %     write_metadata_h5(options, plane_name_save, '/cnmf');
+    % end
     log_message(fid, "Data loaded in. This process took: %0.2f seconds... Beginning CNMF.\n\n", toc(t_start));
     log_message(fid, "--------------------------------------------------\n");
     log_struct(fid,options,'CNMF Parameters', log_full_path);
@@ -325,7 +324,11 @@ for plane_idx = start_plane:end_plane
     log_message(fid, "Writing data to disk to:\n\n %s\n", plane_name_save);
 
     % write frames. Filename, dataset, dataset_name, overwrite, append
-    h5create(plane_name_save,"/T_keep",size(T_keep));
+    try
+        h5create(plane_name_save,"/T_keep",size(T_keep));
+    catch ME
+        error(ME);
+    end
     h5create(plane_name_save,"/Ac_keep",size(Ac_keep));
     h5create(plane_name_save,"/C_keep",size(C_keep));
     h5create(plane_name_save,"/Km",size(Km));
@@ -354,9 +357,11 @@ for plane_idx = start_plane:end_plane
     h5write(plane_name_save,"/acm",acm);
 
     write_metadata_h5(metadata, plane_name_save, '/');
-    write_metadata_h5(options, plane_name_save, '/opts');
+    % write_metadata_h5(options, plane_name_save, '/opts');
     log_message(fid, "Data saved. Elapsed time: %.2f seconds.\n",toc(t_save)/60);
-    % savefast(fullfile(save_path, ['caiman_output_plane_' num2str(plane_idx) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Ym','Cn','b','f','acx','acy','acm')
+
+    clearvars -except *path fid num_cores t_all files ds start_plane end_plane options plane_idx
+    savefast(fullfile(save_path, ['caiman_output_plane_' num2str(plane_idx) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Cn','b','f','acx','acy','acm')
 end
 catch ME
     disp(ME)
