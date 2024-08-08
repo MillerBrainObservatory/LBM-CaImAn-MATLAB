@@ -1,4 +1,4 @@
-%% This file should go in your matlab path
+% This file should go in your matlab path
 % >> userpath
 % ans = 
 %      'C:/<username>/Documents/MATLAB'

@@ -1,8 +1,127 @@
+.. _tips_and_tricks:
 
 Tips and Tricks
-###############
+######################
+
+.. _explore_data_matlab:
+
+Exploring Datasets in MATLAB
+=================================
+
+There are several helper functions located in ``core/utils``.
+
+.. _tnt_loading_data:
+
+Loading Data
+-----------------------
+
+:func:`read_plane` is helper function that lets you quickly load a HDF5 plane without dealing with matlabs `h5read <https://www.mathworks.com/help/matlab/ref/h5read.html>`_ function.
+
+You can use it using prompts:
+
+.. code-block:: MATLAB
+
+     Use dialog and prompts only:
+         Y_out = read_plane();
+
+.. warning::
+
+   Make you you include the semi-colon ; after you call read_plane(), otherwise your command window will print every value in the dataset to the command window.
+
+You can give it a folder containing H5 files, and you will be prompted for the plane and frames:
+
+.. code-block:: MATLAB
+
+    >> Y_out = read_plane('path/to/h5');
+
+    Which plane do you want to read? Enter a number (e.g. 4)
+
+    >> 4
+
+    Which frames do you want to read? enter a slice, vector with start/stop or 'all':
+
+    >> [1 15]
+
+If you already know which plane you want to load, use that as a `key-value pair` (hence why you need to include `plane` before the value):
+
+.. code-block:: MATLAB
+
+     Y_out = read_plane('C:/data/extracted_files', 'plane', 4);
+
+Or just give a path to the fully qualified filename of the plane you wish to read (so you no longer need the 'plane':
+
+.. code-block:: MATLAB
+
+    Y_out = read_plane('C:/data/extracted_files/data.h5');
+
+Pick how many frames you want to load in a similar manner:
+
+.. code-block:: MATLAB
+
+     Y_out = read_plane('data.h5', 'frames', 1:10);
+
+Or :code:`all` for everything:
+
+.. code-block:: MATLAB
+
+     Y_out = read_plane('data.h5', 4, 'all');
+
+.. _tnt_mean_images:
+
+Mean Images
+-----------------------
+
+Mean images are a good way to see small artifacts that may appear in sparse areas.
+
+Quickly view a grid of mean images with :func:`write_mean_images_to_png`:
+
+.. thumbnail:: ../_images/gen_mean_images.png
+   :align: center
+
+.. _tnt_making_gifs:
+
+Making Gifs
+-----------------------
+
+:func:`write_frames_to_gif` lets you visualize your movie quickly at any stage.
+
+.. code-block:: MATLAB
+
+    array = rand(100, 100, 500)
+    write_frames_to_gif(array, 'output.gif', 45)
+
+You want your input array to have dimensions :code:`height x width x frames`. For very large movies, use the :code:`size_mb` parameter to limit the resulting gif to that many megabytes.
+
+.. _tnt_quickplay:
+
+Quick-play Movies
+------------------------------
+
+:func:`play_movie()`: Quickly view a movie of any plane.
+
+.. code-block:: MATLAB
+
+    % read in a motion-corrected plane
+    y_extracted = read_plane('C:/data/extraction/', 'plane', 4);
+    y_corrected = read_plane('C:/data/registration/', 'plane', 4);
+    play_movie({y_extracted, y_corrected}, {'Raw', 'Corrected'}, 0, 255)
+
+.. thumbnail:: ../_images/plane_1.gif
+   :align: center
+
+
+.. _tnt_fullfile:
+
+Fullfile
+==============
+
+Matlabs `fullfile <https://www.mathworks.com/help/matlab/ref/fullfile.html>`_ function makes it easy to search for a filename:
+
+.. image:: ../_images/gen_fullfile.png
 
 .. _help_functions:
+
+.. _tnt_functions:
 
 Learn about Functions
 ============================
@@ -52,40 +171,26 @@ Learn about Functions
 
       See also fileparts, addpath, genpath, isfolder, dir, fullfile, error, regexp, savefast
 
-MATLAB and Python
-=======================
 
-Transitioning data pipelines between MATLAB and Python can be tricky. The two primary reasons for this are the indexing and row/column major array operations.
-
-Indexing
----------------------------
-
-In modern-day computer science, most programming languages such as Python, Ruby, PHP, and Java have array indices starting at zero.
-A big reason for this is that it provides a clear distinction that ordinal forms (e.g. first, second, third) has a well-established meaning that the zeroth derivative of a function.
-
-Matlab, like Julia, was created for scientific computing tailored to beginners and thus adopted the more intuitive 1 based indexing.
-
-Row/Column Operations
----------------------------
-
-In terms of practically transfering data between programming languages,
-0 or 1 based indexing can be managed by single `enumerating <https://stackoverflow.com/a/7233597/12953787>`_ for loops.
-
-.. _num_cores:
+.. _tnt_num_cores:
 
 Parallel Processing
----------------------
+==============================
 
-By default, Matlab creates as many workers as logical CPU cores. On Intel CPUs, the OS reports two logical cores per each physical core due to hyper-threading, for a total of 4 workers on a dual-core machine. However, in many situations, hyperthreading does not improve the performance of a program and may even degrade it (I deliberately wish to avoid the heated debate over this: you can find endless discussions about it online and decide for yourself). Coupled with the non-negligible overhead of starting, coordinating and communicating with twice as many Matlab instances (workers are headless [=GUI-less] Matlab processes after all), we reach a conclusion that it may actually be better in many cases to use only as many workers as physical (not logical) cores.
-I know the documentation and configuration panel seem to imply that parpool uses the number of physical cores by default, but in my tests I have seen otherwise (namely, logical cores). Maybe this is system-dependent, and maybe there is a switch somewhere that controls this, I don’t know. I just know that in many cases I found it beneficial to reduce the number of workers to the actual number of physical cores:
+The MATLAB `parpool documentation <https://www.mathworks.com/help/parallel-computing/parpool.html>`_ and imply that parpool uses the **number of physical cores** (rather than logical) by default.
+However, there are instances where the parpool shuts down due to requesting "too many logical cores", suggesting the contrary to the documentation.
+You can avoid many parallel-processing related issues by **reducing the number of workers to the actual number of physical cores**:
 
 .. code-block:: MATLAB
 
     p = parpool;     % NOT RECOMMENDED, CaImAn will very likely run out of resources error
     p = parpool(2);  % use only 2 parallel workers
 
-This can vary greatly across programs and platforms, so you should first ensure the pipeline will run using <1/2 available cores before increasing the compute demands.
-It would of course be better to dynamically retrieve the number of physical cores, rather than hard-coding a constant value (number of workers) into our program.
+This can vary greatly across programs and platforms. 
+
+.. tip::
+
+    You should first ensure the pipeline will run using <1/2 available cores before increasing the compute demands.
 
 We can get this value in Matlab using the undocumented feature(‘numcores’) function:
 
@@ -121,3 +226,50 @@ You can use this return value to decide how how much of your computers total pro
 
 This is equally valid for parfor/eval loops and spmd blocks, since both of them use the pool of workers started by parpool.
 
+.. _tnt_matlab_install_path:
+
+Find MATLAB Install Location
+========================================
+
+The location of the installation is often in `~/Documents/MATLAB/`.
+If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI.
+
+Modern versions of MATLAB (2017+) solve most Linux/Windows filesystem conflicts.
+
+Generally, the main difference in matlab installations on unix vs windows systems is nothing more than the install path::
+
+    Windows (64-bit):
+    - C:\Program Files\MATLAB\R20XXx (64-bit MATLAB)
+    - C:\Program Files (x86)\MATLAB\R20XXx (32-bit MATLAB)
+    Windows (32-bit):
+    - C:\Program Files\MATLAB\R20XXx
+    Linux:
+    - /usr/local/MATLAB/R20XXx
+    Mac:
+    - /Applications/MATLAB_R20XXx.app
+
+To find your install location:
+
+.. code-block:: MATLAB
+
+    >> matlabroot
+        ans =
+            'C:\Program Files\MATLAB\R2023b'
+
+Generally, MATLAB code should be stored in your `userpath`:
+
+.. code-block:: MATLAB
+
+   >> userpath
+   ans =
+       'C:\Users\RBO\Documents\MATLAB'
+
+
+You can add the path programmatically from within matlab:
+
+.. code-block:: MATLAB
+
+   >> addpath(genpath("path/to/caiman_matlab"))
+
+Otherwise, you can simply navigate to that directory within the matlab GUI or add the path to this repository as
+shown in the :ref:`install from source <from_source>` section.

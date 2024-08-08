@@ -11,16 +11,17 @@ matlab_auto_link = "basic"
 matlab_short_links = True
 
 project = "LBM-CaImAn-MATLAB"
-copyright = "2024, Elizabeth R. Miller Brain Observatory (MBO) | The Rockefeller University. All Rights Reserved."
-
+copyright = "2024, Elizabeth R. Miller Brain Observatory | The Rockefeller University. All Rights Reserved."
 
 myst_enable_extensions = [
     "amsmath",
     "colon_fence",
     "deflist",
+    "attrs_block",
     "dollarmath",
     "html_image",
 ]
+
 myst_url_schemes = ("http", "https", "mailto")
 
 templates_path = ["_templates"]
@@ -31,13 +32,13 @@ extensions = [
     "sphinxcontrib.images",
     "sphinxcontrib.video",
     "sphinxcontrib.matlab",
+    # "myst_parser",
     "myst_nb",
     "sphinx_copybutton",
     "numpydoc",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    "sphinx.ext.autosectionlabel",
     "sphinx_togglebutton",
     "sphinx_design",
     "sphinx_tippy",
@@ -50,12 +51,12 @@ images_config = dict(
     default_group="default",
 )
 
-# suppress_warnings = ["myst.domains", "ref.ref"]
 source_suffix = {
     ".rst": "restructuredtext",
-    ".ipynb": "myst-nb",
     ".md": "myst-nb",
+    ".myst": "myst-nb",
 }
+
 myst_enable_extensions = [
     "amsmath",
     "attrs_inline",
@@ -72,31 +73,40 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
+current_filepath = (
+    Path().home()
+    / "repos"
+    / "work"
+    / "millerbrainobservatory.github.io/docs/build/html/"
+)
+# print(current_filepath.is_dir())
+
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3.9", None),
-    "mbo": ("https://millerbrainobservatory.github.io/", None),
-    "lbmpy": ("https://millerbrainobservatory.github.io/LBM-CaImAn-Python/", None),
-    "wiki-reg": ("https://en.wikipedia.org/wiki/Image_registration/", None),
+    "mbo": (
+        str(current_filepath),
+        None,
+    ),
 }
 
 templates_path = ["_templates"]
 
-html_theme = "pydata_sphinx_theme"
+html_theme = "sphinx_book_theme"
 
 html_logo = "_static/CaImAn-MATLAB_logo.svg"
-html_short_title = "CaImAn Pipeline"
+html_short_title = "LBM CaImAn Pipeline"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
+# html_js_files = ["subtoc.js"]
 html_favicon = "_static/mbo_icon_dark.ico"
 html_copy_source = True
 
 html_context = {
     "github_user": "https://github.com/MillerBrainObservatory/",
     "github_repo": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
-    "doc_path": "docs",
 }
 
-sphinx_book_options = {
+html_theme_options = {
+    "path_to_docs": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/tree/master/docs",
     "external_links": [
         {
             "name": "MBO.io",
@@ -112,5 +122,3 @@ sphinx_book_options = {
         },
     ],
 }
-
-html_theme_options = sphinx_book_options

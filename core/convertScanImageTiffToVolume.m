@@ -1,7 +1,7 @@
 function convertScanImageTiffToVolume(data_path, varargin)
 % Convert ScanImage .tif files into a 4D volume.
 %
-% Convert raw `ScanImage`_ multi-roi .tif files from a single session
+% Convert raw scanimage multi-roi .tif files from a single session
 % into a single 4D volumetric time-series (x, y, z, t). It's designed to process files for the
 % ScanImage Version: 2016 software.
 %

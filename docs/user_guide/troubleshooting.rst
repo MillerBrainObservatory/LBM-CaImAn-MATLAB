@@ -1,11 +1,15 @@
+.. _troubleshooting:
+
 Troubleshooting
 ===============
+
+.. _ts_memory:
 
 Memory
 ***************************************
 
 - Number of Workers/Cores > 100: There a a known bug in MATLAB R2023a for cases when the number of workers is more than 100.
-  Refer to the following `bug report <https://www.mathworks.com/support/bugreports/details/2968710.html>`_ for a workaround to resolve the issue. Additionally, steps taken in :ref:`matlab server issues` can help to solve this problem.
+  Refer to the following `bug report <https://www.mathworks.com/support/bugreports/details/2968710.html>`_ for a workaround to resolve the issue. Additionally, steps taken in :ref:`matlab server issues <ts_matlab_server>` can help to solve this problem.
 
 - Out of Memory during deserialization
 
@@ -15,6 +19,7 @@ Memory
   a single 3D-planar time-series being too large to fit in memory, in which case you can prevent caiman from processing the image patches
   in parallel. Keep in mind this will be noticably slower than the parallel counterpart.
 
+.. _ts_mex:
 
 Missing Compiled Binary (Windows)
 ***************************************
@@ -36,9 +41,10 @@ Missing Compiled Binary (Windows)
 
    Newest version 0.2.0+ include both precompiled binaries.
 
+.. _ts_matlab_server:
+
 Matlab Server Issues
 ***********************
-.. _server_issues:
 
 These come in many flavors and are mostly `windows` issues due to their background serrvice.
 
@@ -59,6 +65,7 @@ Here is the general fix for all of them:
 - Run `which -all pathdef.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\pathdef.m`.
 - Run `which -all matlabrc.m`. Ensure it's located in `C:\Program Files\MATLAB\R2023b\toolbox\local\matlabrc.m`.
 
+.. _ts_win_filepaths:
 
 Windows Filepaths
 ***********************
