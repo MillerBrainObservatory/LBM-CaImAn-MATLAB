@@ -52,7 +52,7 @@ The most up to date mexfiles are always kept in the [releases](https://github.co
 
 This pipeline is unique only in the routines to extract raw data from [ScanImage BigTiff files](https://docs.scanimage.org/Appendix/ScanImage%2BBigTiff%2BSpecification.html#scanimage-bigtiff-specification), as is outlined below:
 
-![Extraction Diagram]( docs/_images/ex_diagram.png)
+![Extraction Diagram]( docs/_images/ex_diagram_tp.svg)
 
 Once data is extracted to an intermediate `.h5` filetype, registration, segmentation and deconvolution can all be performed as described in the pipelines documentation.
 
