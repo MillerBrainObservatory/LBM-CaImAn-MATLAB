@@ -107,6 +107,7 @@ html_context = {
 
 html_theme_options = {
     "path_to_docs": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/tree/master/docs",
+    "show_toc_level": 3,
     "external_links": [
         {
             "name": "MBO.io",
