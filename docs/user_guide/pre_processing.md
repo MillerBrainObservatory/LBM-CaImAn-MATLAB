@@ -21,14 +21,11 @@ Pre-processing LBM datasets consists of 2 main processing steps:
 2. {ref}`Correct Scan-Phase <ex_scanphase>` alignment for each ROI.
 3. {ref}`Re-tile <ex_retile>` vertically concatenated ROI's horizontally.
 
-```{thumbnail} ../_images/ex_diagram.png
----
-title: Step 1: Image Extraction and Assembly
----
+```{thumbnail} ../_images/ex_diagram_test2.svg
 
 ```
 
-For a more in-depth look at the LBM datasets and accompanying metadata, see the {ref}`LBM metadata <scanimage_metadata>` section of the MBO user documentation.
+For a more in-depth look at the LBM datasets and accompanying metadata, see the {ref}`LBM metadata <primary_metadata>` section of the MBO user documentation.
 
 ```{warning}
 
@@ -42,21 +39,20 @@ No other .tiff files should be in this directory. If this happens, an error will
 
 This example follows a directory structure shown in {ref}`the first steps guide <directory_structure>`.
 
-Inputs and outputs can be (almost) anywhere you wish.
+Inputs and outputs can be anywhere you wish so long as you have read/write permissions.
 
-```{code-block} MATLAB
+:::{code-block} MATLAB
 
 parent_path = 'C:\Users\<username>\Documents\data\high_res\';
 
 raw_path = [ parent_path 'raw\']; % where our raw .tiffs go
 extract_path = [ parent_path 'extracted\']; % where results are saved
 
-```
+:::
 
-```{note}
+:::{note}
 Files are saved with the string {code}'_plane_' appended automatically, don't put the characters {code}`_plane_` together in your raw/extracted filenames!
-
-```
+:::
 
 (scan_phase)=
 ### Scan Phase
@@ -70,9 +66,10 @@ This example shows that shifting every *other* row of pixels +2 (to the right) i
 ```{thumbnail} ../_images/ex_phase.png
 
 ```
-.. important::
 
-    Checking for a scan-phase offset correction is computationally cheap, so it is recommended to keep this to true.
+:::{important}
+Checking for a scan-phase offset correction is computationally cheap, so it is recommended to keep this to true.
+:::
 
 When every other row of our image if shifted by N pixels, adjacent rows that *are not* shifted now have a N number of 0's padded in between the rows that were shifted.
 
@@ -87,86 +84,120 @@ align: center
 
 You'll see the decreased gap between ROI's for the scan-offset corrected image, showing the 2 pixels removed from each edge accounting for the padded 0's.
 
-(trim_pixels)=
-### Trim Pixels off ROI's
+:::{caution}
+If a scan-offset correction is applied, the ROI edge may contain these shifted pixels. This can be corrected with the trim_roi parameter discussed in the next section.
+:::
+
+(trim_roi)=
+### Trim ROIs
 
 There are times when the seam between re-tiled ROI's is still present.
 
-Sometimes, this seam may not appear when frames are viewed individually, but are present in the {ref}`mean image <ex_meanimage>`.
+This seam may not appear when frames are viewed individually, but are present in the {ref}`mean image <ex_meanimage>`.
 
-The {code}`trim_pixels` parameter takes an array of 4 values as input corresponding to the number of pixels to trim on the left, right, top and bottom of each ROI.
+The {code}`trim_roi` parameter takes an array of 4 values as input corresponding to the number of pixels to trim on the left, right, top and bottom of each ROI.
 
 ```{code-block} MATLAB
 
-trim_pixels = [4,4,8,0]
+trim_roi = [4,4,8,0]
 
 ```
+
+:::{tip}
+If a {ref}`scan-phase correction <scan_phase>` is applied to this plane, there will be dead pixels on the left/right edges.
+More than 3 pixel-shift offsets are rare, so we recommend a starting value of {code}`[2 2 x x]` which trims 2 pixels from the left and right edge.
+:::
+
+(trim_image)=
+### Trim Image
+
+In the same manner as {ref}`trimming ROIs <trim_roi>`, the {code}`trim_image` parameter will trim the edges of the {ref}`retiled-image <ex_retile>`.
 
 (extraction_outputs)=
 ## Outputs
 
-(extraction_format)=
 Output data are saved in {code}`.h5` format, with the following characteristics:
+- one file per plane
+- named {code}"<step>_plane_N.h5" where step = extraction, registration or segmentation
+- data saved to a `h5 group`
+- metadata saved as `h5 attributes`
 
-- one file-per-plane
-
-- named {code}`extraction_plane_N.h5`
-
-- metadata saved as attributes
+-----
 
 ### H5 Groups
 
-You can use {code}`h5info(h5path)` in the MATLAB command window to reveal some helpful information about our data.
-
-For example, the following is an example structure of the {code}`.h5` file at the outermost level:
-
-```{code-block} MATLAB
-
-h5info(extract_path, '/extraction')
-
-Filename: 'C:\Users\<username>\high_res_dataset.h5'
-Name: '/extraction'
-Groups:
-    /Y
-    /Ym
-Datasets: []
-Datatypes: []
-Links: []
-Attributes: []
-
-```
-
-We have our {ref}`Dataset Name <ds>` parameter set as the group name.
-
-`/Ym` is the {ref}`mean image <ex_meanimage>`
-
-{code}`/Ym`:
-
-{code}`/Y`:
-
-Below you'll see that {code}`h5info` 30 datasets corresponding to each of our z-planes, but no groups or attributes.
-
-That information is stored within each plane:
-
-```{code-block} MATLAB
-
-h5info(extract_path, '/plane_1')
-
-struct with fields:
-
-Filename: 'C:\Users\<username>\extracted\MH184_both_6mm_FOV_150_600um_depth_410mW_9min_no_stimuli_00001_00001.h5'
-Name: 'plane_1'
-Datatype: [1×1 struct]
-Dataspace: [1×1 struct]
-ChunkSize: [1165 1202 1]
-FillValue: 0
-Filters: [1×1 struct]
-Attributes: [30×1 struct]
-
-```
+[HDF5](https://www.neonscience.org/resources/learning-hub/tutorials/about-hdf5) is the primary file format for this pipeline. HDF5 relied on groups and attributes to save data to disk.
 
 - **Groups**: h5 files can be thought of like directories where a 3D time-series is self contained within its own folder (or group).
-- **Attributes**: Attributes are special "tags" attached to a group. This is where we store metadata associated with each group and dataset. The result of calling `get_metadata(raw_path)` (see {ref}`scanimage metadata <scanimage_metadata>` for more information about the magic behind the scenes here).
+- **Attributes**: Attributes are special "tags" attached to a group. This is where we store metadata associated with each group and dataset. The result of calling `get_metadata(raw_path)` (see {ref}`scanimage metadata <primary_metadata>` for more information about the magic behind the scenes here).
+
+For pre-processing, two "groups" are saved: registered timeseries and mean image:
+
+{code}`/Y`
+: The 3D final, re-tiled image.
+
+{code}`/Ym`
+: The 2D {ref}`mean image <ex_meanimage>`
+  
+````{admonition} Preview file contents
+:class: dropdown
+
+Use MATLAB functions [h5info](https://www.mathworks.com/help/matlab/ref/h5disp.html) and [h5disp](https://www.mathworks.com/help/matlab/ref/h5disp.html) to preview file contents.
+
+h5disp takes the {code}`filename` as the only input parameter, and displays the contents of the file:
+
+```{code-block} MATLAB
+
+>> h5disp(fullfile(data_path, "extracted/extracted_plane_1.h5"));
+
+    HDF5 extracted_plane_1.h5 
+
+    Group '/' 
+        Attributes:
+            'num_planes':  28.000000 
+            'num_rois':  3.000000 
+            'num_frames':  2320.000000 
+            'frame_rate':  7.720873 
+            'fov':  672.000000 668.000000 
+            'pixel_resolution':  1.000000 
+            %% Metadata values removed to save space ...
+        Dataset 'Y' 
+            Size:  668x222x2320
+            MaxSize:  668x222xInf
+            Datatype:   H5T_STD_I16LE (int16)
+            ChunkSize:  668x222x16
+            Filters:  none
+            FillValue:  0
+        Dataset 'Ym' 
+            Size:  668x222
+            MaxSize:  668x222
+            Datatype:   H5T_IEEE_F64LE (double)
+            ChunkSize:  []
+            Filters:  none
+            FillValue:  0.000000
+
+```
+
+h5info takes the {code}`filename` and the {ref}`group <dataset_name>`, and displays the contents of the file:
+
+```{code-block} MATLAB
+
+>> h5info(fullfile(data_path, "extracted/extracted_plane_1.h5"))
+
+ans = 
+
+  struct with fields:
+
+      Filename: 'C:\Users\RBO\caiman_data\mk717\1um_72hz\extracted\extracted_plane_1.h5'
+          Name: '/'
+        Groups: []
+      Datasets: [2×1 struct]
+     Datatypes: []
+         Links: []
+    Attributes: [27×1 struct]
+```
+Notice our metadata is saved to the root group. This is to allow you to easily retrieve metadata for a step by calling {func}`read_h5_metadata`.
+````
 
 ## Validate Outputs
 
@@ -196,17 +227,16 @@ For example, consider the below image:
 
 ```{thumbnail} ../_images/ex_brightest_feature.png
 ---
-width: 800
+scale: 50%
 align: center
 title: Brightest Feature
 ---
 
 ```
 
-Taking the {term}`pixel resolution <pixel-resolution>` of 3 μm from our metadata, we see this neuron is ~10μm wide.
+Taking the {term}`pixel resolution <pixel-resolution>` of $3μm$ from our metadata, we see this neuron is $~10μm$ wide.
 
 We may then want to limit our {ref}`NoRMCorre Parameters <normcorre_params>` to only allow shifts of this size with {code}`max_shift=10/metadata.pixel_resolution`.
 
 To get a sense of how much motion is present in your timeseries, see {ref}`tips and tricks: exploring datasets in MATLAB <explore_data_matlab>`
 
-```

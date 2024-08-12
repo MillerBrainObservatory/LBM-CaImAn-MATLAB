@@ -63,7 +63,7 @@ First, each z-plane should be close enough in distance (for example, ~16um) that
 
 ## Outputs
 
-- .fig files showing neuron distributions in z and radial directions.
+- {code}`.fig` files showing neuron distributions in z and radial directions.
 - A {code}`.mat` file: {code}`caiman_collated_output_plane_N` with collated and processed imaging data.
 
 This output file mirrors the registration output but with all z-planes collated into a single dataset.

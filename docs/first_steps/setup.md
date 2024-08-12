@@ -1,8 +1,11 @@
 (project_setup)=
-# 0.1 Project Setup
+# 0.1. Project Setup
 
 (installation)=
-## 0.1.1. Installation
+## Installation
+
+Users with [git](https://git-scm.com/) experience are encouraged to skip to the {ref}`git installation section <installation_git>`. 
+This option avoids the need repeat the download process each time a new version of the pipeline is produced.
 
 (from_source)=
 ### From Source
@@ -15,10 +18,10 @@ Move/extract the downloaded folder into a folder on your {code}`userpath`.
 
 ```{hint}
 
-To find your userpath, open matlab, and in the command window: {code}`userpath`
+>>> userpath
 
-ans =
-    '/home/<username>/Documents/MATLAB'
+    ans =
+        '/home/<username>/Documents/MATLAB'
 
 ```
 
@@ -50,14 +53,12 @@ addpath(genpath(fullfile("path/to/caiman_matlab")))
 
 There is a sample setup.m file located at the root of this repository.
 
-(with_git)=
-
 (installation_git)=
-
 ### With git
 
 Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.
 
+(installation_win)=
 ### Windows
 
 The easiest method to download this repository with git is via [mysys](https://gitforwindows.org/)
@@ -67,6 +68,7 @@ If you have MATLAB installed on Windows, you won't be able to run commands from 
 due to the separate filesystems. Pay attention to which environment you install.
 ```
 
+(installation_wsl)=
 ### WSL2 (Windows Subsystem for Linux)
 
 Windows subsystem for Linux (WSL/WSL2) is a local environment on your windows machine that is capable of running linux commands using a separate filesystem.
@@ -80,11 +82,11 @@ This means you will not be able to run matlab from the WSL filesystem (i.e. `//w
 ```{code-block} bash
 $ cd /mnt/c/Users/<Username>/<project-install-path>
 ```
-
 This pipeline has been tested on WSL2, Ubuntu 22.04.
 
 Though any debian-based distribution should work.
 
+(installation_linux)=
 ### Linux
 
 In Linux, WSL or mysys, clone this repository with the pre-installed git client:
@@ -96,7 +98,7 @@ $ cd caiman_matlab
 $ matlab
 ```
 
-## 0.1.2. Dependencies
+## Dependencies
 
 Before running your first dataset, you should ensure that all dependencies of the pipeline are satisfied.
 
@@ -135,7 +137,7 @@ No other .tiff files should be in this directory. If this happens, an error will
 ```
 
 (directory_structure)=
-### 0.1.3. Directory Structure
+### Directory Structure
 
 The following is an example of the directory hierarchy
 used for the demo.

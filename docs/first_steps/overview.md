@@ -7,7 +7,7 @@ The only *required* inputs to the pipeline are a path where your raw/previously 
 This common interface is described here with the goal of avoiding redundancy through the rest of the documentation.
 
 (parameters)=
-## 0.2.1. Core Parameters
+## Core Parameters
 
 For the {ref}`Core <core_api>` functions in this pipeline, the initial parameters are always the same.
 
@@ -80,7 +80,7 @@ convertScanImageTiffToVolume( ...
 
 See the included script {scpt}`demo_LBM_pipeline` at the root of this repository for a working example.
 
-## 0.2.2. Logging
+## Logging
 
 ### To File
 
@@ -89,6 +89,11 @@ A log file will be saved with every processing step.
 This logs the start time and duration of each computation, as well as storing metadata and function parameters.
 
 The pipeline step is prepended to the function name, followed by the data and time of the run.
+
+:::{thumbnail} ../_images/reg_log_output.png
+:class: dropdown
+:::
+
 
 ### To Command Window
 

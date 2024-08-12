@@ -59,10 +59,10 @@ Avoid the {code}`bidir` options as we correct for bi-directional scaling ourselv
 
 The most important NoRMCorre parameters are:
 
-1. {code}`grid-size`
+1. {code}`grid_size`
 : Determines how many patches your image is split into. The smaller the patch, the **more precise the registration**, with a tradeoff being **increased compute times**.
 
-2. {code}`max-shift`
+2. {code}`max_shift`
 : Determines the maximum number of pixels that your movie will be translated in X/Y.
 
 3. {code}`fr`
@@ -71,29 +71,36 @@ The most important NoRMCorre parameters are:
 4. {code}`correct_bidir`
 : Attempts to correct for bi-directional scan offsets, a step that was performed {ref}`in pre-processing <scan_phase>`.
 
-```{hint} MAX SHIFT PARAMETER
+```{admonition} A note on {code}`max_shift`
+:class: dropdown
 
-For timeseries where the FOV is sparsely labeled or a frame is corrupted, the registration process of two neighboring patches can produce very different shifts, which can lead to corrupted registered frames. We limit the largest allowed shift with the max_shift parameter.
+For timeseries where the FOV is sparsely labeled or a frame is corrupted, the registration process of two neighboring patches can produce very different shifts, which can lead to corrupted registered frames.
+We limit the largest allowed shift with the {code}`max_shift` parameter.
 
-If you see large single-frame spikes, try decreasing the {code}`max-shift` parameter.
+If you see large single-frame spikes, try decreasing the {code}`max-shift` parameter (Default is $10μm$).
 ```
 
-(ug_rigid_registration):
-(rigid_registration):
+(ug_rigid_registration)=
+(rigid_registration)=
 ## Rigid Registration
 
-Rigid registration is accomplished by giving NoRMCorre no variable for {code}`grid-size`, so it defaults to the size of your image and thus only processing a single patch encompassing the entire field-of-view.
+Rigid registration is accomplished by giving NoRMCorre **no variable for {code}`grid_size`**,
+so it defaults to the size of your image and thus only processing a single patch encompassing the entire field-of-view.
+
+```{note}
+The pipeline uses rigid registration internally to first create a `template`. This template downsampled and used to obtain the most accurate mean image for alignment.
+```
 
 Ideally, you want registration parameters in units of *real-world values*.
 
-For example, rather than specifying a max-shift in units of pixels, use the {term}`pixel-resolution` metadata to calculate a {code}`max_shift` of ~1/2 size of the neuron:
+For example, rather than specifying a max_shift in units of pixels, use the {term}`pixel-resolution` metadata to calculate a {code}`max_shift` as ~1/2 the size of the neuron:
 
 ```{code-block} MATLAB
 
 plane_name = fullfile("path/to/raw_tif"); 
 metadata = read_metadata(plane_name);
 
-% assuming a typical cortical neuron size of 15 micron
+% assuming a typical cortical neuron size of $15μm$.
 max_shift = 7.5/metadata.pixel_resolution
 ```
 
@@ -107,7 +114,7 @@ plane_number = 1;
 
 Y = read_plane(plane_name, 'ds', dataset_name, 'plane', plane_number);
 
-% empty grid-size results in rigid-registration
+% empty grid_size results in rigid-registration
 options_rigid = NoRMCorreSetParms(...
    'd1',size(Y, 1),... 
    'd2',size(Y, 2),...
@@ -138,35 +145,22 @@ options_rigid = NoRMCorreSetParms(...
 (reg_output)=
 ## Outputs
 
-Just like {ref}`pre-processing <extraction_inputs>`, registration outputs in {code}`.h5` format.
+Just like {ref}`pre-processing outputs <extraction_inputs>`, registration outputs to {code}`.h5` format.
 
-(file_format)=
-### File-Format
+Registration outputs have the following groups:
 
-Output data are saved in {code}`.h5` format, with the following characteristics:
-- one file per plane
-- named {code}"registration_plane_N.h5"
-- metadata saved as attributes
-
-You can use {code}`h5info(h5path)` in the MATLAB command window to reveal some helpful information about our data.
-
-This file has the following groups:
-
-{code}`/<param>`
-: Takes the name of the {code}`ds` parameter. This group contains the 3D planar timeseries. Default {code}`'/Y'`}.
-: {code}`h5read()`
+{code}`/Y`
+: Takes the name of the {ref}`ds <dataset_name>` parameter. This group contains the 3D timeseries.
 
 {code}`/Ym`
 : The mean image of the motion-corrected movie. Each image is averaged over time to produce the mean pixel intensity.
 
-{code}`/template`
-: The mean image [X, Y] used to align each frame in the timeseries. This image is calculated to correlate the most with each frame in the image.
-
 {code}`/shifts`
 : A {code}`2xN` column vector containing the number of pixels in X and Y that each frame was shifted.
 
-```:{hint}
+````{hint}
 To get the shifts and plot them in MATLAB:
+:class: dropdown
 
 ```{code-block} MATLAB
 
@@ -174,19 +168,22 @@ x_shifts = shifts(:,1) % represent pixel-shifts in *x*
 y_shifts = shifts(:,2) % represent pixel-shifts in *y*
 ```
 
-```:
+````
 
 (validate_outputs)=
 ## Validate Outputs
 
-```:{hint}
-Figures of the below validation metrics are placed in your {code}`save_path` as {code}`figures/registration_metrics_plane_N`:
+```{hint}
+Validation metric figures are placed in your {code}`save_path` as {code}`figures/registration_metrics_plane_N`:
 
 ```{thumbnail} ../_images/reg_figure_output.png
 :title: Figure Output
-:align: center
+:align: right
 :width: 50%
-```:
+
+```
+
+The pipeline saves 4 files / z-plane for you to quickly evaluate registration results in your {code}`save_path/figures/` as {code}`registration_metrics_plane_N`.
 
 Internally, the pipeline first create a "template" using {ref}`rigid registration <tut_rigid>`.
 
@@ -200,6 +197,15 @@ The distance needed to shift these pixels to most closely align with the templat
 
 Pixels that are highly correlated over the timecourse of an experiment are stationary in the image. Proper registration should **increase the correlation between neighboring pixels**.
 
+```{admonition} Validation metrics rely on good signal!
+:class: dropdown
+
+The correlation metrics operate on each individual frame of the timeseries.
+As such, they depend on the quality of the registration and noise level but also on the level of neural activity.
+
+Be weary of correlation metrics showing good registration on data with lots of noise or little signal.
+```
+
 ------
 
 ```{thumbnail} ../_images/reg_corr_with_mean.svg
@@ -211,7 +217,7 @@ The high degree of overlap between rigid/non-rigid registration indicates our mo
 
 This could be due to too large of a {code}`grid_size` or a general lack of non-uniform motion.
 
-```thumbnail:: ../_images/reg_correlation_zoom.png
+```{thumbnail} ../_images/reg_correlation_zoom.png
 :title: Correlation Metrics
 ```
 

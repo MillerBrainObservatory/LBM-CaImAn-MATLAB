@@ -1,4 +1,3 @@
-.. _ug_source_extraction:
 (ug_source_extraction)=
 # Segmentation
 
@@ -34,22 +33,28 @@ Turning this flourescence into "spikes" relies on several mathmatical operations
 ```{image} ../_images/seg_traces.png
 ```
 
+```{admonition} A note on noisy data
+:class: dropdown
+
+Much of work is about separating "good activity", the flourescence changes that we can attribute to a single cell, vs "noise, which is everything else (including signal from other neurons).
+To do this, we take advantage of the fact that the slow calcium signal is typically very similar between adjacent frames.
+See [this blog post](https://gcamp6f.com/2024/04/24/why-your-two-photon-images-are-noisier-than-you-expect) for a nice discussion on shot noise calculations and poisson processes.
+```
+
 (seg_definitions)=
 ## Inputs
 
-Inputs (covered in {ref}`params`) are consistent with {ref}`registration`, substituting::
+Inputs are consistent with {ref}`registration`, substituting::
 
     NoRMCorreSetParams -> CNMFSetParams
 
-
-All of the parameters and options fed into the code`CNMF` pipeline are contained within a single `MATLAB struct <https://www.mathworks.com/help/matlab/ref/struct.html>`_.
+All of the parameters and options fed into the code`CNMF` pipeline are contained within a single [MATLAB struct](https://www.mathworks.com/help/matlab/ref/struct.html).
 
 ```{note}
 There is an example file describing CNMF parameters at the root of this project. {scpt}`demo_CNMF_params`.
 ```
 
 (seg_tuning)=
-
 ## Tuning CNMF
 
 To get an idea of the default parameters (what happens if you use {code}`CNMFSetParams()` with no arguments),
@@ -59,11 +64,13 @@ you can run the following code to see the defaults:
 >> opts = CNMFSetParams()
 ```
 
-There are several different thresholds that correlation coefficients must cross to be considered a "valid" neuron or a "valid" transient signal. Below are the `CNMF` parameters that control these thresholds and allow tuning the algorithm to your dataset.
+There are several different thresholds that correlation coefficients must cross to be considered a "valid" neuron or a "valid" transient signal.
+
+Below are the {term}`CNMF` parameters that control these thresholds and allow tuning the algorithm to your dataset.
 
 (seg_merge_thresh)=
 
-### merge_thresh
+### {code}`merge_thresh`
 
 A correlation coefficient determining the amount of correlation between pixels in time needed to consider two neurons the same neuron.
 
@@ -75,9 +82,9 @@ A correlation coefficient determining the amount of correlation between pixels i
 ```
 
 (seg_minsnr)=
-### min_SNR
+### {code}`min_SNR`
 
-The minimum "shot noise" to calcium activity to accept a neurons initialization (accept it as valid).
+The minimum [signal-noise ratio](https://en.wikipedia.org/wiki/Signal-to-noise_ratio) needed for the algorithm to accept a neurons initialization (accept it as valid).
 
 This value is used for an event exceptionality test, which tests the probabilty if some "exceptional events" (like a spike).
 
@@ -92,11 +99,11 @@ This value is used for an event exceptionality test, which tests the probabilty 
 This probability is used to order the components according to "most likely to be exceptional".
 
 (seg_tau)=
-### Tau
+### {code}`Tau`
 
 Half-size of your neurons.
 
-- Tau is the {code}`half-size` of a neuron. If a neuron is `10um`, {code}`Tau` will be a `5um`.
+- Tau is the {code}`half-size` of a neuron. If a neuron is $10μm$, {code}`Tau` will be a $5μm$.
 - In general, round up.
 - This changes depending on the area of the brain you're in and should be adjusted to match the ~cell size of the brain region.
 
@@ -107,10 +114,12 @@ If this parameter is not included, they will be calculated for you based on the 
 
 - For example, {code}`Tau` is a widely talked about parameter being the half-size of your neuron.
 
-This is calculated by default as :math:`7.5/pixel_resolution`. This only makes sense if we assume an ~neuron size of `14um`.
+This is calculated by default as :math:`7.5/pixel_resolution`.
+
+This makes sense if we assume an ~neuron size of $14μm$.
 
 (seg_p)=
-### P
+### {code}`P`
 
 This is the autoregressive order of the system.
 - It is a measure of how the signal changes with respect to time.
@@ -124,7 +133,8 @@ otherwise, P=1 (fast)
 (seg_outputs)=
 ## Segmentation Outputs
 
-The {code}`.h5` output for segmentation contains several groups. You will not find any movies, those are stored in the {ref}`registration outputs <reg_output>`.
+The {code}`.h5` output for segmentation contains several groups.
+You will not find any movies, those are stored in the {ref}`registration outputs <reg_output>`.
 
 ### H5 Groups
 
@@ -136,73 +146,85 @@ Below is a description of each output variable, along with an example of how to 
     - The fluorescence time-series data for each detected neuronal component. Each row corresponds to a different neuron, and each column corresponds to a different time point.
     - This data can be used to analyze the temporal dynamics of neuronal activity, such as identifying patterns of activation over time.
 
-```:{dropdown}
+````{admonition} Example: Plot all neuronal traces
+:class: dropdown
 
 ```{code-block} MATLAB
 
-    plot(T_all(1, :)); % Plot the time-series for the first neuron
-    xlabel('Time (frames)');
-    ylabel('Fluorescence (dF/F)');
+plot(T_all(1, :)); % Plot the time-series for the first neuron
+xlabel('Time (frames)');
+ylabel('Fluorescence (dF/F)');
 
 ```
-```:
+````
 
 2. {code}`C_all`: Deconvolved neuronal activity
     - The deconvolved activity traces, which represent the estimated underlying neuronal firing rates. This data is derived from `T_all` through a deconvolution process that attempts to remove the effects of calcium dynamics.
     - This data can be used to study the inferred spiking activity of neurons, which is often more directly related to neuronal communication than raw fluorescence data.
 
-    .. code-block:: matlab
+````{admonition} Example: Plot deconvolved activity
+:class: dropdown
 
-        plot(C_all(1, :)); % Plot the deconvolved activity for the first neuron
-        xlabel('Time (frames)');
-        ylabel('Deconvolved activity');
+```{code-block} MATLAB
+
+plot(C_all(1, :)); % Plot the deconvolved activity for the first neuron
+xlabel('Time (frames)');
+ylabel('Deconvolved activity');
+```
+````
 
 3. {code}`N_all`: Neuronal spatial coordinates mapped to X/Y coordinates
-    - A matrix where each row represents a neuron, and the columns contain properties such as the neuron's integrated fluorescence ({code}`acm`), x-coordinate ({code}`acx`), y-coordinate ({code}`acy`), and z-coordinate ({code}`plane_index`).
-    - This data can be used to analyze the spatial distribution of neurons within the imaging field and correlate spatial properties with functional data.
 
-   ```{code-block} matlab
+- A matrix where each row represents a neuron, and the columns contain properties such as the neuron's integrated fluorescence ({code}`acm`), x-coordinate ({code}`acx`), y-coordinate ({code}`acy`), and z-coordinate ({code}`plane_index`).
+- This data can be used to analyze the spatial distribution of neurons within the imaging field and correlate spatial properties with functional data.
 
-        scatter(N_all(:, 2), N_all(:, 3)); % Plot the spatial distribution of neurons in the xy-plane
-        xlabel('x-coordinate');
-        ylabel('y-coordinate');
-    ```
+````{admonition} Example: Plot spatial neuron distribution
+:class: dropdown
+
+```{code-block} matlab
+
+    scatter(N_all(:, 2), N_all(:, 3)); % Plot the spatial distribution of neurons in the xy-plane
+    xlabel('x-coordinate');
+    ylabel('y-coordinate');
+```
+````
 
 4. {code}`Ac_keep`: Neuronal footprints
-    - The spatial footprints of the detected neurons. Each neuron is represented by a 2D matrix showing its spatial extent and intensity within the imaging field.
-    - This data can be used to visualize the spatial arrangement and morphology of neuronal components.
 
-   ```{code-block} matlab
+- The spatial footprints of the detected neurons. Each neuron is represented by a 2D matrix showing its spatial extent and intensity within the imaging field.
+- This data can be used to visualize the spatial arrangement and morphology of neuronal components.
 
-    >> figure; imagesc(Ac_keep(:,:,1)); axis image; axis tight; axis off; colormap gray; title("Single Spatial Component");
+````{admonition} Example: Plot accepted neurons only
+:class: dropdown
 
-    >> size(Ac_keep)
+```{code-block} matlab
 
-    ans =
+>> figure; imagesc(Ac_keep(:,:,1)); axis image; axis tight; axis off; colormap gray; title("Single Spatial Component");
 
-        33    33   447
-   ```
-
+```
+````
 
 ```{thumbnail} ../_images/seg_ac_keep.png
-:width: 800
+:width: 300
 ```
-
 5. {code}`Cn`: Correlation image
     - A 2D image showing the correlation of each pixel's time-series with its neighboring pixels, highlighting areas of correlated activity.
     - This image can be used to identify regions of interest and assess the overall quality of the motion correction and segmentation process.
 
-   ```{code-block} matlab
+````{admonition} Example: Plot accepted neurons only
+:class: dropdown
 
-    >> figure; imagesc(Cn); axis image; axis tight; axis off; colormap gray; title("Single Spatial Component");
-    >> size(Cn) % [Y, X]
+```{code-block} matlab
 
-    ans =
+>> figure; imagesc(Cn); axis image; axis tight; axis off; colormap gray; title("Single Spatial Component");
+>> size(Cn) % [Y, X]
 
-        583 528
+ans =
+
+    583 528
 ```
 
 ```{thumbnail} ../_images/seg_cn.png
-:width: 800
+:width: 200
 ```
-
+````
