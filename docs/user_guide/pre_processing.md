@@ -96,11 +96,11 @@ Sometimes, this seam may not appear when frames are viewed individually, but are
 
 The {code}`trim_pixels` parameter takes an array of 4 values as input corresponding to the number of pixels to trim on the left, right, top and bottom of each ROI.
 
-:::{code-block} MATLAB
+```{code-block} MATLAB
 
 trim_pixels = [4,4,8,0]
 
-:::
+```
 
 (extraction_outputs)=
 ## Outputs
@@ -120,7 +120,7 @@ You can use {code}`h5info(h5path)` in the MATLAB command window to reveal some h
 
 For example, the following is an example structure of the {code}`.h5` file at the outermost level:
 
-:::{code-block} MATLAB
+```{code-block} MATLAB
 
 h5info(extract_path, '/extraction')
 
@@ -134,7 +134,7 @@ Datatypes: []
 Links: []
 Attributes: []
 
-:::
+```
 
 We have our {ref}`Dataset Name <ds>` parameter set as the group name.
 
@@ -148,7 +148,7 @@ Below you'll see that {code}`h5info` 30 datasets corresponding to each of our z-
 
 That information is stored within each plane:
 
-:::{code-block} MATLAB
+```{code-block} MATLAB
 
 h5info(extract_path, '/plane_1')
 
@@ -163,7 +163,7 @@ FillValue: 0
 Filters: [1×1 struct]
 Attributes: [30×1 struct]
 
-:::
+```
 
 - **Groups**: h5 files can be thought of like directories where a 3D time-series is self contained within its own folder (or group).
 - **Attributes**: Attributes are special "tags" attached to a group. This is where we store metadata associated with each group and dataset. The result of calling `get_metadata(raw_path)` (see {ref}`scanimage metadata <scanimage_metadata>` for more information about the magic behind the scenes here).

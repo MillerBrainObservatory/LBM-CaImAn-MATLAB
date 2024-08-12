@@ -1,11 +1,11 @@
 (registration)=
 # Registration
 
-:::{note}
+```{note}
 The terms motion-correction and registration are often used interchangably.
 Similary, non-rigid and peicewise-rigid are often used interchangably.
 Here, peicewise-rigid registration is the **method** to correct for non-rigid motion.
-:::
+```
 
 We use [image registration](https://en.wikipedia.org/wiki/Image_registration) to make sure that our neuron in the first frame is in the same spatial location as in frame N throughout the time-series.
 
@@ -16,9 +16,9 @@ Disturbances or movement in our timeseries cause variations in pixel locations b
 
 The motion artifacts present in our sample come in two flavors, `rigid` and `non-rigid`. See {ref}`Types of Registration <tut_types_of_reg>` for more information.
 
-:::{thumbnail} ../_images/reg_patches.png
+```{thumbnail} ../_images/reg_patches.png
 width: 1440
-:::
+```
 
 -----
 
@@ -39,9 +39,9 @@ In addition to the default function inputs described in section {ref}`parameters
 {code}`options` 
 : NormCorre Params Object
 
-:::{note}
+```{note}
 All planes in between {code}`start_plane` and {code}`end_plane` will undergo registration [sequentially](https://www.merriam-webster.com/dictionary/sequential).
-:::
+```
 
 (normcorre_params)=
 ### NoRMCorre Parameters
@@ -53,9 +53,9 @@ NoRMCorre provides the algorithm for registration and dictates the values in tha
 
 There is an example parameters struct at the root of this project ([Github](https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/blob/master/demo_CNMF_params.m)).
 
-:::{warning}
+```{warning}
 Avoid the {code}`bidir` options as we correct for bi-directional scaling ourselves.
-:::
+```
 
 The most important NoRMCorre parameters are:
 
@@ -71,12 +71,12 @@ The most important NoRMCorre parameters are:
 4. {code}`correct_bidir`
 : Attempts to correct for bi-directional scan offsets, a step that was performed {ref}`in pre-processing <scan_phase>`.
 
-:::{hint} MAX SHIFT PARAMETER
+```{hint} MAX SHIFT PARAMETER
 
 For timeseries where the FOV is sparsely labeled or a frame is corrupted, the registration process of two neighboring patches can produce very different shifts, which can lead to corrupted registered frames. We limit the largest allowed shift with the max_shift parameter.
 
 If you see large single-frame spikes, try decreasing the {code}`max-shift` parameter.
-:::
+```
 
 (ug_rigid_registration):
 (rigid_registration):
@@ -88,18 +88,18 @@ Ideally, you want registration parameters in units of *real-world values*.
 
 For example, rather than specifying a max-shift in units of pixels, use the {term}`pixel-resolution` metadata to calculate a {code}`max_shift` of ~1/2 size of the neuron:
 
-:::{code-block} MATLAB
+```{code-block} MATLAB
 
 plane_name = fullfile("path/to/raw_tif"); 
 metadata = read_metadata(plane_name);
 
 % assuming a typical cortical neuron size of 15 micron
 max_shift = 7.5/metadata.pixel_resolution
-:::
+```
 
 We can then use this value in our own parameters struct with the help of {func}`read_plane()`:
 
-:::{code-block}
+```{code-block}
 % default dataset name
 % depends on your input for the `ds` parameter in subsequent steps
 dataset_name = '/Y'; 
@@ -114,7 +114,7 @@ options_rigid = NoRMCorreSetParms(...
    'bin_width',200,...   % number of frames to initialze the template
    'max_shift', round(7.5/pixel_resolution), ... % still useful in non-rigid
 );
-:::
+```
 
 (nonrigid_registration)=
 (ug_nonrigid_registration)=
@@ -124,7 +124,7 @@ To perform non-rigid registration, you must specify the size of the patches you 
 
 Typical patch sizes for $512x512$ movies are $32x32$, which would lead to $512/32=16$ blocks that will be motion-corrected in parallel.
 
-:::{code-block} MATLAB
+```{code-block} MATLAB
 
 options_rigid = NoRMCorreSetParms(...
    'd1',size(Y, 1),... 
@@ -133,7 +133,7 @@ options_rigid = NoRMCorreSetParms(...
    'max_shift', round(20/pixel_resolution), ... % still useful in non-rigid
 );
 
-:::
+```
 
 (reg_output)=
 ## Outputs
@@ -165,28 +165,28 @@ This file has the following groups:
 {code}`/shifts`
 : A {code}`2xN` column vector containing the number of pixels in X and Y that each frame was shifted.
 
-::::{hint}
+```:{hint}
 To get the shifts and plot them in MATLAB:
 
-:::{code-block} MATLAB
+```{code-block} MATLAB
 
 x_shifts = shifts(:,1) % represent pixel-shifts in *x*
 y_shifts = shifts(:,2) % represent pixel-shifts in *y*
-:::
+```
 
-::::
+```:
 
 (validate_outputs)=
 ## Validate Outputs
 
-::::{hint}
+```:{hint}
 Figures of the below validation metrics are placed in your {code}`save_path` as {code}`figures/registration_metrics_plane_N`:
 
-:::{thumbnail} ../_images/reg_figure_output.png
+```{thumbnail} ../_images/reg_figure_output.png
 :title: Figure Output
 :align: center
 :width: 50%
-::::
+```:
 
 Internally, the pipeline first create a "template" using {ref}`rigid registration <tut_rigid>`.
 
@@ -194,16 +194,16 @@ Each frame of the timeseries is aligned to this frame.
 
 The distance needed to shift these pixels to most closely align with the template is computed by locating the maximum of the cross-correlation between the each and every frame and the template.
 
-:::{thumbnail} ../_images/reg_correlation.png
+```{thumbnail} ../_images/reg_correlation.png
 :title: Correlation Metrics
-:::
+```
 
 Pixels that are highly correlated over the timecourse of an experiment are stationary in the image. Proper registration should **increase the correlation between neighboring pixels**.
 
 ------
 
-:::{thumbnail} ../_images/reg_corr_with_mean.svg
-:::
+```{thumbnail} ../_images/reg_corr_with_mean.svg
+```
 
 The above image shows these correlations. Closer to 1 (the top of the graph) indicates high correlation and a more stationary image.
 
@@ -211,16 +211,16 @@ The high degree of overlap between rigid/non-rigid registration indicates our mo
 
 This could be due to too large of a {code}`grid_size` or a general lack of non-uniform motion.
 
-:::thumbnail:: ../_images/reg_correlation_zoom.png
+```thumbnail:: ../_images/reg_correlation_zoom.png
 :title: Correlation Metrics
-:::
+```
 
-:::{tip}
+```{tip}
 A quick way to see if registration was effective is to compare the two mean images,
 looking for differences in the "blurryness" between them. 
-:::
+```
 
-:::{thumbnail} ../_images/reg_blurry.svg
+```{thumbnail} ../_images/reg_blurry.svg
 :title: Raw vs Registered Movie
-:::
+```
 

@@ -9,7 +9,7 @@ Setup covers project dependencies and organization.
 
 Parameters describe the common interface shared by each of the {ref}`Core <core_api>` functions.
 
-:::{toctree}
+```{toctree}
 ---
 maxdepth: 2
 caption: First Steps
@@ -17,5 +17,5 @@ caption: First Steps
 
 setup
 overview
-:::
+```
 

@@ -13,14 +13,14 @@ download the project via the {bdg-link-light-line}`Download ZIP` button.
 
 Move/extract the downloaded folder into a folder on your {code}`userpath`.
 
-:::{hint}
+```{hint}
 
 To find your userpath, open matlab, and in the command window: {code}`userpath`
 
 ans =
     '/home/<username>/Documents/MATLAB'
 
-:::
+```
 
 This will automatically add all necessary files for this pipeline to your MATLAB path to be fully accessable.
 
@@ -40,13 +40,13 @@ If either of these folders is not bright, right-click on the folder and "Add to 
 (startup)=
 Alternatively, you can create a [startup.m](https://www.mathworks.com/help/matlab/ref/startup.html) file located in this same {code}`userpath` directory: {code}`~/Documents/MATLAB/startup.m` and add the following code snippet:
 
-:::{code-block} MATLAB
+```{code-block} MATLAB
 
 % <HOME>/Documents/MATLAB/startum.m
 % note "fullfile" isnt needed, but helpfully provides directory autocompletion
 addpath(genpath(fullfile("path/to/caiman_matlab")))
 
-:::
+```
 
 There is a sample setup.m file located at the root of this repository.
 
@@ -62,10 +62,10 @@ Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts.
 
 The easiest method to download this repository with git is via [mysys](https://gitforwindows.org/)
 
-:::{note}
+```{note}
 If you have MATLAB installed on Windows, you won't be able to run commands from within WSL (i.e. //wsl.localhost/)
 due to the separate filesystems. Pay attention to which environment you install.
-:::
+```
 
 ### WSL2 (Windows Subsystem for Linux)
 
@@ -77,9 +77,9 @@ If you have MATLAB installed on Windows and wish to use this repository from a W
 
 This means you will not be able to run matlab from the WSL filesystem (i.e. `//wsl.localhost/`), but you can use a mounted `C://` drive path like so:
 
-:::{code-block} bash
+```{code-block} bash
 $ cd /mnt/c/Users/<Username>/<project-install-path>
-:::
+```
 
 This pipeline has been tested on WSL2, Ubuntu 22.04.
 
@@ -89,12 +89,12 @@ Though any debian-based distribution should work.
 
 In Linux, WSL or mysys, clone this repository with the pre-installed git client:
 
-:::{code-block}
+```{code-block}
 $ cd ~/Documents/MATLAB
 $ git clone https://github.com/ru-rbo/caiman_matlab.git
 $ cd caiman_matlab
 $ matlab
-:::
+```
 
 ## 0.1.2. Dependencies
 
@@ -104,7 +104,7 @@ This pipeline requires the parallel pool, statistics and machine learning, and i
 
 To see what toolboxes you have installed, use {code}`ver` in the MATLAB command window:
 
-:::{code-block}
+```{code-block}
 
 >> ver
 ----------------------------------------------------------------------------------------------------------------
@@ -124,15 +124,15 @@ Signal Processing Toolbox                             Version 24.1        (R2024
 Statistics and Machine Learning Toolbox               Version 24.1        (R2024a)
 Wavelet Toolbox                                       Version 24.1        (R2024a)
 
-:::
+```
 
 If the user choses to split frames across multiple {code}`.tiff` files, there will be multiple tiff files in ascending order
 of an suffix appended to the filename: {code}`_000N`, where n=number of files chosen by the user.
 
-:::{important}
+```{important}
 All output .tiff files for a single imaging session should be placed in the same directory.
 No other .tiff files should be in this directory. If this happens, an error will throw.
-:::
+```
 
 (directory_structure)=
 ### 0.1.3. Directory Structure
@@ -140,7 +140,7 @@ No other .tiff files should be in this directory. If this happens, an error will
 The following is an example of the directory hierarchy
 used for the demo.
 
-:::{code-block} text
+```{code-block} text
 
     Parent/
     ├── raw/
@@ -174,30 +174,30 @@ used for the demo.
 *`N` = the number of `[Y, X, T]` planar time-series.
 *`R` = the number of `[Y, X, T]` ROI's per scanfield.
 
-:::
+```
 
 Following the recommendation described in the {ref}`installation` guide all necessary functions should already be on your MATLAB path.
 
 If "Undefined Function" error occurs, such as:
 
-:::{code-block}
+```{code-block}
 Undefined function {code}'convertScanImageTiffToVolume' for input arguments of type 'char'.
-:::
+```
 
 This means the input is not on your MATLAB path.
 
 Add this to the top of the script you are running:
 
-:::{code-block}:: MATLAB
+```{code-block}:: MATLAB
 
 [fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
 addpath(genpath(fullfile(fpath, 'core/')));
 
-:::
+```
 
 You can make sure all of the requirements for the package are in the path with the following:
 
-:::{code-block}:: MATLAB
+```{code-block}:: MATLAB
 
 result = validate_toolboxes(); % make sure we have dependencies in accessible places
 if ischar(result)
@@ -205,7 +205,7 @@ if ischar(result)
 else
     disp('Proceeding with execution...');
 end
-:::
+```
 
 It is helpful to first set-up directories where youd like your results to go.
 
@@ -213,8 +213,8 @@ Each core function in this pipeline takes a {ref}'data_path' path and a {ref}'sa
 
 Following the {ref}`Directory Structure <directory_structure>`:
 
-:::{thumbnail} ../_images/gen_output_paths.png
+```{thumbnail} ../_images/gen_output_paths.png
 download: true
 align: center
-:::
+```
 
