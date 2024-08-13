@@ -168,10 +168,10 @@ for plane_idx = start_plane:end_plane
         options = NoRMCorreSetParms(...
             'd1', d1,...
             'd2', d2,...
-            'bin_width', 10,...
+            'bin_width', 20,...
             'grid_size', [128,128], ...
-            'max_shift', round(20/pixel_resolution),...
-            'us_fac', 20,...
+            'max_shift', round(100/pixel_resolution),...
+            'us_fac', 5,...
             'init_batch', 200,...
             'iter', 1, ...
             'plot_flag', true, ...
@@ -183,8 +183,6 @@ for plane_idx = start_plane:end_plane
     t_nonrigid=tic; log_message(fid, "Template creation complete. Beginning non-rigid registration...\n");
     [M2, shifts2, ~, ~] = normcorre_batch(Y, options, template_good);
     log_message(fid, "Non-rigid registration complete. Elapsed time: %.3f minutes.\n",toc(t_nonrigid)/60);
-
-    log_message(fid, "Calculating registration metrics...\n");
 
     if do_figures
 
@@ -200,21 +198,34 @@ for plane_idx = start_plane:end_plane
         T = length(cY);
 
         f = figure('Visible', 'on', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
+
         ax1 = subplot(2, 3, 1); imagesc(mY); axis equal; axis tight; axis off;
-        title('mean raw data');
+        title('Mean raw', 'fontsize',10,'fontweight','bold', 'Color', 'k');
 
         ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off;
-        title('mean rigid template');
+        title('Mean rigid template', 'fontsize',10,'fontweight','bold', 'Color', 'k');
+
         ax3 = subplot(2, 3, 3); imagesc(mM2); axis equal; axis tight; axis off;
-        title('mean non-rigid corrected');
+        title('Rean non-rigid corrected', 'fontsize',10,'fontweight','bold', 'Color', 'k');
+
         subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid');
-        title('correlation coefficients');
-        subplot(2, 3, 5); scatter(cY, cM1); hold on;
+        title('Pixel-wise Correlation', 'fontsize',10,'fontweight','bold', 'Color', 'k');
+        ylabel('Correlation-coefficient (r)', 'fontsize',10,'fontweight','bold', 'Color', 'k');
+        xlabel('Frame','fontsize',10,'fontweight','bold', 'Color', 'k');
+        axis square;
+
+        subplot(2, 3, 5); scatter(cY, cM1, 'MarkerEdgeColor', 'w'); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        xlabel('raw data'); ylabel('rigid corrected');
-        subplot(2, 3, 6); scatter(cM1, cM2); hold on;
+        title('Template vs Mean Image Correlation','fontsize',10,'fontweight','bold', 'Color', 'k');
+        xlabel('Raw data correlation', 'fontsize',10,'fontweight','bold', 'Color', 'k');
+        ylabel('Rigid template correlation', 'fontsize',10,'fontweight','bold', 'Color', 'k');
+
+        subplot(2, 3, 6); scatter(cM1, cM2,  'MarkerEdgeColor', 'w'); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        xlabel('rigid template'); ylabel('non-rigid correlation');
+        title('Non-Rigid vs Rigid Correlation', 'fontsize',10,'fontweight','bold', 'Color', 'k');
+        xlabel('Rigid template');
+        ylabel('Corrected correlation');
+
         linkaxes([ax1, ax2, ax3], 'xy');
         savefig(metrics_name_fig)
         exportgraphics(f, metrics_name_png, 'Resolution', 600);
