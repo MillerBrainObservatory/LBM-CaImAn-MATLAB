@@ -154,9 +154,10 @@ ylabel('Fluorescence (dF/F)');
 ```
 ````
 
-2. {code}`C_all`: Deconvolved neuronal activity
-    - The deconvolved activity traces, which represent the estimated underlying neuronal firing rates. This data is derived from `T_all` through a deconvolution process that attempts to remove the effects of calcium dynamics.
-    - This data can be used to study the inferred spiking activity of neurons, which is often more directly related to neuronal communication than raw fluorescence data.
+2. `C_all`: Deconvolved neuronal activity
+
+- The deconvolved activity traces, which represent the estimated underlying neuronal firing rates. This data is derived from `T_all` through a deconvolution process that attempts to remove the effects of calcium dynamics.
+- This data can be used to study the inferred spiking activity of neurons, which is often more directly related to neuronal communication than raw fluorescence data.
 
 ````{admonition} Example: Plot deconvolved activity
 :class: dropdown
@@ -169,7 +170,7 @@ ylabel('Deconvolved activity');
 ```
 ````
 
-3. {code}`N_all`: Neuronal spatial coordinates mapped to X/Y coordinates
+3. `N_all`: Neuronal spatial coordinates mapped to X/Y coordinates
 
 - A matrix where each row represents a neuron, and the columns contain properties such as the neuron's integrated fluorescence ({code}`acm`), x-coordinate ({code}`acx`), y-coordinate ({code}`acy`), and z-coordinate ({code}`plane_index`).
 - This data can be used to analyze the spatial distribution of neurons within the imaging field and correlate spatial properties with functional data.
@@ -179,13 +180,18 @@ ylabel('Deconvolved activity');
 
 ```{code-block} matlab
 
-    scatter(N_all(:, 2), N_all(:, 3)); % Plot the spatial distribution of neurons in the xy-plane
-    xlabel('x-coordinate');
-    ylabel('y-coordinate');
+scatter(N_all(:, 2), N_all(:, 3)); % Plot the spatial distribution of neurons in the xy-plane
+xlabel('x-coordinate');
+ylabel('y-coordinate');
 ```
 ````
 
-4. {code}`Ac_keep`: Neuronal footprints
+4. `Ac_keep`: Neuronal footprints
+
+```{thumbnail} ../_images/seg_ac_keep.png
+:width: 200
+:align: right
+```
 
 - The spatial footprints of the detected neurons. Each neuron is represented by a 2D matrix showing its spatial extent and intensity within the imaging field.
 - This data can be used to visualize the spatial arrangement and morphology of neuronal components.
@@ -195,17 +201,25 @@ ylabel('Deconvolved activity');
 
 ```{code-block} matlab
 
->> figure; imagesc(Ac_keep(:,:,1)); axis image; axis tight; axis off; colormap gray; title("Single Spatial Component");
+figure;
+imagesc(Ac_keep(:,:,1));
+axis image;
+axis tight; axis off; colormap gray;
+title("Single Spatial Component");
 
 ```
 ````
 
-```{thumbnail} ../_images/seg_ac_keep.png
-:width: 300
+5. `Cn`: Correlation image
+
+```{thumbnail} ../_images/seg_cn.png
+:width: 200
+:align: right
 ```
-5. {code}`Cn`: Correlation image
-    - A 2D image showing the correlation of each pixel's time-series with its neighboring pixels, highlighting areas of correlated activity.
-    - This image can be used to identify regions of interest and assess the overall quality of the motion correction and segmentation process.
+
+- A 2D image showing the correlation of each pixel's time-series with its neighboring pixels, highlighting areas of correlated activity.
+- This image can be used to identify regions of interest and assess the overall quality of the motion correction and segmentation process.
+
 
 ````{admonition} Example: Plot accepted neurons only
 :class: dropdown
@@ -220,7 +234,4 @@ ans =
     583 528
 ```
 
-```{thumbnail} ../_images/seg_cn.png
-:width: 200
-```
 ````
