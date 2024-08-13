@@ -11,7 +11,7 @@ matlab_auto_link = "basic"
 matlab_short_links = True
 
 project = "LBM-CaImAn-MATLAB"
-copyright = "2024, Elizabeth R. Miller Brain Observatory | The Rockefeller University. All Rights Reserved."
+copyright = "2024, Elizabeth R. Miller Brain Observatory | The Rockefeller University. All Rights Reserved"
 
 myst_enable_extensions = [
     "amsmath",
