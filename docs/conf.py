@@ -112,6 +112,7 @@ html_theme_options = {
     "use_issues_button": True,
     "use_download_button": True,
     "show_toc_level": 3,
+    "navbar_align": "content",
     "icon_links": [
         {
             "name": "MBO User Hub",
