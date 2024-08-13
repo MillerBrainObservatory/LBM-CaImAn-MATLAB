@@ -41,18 +41,18 @@ This example follows a directory structure shown in {ref}`the first steps guide 
 
 Inputs and outputs can be anywhere you wish so long as you have read/write permissions.
 
-:::{code-block} MATLAB
+```{code-block} MATLAB
 
 parent_path = 'C:\Users\<username>\Documents\data\high_res\';
 
 raw_path = [ parent_path 'raw\']; % where our raw .tiffs go
 extract_path = [ parent_path 'extracted\']; % where results are saved
 
-:::
+```
 
-:::{note}
-Files are saved with the string {code}'_plane_' appended automatically, don't put the characters {code}`_plane_` together in your raw/extracted filenames!
-:::
+```{note}
+Files are saved with the string '_plane_' appended automatically, don't put the characters `_plane_` together in your raw/extracted filenames!
+```
 
 (scan_phase)=
 ### Scan Phase
@@ -67,9 +67,9 @@ This example shows that shifting every *other* row of pixels +2 (to the right) i
 
 ```
 
-:::{important}
+```{important}
 Checking for a scan-phase offset correction is computationally cheap, so it is recommended to keep this to true.
-:::
+```
 
 When every other row of our image if shifted by N pixels, adjacent rows that *are not* shifted now have a N number of 0's padded in between the rows that were shifted.
 
@@ -84,9 +84,9 @@ align: center
 
 You'll see the decreased gap between ROI's for the scan-offset corrected image, showing the 2 pixels removed from each edge accounting for the padded 0's.
 
-:::{caution}
+```{caution}
 If a scan-offset correction is applied, the ROI edge may contain these shifted pixels. This can be corrected with the trim_roi parameter discussed in the next section.
-:::
+```
 
 (trim_roi)=
 ### Trim ROIs
@@ -97,28 +97,28 @@ This seam may not appear when frames are viewed individually, but are present in
 
 The {code}`trim_roi` parameter takes an array of 4 values as input corresponding to the number of pixels to trim on the left, right, top and bottom of each ROI.
 
-:::{code-block} MATLAB
+```{code-block} MATLAB
 
 trim_roi = [4,4,8,0]
 
-:::
+```
 
-:::{tip}
+```{tip}
 If a {ref}`scan-phase correction <scan_phase>` is applied to this plane, there will be dead pixels on the left/right edges.
 More than 3 pixel-shift offsets are rare, so we recommend a starting value of {code}`[2 2 x x]` which trims 2 pixels from the left and right edge.
-:::
+```
 
 (trim_image)=
 ### Trim Image
 
-In the same manner as {ref}`trimming ROIs <trim_roi>`, the {code}`trim_image` parameter will trim the edges of the {ref}`retiled-image <ex_retile>`.
+In the same manner as {ref}`trimming ROIs <trim_roi>`, the `trim_image` parameter will trim the edges of the {ref}`retiled-image <ex_retile>`.
 
 (extraction_outputs)=
 ## Outputs
 
-Output data are saved in {code}`.h5` format, with the following characteristics:
+Output data are saved in `.h5` format, with the following characteristics:
 - one file per plane
-- named {code}"<step>_plane_N.h5" where step = extraction, registration or segmentation
+- named "*step*_plane_N.h5" where *step* = extraction, registration or segmentation
 - data saved to a `h5 group`
 - metadata saved as `h5 attributes`
 
@@ -138,15 +138,15 @@ For pre-processing, two "groups" are saved: registered timeseries and mean image
 
 {code}`/Ym`
 : The 2D {ref}`mean image <ex_meanimage>`
-
-:::::{admonition} Preview file contents
+  
+````{admonition} How to: Preview file contents
 :class: dropdown
 
 Use MATLAB functions [h5info](https://www.mathworks.com/help/matlab/ref/h5disp.html) and [h5disp](https://www.mathworks.com/help/matlab/ref/h5disp.html) to preview file contents.
 
-h5disp takes the {code}`filename` as the only input parameter, and displays the contents of the file:
+`h5disp` takes the `filename` as the only input parameter, and displays the contents of the file:
 
-:::{code-block} MATLAB
+```{code-block} MATLAB
 
 >> h5disp(fullfile(data_path, "extracted/extracted_plane_1.h5"));
 
@@ -176,12 +176,12 @@ h5disp takes the {code}`filename` as the only input parameter, and displays the 
             Filters:  none
             FillValue:  0.000000
 
-:::
+```
 
 h5info takes the {code}`filename` and the {ref}`group <dataset_name>`, and displays the contents of the file:
 
+```{code-block} MATLAB
 
-:::{code-block} MATLAB
 >> h5info(fullfile(data_path, "extracted/extracted_plane_1.h5"))
 
 ans = 
@@ -195,44 +195,35 @@ ans =
      Datatypes: []
          Links: []
     Attributes: [27×1 struct]
-:::
-
-::::
-
+```
 Notice our metadata is saved to the root group. This is to allow you to easily retrieve metadata for a step by calling {func}`read_h5_metadata`.
-
-::::::
+````
 
 ## Validate Outputs
 
-In your {code}`save_path`, you will see a newly created {code}`figures` folder.
+In your `save_path`, you will see a newly created `figures` folder:
 
-This contains an image for each {code}`[X,Y,T]` plane and checks for proper tiling.
+- This contains an image for each z-plane and each ROI 
+- A *close-up of the brightest image* in every plane for a random frame.
+- Each ROI image shoes the neuron **before** and **after** scan-correction.
 
-In this folder is a close-up of the brightest image in every plane for a random frame.
-
-Each image shoes the neuron before and after scan-correction.
-
-This lets you compare planes, validate the correct scan-phase offset value (usually 1, 2 or 3 pixels).
-
-We can see that our plane quality changes with depth:
+We can both evaluate scan-correction and see that our plane quality changes with depth:
 
 ```{thumbnail} ../_images/ex_offset.svg
 ---
 width: 800
-align: center
 ---
 
 ```
 
-Additionally, you can use this images to get an idea of values you want to use for registration.
+----
 
-For example, consider the below image:
+Additionally, you can use this images to get an idea of values you want to use for registration.
 
 ```{thumbnail} ../_images/ex_brightest_feature.png
 ---
-scale: 50%
-align: center
+width: 200
+align: right
 title: Brightest Feature
 ---
 

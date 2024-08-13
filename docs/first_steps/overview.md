@@ -11,15 +11,15 @@ This common interface is described here with the goal of avoiding redundancy thr
 
 For the {ref}`Core <core_api>` functions in this pipeline, the initial parameters are always the same.
 
-:::{note}
+````{admonition} Parameters and Arguments
 
 The term "parameter" and "argument" used throughout this guide refer to the inputs to each function, what goes inside the paranthesis ().
 Running "help convertScanImageTiffToVolume" in the command window will show to you and describe the parameters of that function.
 
-:::
+```{thumbnail} ../_images/gen_param_v_arg.png
+```
 
-:::{thumbnail} ../_images/gen_param_v_arg.png
-:::
+````
 
 ### Required
 
@@ -30,9 +30,9 @@ The only required parameter is the data-path:
 
 This can be given as an argument without specifying the 'name':
 
-:::{code-block} MATLAB
+```{code-block} MATLAB
 convertScanImageTiffToVolume("C:/Users/MBO/MATLAB/data/");
-:::
+```
 
 ### Optional
 
@@ -61,7 +61,7 @@ Though {code}`num_cores` is an option in pre-processing, there are no parallel c
 
 Optional parameters must be given a name for the function to parse:
 
-:::{code-block} MATLAB
+```{code-block} MATLAB
 
 data_path = "C:/Users/MBO/MATLAB/data/";
 save_path = fullfile(data_path, "results"); % data_path/results
@@ -76,7 +76,7 @@ convertScanImageTiffToVolume( ...
     'fix_scan_phase', 0 ...
 );
 
-:::
+```
 
 See the included script {scpt}`demo_LBM_pipeline` at the root of this repository for a working example.
 
@@ -90,16 +90,16 @@ This logs the start time and duration of each computation, as well as storing me
 
 The pipeline step is prepended to the function name, followed by the data and time of the run.
 
-:::{thumbnail} ../_images/reg_log_output.png
+```{thumbnail} ../_images/reg_log_output.png
 :class: dropdown
-:::
+```
 
 
 ### To Command Window
 
 Additionally, you will see metadata printed to the command window when a processing step is started:
 
-:::{code-block} MATLAB
+```{code-block} MATLAB
    
 Log file created: save_path\2024_08_02_11_21_05_segmentation.log
 Beginning registration with 23 cores...
@@ -131,4 +131,4 @@ metadata contents:
     num_files = 1
     dataset_name = /Y
 
-:::
+```

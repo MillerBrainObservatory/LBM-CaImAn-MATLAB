@@ -1,18 +1,3 @@
----
-myst:
-  substitutions:
-    key1: "I'm a **substitution**"
-    key2: |
-      ```{note}
-      {{ key1 }}
-      ```
-    key3: |
-      ```{image} https://github.com/MillerBrainObservatory/static-assets/blob/master/_images/MillerBrainObservatory_logo.svg
-      :alt: mbo
-      :width: 200px
-      ```
-    key4: example
----
 # LBM-CaImAn-MATLAB Documentation
 
 Currently, inputs to this pipeline are limited to ScanImage {code}`.tiff` files.
