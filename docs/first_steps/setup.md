@@ -14,37 +14,40 @@ The easiest way to download the source code is to visit the
 [github repository](https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB),
 download the project via the {bdg-link-light-line}`Download ZIP` button.
 
-Move/extract the downloaded folder into a folder on your {code}`userpath`.
+Move/extract the downloaded folder into a folder on your `userpath`.
 
-````{admonition} Find your matlab userpath
+::::{admonition} Example: Find MATLAB `userpath`
+:class: dropdown
 
-```{code-block} MATLAB
+In the MATLAB Command-Window:
+:::{code-block} MATLAB
 
 >>> userpath
 
-    ans =
-        '/home/<username>/Documents/MATLAB'
+ans =
+    '/home/<username>/Documents/MATLAB'
 
-```
-````
+:::
 
-This will automatically add all necessary files for this pipeline to your MATLAB path to be fully accessable.
+All files located in this path will be fully accessable.
+
+::::
 
 You can tell if the pipeline is added successfully to the path by looking at the file window.
 
 ```{thumbnail} ../_images/gen_matlab_path_explorer.png
 :width: 200
-:align: center
+:align: right
 ```
 
-Here, {code}`/core` and {code}`/packages` are both bright in the files window, this indicates those folders are properly in the MATLAB path.
+Here, `/core` and `/packages` are both bright in the files window, this indicates those folders are properly in the MATLAB path.
 
 These two folders contain all of the code the pipeline needs to run and are the only two folders that **must** be on the path.
 
 If either of these folders is not bright, right-click on the folder and "Add to path -> Selected Folders and Subfolders"
 
 (startup)=
-Alternatively, you can create a [startup.m](https://www.mathworks.com/help/matlab/ref/startup.html) file located in this same {code}`userpath` directory: {code}`~/Documents/MATLAB/startup.m` and add the following code snippet:
+Alternatively, you can create a [startup.m](https://www.mathworks.com/help/matlab/ref/startup.html) file located in this same `userpath` directory: `~/Documents/MATLAB/startup.m` and add the following code snippet:
 
 ```{code-block} MATLAB
 
@@ -107,7 +110,7 @@ Before running your first dataset, you should ensure that all dependencies of th
 
 This pipeline requires the parallel pool, statistics and machine learning, and image processing toolboxes.
 
-To see what toolboxes you have installed, use {code}`ver` in the MATLAB command window:
+To see what toolboxes you have installed, use `ver` in the MATLAB command window:
 
 ```{code-block}
 
@@ -131,8 +134,8 @@ Wavelet Toolbox                                       Version 24.1        (R2024
 
 ```
 
-If the user choses to split frames across multiple {code}`.tiff` files, there will be multiple tiff files in ascending order
-of an suffix appended to the filename: {code}`_000N`, where n=number of files chosen by the user.
+If the user choses to split frames across multiple `.tiff` files, there will be multiple tiff files in ascending order
+of an suffix appended to the filename: `_000N`, where n=number of files chosen by the user.
 
 ```{important}
 All output .tiff files for a single imaging session should be placed in the same directory.
@@ -140,7 +143,7 @@ No other .tiff files should be in this directory. If this happens, an error will
 ```
 
 (directory_structure)=
-### Directory Structure
+## Directory Structure
 
 The following is an example of the directory hierarchy
 used for the demo.
@@ -193,7 +196,7 @@ This means the input is not on your MATLAB path.
 
 Add this to the top of the script you are running:
 
-```{code-block}:: MATLAB
+```{code-block} MATLAB
 
 [fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
 addpath(genpath(fullfile(fpath, 'core/')));
@@ -202,7 +205,7 @@ addpath(genpath(fullfile(fpath, 'core/')));
 
 You can make sure all of the requirements for the package are in the path with the following:
 
-```{code-block}:: MATLAB
+```{code-block} MATLAB
 
 result = validate_toolboxes(); % make sure we have dependencies in accessible places
 if ischar(result)
@@ -214,12 +217,9 @@ end
 
 It is helpful to first set-up directories where youd like your results to go.
 
-Each core function in this pipeline takes a {ref}'data_path' path and a {ref}'save_path' path as arguments.
-
-Following the {ref}`Directory Structure <directory_structure>`:
+Following the demo {ref}`Directory Structure <directory_structure>`:
 
 ```{thumbnail} ../_images/gen_output_paths.png
-download: true
-align: center
+:width: 200
+:title: Example Directory Structure
 ```
-

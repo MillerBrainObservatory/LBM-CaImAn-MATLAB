@@ -5,19 +5,13 @@ Function for this step: {func}`segmentPlane()`
 
 ## Segmentation Overview
 
-```{note}
-
-   {func}`segmentPlane()` will take significantly longer than the previous steps.
-
-```
-
-```{note}
-
-    Much of work is about separating "good activity", the flourescence changes that we can attribute to a single cell, vs "noise, which is everything else (including signal from other neurons).
-    To do this, we take advantage of the fact that the slow calcium signal is typically very similar between adjacent frames.
-    See [this blog post](https://gcamp6f.com/2024/04/24/why-your-two-photon-images-are-noisier-than-you-expect) for a nice discussion on shot noise calculations and poisson processes.
+```{warning}
+{func}`segmentPlane()` will take significantly longer than the previous steps.
 
 ```
+Much of work is about separating "good activity", the flourescence changes that we can attribute to a single cell, vs "noise, which is everything else (including signal from other neurons).
+
+To do this, we take advantage of the fact that a *slow calcium signal is typically similar between adjacent frames*.
 
 The *speed of transients*, or the time it takes for the neuron to fully glow (rise time) and unglow (decay time), is a very important metric used to calculate several of the parameters for CNMF.
 
@@ -30,14 +24,16 @@ Turning this flourescence into "spikes" relies on several mathmatical operations
 - infer the times of action potentials from the fluorescence traces (deconvolution).
 
 (seg_cnmf)=
-```{image} ../_images/seg_traces.png
-```
+<!-- ```{image} ../_images/seg_traces.png -->
+<!-- ``` -->
 
 ```{admonition} A note on noisy data
 :class: dropdown
 
 Much of work is about separating "good activity", the flourescence changes that we can attribute to a single cell, vs "noise, which is everything else (including signal from other neurons).
+
 To do this, we take advantage of the fact that the slow calcium signal is typically very similar between adjacent frames.
+
 See [this blog post](https://gcamp6f.com/2024/04/24/why-your-two-photon-images-are-noisier-than-you-expect) for a nice discussion on shot noise calculations and poisson processes.
 ```
 

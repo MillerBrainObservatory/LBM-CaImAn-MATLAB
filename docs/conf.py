@@ -32,8 +32,8 @@ extensions = [
     "sphinxcontrib.images",
     "sphinxcontrib.video",
     "sphinxcontrib.matlab",
-    # "myst_parser",
-    "myst_nb",
+    "myst_parser",
+    # "myst_nb",
     "sphinx_copybutton",
     "numpydoc",
     "sphinx.ext.intersphinx",
@@ -53,7 +53,7 @@ images_config = dict(
 
 source_suffix = {
     ".rst": "restructuredtext",
-    ".md": "myst-nb",
+    ".ipynb": "myst-nb",
     ".myst": "myst-nb",
 }
 

@@ -71,14 +71,15 @@ The most important NoRMCorre parameters are:
 4. {code}`correct_bidir`
 : Attempts to correct for bi-directional scan offsets, a step that was performed {ref}`in pre-processing <scan_phase>`.
 
-```{admonition} A note on {code}`max_shift`
+:::{admonition} A note on `max_shift`
 :class: dropdown
-
+ 
 For timeseries where the FOV is sparsely labeled or a frame is corrupted, the registration process of two neighboring patches can produce very different shifts, which can lead to corrupted registered frames.
 We limit the largest allowed shift with the {code}`max_shift` parameter.
 
+:::
+
 If you see large single-frame spikes, try decreasing the {code}`max-shift` parameter (Default is $10μm$).
-```
 
 (ug_rigid_registration)=
 (rigid_registration)=
@@ -158,8 +159,7 @@ Registration outputs have the following groups:
 {code}`/shifts`
 : A {code}`2xN` column vector containing the number of pixels in X and Y that each frame was shifted.
 
-````{hint}
-To get the shifts and plot them in MATLAB:
+````{admonition} Example: Plot X/Y Shifts in MATLAB:
 :class: dropdown
 
 ```{code-block} MATLAB
@@ -173,11 +173,10 @@ y_shifts = shifts(:,2) % represent pixel-shifts in *y*
 (validate_outputs)=
 ## Validate Outputs
 
-```{hint}
-Validation metric figures are placed in your {code}`save_path` as {code}`figures/registration_metrics_plane_N`:
+Validation metric figures are placed in your `save_path` as `figures/registration_metrics_plane_N`.
 
 ```{thumbnail} ../_images/reg_figure_output.png
-:title: Figure Output
+:title: Registration Output Figures
 :align: right
 :width: 50%
 
