@@ -16,7 +16,9 @@ download the project via the {bdg-link-light-line}`Download ZIP` button.
 
 Move/extract the downloaded folder into a folder on your {code}`userpath`.
 
-```{hint}
+````{admonition} Find your matlab userpath
+
+```{code-block} MATLAB
 
 >>> userpath
 
@@ -24,6 +26,7 @@ Move/extract the downloaded folder into a folder on your {code}`userpath`.
         '/home/<username>/Documents/MATLAB'
 
 ```
+````
 
 This will automatically add all necessary files for this pipeline to your MATLAB path to be fully accessable.
 
