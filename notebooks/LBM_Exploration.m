@@ -21,9 +21,7 @@ parent_path = 'C:/Users/RBO/Documents/data/';
 ds1 = fullfile(parent_path, "high_res");
 contents = dir(ds1);
 for dataset_idx = 1:length(contents)
-    % Check if the entry is a directory and starts with 'extracted_'
     if contents(dataset_idx).isdir && startsWith(contents(dataset_idx).name, 'extracted_')
-        % Get the files within the 'extracted_*' directory
         extracted_contents = dir(fullfile(contents(dataset_idx).folder, contents(dataset_idx).name));
         for plane_idx = 1:length(extracted_contents)
             % Skip '.' and '..' entries
@@ -37,16 +35,10 @@ for dataset_idx = 1:length(contents)
     end
 end
 
-
-
-
 %% Interactive Widget
-
 exploreImageFrames(datasets);
 
-%% Functions
-
-
+%% Function
 function exploreImageFrames(files)
     % Initial values
     plane = 1;

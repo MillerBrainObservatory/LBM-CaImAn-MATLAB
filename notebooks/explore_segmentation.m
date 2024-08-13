@@ -1,8 +1,18 @@
-clear;
+clc; clear;
 gcp;    % start a local cluster
-filename = fullfile('D:\DATA\2024-07-31_GCaMP8s_mk717\mk717_1umpx_7p72hz_224pxby668px_3mroi_350mw_50to550umdeep_00001\registration_roi2/motion_corrected_plane_14.h5');
 
+% parent_path = fullfile('C:\Users\RBO\caiman_data\mk717\');
+% data_path = fullfile(parent_path, '1um_72hz');
+% filename = fullfile(data_path, "/extracted/extracted_plane_14.h5");
+% Y = read_file(fullfile(filename));
+%%
+% clear;
+parent_path = fullfile('C:\Users\RBO\caiman_data\high_res');
+filename = fullfile(parent_path, "/extracted_plane_1.h5");
 Y = read_file(fullfile(filename));
+
+%%
+
 [d1,d2,T] = size(Y);    % dimensions of file
 Y = Y - min(Y(:));      % remove negative offset
 
@@ -11,7 +21,7 @@ maxY = quantile(Y(1:1e7),1-0.0005);
 
 %%  view data
 % figure;play_movie({Y},{'raw data'},minY,maxY);
-    
+
 %% perform motion correction (start with rigid)
 % parameters motion correction
 % 'd1','d2': size of FOV
@@ -20,16 +30,16 @@ maxY = quantile(Y(1:1e7),1-0.0005);
 
 options_rg = NoRMCorreSetParms('d1',size(Y,1),'d2',size(Y,2),'bin_width',100,'max_shift',15);
 
-[M_rg,shifts_rg,template_rg] = normcorre_batch(Y,options_rg); 
+[M_rg,shifts_rg,template_rg] = normcorre_batch(Y,options_rg);
 
 %% view data
 tsub = 5;   % downsampling factor (only for display purposes)
 Y_sub = downsample_data(Y,'time',tsub);
 M_rgs = downsample_data(M_rg,'time',tsub);
+%%
+play_movie_save({Y_sub,M_rgs},{'raw data','rigid'},minY,maxY,1,savename);
 
-play_movie({Y_sub,M_rgs},{'raw data','rigid'},minY,maxY);
-
-%% perform non-rigid motion correction    
+%% perform non-rigid motion correction
 % parameters motion correction
 % 'd1','d2': size FOV movie
 % 'grid_size','overlap_pre': parameters regulating size of patch (size patch ~ (grid_size + 2*overlap_pre))
@@ -39,15 +49,15 @@ play_movie({Y_sub,M_rgs},{'raw data','rigid'},minY,maxY);
 % 'max_dev': maximum deviation allowed for each patch from the rigid shift value
 
 options_nr = NoRMCorreSetParms('d1',size(Y,1),'d2',size(Y,2),...
-                    'grid_size',[48,48],'mot_uf',4,'overlap_pre',[16,16],...
-                    'bin_width',100,'max_shift',15,'max_dev',8);
+    'grid_size',[48,48],'mot_uf',4,'overlap_pre',[16,16],...
+    'bin_width',100,'max_shift',15,'max_dev',8);
 
-[M_nr,shifts_nr,template_nr] = normcorre_batch(Y,options_nr,template_rg); 
-                
+[M_nr,shifts_nr,template_nr] = normcorre_batch(Y,options_nr,template_rg);
+
 %% view (downsampled) data
-
+savename = fullfile(parent_path, 'registration_results.mp4');
 M_nrs = downsample_data(M_nr,'time',tsub);
-play_movie({Y_sub,M_rgs,M_nrs},{'raw data','rigid','pw-rigid'},minY,maxY);
+play_movie_save({Y_sub,M_rgs,M_nrs},{'raw data','rigid','pw-rigid'},minY,maxY, savename);
 
 %% compute some metrics for motion correction quality assessment
 
@@ -57,16 +67,18 @@ play_movie({Y_sub,M_rgs,M_nrs},{'raw data','rigid','pw-rigid'},minY,maxY);
 
 %% plot metrics
 figure;
-    ax(1) = subplot(2,3,1); imagesc(mY,[minY,maxY]);  axis equal; axis tight; axis off; title('mean raw data','fontsize',14,'fontweight','bold')
-    ax(2) = subplot(2,3,2); imagesc(mM_rg,[minY,maxY]); axis equal; axis tight; axis off; title('mean rigid corrected','fontsize',14,'fontweight','bold')
-    ax(3) = subplot(2,3,3); imagesc(mM_nr,[minY,maxY]); axis equal; axis tight; axis off; title('mean non-rigid corrected','fontsize',14,'fontweight','bold')
-    subplot(2,3,4); plot(1:T,cY,1:T,cM_rg,1:T,cM_nr); legend('raw data','rigid','non-rigid'); title('correlation coefficients','fontsize',14,'fontweight','bold')
-    subplot(2,3,5); scatter(cY,cM_rg); hold on; plot([0.9*min(cY),1.05*max(cM_rg)],[0.9*min(cY),1.05*max(cM_rg)],'--r'); axis square;
-        xlabel('raw data','fontsize',14,'fontweight','bold'); ylabel('rigid corrected','fontsize',14,'fontweight','bold');
-    subplot(2,3,6); scatter(cM_rg,cM_nr); hold on; plot([0.95*min(cM_rg),1.05*max(cM_nr)],[0.95*min(cM_rg),1.05*max(cM_nr)],'--r'); axis square;
-        xlabel('rigid corrected','fontsize',14,'fontweight','bold'); ylabel('non-rigid corrected','fontsize',14,'fontweight','bold');
-    linkaxes(ax,'xy')
-%% plot shifts        
+
+ax(1) = subplot(2,3,1); imagesc(mY,[minY,maxY]);  axis equal; axis tight; axis off; title('mean raw data','fontsize',14,'fontweight','bold')
+ax(2) = subplot(2,3,2); imagesc(mM_rg,[minY,maxY]); axis equal; axis tight; axis off; title('mean rigid corrected','fontsize',14,'fontweight','bold')
+ax(3) = subplot(2,3,3); imagesc(mM_nr,[minY,maxY]); axis equal; axis tight; axis off; title('mean non-rigid corrected','fontsize',14,'fontweight','bold')
+subplot(2,3,4); plot(1:T,cY,1:T,cM_rg,1:T,cM_nr); legend('raw data','rigid','non-rigid'); title('correlation coefficients','fontsize',14,'fontweight','bold')
+subplot(2,3,5); scatter(cY,cM_rg); hold on; plot([0.9*min(cY),1.05*max(cM_rg)],[0.9*min(cY),1.05*max(cM_rg)],'--r'); axis square;
+xlabel('raw data','fontsize',14,'fontweight','bold'); ylabel('rigid corrected','fontsize',14,'fontweight','bold');
+subplot(2,3,6); scatter(cM_rg,cM_nr); hold on; plot([0.95*min(cM_rg),1.05*max(cM_nr)],[0.95*min(cM_rg),1.05*max(cM_nr)],'--r'); axis square;
+xlabel('rigid corrected','fontsize',14,'fontweight','bold'); ylabel('non-rigid corrected','fontsize',14,'fontweight','bold');
+linkaxes(ax,'xy')
+
+%% plot shifts
 
 shifts_r = squeeze(cat(3, shifts_rg(:).shifts));
 shifts_n = cat(ndims(shifts_nr(1).shifts)+1, shifts_nr(:).shifts);
@@ -79,32 +91,32 @@ str = strtrim(cellstr(int2str(patch_id.')));
 str = cellfun(@(x) ['patch # ',x],str,'un',0);
 
 figure;
-    ax1 = subplot(311); plot(1:T,cY,1:T,cM_rg,1:T,cM_nr); legend('raw data','rigid','non-rigid'); title('correlation coefficients','fontsize',14,'fontweight','bold')
-            set(gca,'Xtick',[])
-    ax2 = subplot(312); plot(mean(shifts_x, 2)); hold on; plot(shifts_r(:,2),'--k','linewidth',2); title('displacements along x','fontsize',14,'fontweight','bold')
-            set(gca,'Xtick',[])
-    ax3 = subplot(313); plot(shifts_y); hold on; plot(shifts_r(:,1),'--k','linewidth',2); title('displacements along y','fontsize',14,'fontweight','bold')
-            xlabel('timestep','fontsize',14,'fontweight','bold')
-    linkaxes([ax1,ax2,ax3],'x')
+ax1 = subplot(311); plot(1:T,cY,1:T,cM_rg,1:T,cM_nr); legend('raw data','rigid','non-rigid'); title('correlation coefficients','fontsize',14,'fontweight','bold')
+set(gca,'Xtick',[])
+ax2 = subplot(312); plot(mean(shifts_x, 2)); hold on; plot(shifts_r(:,2),'--k','linewidth',2); title('displacements along x','fontsize',14,'fontweight','bold')
+set(gca,'Xtick',[])
+ax3 = subplot(313); plot(shifts_y); hold on; plot(shifts_r(:,1),'--k','linewidth',2); title('displacements along y','fontsize',14,'fontweight','bold')
+xlabel('timestep','fontsize',14,'fontweight','bold')
+linkaxes([ax1,ax2,ax3],'x')
 
 %% now perform source extraction by splitting the FOV in patches
 
 sizY = size(M_nr);
-patch_size = [128,128];                   % size of each patch along each dimension (optional, default: [32,32])
-overlap = [16,16];                        % amount of overlap in each dimension (optional, default: [4,4])
+patch_size = [64,64];                   % size of each patch along each dimension (optional, default: [32,32])
+overlap = [8,8];                        % amount of overlap in each dimension (optional, default: [4,4])
 
 patches = construct_patches(sizY(1:end-1),patch_size,overlap);
 K = 4;                                            % number of components to be found
-tau = 4;                                          % std of gaussian kernel (half size of neuron) 
+tau = 4;                                          % std of gaussian kernel (half size of neuron)
 p = 0;                                            % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
 
 options = CNMFSetParms(...
     'd1',sizY(1),'d2',sizY(2),...
-    'temporal_iter',2,...                       % number of block-coordinate descent steps 
+    'temporal_iter',2,...                       % number of block-coordinate descent steps
     'ssub',1,...                                % downsample in space
     'tsub',2,...                                % downsample in time
     'merge_thr',0.8,...                         % merging threshold
-    'gSig',tau,... 
+    'gSig',tau,...
     'gnb',2,...                                 % number of background components
     'spatial_method','regularized'...
     );
@@ -117,35 +129,52 @@ toc
 
 %% a simple GUI
 Cn = correlation_image_max(M_nr);
-Coor = plot_contours(A,Cn,options,1); close;
+Coor = plot_contours(A,Cn,options,1);
+
 %%
-%this will create a User interface for the rest of the pipeline described in demoscript and 
-%demo pipeline. LOOK at demo pipeline to understand how to use this GUI and what to pass it
-%           
-%It is a mix of everyhting found in those pipelines. In the future it will be also called by 
-%the initialization GUI 
-%
-%run GUI will let you, refine the components manually, change the parameters and see the results,
-%analyse the trace of each components, use a classification algorithm to
-%find the components instead, add and remove components, save the ROIS
-%and finish the pipeline with button clicks. 
-%It is still an optional method.
+pixel_resolution = metadata.pixel_resolution;
+frame_rate = metadata.frame_rate;
+[d1,d2,T] = size(M_nr);
+d = d1*d2; % total number of samples
+tau = ceil(7.5./pixel_resolution);
 
-% WARNING : do not use simplemode for now - minimum MATLAB VERSION 2014
-%                   save is only compatible with the JSON matlabpackage
+merge_thresh = 0.8; % threshold for merging
+min_SNR = 0.8; % liberal threshold, can tighten up in additional post-processing
+space_thresh = 0.5; % threhsold for selection of neurons by space
+time_thresh = 0.0;
 
-% here is what the GUI needs to receive in parameters
-GUIout = ROI_GUI(Y,A,P,options,Cn,C,b,f);   
-pause;
+[rval_space,~,~,sizeA,~,~,traces] = classify_components_jeff(M_nr,A,C,b,f,YrA,options);
+ind_corr = (rval_space > space_thresh) & (sizeA >= options.min_size_thr) & (sizeA <= options.max_size_thr);
 
+% Event exceptionality:
+fitness = compute_event_exceptionality(traces,options.N_samples_exc,options.robust_std);
+ind_exc = (fitness < options.min_fitness);
+
+% Select components:
+keep = ind_corr & ind_exc;
+
+A_keep = A(:,keep);
+C_keep = C(keep,:);
+Km = size(C_keep,1); % total number of components
+
+rVals = rval_space(keep);
 %% view contour plots of selected and rejected components (optional)
 throw = ~keep;
 figure;
-    ax1 = subplot(121); plot_contours(A(:,keep),Cn,options,0,[],Coor,1,find(keep)); title('Selected components','fontweight','bold','fontsize',14);
-    ax2 = subplot(122); plot_contours(A(:,throw),Cn,options,0,[],Coor,1,find(throw));title('Rejected components','fontweight','bold','fontsize',14);
-    linkaxes([ax1,ax2],'xy')
+ax1 = subplot(121); plot_contours(A(:,keep),Cn,options,0,[],Coor,1,find(keep)); title('Selected components','fontweight','bold','fontsize',14);
+ax2 = subplot(122); plot_contours(A(:,throw),Cn,options,0,[],Coor,1,find(throw));title('Rejected components','fontweight','bold','fontsize',14);
+linkaxes([ax1,ax2],'xy')
+
 %% inspect components
 plot_components_GUI(M_nr,A(:,keep),C(keep,:),b,f,Cn,options);
+
+
+plot_components_GUI(Yr,A_or,C_or,b2,f2,Cn,options);
+
+%% make movie
+
+make_patch_video(A(:,keep),C(keep,:),b,f,M_nr,Coor,options)
+
 
 %% refine temporal components
 A_keep = A(:,keep);
@@ -155,7 +184,7 @@ C_keep = C(keep,:);
 %% detrend fluorescence and extract DF/F values
 
 df_percentile = 30;
-window = 1000; 
+window = 1000;
 
 F = diag(sum(A_keep.^2))*(C2 + YrA2);  % fluorescence
 Fd = prctfilt(F,df_percentile,window);                      % detrended fluorescence
@@ -178,18 +207,18 @@ end
 
 i = randi(nNeurons);
 
-figure;plot(1:T,F_dff(i,:),'--k'); hold all; plot(1:T,C_dec(i,:),'r','linewidth',2);
-    spt = find(S(i,:));
-    if spt(1) == 1; spt(1) = []; end
-    hold on; scatter(spt,repmat(-0.25,1,length(spt)),'m*')
-    title(['Component ',num2str(i)]);
-    
-    legend('Fluorescence DF/F','Deconvolved','Spikes')
+figure;plot(1:T,F_dff(i,:),'--w'); hold all; plot(1:T,C_dec(i,:),'r','linewidth',2);
+spt = find(S(i,:));
+if spt(1) == 1; spt(1) = []; end
+hold on; scatter(spt,repmat(-0.25,1,length(spt)),'m*')
+title(['Component ',num2str(i)]);
+
+legend('Fluorescence DF/F','Deconvolved','Spikes')
 
 %%
 % Create a figure
 figure;
-imshow(data.Cn);
+imshow(Cn);
 hold on;
 
 for k = 1:length(patches)
