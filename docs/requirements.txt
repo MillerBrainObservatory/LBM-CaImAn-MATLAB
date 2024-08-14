@@ -1,5 +1,5 @@
-sphinx>=6.1.3
-docutils>=0.19
+sphinx
+docutils
 myst_nb
 numpydoc
 sphinx_copybutton

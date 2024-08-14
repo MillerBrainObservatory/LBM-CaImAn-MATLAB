@@ -112,12 +112,13 @@ html_theme_options = {
     "use_issues_button": True,
     "use_download_button": True,
     "show_toc_level": 3,
+    "navbar_align": "content",
     "icon_links": [
         {
             "name": "MBO User Hub",
             "url": "https://millerbrainobservatory.github.io/",
-            "icon": "fa-solid fa-house-user",
-            "type": "fontawesome",
+            "icon": "./_static/icon_mbo_home.png",
+            "type": "local",
         },
         {
             "name": "MBO Github",
