@@ -50,11 +50,11 @@ images_config = dict(
     default_group="default",
 )
 
-source_suffix = {
-    ".rst": "restructuredtext",
-    ".ipynb": "myst-nb",
-    ".myst": "myst-nb",
-}
+# source_suffix = {
+#     ".rst": "restructuredtext",
+#     ".ipynb": "myst-nb",
+#     ".myst": "myst-nb",
+# }
 
 current_filepath = (
     Path().home()
@@ -65,10 +65,7 @@ current_filepath = (
 # print(current_filepath.is_dir())
 
 intersphinx_mapping = {
-    "mbo": (
-        "https://millerbrainobservatory.github.io/index.html",
-        None
-    ),
+    "mbo": ("https://millerbrainobservatory.github.io/", None),
 }
 
 templates_path = ["_templates"]

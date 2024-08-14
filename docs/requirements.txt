@@ -1,6 +1,6 @@
-sphinx <=6, <= 4 ; python_version < "3.9"
-docutils>=0.19
-myst_nb
+sphinx <=6, <= 4
+docutils<0.20
+myst_parser
 numpydoc
 sphinx_copybutton
 sphinx_togglebutton
