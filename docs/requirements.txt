@@ -1,5 +1,5 @@
-sphinx
-docutils
+sphinx <=6, <= 4 ; python_version < "3.9"
+docutils>=0.19
 myst_nb
 numpydoc
 sphinx_copybutton
@@ -8,7 +8,6 @@ sphinxcontrib-matlabdomain
 sphinxcontrib-images
 sphinxcontrib-video
 sphinx_gallery
-pydata_sphinx_theme
 sphinx_book_theme
 sphinx_design
 sphinx_tippy
