@@ -16,7 +16,7 @@ download the project via the {bdg-link-light-line}`Download ZIP` button.
 
 Move/extract the downloaded folder into a folder on your `userpath`.
 
-`````{admonition} Example: Find MATLAB `userpath`
+::::{admonition} Example: Find MATLAB `userpath`
 :class: dropdown
 
 In the MATLAB Command-Window:
@@ -29,11 +29,10 @@ ans =
     '/home/<username>/Documents/MATLAB'
 
 ```
-````
+
+::::
 
 All files located in this path will be fully accessable.
-
-```
 
 You can tell if the pipeline is added successfully to the path by looking at the file window.
 
