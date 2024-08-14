@@ -20,18 +20,19 @@ Move/extract the downloaded folder into a folder on your `userpath`.
 :class: dropdown
 
 In the MATLAB Command-Window:
-:::{code-block} MATLAB
+
+```{code-block} MATLAB
 
 >>> userpath
 
 ans =
     '/home/<username>/Documents/MATLAB'
 
-:::
-
-All files located in this path will be fully accessable.
+```
 
 ::::
+
+All files located in this path will be fully accessable.
 
 You can tell if the pipeline is added successfully to the path by looking at the file window.
 

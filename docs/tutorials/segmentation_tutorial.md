@@ -32,9 +32,9 @@ The CNMF output yields "raw" traces, we need to deconvolve these to convert thes
 
 These raw traces are noisy, jagged, and must be denoised, detrended and deconvolved.
 
-:::{note}
+```{note}
 Deconvolution and correlation metrics are closely related (see [here](https://dsp.stackexchange.com/questions/736/how-do-i-implement-cross-correlation-to-prove-two-audio-files-are-similar) for a helpful discussion).
-:::
+```
 
 Each raw trace is deconvolved via "constrained foopsi", which yields:
 
@@ -44,27 +44,26 @@ Each raw trace is deconvolved via "constrained foopsi", which yields:
 `S`
 : The vector of "spiking" activity that best explain the raw trace.
 
-:::{note}
+```{note}
 S should ideally be ~90% zeros, also known as "sparse"
-:::
+```
 
 `S` and `g` are then used to produce `C` (deconvolved traces), which looks like the raw trace `Y`, but much cleaner and smoother.
 
-:::{important}
+```{important}
 The optional output YrA is equal to Y-C, representing the original raw trace.
-:::
+```
 
-:::{thumbnail} ../_images/seg_sparse_rep.png
+```{thumbnail} ../_images/seg_sparse_rep.png
 width: 600
-:::
+```
 
 ## Validating Neurons and Traces
 
-:::{note}
-
-   Although it is important to understand the process governing validating neurons, this process is
-   fully performed for you with no extra steps needed.
-:::
+```{note}
+Although it is important to understand the process governing validating neurons, this process is
+fully performed for you with no extra steps needed.
+```
 
 The key idea for validating our neurons is that **we know how long the
 brightness indicating neurons activity should stay bright** as a function

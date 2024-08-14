@@ -4,11 +4,6 @@ from pathlib import Path
 
 os.path.abspath(os.path.join("..", "core/utils"))
 sys.path.insert(0, os.path.abspath(os.path.join("..", "core")))
-matlab_src_dir = os.path.abspath("../core/")
-
-primary_domain = "mat"
-matlab_auto_link = "basic"
-matlab_short_links = True
 
 project = "LBM-CaImAn-MATLAB"
 copyright = "2024, Elizabeth R. Miller Brain Observatory | The Rockefeller University. All Rights Reserved"
@@ -25,12 +20,11 @@ templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "exclude"]
 
 extensions = [
+    "sphinxcontrib.matlab",
     "sphinx.ext.autodoc",
     "sphinxcontrib.images",
     "sphinxcontrib.video",
-    "sphinxcontrib.matlab",
-    "myst_parser",
-    # "myst_nb",
+    "myst_nb",
     "sphinx_copybutton",
     "numpydoc",
     "sphinx.ext.intersphinx",
@@ -41,6 +35,14 @@ extensions = [
     "sphinx_tippy",
 ]
 
+# https://github.com/sphinx-contrib/matlabdomain
+matlab_src_dir = os.path.abspath("../core/")
+
+primary_domain = "mat"
+matlab_auto_link = "basic"
+matlab_short_links = True
+
+
 images_config = dict(
     backend="LightBox2",
     default_image_width="100%",
@@ -48,27 +50,11 @@ images_config = dict(
     default_group="default",
 )
 
-source_suffix = {
-    ".rst": "restructuredtext",
-    ".ipynb": "myst-nb",
-    ".myst": "myst-nb",
-}
-
-myst_enable_extensions = [
-    "amsmath",
-    "attrs_inline",
-    "colon_fence",
-    "deflist",
-    "dollarmath",
-    "fieldlist",
-    "html_admonition",
-    "html_image",
-    "replacements",
-    "smartquotes",
-    "strikethrough",
-    "substitution",
-    "tasklist",
-]
+# source_suffix = {
+#     ".rst": "restructuredtext",
+#     ".ipynb": "myst-nb",
+#     ".myst": "myst-nb",
+# }
 
 current_filepath = (
     Path().home()
@@ -79,10 +65,7 @@ current_filepath = (
 # print(current_filepath.is_dir())
 
 intersphinx_mapping = {
-    "mbo": (
-        str(current_filepath),
-        None,
-    ),
+    "mbo": ("https://millerbrainobservatory.github.io/", None),
 }
 
 templates_path = ["_templates"]
@@ -99,14 +82,8 @@ html_copy_source = True
 
 html_theme_options = {
     "path_to_docs": "docs",
-    "repository_url": "https://github.com/executablebooks/sphinx-book-theme",
+    "repository_url": "https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB",
     "repository_branch": "master",
-    "launch_buttons": {
-        "binderhub_url": "https://mybinder.org",
-        "colab_url": "https://colab.research.google.com/",
-        "deepnote_url": "https://deepnote.com/",
-        "notebook_interface": "jupyterlab",
-    },
     "use_edit_page_button": True,
     "use_source_button": True,
     "use_issues_button": True,
