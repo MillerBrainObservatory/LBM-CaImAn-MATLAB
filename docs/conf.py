@@ -72,12 +72,12 @@ templates_path = ["_templates"]
 
 html_theme = "sphinx_book_theme"
 
-html_logo = "_static/CaImAn-MATLAB_logo.svg"
+html_logo = "_static/logo_caiman_matlab_with_icon.png"
 html_short_title = "LBM CaImAn Pipeline"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 # html_js_files = ["subtoc.js"]
-html_favicon = "./_static/lbm_caiman_mat.svg"
+html_favicon = "./_static/lbm_mat_favicon.svg"
 html_copy_source = True
 
 html_theme_options = {
