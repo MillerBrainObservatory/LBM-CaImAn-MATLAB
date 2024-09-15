@@ -42,8 +42,7 @@ if isempty(scales) || length(scales) ~= num_images
     scales = repmat({0}, 1, num_images);
 end
 
-f = figure('Visible', 'off');
-sgtitle(fig_title, 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'w');
+f = figure('Visible', 'on');
 
 switch layout
     case 'horizontal'
@@ -76,7 +75,7 @@ for i = 1:num_images
     imagesc(img);
     axis image; axis tight; axis off; colormap('gray');
     if ~isempty(titles) > 0
-        title(titles{i}, 'FontSize', 12, 'FontWeight', 'bold', 'Color', 'w');
+        title(titles{i}, 'FontSize', 12, 'FontWeight', 'bold');
     end
 
     if this_scale < size(img, 2) / 10 % make sure its not too small
@@ -91,11 +90,14 @@ for i = 1:num_images
         hold on;
         scale_bar_x = [size(img, 2) - scale_length_pixels - 3, size(img, 2) - 3];
         scale_bar_y = [size(img, 1) - 3, size(img, 1) - 3];
-        line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 5);
+        % TODO: Scale line width with image resolution
+        line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 3);
         text(mean(scale_bar_x), scale_bar_y(1), sprintf('%d µm', mod_scale), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
         hold off;
     end
 end
+
+sgtitle(fig_title, 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'w');
 
 if ~isempty(save_name)
     exportgraphics(gcf, save_name, 'Resolution',600);

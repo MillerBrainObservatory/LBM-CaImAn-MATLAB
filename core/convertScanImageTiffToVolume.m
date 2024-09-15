@@ -147,12 +147,11 @@ raw_y_roi = min(raw_y_roi, metadata.tiff_length);
 
 % ROI slices
 trimmed_yslice = (t_top+1:raw_y_roi-t_bottom); % used to slice roi_arr, which already is separated as an individual roi
-trimmed_xslice = (t_left+1:raw_x-t_right);
+trimmed_xslice = (t_left+1:raw_x_roi-t_right);
 
 %% File structure setup
 raw_files = []; extracted_files = [];
 
-% Case 2: Save path given
 % display whats there with the size
 contents = dir([save_path '/' '*.h5']);
 for i = 1:length(contents)
@@ -186,18 +185,11 @@ log_struct(fid,metadata,'Metadata',log_full_path);
 log_message(fid, "-----------------------------\n");
 log_message(fid, "Aggregating data from %d file(s) with %d plane(s).\n",num_files, num_planes);
 
-% Part 1) Pull tiff file data into temporary h5 store
-
-% Aout = zeros(metadata.tiff_length, metadata.tiff_width, num_planes, num_frames*num_files, data_type);
-if numel(raw_files) == num_planes
-    extract_raw = false;
-end
-
 if numel(extracted_files) == num_planes
     if overwrite
         log_message(fid, 'Save path contains extracted data. Overwrite = true, deleting extracted files...');
         for di=1:num_planes
-            pstr=sprintf("extracted_plane_%d", di);
+            pstr=sprintf("extracted_plane_%d.h5", di);
             delete(fullfile(save_path,pstr));
         end
     else
@@ -206,44 +198,41 @@ if numel(extracted_files) == num_planes
     end
 end
 
-if extract_raw
-    offset_file = 0;
-    for file_idx = 1:num_files
-        if file_idx > 1; offset_file = offset_file + num_frames; end
-        tpf = tic;
-        raw_tiff_file = fullfile(save_path, files(file_idx).name);
+offset_file = 0;
+for file_idx = 1:num_files
+    if file_idx > 1; offset_file = offset_file + num_frames; end
+    tpf = tic;
+    raw_tiff_file = fullfile(data_path, files(file_idx).name);
 
-        log_message(fid, 'Loading file %d of %d...\n', file_idx, num_files);
+    log_message(fid, 'Creating temporary file %d of %d...\n', file_idx, num_files);
 
-        hTif=ScanImageTiffReader(raw_tiff_file);
-        hTif=hTif.data();
-        size_y=size(hTif);
-        hTif=reshape(hTif, [size_y(1), size_y(2), num_planes, num_frames]);
-        hTif=permute(hTif, [2 1 3 4]);
+    hTif=ScanImageTiffReader(raw_tiff_file);
+    hTif=hTif.data();
+    size_y=size(hTif);
+    hTif=reshape(hTif, [size_y(1), size_y(2), num_planes, num_frames]);
+    hTif=permute(hTif, [2 1 3 4]);
 
-        log_message(fid, '%.2f Gb tiff data loaded. Saving data to file...\n', whos('hTif').bytes / 1e9);
-        for pi = 1:num_planes
-            tps = tic;
-            raw_full_path = sprintf("raw_plane_%d.h5", pi);
-            full_name = fullfile(save_path, raw_full_path);
-            if isfile(full_name)
-                if overwrite
-                    log_message(fid, "File %s exists, deleting...\n", full_name);
-                    delete(full_name)
-                else
-                    log_message(fid, 'Raw data for plane %d exists, but user chose not to overwrite. Skipping.\n',pi);
-                    continue
-                end
+    for pi = 1:num_planes
+        tps = tic;
+        raw_full_path = sprintf("raw_plane_%d.h5", pi);
+        full_name = fullfile(save_path, raw_full_path);
+        if isfile(full_name)
+            if overwrite
+                log_message(fid, "File %s exists, deleting...\n", full_name);
+                delete(full_name)
+            else
+                log_message(fid, 'Raw data for plane %d exists, but user chose not to overwrite. Skipping.\n',pi);
+                continue
             end
-            write_frames_3d(full_name,hTif(:,:,pi,:),ds,multifile,4);
-            write_metadata_h5(metadata,full_name, '/');
-            log_message(fid, 'Plane %d saved in %.2f seconds.\n',pi,toc(tps));
         end
-        log_message(fid, 'File %d loaded and saved in %.2f seconds.\n',pi,toc(tpf));
+        write_frames_3d(full_name,hTif(:,:,pi,:),ds,multifile,4);
+        write_metadata_h5(metadata,full_name, '/');
+        log_message(fid, 'Plane %d saved in %.2f seconds.\n',pi,toc(tps));
     end
-    clear hTif size_y raw_full_path
+    log_message(fid, 'Temporary file %d loaded and saved in %.2f seconds.\n',pi,toc(tpf));
 end
 
+clear hTif size_y raw_full_path
 tfile = tic;
 
 % Initialize a container to hold our final, re-tiled image
@@ -317,28 +306,6 @@ for plane_idx = 1:num_planes
             (offset_x + 1):(offset_x + size(roi_arr,2)), ...
             : ...
             ) = roi_arr;
-
-        %% Figures
-        if do_figures
-            [yind, xind] = get_central_indices(roi_arr(:,:,2), 40);
-            [yindr, xindr] = get_central_indices(vol(trimmed_yslice,:,2), 40);
-
-            images = {roi_arr(yind,xind,2), vol(yindr, xindr, 2)};
-            zoomed_scale = calculate_scale(size(images{1},2),metadata.pixel_resolution);
-            roi_scales = {zoomed_scale,zoomed_scale};
-            labels = {'Pre-Corrected/Trimmed', 'Phase-Corrected/Trimmed'};
-
-            roi_savename = fullfile(fig_save_path, sprintf('plane_%d_roi_%d.png',plane_idx,roi_idx));
-            write_images_to_tile( ...
-                images, ...
-                metadata, ...
-                'fig_title', sprintf('ROI %d', roi_idx), ...
-                'titles', labels, ...
-                'scales', roi_scales, ...
-                'save_name', roi_savename ...
-                );
-        end
-
         cnt = cnt + 1;
     end
     % remove padded 0's
@@ -357,7 +324,6 @@ for plane_idx = 1:num_planes
     mean_img = mean(z_timeseries, 3);
     if do_figures
         img_frame = z_timeseries(:,:,2);
-        [yind, xind] = get_central_indices(mean_img, 30); % 30 pixels around the center of the brightest part of an image frame
         images = {img_frame, mean_img};
         labels = {'Second Frame', 'Mean Image'};
         scale_full = calculate_scale(size(img_frame, 2), metadata.pixel_resolution);
@@ -368,6 +334,7 @@ for plane_idx = 1:num_planes
             images, ...
             metadata, ...
             'titles', labels, ...
+            'fig_title',  sprintf('plane_%d', plane_idx), ...
             'scales', scales, ...
             'save_name', plane_save_path ...
             );
@@ -392,6 +359,13 @@ for plane_idx = 1:num_planes
     log_message(fid, "---- Complete: Plane %d processed in %.2f seconds ----\n",plane_idx, toc(tplane));
     close all hidden;
 end
+
+% Cleanup temporarily created files
+for i = 1:length(raw_files)
+    file_to_delete = fullfile(raw_files(i).folder, raw_files(i).name);
+    delete(file_to_delete);
+end
+
 log_message(fid,"Processing complete. Time: %.3f minutes.",toc(tfile)/60);
 fclose('all');
 end
