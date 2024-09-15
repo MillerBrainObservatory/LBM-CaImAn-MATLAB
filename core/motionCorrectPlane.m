@@ -32,25 +32,6 @@ function motionCorrectPlane(data_path, varargin)
 %   shift vectors in x and y. The raw movie is saved in '/Y' and the
 %
 % - Only .h5 files containing processed volumes should be in the file_path.
-% (groot is the default figure object).
-set(groot, ...
-'DefaultFigureColor', 'w', ...
-'DefaultAxesLineWidth', 0.5, ...
-'DefaultAxesXColor', 'k', ...
-'DefaultAxesYColor', 'k', ...
-'DefaultAxesFontUnits', 'points', ...
-'DefaultAxesFontSize', 8, ...
-'DefaultAxesFontName', 'Helvetica', ...
-'DefaultLineLineWidth', 1, ...
-'DefaultTextFontUnits', 'Points', ...
-'DefaultTextFontSize', 8, ...
-'DefaultTextFontName', 'Helvetica', ...
-'DefaultAxesBox', 'off', ...
-'DefaultAxesTickLength', [0.02 0.025]);
- 
-% set the tickdirs to go out - need this specific order
-set(groot, 'DefaultAxesTickDir', 'out');
-set(groot, 'DefaultAxesTickDirMode', 'manual');
 
 p = inputParser;
 
@@ -225,15 +206,15 @@ for plane_idx = start_plane:end_plane
         ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off;
         title('mean rigid template');
         ax3 = subplot(2, 3, 3); imagesc(mM2); axis equal; axis tight; axis off;
-        title('mean non-rigid corrected');
+        title('mean non-rigid corrected', 'Color', 'black', 'FontWeight', 'bold');
         subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid');
-        title('correlation coefficients');
+        title('correlation coefficients', 'Color', 'black', 'FontWeight', 'bold');
         subplot(2, 3, 5); scatter(cY, cM1); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
         xlabel('raw data'); ylabel('rigid corrected');
         subplot(2, 3, 6); scatter(cM1, cM2); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        xlabel('rigid template'); ylabel('non-rigid correlation');
+        xlabel('rigid template', 'Color', 'black', 'FontWeight', 'bold'); ylabel('non-rigid correlation', 'Color', 'black', 'FontWeight', 'bold');
         linkaxes([ax1, ax2, ax3], 'xy');
         savefig(metrics_name_fig)
         exportgraphics(f, metrics_name_png, 'Resolution', 600);
@@ -252,12 +233,14 @@ for plane_idx = start_plane:end_plane
         shifts_name_png = sprintf("%s_shifts.png", fig_plane_name);
         shifts_name_fig = sprintf("%s_shifts.fig", fig_plane_name);
         f = figure;
-        ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2); title('correlation coefficients'); legend('raw data','rigid','non-rigid');
+        ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2);
+        title('correlation coefficients', 'Color', 'black', 'FontWeight', 'bold');
+        legend('raw data','registered data','non-rigid', 'Color', 'black', 'FontWeight', 'bold');
         set(gca,'Xtick',[])
-        ax2 = subplot(312); plot(shifts_x, 'LineWidth',.2); title('displacements along x')
+        ax2 = subplot(312); plot(shifts_x, 'LineWidth',.2); title('displacements along x', 'Color', 'black', 'FontWeight', 'bold')
         set(gca,'Xtick',[])
-        ax3 = subplot(313); plot(shifts_y); title('displacements along y')
-        xlabel('timestep')
+        ax3 = subplot(313); plot(shifts_y); title('displacements along y', 'Color', 'black', 'FontWeight', 'bold')
+        xlabel('timestep', 'Color', 'black', 'FontWeight', 'bold')
         linkaxes([ax1,ax2,ax3],'x')
         exportgraphics(f,shifts_name_png, 'Resolution', 600);
         savefig(shifts_name_fig);

@@ -131,23 +131,30 @@ else
     fprintf('Log file created: %s\n', log_full_path);
 end
 
-%% Pull metadata from attributes attached to this group
 num_cores = max(num_cores, 23);
 log_message(fid, 'Beginning registration with %d cores...\n',num_cores);
 t_all=tic;
-try
+% try
 for plane_idx = start_plane:end_plane
     log_message(fid, 'Beginning plane: %d\n',plane_idx);
     p_str = sprintf('plane_%d', plane_idx);
     plane_name = sprintf("%s//motion_corrected_%s.h5", data_path, p_str);
     plane_name_save = sprintf("%s//segmented_%s.h5", save_path, p_str);
 
-    %% Attach metadata to attributes for this plane
-    if plane_idx == start_plane
-        metadata = read_h5_metadata(plane_name, '/');
-        if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
-        log_struct(fid,metadata,'metadata', log_full_path);
+    if isfile(plane_name_save)
+        if overwrite
+            log_message(fid, 'File: %s esists. Overwrite set to true. Deleting ...\n',plane_name_save);
+            delete(plane_name_save)
+        else
+            log_message(fid, 'File: %s esists. Overwrite set to false. Skipping plane %d ...\n',plane_name_save, plane_idx);
+            continue
+        end
     end
+
+    %% Attach metadata to attributes for this plane
+    metadata = read_h5_metadata(plane_name, '/');
+    if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
+    log_struct(fid,metadata,'metadata', log_full_path);
 
     %% Load in data
     data = h5read(plane_name, ds);
@@ -177,29 +184,30 @@ for plane_idx = start_plane:end_plane
     mx = ceil(pi.*(1.33.*tau).^2);
     mn = floor(pi.*(tau.*0.5).^2); % SHRINK IF FOOTPRINTS ARE TOO SMALL
     sizY = size(data);
-    % patch_size = [100,100];
-    % overlap = [10,10];
-    % patches = construct_patches(sizY(1:end-1),patch_size,overlap);
-    % K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2);
-    patch_size = [64,64];                   % size of each patch along each dimension (optional, default: [32,32])
-    overlap = [16,16];                        % amount of overlap in each dimension (optional, default: [4,4])
-    
+    patch_size = [100,100];
+    overlap = [10,10];
     patches = construct_patches(sizY(1:end-1),patch_size,overlap);
+    K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2);
+    disp(K);
+    % patch_size = [64,64];                   % size of each patch along each dimension (optional, default: [32,32])
+    % overlap = [16,16];                        % amount of overlap in each dimension (optional, default: [4,4])
+    % 
+    % patches = construct_patches(sizY(1:end-1),patch_size,overlap);
     K = 7;                                            % number of components to be found / patch
     tau = 8;                                          % std of gaussian kernel (half size of neuron) 
     p = 2;                                            % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
     % 
-    % poolobj = gcp('nocreate'); % create a parallel pool
-    % if isempty(poolobj)
-    %     disp('Starting the parallel pool...')
-    %     poolobj = parpool('local',num_cores);
-    %     tmpDir = tempname();
-    %     mkdir(tmpDir);
-    %     poolobj.Cluster.JobStorageLocation = tmpDir;
-    % else
-    %     numworkers = poolobj.NumWorkers;
-    %     disp(['Continuing with existing pool of ' num2str(numworkers) '.'])
-    % end
+    poolobj = gcp('nocreate'); % create a parallel pool
+    if isempty(poolobj)
+        disp('Starting the parallel pool...')
+        poolobj = parpool('local',num_cores);
+        tmpDir = tempname();
+        mkdir(tmpDir);
+        poolobj.Cluster.JobStorageLocation = tmpDir;
+    else
+        numworkers = poolobj.NumWorkers;
+        disp(['Continuing with existing pool of ' num2str(numworkers) '.'])
+    end
     
     % Set caiman parameters
     log_message(fid, "Using default CNMF parameters.\n")
@@ -286,14 +294,21 @@ for plane_idx = start_plane:end_plane
     
     %% Detrend
     t_detrend = tic;
-    if size(A_keep,2) < 2 % Calculate "raw" traces in terms of delta F/F0
+    % Calculate "raw" traces in terms of delta F/F0
+    if size(A_keep,2) < 2
+        log_message(fid, '  Detrending multiple components.');
         [T_keep,~] = detrend_df_f([A_keep,ones(d1*d2,1)],[b,ones(d1*d2,1)],[C_keep;ones(1,T)],[f;-min(min(min(data)))*ones(1,T)],[R_keep; ones(1,T)],options);
+                log_message(fid, '  Detrending Complete ...');
     else % total number of pixels
         % handle min(data) = 0
+        log_message(fid, '  Detrending A_keep of >2 components.');
         F_dark = min(min(data(:)),eps);
+        log_message(fid, '  F_Dark complete.');
         if F_dark == 0
+            log_message(fid, '  F_Dark == 0.');
             F_dark = eps;
         end
+        log_message(fid, ' Detrending components ...');
         [T_keep,~] = detrend_df_f( ...
             A_keep, ...
             [b,ones(d1*d2,1)], ...
@@ -326,8 +341,10 @@ for plane_idx = start_plane:end_plane
     % write frames. Filename, dataset, dataset_name, overwrite, append
     try
         h5create(plane_name_save,"/T_keep",size(T_keep));
-    catch ME
-        error(ME);
+    catch
+        log_message(fid, "Error writing to hdf5, likely file already exists. Deleting file to attempt another save.");
+        delete(plane_name_save)
+        h5create(plane_name_save,"/T_keep",size(T_keep));
     end
     h5create(plane_name_save,"/Ac_keep",size(Ac_keep));
     h5create(plane_name_save,"/C_keep",size(C_keep));
@@ -341,7 +358,7 @@ for plane_idx = start_plane:end_plane
     h5create(plane_name_save,"/acx",size(acx));
     h5create(plane_name_save,"/acy",size(acy));
     h5create(plane_name_save,"/acm",size(acm));
-
+  
     h5write(plane_name_save,"/T_keep",T_keep);
     h5write(plane_name_save,"/Ac_keep",Ac_keep);
     h5write(plane_name_save,"/C_keep",C_keep);
@@ -360,11 +377,8 @@ for plane_idx = start_plane:end_plane
     % write_metadata_h5(options, plane_name_save, '/opts');
     log_message(fid, "Data saved. Elapsed time: %.2f seconds.\n",toc(t_save)/60);
 
-    clearvars -except *path fid num_cores t_all files ds start_plane end_plane options plane_idx
     savefast(fullfile(save_path, ['caiman_output_plane_' num2str(plane_idx) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Cn','b','f','acx','acy','acm')
-end
-catch ME
-    disp(ME)
+    clearvars -except poolobj tmpDir numworkers *path fid num_cores t_all files ds start_plane end_plane options plane_idx
 end
 fprintf(fid, 'Routine complete for %d planes. Total Completion time: %.2f hours.\n',((end_plane-start_plane)+1),toc(t_all)./3600);
 end
