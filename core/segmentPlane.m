@@ -375,9 +375,9 @@ for plane_idx = start_plane:end_plane
 
     write_metadata_h5(metadata, plane_name_save, '/');
     % write_metadata_h5(options, plane_name_save, '/opts');
-    log_message(fid, "Data saved. Elapsed time: %.2f seconds.\n",toc(t_save)/60);
 
     savefast(fullfile(save_path, ['caiman_output_plane_' num2str(plane_idx) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Cn','b','f','acx','acy','acm')
+    log_message(fid, "Data saved. Elapsed time: %.2f seconds.\n",toc(t_save));
     clearvars -except poolobj tmpDir numworkers *path fid num_cores t_all files ds start_plane end_plane options plane_idx
 end
 fprintf(fid, 'Routine complete for %d planes. Total Completion time: %.2f hours.\n',((end_plane-start_plane)+1),toc(t_all)./3600);
