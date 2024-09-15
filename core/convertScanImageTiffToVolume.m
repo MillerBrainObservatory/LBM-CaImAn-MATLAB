@@ -88,7 +88,6 @@ do_figures = p.Results.do_figures;
 trim_roi = p.Results.trim_roi;
 trim_image = p.Results.trim_image;
 
-
 if debug_flag == 1; dir([data_path '/' '*.tif']); return; end
 
 files = dir(fullfile(data_path, '*.tif*'));

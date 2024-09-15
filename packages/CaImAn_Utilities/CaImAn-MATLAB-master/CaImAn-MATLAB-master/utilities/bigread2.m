@@ -167,7 +167,7 @@ elseif strcmpi(ext,'.hdf5') || strcmpi(ext,'.h5');
         num2read = dims(end)-sframe+1;
     end
     num2read = min(num2read,dims(end)-sframe+1);
-    imData = h5read(path_to_file,'/mov',[ones(1,length(dims)-1),sframe],[dims(1:end-1),num2read]);
+    imData = h5read(path_to_file,'/Y',[ones(1,length(dims)-1),sframe],[dims(1:end-1),num2read]);
 else
     error('Unknown file extension. Only .tiff and .hdf5 files are currently supported');
 end

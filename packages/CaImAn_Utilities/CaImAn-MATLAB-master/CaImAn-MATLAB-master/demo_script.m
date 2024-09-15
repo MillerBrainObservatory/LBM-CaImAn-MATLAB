@@ -8,7 +8,7 @@ nam = 'demoMovie.tif';          % insert path to tiff stack here
 sframe=1;						% user input: first frame to read (optional, default 1)
 num2read=2000;					% user input: how many frames to read   (optional, default until the end)
 Y = read_file(nam,sframe,num2read);
-
+%%
 %Y = Y - min(Y(:)); 
 if ~isa(Y,'single');    Y = single(Y);  end         % convert to single
 
@@ -28,8 +28,7 @@ options = CNMFSetParms(...
     'merge_thr',0.80,...                        % merging threshold  
     'nb',2,...                                  % number of background components    
     'min_SNR',3,...                             % minimum SNR threshold
-    'space_thresh',0.5,...                      % space correlation threshold
-    'cnn_thr',0.2...                            % threshold for CNN classifier    
+    'space_thresh',0.5 ...                      % space correlation threshold
     );
 %% Data pre-processing
 
@@ -48,7 +47,7 @@ figure;imagesc(Cn);
 
 
     %% manually refine components (optional)
-refine_components = false;  % flag for manual refinement
+refine_components = true;  % flag for manual refinement
 if refine_components
     [Ain,Cin,center] = manually_refine_components(Y,Ain,Cin,center,Cn,tau,options);
 end
@@ -69,7 +68,7 @@ ind_corr = rval_space > options.space_thresh;           % components that pass t
                                         
 %% further classification with cnn_classifier
 try  % matlab 2017b or later is needed
-    [ind_cnn,value] = cnn_classifier(A,[d1,d2],'cnn_model',options.cnn_thr);
+    [ind_cnn,value] = cnn_classifier(A,[d1,d2],'cnn_model',0.2);
 catch
     ind_cnn = true(size(A,2),1);                        % components that pass the CNN classifier
 end     
@@ -136,6 +135,4 @@ figure;
 plot_components_GUI(Yr,A_or,C_or,b2,f2,Cn,options);
 
 %% make movie
-if (0)  
-    make_patch_video(A_or,C_or,b2,f2,Yr,Coor,options)
-end
+make_patch_video(A_or,C_or,b2,f2,Yr,Coor,options)

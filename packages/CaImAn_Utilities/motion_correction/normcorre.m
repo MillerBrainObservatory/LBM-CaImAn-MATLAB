@@ -272,7 +272,7 @@ for it = 1:iter
             case 'tif'
                 Yt = single(imread(Y,'Index',t,'Info',tiffInfo));
             case 'hdf5'
-                Yt = single(h5read(Y,'/mov',[ones(1,nd),t],[sizY(1:nd),1]));
+                Yt = single(h5read(Y,'/Y',[ones(1,nd),t],[sizY(1:nd),1]));
             case 'mem'
                 if nd == 2; Yt = single(Y.(var_name)(:,:,t)); end
                 if nd == 3; Yt = single(Y.(var_name)(:,:,:,t)); end

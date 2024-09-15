@@ -22,7 +22,8 @@ classdef MotionCorrection < handle
         col_shift = 0;       % relative shift due to bidirectional scanning
         gSig = 7;            % std of gaussian kernel for high pass filtering
         gSiz = 21;           % size of high pass filter
-        file_orig;           % original file (used for 1p correction)        
+        file_orig;           % original file (used for 1p correction)   
+        % Y; % movie MBO 0708
     end
     
     methods                
@@ -35,7 +36,8 @@ classdef MotionCorrection < handle
             else    % filename is an array already loaded in memory
                 sizY = size(filename);
                 obj.T = sizY(end);          % assuming more than 1 frames
-                obj.dims = sizY(1:end-1);                      
+                obj.dims = sizY(1:end-1); 
+                % obj.Y = filename;
             end
             obj.nd = length(obj.dims);  
             obj.options.d1 = obj.dims(1);
