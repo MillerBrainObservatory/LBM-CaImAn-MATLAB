@@ -14,7 +14,7 @@ function convertScanImageTiffToVolume(data_path, varargin)
 %     The directory where processed files will be saved. It is created if it does
 %     not exist. Defaults to the data_path directory.
 % ds : string, optional
-%     Name of the group (h5 dataset) to save the extracted data. Default is
+%     Name of the group (h5 dataset) to save the assembled data. Default is
 %     '/Y'. Must contain a leading slash.
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
@@ -56,12 +56,12 @@ addParameter(p, 'do_figures', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', true, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 
-%% additional parameters for extraction/pre-proccessing
+%% additional parameters for assemblyn/pre-proccessing
 addParameter(p, 'fix_scan_phase', true, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'trim_roi', [0 0 0 0], @isnumeric);
 addParameter(p, 'trim_image', [0 0 0 0], @isnumeric);
 
-parse(p,data_path, varargin{:});
+parse(p, data_path, varargin{:});
 
 % Retrieve the parsed input arguments
 data_path = convertStringsToChars(p.Results.data_path);
@@ -69,9 +69,9 @@ save_path = convertStringsToChars(p.Results.save_path);
 
 if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", fullfile(data_path)); end
 
-% Make the save path in data_path/extracted, if not given
+% Make the save path in data_path/assembly, if not given
 if isempty(save_path)
-    save_path = fullfile(data_path, 'extracted');
+    save_path = fullfile(data_path, 'assembled');
     if ~isfolder(save_path); mkdir(save_path);
         warning('Creating save path since one was not provided, located: %s', save_path);
     end
@@ -87,7 +87,6 @@ do_figures = p.Results.do_figures;
 % num_cores = p.Results.num_cores;
 trim_roi = p.Results.trim_roi;
 trim_image = p.Results.trim_image;
-
 
 if debug_flag == 1; dir([data_path '/' '*.tif']); return; end
 
@@ -105,7 +104,7 @@ else
     multifile=false;
 end
 
-log_file_name = sprintf("%s_extraction.log", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
+log_file_name = sprintf("%s_assembly.log", datestr(datetime("now"), 'dd_mmm_yyyy_HH_MM_SS'));
 log_full_path = fullfile(save_path, log_file_name);
 fid = fopen(log_full_path, 'w');
 if fid == -1
@@ -150,31 +149,31 @@ trimmed_yslice = (t_top+1:raw_y_roi-t_bottom); % used to slice roi_arr, which al
 trimmed_xslice = (t_left+1:raw_x_roi-t_right);
 
 %% File structure setup
-raw_files = []; extracted_files = [];
+raw_files = []; assembled_files = [];
 
 % display whats there with the size
 contents = dir([save_path '/' '*.h5']);
 for i = 1:length(contents)
     if contains(contents(i).name, 'raw_plane_')
         raw_files = [raw_files; contents(i)];
-    elseif contains(contents(i).name, 'extracted_plane_')
-        extracted_files = [extracted_files; contents(i)];
+    elseif contains(contents(i).name, 'assembled_plane_')
+        assembled_files = [assembled_files; contents(i)];
     end
 end
 if ~isempty(raw_files)
-    fprintf("Previously extracted raw files in save_path : (%s):\n", save_path);
+    fprintf("Previously assembled raw files in save_path : (%s):\n", save_path);
     fprintf('%-30s %-20s %-10s\n', 'Name', 'Date', 'Size (Gb)');
     fprintf('%-30s %-20s %-10s\n', '----', '----', '------------');
     for i = 1:length(raw_files)
         fprintf('%-30s %-20s %.2f\n', raw_files(i).name, raw_files(i).date, raw_files(i).bytes / 1e9);
     end
 end
-if ~isempty(extracted_files)
-    fprintf("Previously extracted/pre-processed files in save_path : (%s):\n", save_path);
+if ~isempty(assembled_files)
+    fprintf("Previously assembled/pre-processed files in save_path : (%s):\n", save_path);
     fprintf('%-30s %-20s %-10s\n', 'Name', 'Date', 'Size (Gb)');
     fprintf('%-30s %-20s %-10s\n', '----', '----', '------------');
-    for i = 1:length(extracted_files)
-        fprintf('%-30s %-20s %.2f\n', extracted_files(i).name, extracted_files(i).date, extracted_files(i).bytes / 1e9);
+    for i = 1:length(assembled_files)
+        fprintf('%-30s %-20s %.2f\n', assembled_files(i).name, assembled_files(i).date, assembled_files(i).bytes / 1e9);
     end
 end
 
@@ -185,15 +184,15 @@ log_struct(fid,metadata,'Metadata',log_full_path);
 log_message(fid, "-----------------------------\n");
 log_message(fid, "Aggregating data from %d file(s) with %d plane(s).\n",num_files, num_planes);
 
-if numel(extracted_files) == num_planes
+if numel(assembled_files) == num_planes
     if overwrite
-        log_message(fid, 'Save path contains extracted data. Overwrite = true, deleting extracted files...');
+        log_message(fid, 'Save path contains assembled data. Overwrite = true, deleting assembled files...');
         for di=1:num_planes
-            pstr=sprintf("extracted_plane_%d.h5", di);
+            pstr=sprintf("assembled_plane_%d.h5", di);
             delete(fullfile(save_path,pstr));
         end
     else
-        log_message(fid, 'Save path contains extracted data. Overwrite = false, returning...');
+        log_message(fid, 'Save path contains assembled data. Overwrite = false, returning...');
         return
     end
 end
@@ -247,19 +246,19 @@ for plane_idx = 1:num_planes
 
     p_str = sprintf("plane_%d", plane_idx);
     raw_p_str = sprintf("raw_%s", p_str);
-    extracted_p_str = sprintf("extracted_%s", p_str);
+    assembled_p_str = sprintf("assembled_%s", p_str);
     raw_full_path = sprintf("%s.h5",fullfile(save_path,raw_p_str));
-    extracted_full_path = sprintf("%s.h5",fullfile(save_path,extracted_p_str));
+    assembled_full_path = sprintf("%s.h5",fullfile(save_path,assembled_p_str));
 
     if ~isfile(raw_full_path)
         error("Processing stopped due to missing temporary file. Try re-processing with overwrite=True to delete a corrupted file.")
     end
 
-    if isfile(extracted_full_path)
+    if isfile(assembled_full_path)
         warning("File:\n%s\n...already exists.")
         if overwrite
-            log_message(fid, "Overwrite set to true, deleting...\n", extracted_full_path);
-            delete(extracted_full_path)
+            log_message(fid, "Overwrite set to true, deleting...\n", assembled_full_path);
+            delete(assembled_full_path)
         else
             continue
         end
@@ -290,7 +289,7 @@ for plane_idx = 1:num_planes
             raw_offset_y = raw_offset_y + raw_y_roi + metadata.num_lines_between_scanfields;
         end
 
-        % extract the **UNTRIMMED ROI**
+        % assemble the **UNTRIMMED ROI**
         raw_yslice = (raw_offset_y + 1):(raw_offset_y + raw_y_roi);
         roi_arr = vol(raw_yslice, :, :);
 
@@ -339,17 +338,17 @@ for plane_idx = 1:num_planes
             'save_name', plane_save_path ...
             );
     end
-    write_frames_3d(extracted_full_path, z_timeseries,ds,multifile,4);
+    write_frames_3d(assembled_full_path, z_timeseries,ds,multifile,4);
     try
-        h5create(extracted_full_path,"/Ym",size(mean_img));
+        h5create(assembled_full_path,"/Ym",size(mean_img));
     catch
     end
     try
-        h5write(extracted_full_path, '/Ym', mean_img);
+        h5write(assembled_full_path, '/Ym', mean_img);
     catch ME
         warning(ME.identifier, '%s\n', ME.message)
     end
-    write_metadata_h5(metadata, extracted_full_path, '/');
+    write_metadata_h5(metadata, assembled_full_path, '/');
     if getenv("OS") == "Windows_NT"
         mem = memory;
         max_avail = mem.MemAvailableAllArrays / 1e9;

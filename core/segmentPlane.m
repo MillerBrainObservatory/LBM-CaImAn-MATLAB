@@ -9,7 +9,7 @@ function segmentPlane(data_path, save_path, varargin)
 % Parameters
 % ----------
 % data_path : char
-%     Path to the directory containing the files extracted via convertScanImageTiffToVolume.
+%     Path to the directory containing the files assembled via convertScanImageTiffToVolume.
 % save_path : char
 %     Path to the directory to save the motion vectors.
 % ds : string, optional
@@ -67,7 +67,6 @@ function segmentPlane(data_path, save_path, varargin)
 % 
 % :code:`acm`
 % :  sum of component pixels for each neuron [1, Km]. :code:`single`
-clc;
 
 p = inputParser;
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
@@ -103,11 +102,8 @@ addpath(genpath(fullfile(currpath, './utils')));
 addpath(genpath(fullfile(currpath, './internal')));
 
 if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist, but should contain motion corrected HDF5 files.", data_path); end
-if debug_flag == 1 || debug_flag == true
-    disp("Files to process:")
-    dir([fullfile(data_path, '*.h*')])
-    return;
-end
+
+if debug_flag == 1; dir([data_path '/' '*.h*']); return; end
 
 if isempty(save_path)
     warning("No save_path given. Saving data in data_path: %s\n", data_path);
