@@ -71,7 +71,7 @@ if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", fullfile(da
 
 % Make the save path in data_path/assembly, if not given
 if isempty(save_path)
-    save_path = fullfile(data_path, 'assembled');
+    save_path = fullfile(data_path, '../', 'assembled');
     if ~isfolder(save_path); mkdir(save_path);
         warning('Creating save path since one was not provided, located: %s', save_path);
     end
@@ -210,6 +210,9 @@ for file_idx = 1:num_files
     size_y=size(hTif);
     hTif=reshape(hTif, [size_y(1), size_y(2), num_planes, num_frames]);
     hTif=permute(hTif, [2 1 3 4]);
+    plane_order = fliplr([1 5:10 2 11:17 3 18:23 4 24:30]);
+
+    hTif = hTif(:,:,plane_order,:);
 
     for pi = 1:num_planes
         tps = tic;
@@ -392,7 +395,7 @@ if dim == 1
     end
 end
 if offset ~= 0
-    dataOut = dataOut(:, 1+ciel(abs(offset)/2):end-(abs(offset)/2), :, :);
+    dataOut = dataOut(:, 1+ceil(abs(offset)/2):end-(abs(offset)/2), :, :);
 end
 end
 

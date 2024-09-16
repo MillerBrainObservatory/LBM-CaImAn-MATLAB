@@ -1,5 +1,5 @@
 function segmentPlane(data_path, save_path, varargin)
-% Segment imaging data using CaImAn for motion-corrected data.
+% Segment imaging data using CaImAn CNMF.
 %
 % This function applies the CaImAn algorithm to segment neurons from
 % motion-corrected, pre-processed and ROI re-assembled MAxiMuM data.
@@ -106,8 +106,12 @@ if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist, but should c
 if debug_flag == 1; dir([data_path '/' '*.h*']); return; end
 
 if isempty(save_path)
-    warning("No save_path given. Saving data in data_path: %s\n", data_path);
-    save_path = data_path;
+    save_path = fullfile(data_path, '../', 'segmented');
+    if ~isfolder(save_path); mkdir(save_path);
+        warning('Creating save path since one was not provided, located: %s', save_path);
+    end
+elseif ~isfolder(save_path)
+    mkdir(save_path);
 end
 
 fig_save_path = fullfile(save_path, "figures");
