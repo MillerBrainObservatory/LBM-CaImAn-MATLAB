@@ -4,7 +4,7 @@ function motionCorrectPlane(data_path, varargin)
 % Parameters
 % ----------
 % data_path : char
-%     Path to the directory containing the files assembleed via convertScanImageTiffToVolume.
+%     Path to the directory containing the files assembled via convertScanImageTiffToVolume.
 % save_path : char
 %     Path to the directory to save the motion vectors.
 % ds : char, optional
@@ -66,7 +66,7 @@ options = p.Results.options;
 
 if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", data_path); end
 
-% Make the save path in data_path/assembleed, if not given
+% Make the save path in data_path/assembled, if not given
 if isempty(save_path)
     save_path = fullfile(data_path, '../', 'motion_corrected');
     if ~isfolder(save_path); mkdir(save_path);
