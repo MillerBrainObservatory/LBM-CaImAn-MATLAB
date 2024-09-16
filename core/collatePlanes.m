@@ -1,4 +1,4 @@
-function [] = collatePlanes(data_path, save_path, varargin)
+function [] = collatePlanes(data_path, varargin)
 % COLLATEPLANES Analyzes and processes imaging data by extracting and correcting features across multiple planes.
 %
 % Parameters
@@ -8,9 +8,9 @@ function [] = collatePlanes(data_path, save_path, varargin)
 %     The function expects to find 'pollen_sample_xy_calibration.mat' in this directory along with each caiman_output_plane_N.
 % save_path : char
 %     Path to the directory to save the motion vectors.
-% dataset_name : string, optional
+% ds : char, optional
 %     Group path within the hdf5 file that contains raw data.
-%     Default is 'registration'.
+%     Default is '/Y'.
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
@@ -21,8 +21,6 @@ function [] = collatePlanes(data_path, save_path, varargin)
 % end_plane : double, integer, positive
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
-% reordered : logical, optional
-%      if `rename_planes` was ran, "reordered" will be in the name.
 %
 % Returns
 % -------
@@ -48,51 +46,60 @@ function [] = collatePlanes(data_path, save_path, varargin)
 %
 
 p = inputParser;
-addRequired(p, 'data_path');
-addRequired(p, 'save_path');
-addParameter(p, 'dataset_name', "/mov", @(x) (ischar(x) || isstring(x)) && isValidGroupPath(x));
-addOptional(p, 'debug_flag', 0, @(x) isnumeric(x));
-addParameter(p, 'overwrite', 1, @(x) isnumeric(x));
+addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
+addParameter(p, 'motion_corrected_path', '', @(x) ischar(x) || isstring(x));
+addParameter(p, 'save_path', '', @(x) ischar(x) || isstring(x));
+addParameter(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)));
+addParameter(p, 'debug_flag', 0, @(x) isnumeric(x) && isscalar(x));
+addParameter(p, 'overwrite', 1, @(x) isnumeric(x) && isscalar(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
-addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
+addParameter(p, 'end_plane', 2, @(x) isnumeric(x) && x > 0); % Remove dependence on start_plane
 addParameter(p, 'num_features', 3, @(x) isnumeric(x) && isPositiveIntegerValuedNumeric(x));
-parse(p, data_path, save_path, varargin{:});
+
+parse(p, data_path, varargin{:});
+
+% ensure end_plane is greater than or equal to start_plane
+if p.Results.end_plane < p.Results.start_plane
+    error('end_plane must be greater than or equal to start_plane.');
+end
 
 data_path = p.Results.data_path;
 save_path = p.Results.save_path;
-dataset_name = p.Results.dataset_name; % here for param consistency but ignored
+
+motion_corrected_path = p.Results.motion_corrected_path;
 debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
+dataset_name = p.Results.ds;
 
-if ~isfolder(data_path)
-    error("Data path:\n %s\n ..does not exist", data_path);
+if ~isfolder(data_path); error("%s does not exist", data_path); end
+if isempty(motion_corrected_path)
+    motion_corrected_path = fullfile(data_path, '..', 'motion_corrected');
+    if ~isfolder(motion_corrected_path)
+        error("The filepath for motion corrected videos does not exist. Use 'motion_corrected_path' parameter pointing to this folder.")
+    end
 end
 
-if debug_flag == 1; dir([data_path, '*.tif']); return; end
-if isempty(save_path)
-    warning("No save_path given. Saving data in data_path: %s\n", data_path);
-    save_path = data_path;
+if debug_flag == 1
+    dir([data_path '/' '*.mat*'])
+    dir([data_path '/' '*.h*']) 
+    dir([data_path '/' '*.fig*'])
+    return; 
 end
 
-files = dir(fullfile(data_path, '*.h*'));
-if isempty(files)
-    error('No suitable data files found in: \n  %s', data_path);
-end
+if ~(start_plane<end_plane); error("Start plane must be < end plane"); end
 
-log_file_name = sprintf("%s_collation.log", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
-log_full_path = fullfile(save_path, log_file_name);
+log_file_name = sprintf("%s_axial_offset_correction.log", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+log_full_path = fullfile(data_path, log_file_name);
 fid = fopen(log_full_path, 'w');
 if fid == -1
     error('Cannot create or open log file: %s', log_full_path);
 else
     fprintf('Log file created: %s\n', log_full_path);
 end
-% closeCleanupObj = onCleanup(@() fclose(fid));
 
-calib_files = fullfile(data_path, 'pollen*');
-calib_files = dir(calib_files);
+calib_files = dir(fullfile(data_path, 'pollen*'));
 if length(calib_files) < 2
     error("Missing pollen calibration files in folder:\n%s\n", data_path);
 else
@@ -113,14 +120,21 @@ if ~exist("diffx", "var")
 end
 
 fprintf(fid, '%s : Beginning axial offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+fprintf('%s : Beginning axial offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+
 tall = tic;
-for curr_plane = start_plane:end_plane
-    if curr_plane + 1 > end_plane
-        fprintf("Current plane (%d) > Last Plane (%d)", curr_plane, end_plane);
+%% --------------------------------------------------------------------
+
+for plane_idx = start_plane:end_plane
+    plane_name = sprintf("%s/motion_corrected_plane_%d.h5",motion_corrected_path,plane_idx);
+    h5_segmented = sprintf("%s/segmented_plane_%d.h5",data_path,plane_idx);
+
+    if plane_idx == end_plane
+        log_message(fid, "Reached final plane: %d\n", end_plane);
         continue;
     end
-    plane_name = sprintf("%s/segmented_plane_%d.h5", data_path, curr_plane);
-    plane_name_save = sprintf("%s/collated_plane_%d.h5", save_path, curr_plane);
+
+    plane_name_save = sprintf("%s/axial_corrected_plane_%d.h5", data_path, plane_idx);
     if isfile(plane_name_save)
         fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
         if overwrite
@@ -128,22 +142,27 @@ for curr_plane = start_plane:end_plane
             delete(plane_name_save)
         end
     end
-    if plane_idx == start_plane
-        metadata = read_h5_metadata(plane_name, '/');
-        if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
-        log_metadata(metadata, log_full_path,fid);
-    end
 
-    Y = h5read(plane_name, dataset_name);
-    Y = Y - min(Y(:));
-    volume_size = size(Y);
+    metadata = read_h5_metadata(plane_name, '/');
+    if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
+    log_struct(fid,metadata,'metadata', log_full_path);
 
-    r_thr = metadata.r_thr;
     pixel_resolution = metadata.pixel_resolution;
-    min_snr = metadata.min_snr;
+
+    % r_thr = metadata.r_thr;
+    % pixel_resolution = metadata.pixel_resolution;
+    % min_snr = metadata.min_snr;
     frameRate = metadata.frame_rate;
-    FOVx = metadata.fovx;
-    FOVy = metadata.fovy;
+
+    r_thr = 0.4;
+    % pixel_resolution = 1;
+    min_snr = 1.5;
+    % frameRate = 9.61;
+    FOVx = 600;
+    FOVy = 600*0.97;
+
+    % FOVx = metadata.fovx;
+    % FOVy = metadata.fovy;
 
     tau = ceil(7.5/pixel_resolution);
 
@@ -154,6 +173,7 @@ for curr_plane = start_plane:end_plane
     num_ovlpd = 0;
 
     Ac_keep = h5read(h5_segmented, '/Ac_keep');
+    
     T_keep = h5read(h5_segmented, '/T_keep');
 
     Cn = h5read(h5_segmented, '/Cn');
@@ -178,10 +198,11 @@ for curr_plane = start_plane:end_plane
 
     if size(rVals)>0
         kp = logical(rVals>r_thr & fitness<min_fitness);
+        Ym = h5read(plane_name, '/Ym');
 
         T = T_keep(kp,:);
         C = C_keep(kp,:);
-        Y = Ym;
+        
         A = Ac_keep(:,:,kp);
         K = size(T,1);
         Kms(1) = K;
@@ -196,7 +217,7 @@ for curr_plane = start_plane:end_plane
         bbb = b;
         T = NaN(1,size(fff,2));
         C = NaN(1,size(fff,2));
-        Y = Ym;
+        Y = h5read(plane_name, '/Ym');
         A = NaN(size(bbb,1),1);
         K = 1;
         Kms(1) = K;
@@ -207,7 +228,7 @@ for curr_plane = start_plane:end_plane
     N_all = N;
     C_all = C;
 
-    c = load([path 'mean_neuron_offsets.mat'],'offsets');
+    c = load([data_path '/' 'mean_3_neuron_offsets.mat'],'offsets');
     offsets = round(c.offsets);
 
     xo = cumsum(-offsets(:,2));
@@ -216,11 +237,10 @@ for curr_plane = start_plane:end_plane
     yo = cumsum(-offsets(:,1));
     yo = yo-min(yo);
 
-    for ijk = 2:28
+    for ijk = start_plane:end_plane
 
         disp(['Beginning calculation for plane ' num2str(ijk)])
-
-        pm = load([path 'caiman_output_plane_' num2str(ijk) '.mat']);
+        pm = load([data_path '/' 'caiman_output_plane_' num2str(ijk) '.mat']);
 
         Tinit = pm.T_keep;
         [fitness] = compute_event_exceptionality(Tinit,Nsamples,0);
@@ -233,7 +253,6 @@ for curr_plane = start_plane:end_plane
 
         Tm = pm.T_keep(kpm,:);
         Cm = pm.C_keep(kpm,:);
-        Ym = pm.Ym;
         Am = pm.Ac_keep(:,:,kpm);
         Km = size(Tm,1);
         Kms(ijk) = Km;
@@ -307,7 +326,7 @@ for curr_plane = start_plane:end_plane
         C_all = cat(1,C_all,Cm);
         T = Tm;
         C = Cm;
-        Y = Ym;
+        Y = h5read(plane_name, '/Ym');
         A = Am;
         N = Nm;
 
@@ -344,9 +363,9 @@ for curr_plane = start_plane:end_plane
 
     %% Z plane correction
     try
-        open([path 'pollen_calibration_Z_vs_N.fig'])
+        open([data_path '/' 'pollen_calibration_Z_vs_N.fig'])
     catch
-        open([path 'pollen_calibration_z_vs_N.fig'])
+        open([data_path '/' 'pollen_calibration_z_vs_N.fig'])
     end
 
     fig = gcf;
@@ -365,6 +384,9 @@ for curr_plane = start_plane:end_plane
     nz = ftz(nz);
     curvz = 158/2500^2;
     nz = nz - curvz.*((ny-FOVy/2).^2 + (nx-FOVx/2).^2);
+
+    % z0 = str2double(inputdlg('Enter minimum depth (um):'));
+    z0 = 0;
     nz = nz+z0;
 
     keep = logical(nz>0);
@@ -380,16 +402,16 @@ for curr_plane = start_plane:end_plane
     histogram(nz/1000)
     title('Neuron distribution in z')
     xlabel('z (mm)')
-    saveas(gcf,[path 'all_neuron_z_distribution.fig'])
+    saveas(gcf,[data_path '/' 'all_neuron_z_distribution.fig'])
 
     figure;
     histogram(sqrt((nx-FOVx/2).^2 + (ny-FOVy/2).^2)/1000)
     title('Neuron distribution in r')
     xlabel('r (mm)')
-    saveas(gcf,[path 'all_neuron_r_distribution.fig'])
+    saveas(gcf,[data_path '/' 'all_neuron_r_distribution.fig'])
 
     %%
     disp('Planes collated. Saving data...')
-    savefast([path 'collated_caiman_output_minSNR_' strrep(num2str(min_snr),'.','p') '.mat'],'T_all','nx','ny','nz','C_all','offsets')
+    savefast([data_path '/' 'collated_caiman_output_minSNR_' strrep(num2str(min_snr),'.','p') '.mat'],'T_all','nx','ny','nz','C_all','offsets')
 
 end

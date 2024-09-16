@@ -4,8 +4,9 @@ function [offsets] = calculateZOffset(data_path, varargin)
 % data_path : string
 %     Path to the directory containing the image data and calibration files.
 %     The function expects to find 'pollen_sample_xy_calibration.mat' in this directory along with each caiman_output_plane_N.
-% save_path : char
-%     Path to the directory to save the motion vectors.
+% motion_corrected_path: string
+%     Path to motion corrected data. Default is
+%     data_path/../motion_corrected/
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Default is 0.
@@ -47,7 +48,6 @@ function [offsets] = calculateZOffset(data_path, varargin)
 
 p = inputParser;
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
-addParameter(p, 'save_path', '', @(x) ischar(x) || isstring(x));
 addParameter(p, 'motion_corrected_path', '', @(x) ischar(x) || isstring(x));
 addParameter(p, 'debug_flag', 0, @(x) isnumeric(x) && isscalar(x));
 addParameter(p, 'overwrite', 1, @(x) isnumeric(x) && isscalar(x));
@@ -64,7 +64,6 @@ end
 
 data_path = p.Results.data_path;
 motion_corrected_path = p.Results.motion_corrected_path;
-save_path = p.Results.save_path;
 debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
 start_plane = p.Results.start_plane;
@@ -72,16 +71,6 @@ end_plane = p.Results.end_plane;
 num_features = p.Results.num_features;
 
 if ~isfolder(data_path); error("%s does not exist", data_path); end
-% Make the save path in data_path/axial_corrected, if not given
-if isempty(save_path)
-    save_path = fullfile(data_path, 'axial_corrected');
-    if ~isfolder(save_path); mkdir(save_path);
-        warning('Creating save path since one was not provided, located: %s', save_path);
-    end
-elseif ~isfolder(save_path)
-    mkdir(save_path);
-end
-
 if isempty(motion_corrected_path)
     motion_corrected_path = fullfile(data_path, '..', 'motion_corrected');
     if ~isfolder(motion_corrected_path)
@@ -99,7 +88,7 @@ end
 if ~(start_plane<end_plane); error("Start plane must be < end plane"); end
 
 log_file_name = sprintf("%s_axial_offset_correction.log", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
-log_full_path = fullfile(save_path, log_file_name);
+log_full_path = fullfile(data_path, log_file_name);
 fid = fopen(log_full_path, 'w');
 if fid == -1
     error('Cannot create or open log file: %s', log_full_path);
@@ -150,7 +139,7 @@ for plane_idx = start_plane:end_plane
         continue;
     end
 
-    plane_name_save = sprintf("%s/axial_corrected_plane_%d.h5", save_path, plane_idx);
+    plane_name_save = sprintf("%s/axial_corrected_plane_%d.h5", data_path, plane_idx);
     if isfile(plane_name_save)
         fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
         if overwrite
@@ -267,7 +256,8 @@ for plane_idx = start_plane:end_plane
 end
 
 offsets = round(offsets);
-save(fullfile(save_path, sprintf('mean_%d_neuron_offsets.mat', num_features)), 'offsets');
+save(fullfile(data_path, sprintf('mean_%d_neuron_offsets.mat', num_features)), 'offsets');
+fclose('all');
 
 function [x, y] = safe_ginput(active_ax, other_ax)
     valid = false;

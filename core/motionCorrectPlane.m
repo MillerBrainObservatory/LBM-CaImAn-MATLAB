@@ -68,7 +68,7 @@ if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", data_path);
 
 % Make the save path in data_path/assembleed, if not given
 if isempty(save_path)
-    save_path = fullfile(data_path, 'corrected');
+    save_path = fullfile(data_path, '../', 'motion_corrected');
     if ~isfolder(save_path); mkdir(save_path);
         warning('Creating save path since one was not provided, located: %s', save_path);
     end
@@ -78,7 +78,7 @@ end
 
 if debug_flag == 1; dir([data_path '/' '*.h*']); return; end
 
-files = dir(fullfile(data_path, '*assembleed_plane_*.h*'));
+files = dir(fullfile(data_path, '*assembled_plane_*.h*'));
 if isempty(files)
     error('No suitable data files found in: \n  %s', data_path);
 end
@@ -105,7 +105,7 @@ for plane_idx = start_plane:end_plane
     log_message(fid, 'Beginning plane %d\n', plane_idx);
 
     z_str = sprintf('plane_%d', plane_idx);
-    plane_name = sprintf("%s/assembleed_%s.h5", data_path, z_str);
+    plane_name = sprintf("%s/assembled_%s.h5", data_path, z_str);
     plane_name_save = sprintf("%s/motion_corrected_%s.h5", save_path, z_str);
 
     if plane_idx == start_plane
@@ -252,7 +252,7 @@ for plane_idx = start_plane:end_plane
     h5create(plane_name_save,"/shifts_x",  size(shifts_x));
     h5create(plane_name_save,"/shifts_y",  size(shifts_y));
     h5create(plane_name_save,"/Ym",        size(mM2));
-    
+
     h5write(plane_name_save, '/shifts_x',  shifts_x);
     h5write(plane_name_save, '/shifts_y',  shifts_y);
     h5write(plane_name_save, '/Ym',        mM2);

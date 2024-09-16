@@ -360,6 +360,7 @@ for plane_idx = 1:num_planes
 end
 
 % Cleanup temporarily created files
+raw_files = dir([save_path '/' '*raw_plane_*.h5']);
 for i = 1:length(raw_files)
     file_to_delete = fullfile(raw_files(i).folder, raw_files(i).name);
     delete(file_to_delete);
@@ -391,7 +392,7 @@ if dim == 1
     end
 end
 if offset ~= 0
-    dataOut = dataOut(:, 1+(abs(offset)/2):end-(abs(offset)/2), :, :);
+    dataOut = dataOut(:, 1+ciel(abs(offset)/2):end-(abs(offset)/2), :, :);
 end
 end
 
