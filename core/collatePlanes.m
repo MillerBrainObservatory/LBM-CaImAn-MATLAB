@@ -138,8 +138,6 @@ end
 fprintf(fid, '%s : Beginning offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 fprintf('%s : Beginning offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 
-tall = tic;
-
 %% --------------------------------------------------------------------
 plane_name = sprintf("%s/motion_corrected_plane_1.h5",motion_corrected_path);
 h5_segmented = sprintf("%s/segmented_plane_1.h5",data_path);
@@ -152,24 +150,22 @@ pixel_resolution = metadata.pixel_resolution;
 frameRate = metadata.frame_rate;
 
 r_thr = 0.4;
-min_snr = 0.2;
+min_snr = 1.5;
+merge_thr = 0.2;
 
 FOVx = 600;
 FOVy = 600*0.97;
 
 tau = ceil(7.5/pixel_resolution);
 
-merge_thr = 0.8;
-ovp_thr = 0.0;
 Kms = zeros(30,1);
 num_corr_no_ovp = 0;
 num_ovlpd = 0;
 
 Ac_keep = h5read(h5_segmented, '/Ac_keep');
-
 T_keep = h5read(h5_segmented, '/T_keep');
-log_message(fid, 'T_keep pre: %d\n', size(T_keep));
 
+Ym = h5read(plane_name, '/Ym');
 Cn = h5read(h5_segmented, '/Cn');
 C_keep = h5read(h5_segmented, '/C_keep');
 Km = h5read(h5_segmented, '/Km');
@@ -179,6 +175,8 @@ acy = h5read(h5_segmented, '/acy');
 f = h5read(h5_segmented, '/f');
 b = h5read(h5_segmented, '/b');
 rVals = h5read(h5_segmented, '/rVals');
+
+num_traces_pre = size(T_keep, 1);
 
 % rVals = p.rVals;
 
@@ -192,7 +190,6 @@ clear Tinit
 
 if size(rVals)>0
     kp = logical(rVals>r_thr & fitness<min_fitness);
-    Ym = h5read(plane_name, '/Ym');
 
     T = T_keep(kp,:);
     C = C_keep(kp,:);
@@ -211,7 +208,7 @@ else
     bbb = b;
     T = NaN(1,size(fff,2));
     C = NaN(1,size(fff,2));
-    Y = h5read(plane_name, '/Ym');
+    Y = Ym;
     A = NaN(size(bbb,1),1);
     K = 1;
     Kms(1) = K;
@@ -331,7 +328,6 @@ end
 
 is = ~isnan(sum(T_all,2));
 T_all = T_all(is,:);
-C_all = C_all(is,:);
 N_all = N_all(is,:);
 
 C_all = zeros(size(T_all),'single');
@@ -393,7 +389,8 @@ nx = nx(keep);
 ny = ny(keep);
 nz = nz(keep);
 
-log_message(fid, 'T_keep post: %d\n', size(T_keep, 1));
+num_traces_post = size(T_keep, 1);
+log_message(fid, 'T_keep pre/post refinement: (%d/%d)\n', num_traces_pre, num_traces_post);
 
 figure;
 histogram(nz/1000)
@@ -407,6 +404,5 @@ title('Neuron distribution in r')
 xlabel('r (mm)')
 saveas(gcf,fullfile(fig_save_path, 'all_neuron_r_distribution.fig'))
 
-%%
 disp('Planes collated. Saving data...')
 savefast([fig_save_path '/' 'collated_caiman_output_minSNR_' strrep(num2str(min_snr),'.','p') '.mat'],'T_all','nx','ny','nz','C_all','offsets')

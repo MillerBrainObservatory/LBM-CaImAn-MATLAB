@@ -183,20 +183,47 @@ for plane_idx = start_plane:end_plane
     sz = 0.1; % IF FOOTPRINTS ARE TOO SMALL, CONSIDER sz = 0.1
     mx = ceil(pi.*(1.33.*tau).^2);
     mn = floor(pi.*(tau.*0.5).^2); % SHRINK IF FOOTPRINTS ARE TOO SMALL
+    p = 2; % order of dynamics
+
+    % patch set up; basing it on the ~600 um strips of the 2pRAM, +50 um overlap between patches
     sizY = size(data);
-    patch_size = [100,100];
-    overlap = [10,10];
+    patch_size = round(650/pixel_resolution).*[1,1];
+    overlap = [1,1].*ceil(50./pixel_resolution);
     patches = construct_patches(sizY(1:end-1),patch_size,overlap);
-    K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2);
-    disp(K);
-    % patch_size = [64,64];                   % size of each patch along each dimension (optional, default: [32,32])
-    % overlap = [16,16];                        % amount of overlap in each dimension (optional, default: [4,4])
-    % 
-    % patches = construct_patches(sizY(1:end-1),patch_size,overlap);
-    K = 7;                                            % number of components to be found / patch
-    tau = 8;                                          % std of gaussian kernel (half size of neuron) 
-    p = 2;                                            % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
-    % 
+
+    K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2); % number of components based on assumption of 9.2e4 neurons/mm^3
+        
+    % Set caiman parameters
+    log_message(fid, "Using default CNMF parameters.\n")
+
+    % Set caiman parameters
+    options = CNMFSetParms(...   
+    'd1',d1,'d2',d2,...                         % dimensionality of the FOV
+    'deconv_method','constrained_foopsi',...    % neural activity deconvolution method
+    'temporal_iter',3,...                       % number of block-coordinate descent steps 
+    'maxIter',15,...                            % number of NMF iterations during initialization
+    'spatial_method','regularized',...          % method for updating spatial components
+    'df_prctile',20,...                         % take the median of background fluorescence to compute baseline fluorescence 
+    'p',p,...                                   % order of AR dynamics    
+    'gSig',tau,...                              % half size of neuron
+    'merge_thr',merge_thresh,...                % merging threshold  
+    'nb',1,...                                  % number of background components  
+    'gnb',3,...         
+    'min_SNR',min_SNR,...                       % minimum SNR threshold
+    'space_thresh',space_thresh ,...            % space correlation threshold
+    'decay_time',0.5,...                        % decay time of transients, GCaMP6s
+    'size_thr', sz, ...
+    'search_method','ellipse',...
+    'min_size', round(tau), ...                 % minimum size of ellipse axis (default: 3)
+    'max_size', 2*round(tau), ....              % maximum size of ellipse axis (default: 8)
+    'dist', dist, ...                           % expansion factor of ellipse (default: 3)
+    'max_size_thr',mx,...                       % maximum size of each component in pixels (default: 300)
+    'time_thresh',time_thresh,...
+    'min_size_thr',mn,...                       % minimum size of each component in pixels (default: 9)
+    'refine_flag',0,...
+    'rolling_length',ceil(frame_rate*5),...
+    'fr', frame_rate);                                      % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
+    
     poolobj = gcp('nocreate'); % create a parallel pool
     if isempty(poolobj)
         disp('Starting the parallel pool...')
@@ -208,39 +235,6 @@ for plane_idx = start_plane:end_plane
         numworkers = poolobj.NumWorkers;
         disp(['Continuing with existing pool of ' num2str(numworkers) '.'])
     end
-    
-    % Set caiman parameters
-    log_message(fid, "Using default CNMF parameters.\n")
-    options = CNMFSetParms(...
-        'd1',d1,'d2',d2,...                         % dimensionality of the FOV
-        'deconv_method','constrained_foopsi',...    % neural activity deconvolution method
-        'temporal_iter',3,...                       % number of block-coordinate descent steps
-        'maxIter',15,...                            % number of NMF iterations during initialization
-        'spatial_method','regularized',...          % method for updating spatial components
-        'df_prctile',20,...                         % take the median of background fluorescence to compute baseline fluorescence
-        'p',p,...                                   % order of AR dynamics
-        'gSig',tau,...                              % half size of neuron
-        'merge_thr',merge_thresh,...                % merging threshold
-        'nb',1,...                                  % number of background components
-        'gnb',3,...
-        'min_SNR',min_SNR,...                       % minimum SNR threshold
-        'space_thresh',space_thresh ,...            % space correlation threshold
-        'decay_time',0.5,...                        % decay time of transients, GCaMP6s
-        'size_thr', sz, ...
-        'min_size', round(tau), ...                 % minimum size of ellipse axis (default: 3)
-        'max_size', 2*round(tau), ...               % maximum size of ellipse axis (default: 8)
-        'dist', dist, ...                           % expansion factor of ellipse (default: 3)
-        'max_size_thr',mx,...                       % maximum size of each component in pixels (default: 300)
-        'time_thresh',time_thresh,...
-        'min_size_thr',mn,...                       % minimum size of each component in pixels (default: 9)
-        'refine_flag',0,...
-        'rolling_length',ceil(frame_rate*5),...
-        'fr', frame_rate, ...
-        'plot_df', 1, ...
-        'make_gif', 1, ...
-        'save_avi', 1, ...
-        'name', fullfile(fig_save_path, 'segmented.avi') ...
-    );
 
     log_message(fid, "Data loaded in. This process took: %0.2f seconds... Beginning CNMF.\n\n", toc(t_start));
     log_message(fid, "--------------------------------------------------\n");
