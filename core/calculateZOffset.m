@@ -131,6 +131,13 @@ fprintf('%s : Beginning axial offset correction...\n', datestr(datetime('now'), 
 tall = tic;
 for plane_idx = start_plane:end_plane
 
+      % Check if the figure was closed
+    if ~isvalid(h1)
+        disp('User closed the GUI. Exiting...');
+        fclose(fid);  % Close the log file
+        return;
+    end
+
     plane_name = sprintf("%s/motion_corrected_plane_%d.h5",motion_corrected_path,plane_idx);
     plane_name_next = sprintf("%s/motion_corrected_plane_%d.h5",motion_corrected_path,plane_idx + 1);
 
