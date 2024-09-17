@@ -36,6 +36,9 @@ function convertScanImageTiffToVolume(data_path, varargin)
 %     Pixels to trim from [left, right, top, bottom] edge of each **TILED IMAGE** before
 %     horizontally concatenating the ROI's within an image. Default is
 %     [0 0 0 0]. Only applies to ScanImage multi-ROI recordings.
+% z_plane_order : double, optional
+%     If interleaved z-planes are not ordered from 1-n_planes, reorder the
+%     stack using this array as index.
 
 % Add necessary paths
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath')));
@@ -210,9 +213,10 @@ for file_idx = 1:num_files
     size_y=size(hTif);
     hTif=reshape(hTif, [size_y(1), size_y(2), num_planes, num_frames]);
     hTif=permute(hTif, [2 1 3 4]);
-    plane_order = fliplr([1 5:10 2 11:17 3 18:23 4 24:30]);
-
-    hTif = hTif(:,:,plane_order,:);
+    
+    if z_plane_order
+        hTif = hTif(:,:,z_plane_order,:);
+    end
 
     for pi = 1:num_planes
         tps = tic;
