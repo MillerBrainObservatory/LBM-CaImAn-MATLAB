@@ -1,17 +1,42 @@
 clear;
-gcp;    % start a local cluster
-filename = fullfile('D:\DATA\2024-07-31_GCaMP8s_mk717\mk717_1umpx_7p72hz_224pxby668px_3mroi_350mw_50to550umdeep_00001\registration_roi2/motion_corrected_plane_14.h5');
 
-Y = read_file(fullfile(filename));
-[d1,d2,T] = size(Y);    % dimensions of file
-Y = Y - min(Y(:));      % remove negative offset
+tsub = 6;
 
-minY = quantile(Y(1:1e7),0.0005);
-maxY = quantile(Y(1:1e7),1-0.0005);
+raw = "C://Users/RBO/caiman_data/animal_01/session_01/assembled/assembled_plane_26.h5";
+motion_corrected = "C://Users/RBO/caiman_data/animal_01/session_01/motion_corrected/motion_corrected_plane_26.h5";
+segmented = "C://Users/RBO/caiman_data/animal_01/session_01/segmented_2/segmented_plane_26.h5";
+
+h5disp(segmented);
+
+Cn = h5read(segmented, '/Cn');
+rVals = h5read(segmented, '/rVals');
+rVals = h5read(segmented, '/rVals');
+T_keep = h5read(segmented, '/T_keep');
+C_keep = h5read(segmented, '/C_keep');
+Ac_keep = h5read(segmented, '/Ac_keep');
+acm = h5read(segmented, '/acm');
+acx = h5read(segmented, '/acx');
+acy = h5read(segmented, '/acy');
+b = h5read(segmented, '/b');
+f = h5read(segmented, '/f');
+
+Km = h5read(segmented, '/Km');
+
+Y_raw = h5read(raw, '/Y');
+Y_raw = downsample_data(Y_raw, 'time', tsub);
+Ym_raw = h5read(raw, '/Ym');
+
+Y_mc = h5read(motion_corrected, '/Y');
+Y_mc = downsample_data(Y_mc, 'time', tsub);
+Ym_raw = h5read(motion_corrected, '/Ym');
 
 %%  view data
-% figure;play_movie({Y},{'raw data'},minY,maxY);
+figure;play_movie({Y_raw, Y_mc},{'raw data', 'motion-corrected data'});
     
+%% save data
+filename = "C://Users/RBO/caiman_data/animal_01/session_01/motion_corrected/raw_mc_plane_26.mp4";
+figure;write_frames_to_mp4([Y_raw Y_mc], filename, 30);
+
 %% perform motion correction (start with rigid)
 % parameters motion correction
 % 'd1','d2': size of FOV
@@ -27,7 +52,7 @@ tsub = 5;   % downsampling factor (only for display purposes)
 Y_sub = downsample_data(Y,'time',tsub);
 M_rgs = downsample_data(M_rg,'time',tsub);
 
-play_movie({Y_sub,M_rgs},{'raw data','rigid'},minY,maxY);
+play_movie({Y_sub,M_rgs},{'raw data','rigid'});
 
 %% perform non-rigid motion correction    
 % parameters motion correction
@@ -116,8 +141,19 @@ tic;
 toc
 
 %% a simple GUI
-Cn = correlation_image_max(M_nr);
+mat_segmented = fullfile("C://Users/RBO/caiman_data/animal_01/session_01/segmented_2/caiman_output_plane_26.mat");
+mat_segmented = open(mat_segmented);
+
+h5_segmented = fullfile("C://Users/RBO/caiman_data/animal_01/session_01/segmented_2/segmented_plane_26.h5");
+h5_segmented = h5read(h5_segmented, '/T_keep');
+
 Coor = plot_contours(A,Cn,options,1); close;
+
+%%
+h5_segmented_jeff = fullfile("D://Jeffs LBM paper data/Fig4a-c/20191121/MH70/caiman_output_plane_26.mat");
+h5_segmented_jeff = open(h5_segmented_jeff);
+
+x = 2;
 %%
 %this will create a User interface for the rest of the pipeline described in demoscript and 
 %demo pipeline. LOOK at demo pipeline to understand how to use this GUI and what to pass it
@@ -157,9 +193,9 @@ C_keep = C(keep,:);
 df_percentile = 30;
 window = 1000; 
 
-F = diag(sum(A_keep.^2))*(C2 + YrA2);  % fluorescence
-Fd = prctfilt(F,df_percentile,window);                      % detrended fluorescence
-Bc = prctfilt((A_keep'*b)*f2,30,1000,300,0) + (F-Fd);       % background + baseline for each component
+F = diag(sum(A_keep.^2))*(C2 + YrA2);                   % fluorescence
+Fd = prctfilt(F,df_percentile,window);                  % detrended fluorescence
+Bc = prctfilt((A_keep'*b)*f2,30,1000,300,0) + (F-Fd);   % background + baseline for each component
 F_dff = Fd./Bc;
 
 %% deconvolve data
