@@ -33,6 +33,13 @@ function Ath = threshold_components(A,options)
     if options.d3 > 1; options.thr_method = 'nrg'; end
     [d,nr] = size(A);
     Ath = spalloc(d,nr,nnz(A));
+    disp("Threshold Components --------------------")
+    disp(options.nb)
+    disp(nr)
+    disp(nr-options.nb+1:nr)
+
+    disp("Threshold Components --------------------")
+
     Ath(:,nr-options.nb+1:nr) = A(:,nr-options.nb+1:nr);
     indf = cell(nr,1);
     valf = cell(nr,1);

@@ -4,7 +4,7 @@ function motionCorrectPlane(data_path, varargin)
 % Parameters
 % ----------
 % data_path : char
-%     Path to the directory containing the files extracted via convertScanImageTiffToVolume.
+%     Path to the directory containing the files assembled via convertScanImageTiffToVolume.
 % save_path : char
 %     Path to the directory to save the motion vectors.
 % ds : char, optional
@@ -66,9 +66,9 @@ options = p.Results.options;
 
 if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", data_path); end
 
-% Make the save path in data_path/extracted, if not given
+% Make the save path in data_path/assembled, if not given
 if isempty(save_path)
-    save_path = fullfile(data_path, 'extracted');
+    save_path = fullfile(data_path, '../', 'motion_corrected');
     if ~isfolder(save_path); mkdir(save_path);
         warning('Creating save path since one was not provided, located: %s', save_path);
     end
@@ -78,7 +78,7 @@ end
 
 if debug_flag == 1; dir([data_path '/' '*.h*']); return; end
 
-files = dir(fullfile(data_path, '*extracted_plane_*.h*'));
+files = dir(fullfile(data_path, '*assembled_plane_*.h*'));
 if isempty(files)
     error('No suitable data files found in: \n  %s', data_path);
 end
@@ -105,7 +105,7 @@ for plane_idx = start_plane:end_plane
     log_message(fid, 'Beginning plane %d\n', plane_idx);
 
     z_str = sprintf('plane_%d', plane_idx);
-    plane_name = sprintf("%s/extracted_%s.h5", data_path, z_str);
+    plane_name = sprintf("%s/assembled_%s.h5", data_path, z_str);
     plane_name_save = sprintf("%s/motion_corrected_%s.h5", save_path, z_str);
 
     if plane_idx == start_plane
@@ -206,15 +206,10 @@ for plane_idx = start_plane:end_plane
         title('Mean rigid template', 'fontsize',10,'fontweight','bold', 'Color', 'k');
 
         ax3 = subplot(2, 3, 3); imagesc(mM2); axis equal; axis tight; axis off;
-        title('Rean non-rigid corrected', 'fontsize',10,'fontweight','bold', 'Color', 'k');
-
+        title('mean non-rigid corrected', 'Color', 'black', 'FontWeight', 'bold');
         subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid');
-        title('Pixel-wise Correlation', 'fontsize',10,'fontweight','bold', 'Color', 'k');
-        ylabel('Correlation-coefficient (r)', 'fontsize',10,'fontweight','bold', 'Color', 'k');
-        xlabel('Frame','fontsize',10,'fontweight','bold', 'Color', 'k');
-        axis square;
-
-        subplot(2, 3, 5); scatter(cY, cM1, 'MarkerEdgeColor', 'w'); hold on;
+        title('correlation coefficients', 'Color', 'black', 'FontWeight', 'bold');
+        subplot(2, 3, 5); scatter(cY, cM1); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
         title('Template vs Mean Image Correlation','fontsize',10,'fontweight','bold', 'Color', 'k');
         xlabel('Raw data correlation', 'fontsize',10,'fontweight','bold', 'Color', 'k');
@@ -222,10 +217,7 @@ for plane_idx = start_plane:end_plane
 
         subplot(2, 3, 6); scatter(cM1, cM2,  'MarkerEdgeColor', 'w'); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        title('Non-Rigid vs Rigid Correlation', 'fontsize',10,'fontweight','bold', 'Color', 'k');
-        xlabel('Rigid template');
-        ylabel('Corrected correlation');
-
+        xlabel('rigid template', 'Color', 'black', 'FontWeight', 'bold'); ylabel('non-rigid correlation', 'Color', 'black', 'FontWeight', 'bold');
         linkaxes([ax1, ax2, ax3], 'xy');
         savefig(metrics_name_fig)
         exportgraphics(f, metrics_name_png, 'Resolution', 600);
@@ -244,12 +236,14 @@ for plane_idx = start_plane:end_plane
         shifts_name_png = sprintf("%s_shifts.png", fig_plane_name);
         shifts_name_fig = sprintf("%s_shifts.fig", fig_plane_name);
         f = figure;
-        ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2); title('correlation coefficients'); legend('raw data','rigid','non-rigid');
+        ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2);
+        title('correlation coefficients', 'Color', 'black', 'FontWeight', 'bold');
+        legend('raw data','registered data','non-rigid', 'Color', 'black', 'FontWeight', 'bold');
         set(gca,'Xtick',[])
-        ax2 = subplot(312); plot(shifts_x, 'LineWidth',.2); title('displacements along x')
+        ax2 = subplot(312); plot(shifts_x, 'LineWidth',.2); title('displacements along x', 'Color', 'black', 'FontWeight', 'bold')
         set(gca,'Xtick',[])
-        ax3 = subplot(313); plot(shifts_y); title('displacements along y')
-        xlabel('timestep')
+        ax3 = subplot(313); plot(shifts_y); title('displacements along y', 'Color', 'black', 'FontWeight', 'bold')
+        xlabel('timestep', 'Color', 'black', 'FontWeight', 'bold')
         linkaxes([ax1,ax2,ax3],'x')
         exportgraphics(f,shifts_name_png, 'Resolution', 600);
         savefig(shifts_name_fig);
@@ -261,7 +255,7 @@ for plane_idx = start_plane:end_plane
     h5create(plane_name_save,"/shifts_x",  size(shifts_x));
     h5create(plane_name_save,"/shifts_y",  size(shifts_y));
     h5create(plane_name_save,"/Ym",        size(mM2));
-    
+
     h5write(plane_name_save, '/shifts_x',  shifts_x);
     h5write(plane_name_save, '/shifts_y',  shifts_y);
     h5write(plane_name_save, '/Ym',        mM2);

@@ -25,11 +25,14 @@ function write_metadata_h5(metadata, h5_fullfile, loc)
 % write_metadata_h5(metadata, h5_fullfile, loc);
 if ~exist('loc', 'var'); loc='/'; end
 fields = fieldnames(metadata);
+
 for f = fields'
+    disp(f{1});
     value = metadata.(f{1});
     if isstruct(value)
         % Flatten struct fields that aren't supported by hdf5
         subfields = fieldnames(value);
+
         for sf = subfields'
             subvalue = value.(sf{1});
             att_name = [f{1} '_' sf{1}];
@@ -49,10 +52,15 @@ for f = fields'
                 warning("Failed to write attribute '%s': %s", att_name, ME.message);
             end
         end
-    else
-        if islogical(value)
-            value=num2str(value);
-        end
-        h5writeatt(h5_fullfile, loc, f{1}, value);
+    elseif islogical(value)
+        value=num2str(value);
     end
+    try
+        h5writeatt(h5_fullfile, loc, f{1}, value);
+    catch
+        warning("Error writing attribute: %s", f{1});
+        continue
+    end
+
 end
+

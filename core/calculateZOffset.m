@@ -1,19 +1,12 @@
-function [offsets] = calculateZOffset(data_path, segmentation_path, save_path, varargin)
+function [offsets] = calculateZOffset(data_path, varargin)
 % Parameters
 % ----------
 % data_path : string
 %     Path to the directory containing the image data and calibration files.
 %     The function expects to find 'pollen_sample_xy_calibration.mat' in this directory along with each caiman_output_plane_N.
-% segmentation_path : char
-%     Path to the directory containing CaImAn (step 3) segmentation results.
-% save_path : char
-%     Path to the directory to save the motion vectors.
-% base_name : char
-%     Base name of motion-corrected data file. Default is
-%     'motion_corrected'.
-% dataset_name : string, optional
-%     Group path within the hdf5 file that contains raw data.
-%     Default is '/Y'.
+% motion_corrected_path: string
+%     Path to motion corrected data. Default is
+%     data_path/../motion_corrected/
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Default is 0.
@@ -54,41 +47,48 @@ function [offsets] = calculateZOffset(data_path, segmentation_path, save_path, v
 %
 
 p = inputParser;
-addRequired(p, 'data_path');
-addRequired(p, 'segmentation_path');
-addRequired(p, 'save_path');
-addOptional(p, 'dataset_name', "/mov", @(x) (ischar(x) || isstring(x)) && is_valid_group(x));
-addOptional(p, 'debug_flag', 0, @(x) isnumeric(x));
-addOptional(p, 'overwrite', 1, @(x) isnumeric(x));
-addOptional(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
-addOptional(p, 'end_plane', 2, @(x) isnumeric(x) && x >= p.Results.start_plane);
-addOptional(p, 'num_features', 3, @(x) isnumeric(x) && isPositiveIntegerValuedNumeric(x));
-addOptional(p, 'base_name', 'motion_corrected');
+addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
+addParameter(p, 'motion_corrected_path', '', @(x) ischar(x) || isstring(x));
+addParameter(p, 'debug_flag', 0, @(x) isnumeric(x) && isscalar(x));
+addParameter(p, 'overwrite', 1, @(x) isnumeric(x) && isscalar(x));
+addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
+addParameter(p, 'end_plane', 2, @(x) isnumeric(x) && x > 0); % Remove dependence on start_plane
+addParameter(p, 'num_features', 3, @(x) isnumeric(x) && isPositiveIntegerValuedNumeric(x));
 
-parse(p, data_path, segmentation_path, save_path, varargin{:});
+parse(p, data_path, varargin{:});
+
+% ensure end_plane is greater than or equal to start_plane
+if p.Results.end_plane < p.Results.start_plane
+    error('end_plane must be greater than or equal to start_plane.');
+end
 
 data_path = p.Results.data_path;
-segmentation_path = p.Results.segmentation_path;
-save_path = p.Results.save_path;
-base_name = p.Results.base_name;
-dataset_name = p.Results.dataset_name;
+motion_corrected_path = p.Results.motion_corrected_path;
 debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
 num_features = p.Results.num_features;
 
-if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", data_path); end
-if ~isfolder(segmentation_path); error("Data path:\n %s\n ..does not exist", data_path); end
-if ~isfolder(save_path);mkdir(save_path); end
-if debug_flag == 1; dir([data_path, '*.tif']); return; end
+if ~isfolder(data_path); error("%s does not exist", data_path); end
+if isempty(motion_corrected_path)
+    motion_corrected_path = fullfile(data_path, '..', 'motion_corrected');
+    if ~isfolder(motion_corrected_path)
+        error("The filepath for motion corrected videos does not exist. Use 'motion_corrected_path' parameter pointing to this folder.")
+    end
+end
 
-files = dir(fullfile(data_path, '*.h*'));
-if isempty(files); error('No suitable data files found in: \n  %s', data_path); end
+if debug_flag == 1
+    dir([data_path '/' '*.mat*'])
+    dir([data_path '/' '*.h*']) 
+    dir([data_path '/' '*.fig*'])
+    return; 
+end
+
 if ~(start_plane<end_plane); error("Start plane must be < end plane"); end
 
 log_file_name = sprintf("%s_axial_offset_correction.log", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
-log_full_path = fullfile(save_path, log_file_name);
+log_full_path = fullfile(data_path, log_file_name);
 fid = fopen(log_full_path, 'w');
 if fid == -1
     error('Cannot create or open log file: %s', log_full_path);
@@ -96,7 +96,7 @@ else
     fprintf('Log file created: %s\n', log_full_path);
 end
 
-calib_files = dir(fullfile(segmentation_path, 'pollen*'));
+calib_files = dir(fullfile(data_path, 'pollen*'));
 if length(calib_files) < 2
     error("Missing pollen calibration files in folder:\n%s\n", data_path);
 else
@@ -131,10 +131,22 @@ fprintf('%s : Beginning axial offset correction...\n', datestr(datetime('now'), 
 tall = tic;
 for plane_idx = start_plane:end_plane
 
-    plane_name = sprintf("%s/%s_plane_%d.h5",data_path,base_name,plane_idx);
-    plane_name_next = sprintf("%s/%s_plane_%d.h5",data_path,base_name,plane_idx + 1);
+      % Check if the figure was closed
+    if ~isvalid(h1)
+        disp('User closed the GUI. Exiting...');
+        fclose(fid);  % Close the log file
+        return;
+    end
 
-    plane_name_save = sprintf("%s/axial_corrected_plane_%d.h5", save_path, plane_idx);
+    plane_name = sprintf("%s/motion_corrected_plane_%d.h5",motion_corrected_path,plane_idx);
+    plane_name_next = sprintf("%s/motion_corrected_plane_%d.h5",motion_corrected_path,plane_idx + 1);
+
+    if plane_idx == end_plane
+        log_message(fid, "Reached final plane: %d\n", end_plane);
+        continue;
+    end
+
+    plane_name_save = sprintf("%s/axial_corrected_plane_%d.h5", data_path, plane_idx);
     if isfile(plane_name_save)
         fprintf(fid, '%s : %s already exists.\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'), plane_name_save);
         if overwrite
@@ -143,11 +155,10 @@ for plane_idx = start_plane:end_plane
         end
     end
 
-    if plane_idx == start_plane
-        metadata = read_h5_metadata(plane_name, '/');
-        if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
-        log_struct(metadata,'metadata',log_full_path,fid);
-    end
+    metadata = read_h5_metadata(plane_name, '/');
+    if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
+    log_struct(fid,metadata,'metadata', log_full_path);
+
     pixel_resolution = metadata.pixel_resolution;
 
     dy = round(diffy/pixel_resolution);
@@ -252,7 +263,8 @@ for plane_idx = start_plane:end_plane
 end
 
 offsets = round(offsets);
-save(fullfile(data_path, fprintf('mean_%d_neuron_offsets.mat', num_features)), 'offsets');
+save(fullfile(data_path, sprintf('mean_%d_neuron_offsets.mat', num_features)), 'offsets');
+fclose('all');
 
 function [x, y] = safe_ginput(active_ax, other_ax)
     valid = false;
