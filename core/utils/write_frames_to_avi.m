@@ -97,19 +97,32 @@ sizX = siz(2)-2*buffer; if sizX/2 ~= round(sizX/2); sizX = sizX-1; end
 clf(h)
 
 for k = 1:numFrames
-    imagesc(x,y,data(:,:,k))
+    imagesc(x, y, data(:,:,k))
     axis image
     axis off
     colormap(gray)
     clim(cax)
     hold on
-    set(gca,'YDir','normal','XDir','reverse')
+    set(gca, 'YDir', 'normal', 'XDir', 'reverse')
+    
     frame = getframe;
-    I = frame.cdata(buffer+1:sizY+buffer,buffer+1:sizX+buffer,:);
-    writeVideo(writer_obj,I);
+    
+    % add dynamic size check to allow downsampled data input
+    frame_size = size(frame.cdata);
+    sizY = min(frame_size(1) - 2 * buffer, size(data, 1));
+    sizX = min(frame_size(2) - 2 * buffer, size(data, 2));
+    
+    if sizY < 1 || sizX < 1
+        error('Frame size too small or buffer is too large.');
+    end
+    
+    I = frame.cdata(buffer+1:buffer+sizY, buffer+1:buffer+sizX, :);
+    writeVideo(writer_obj, I);
+    
     pause(0.001);
     clf(h)
 end
+
 
 close(writer_obj)
 close(h)
