@@ -1,5 +1,8 @@
 function motionCorrectPlane(data_path, varargin)
-% MOTIONCORRECTPLANE Perform piecewise-rigid motion correction on imaging data.
+% Perform motion correction on imaging data.
+%
+% Each motion-corrected plane is saved as a .h5 group containing the 2D
+% shift vectors in x and y. The raw movie is saved in '/Y' and the
 %
 % Parameters
 % ----------
@@ -13,6 +16,8 @@ function motionCorrectPlane(data_path, varargin)
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
+% do_figures : double, integer, positive
+%     If true, correlation metrics will be saved to save_path/figures.
 % overwrite : logical, optional
 %     Whether to overwrite existing files (default is 1).
 % num_cores : double, integer, positive
@@ -28,8 +33,6 @@ function motionCorrectPlane(data_path, varargin)
 %
 % Notes
 % -----
-% Each motion-corrected plane is saved as a .h5 group containing the 2D
-%   shift vectors in x and y. The raw movie is saved in '/Y' and the
 %
 % - Only .h5 files containing processed volumes should be in the file_path.
 
@@ -101,18 +104,18 @@ num_cores = max(num_cores, 23);
 tall=tic; log_message(fid, 'Beginning registration with %d cores...\n', num_cores);
 for plane_idx = start_plane:end_plane
     tplane=tic;
-
+    
     log_message(fid, 'Beginning plane %d\n', plane_idx);
-
+    
     z_str = sprintf('plane_%d', plane_idx);
     plane_name = sprintf("%s/assembled_%s.h5", data_path, z_str);
     plane_name_save = sprintf("%s/motion_corrected_%s.h5", save_path, z_str);
-
+    
     if plane_idx == start_plane
         metadata = read_h5_metadata(plane_name);
         log_struct(fid, metadata,'metadata',log_full_path);
     end
-
+    
     if isfile(plane_name_save)
         log_message(fid, '%s already exists.\n',plane_name_save);
         if overwrite
@@ -120,7 +123,7 @@ for plane_idx = start_plane:end_plane
             delete(plane_name_save)
         end
     end
-
+    
     poolobj = gcp("nocreate"); % If no pool, do not create new one.
     if isempty(poolobj)
         log_message(fid, "Initializing parallel cluster with %d workers.\n", num_cores);
@@ -128,14 +131,14 @@ for plane_idx = start_plane:end_plane
         clust.NumWorkers=num_cores;
         parpool(clust,num_cores, 'IdleTimeout', 30);
     end
-
+    
     Y = read_plane(plane_name,'ds',ds,'plane',plane_idx);
-
+    
     volume_size = size(Y);
     d1 = volume_size(1);
     d2 = volume_size(2);
     pixel_resolution = metadata.pixel_resolution;
-
+    
     options_rigid = NoRMCorreSetParms(...
         'd1',d1,...
         'd2',d2,...
@@ -145,15 +148,15 @@ for plane_idx = start_plane:end_plane
         'init_batch',200,...              % #frames used to create template
         'correct_bidir', false...         % DONT Correct bidirectional scanning
         );
-
+    
     % start timer for registration after parpool to avoid inconsistent
     % pool startup times.
     t_rigid=tic;
-
+    
     log_message(fid, "Beginning batch template.\n");
     [M1,shifts1,~,~] = normcorre_batch(Y, options_rigid);
     log_message(fid, "Rigid registration complete. Elapsed time: %.3f minutes\n",toc(t_rigid)/60);
-
+    
     % create the template using X/Y shift displacements
     % with the least variance
     log_message(fid, "Calculating template...\n");
@@ -162,7 +165,7 @@ for plane_idx = start_plane:end_plane
     [~, minv_idx] = sort(shifts_v, 120);
     best_idx = unique(reshape(minv_idx, 1, []));
     template_good = mean(M1(:,:,best_idx), 3);
-
+    
     % % Non-rigid motion correction using the good template from the rigid
     if numel(options) < 3
         options = NoRMCorreSetParms(...
@@ -178,33 +181,33 @@ for plane_idx = start_plane:end_plane
             'correct_bidir', false...
             );
     end
-
+    
     % DFT subpixel registration - results used in CNMF
     t_nonrigid=tic; log_message(fid, "Template creation complete. Beginning non-rigid registration...\n");
     [M2, shifts2, ~, ~] = normcorre_batch(Y, options, template_good);
     log_message(fid, "Non-rigid registration complete. Elapsed time: %.3f minutes.\n",toc(t_nonrigid)/60);
-
+    
     if do_figures
-
+        
         log_message(fid, "Plotting registration metrics...\n");
-
+        
         fig_plane_name = sprintf("%s/plane_%d", fig_save_path, plane_idx);
         metrics_name_png = sprintf("%s_metrics.png", fig_plane_name);
         metrics_name_fig = sprintf("%s_metrics.fig", fig_plane_name);
-
+        
         [cY,mY,~] = motion_metrics(Y,10);
         [cM1,mM1,~] = motion_metrics(M1,10);
         [cM2,mM2,~] = motion_metrics(M2,10);
         T = length(cY);
-
+        
         f = figure('Visible', 'on', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
-
+        
         ax1 = subplot(2, 3, 1); imagesc(mY); axis equal; axis tight; axis off;
         title('Mean raw', 'fontsize',10,'fontweight','bold', 'Color', 'k');
-
+        
         ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off;
         title('Mean rigid template', 'fontsize',10,'fontweight','bold', 'Color', 'k');
-
+        
         ax3 = subplot(2, 3, 3); imagesc(mM2); axis equal; axis tight; axis off;
         title('mean non-rigid corrected', 'Color', 'black', 'FontWeight', 'bold');
         subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid');
@@ -214,7 +217,7 @@ for plane_idx = start_plane:end_plane
         title('Template vs Mean Image Correlation','fontsize',10,'fontweight','bold', 'Color', 'k');
         xlabel('Raw data correlation', 'fontsize',10,'fontweight','bold', 'Color', 'k');
         ylabel('Rigid template correlation', 'fontsize',10,'fontweight','bold', 'Color', 'k');
-
+        
         subplot(2, 3, 6); scatter(cM1, cM2,  'MarkerEdgeColor', 'w'); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
         xlabel('rigid template', 'Color', 'black', 'FontWeight', 'bold'); ylabel('non-rigid correlation', 'Color', 'black', 'FontWeight', 'bold');
@@ -223,16 +226,16 @@ for plane_idx = start_plane:end_plane
         exportgraphics(f, metrics_name_png, 'Resolution', 600);
         close(f);
     end
-
+    
     log_message(fid, "Calculating registration shifts...\n");
-
+    
     shifts_nr = cat(ndims(shifts2(1).shifts)+1,shifts2(:).shifts);
     shifts_nr = reshape(shifts_nr,[],ndims(Y)-1,T);
     shifts_x = squeeze(shifts_nr(:,1,:))';
     shifts_y = squeeze(shifts_nr(:,2,:))';
     if do_figures
         log_message(fid, "Plotting registration shifts...\n");
-
+        
         shifts_name_png = sprintf("%s_shifts.png", fig_plane_name);
         shifts_name_fig = sprintf("%s_shifts.fig", fig_plane_name);
         f = figure;
@@ -249,17 +252,17 @@ for plane_idx = start_plane:end_plane
         savefig(shifts_name_fig);
         close(f);
     end
-
+    
     write_frames_3d(plane_name_save, M2,'/Y',true,4);
-
+    
     h5create(plane_name_save,"/shifts_x",  size(shifts_x));
     h5create(plane_name_save,"/shifts_y",  size(shifts_y));
     h5create(plane_name_save,"/Ym",        size(mM2));
-
+    
     h5write(plane_name_save, '/shifts_x',  shifts_x);
     h5write(plane_name_save, '/shifts_y',  shifts_y);
     h5write(plane_name_save, '/Ym',        mM2);
-
+    
     write_metadata_h5(metadata, plane_name_save, '/');
     log_message(fid, "Plane %d finished, data saved. Elapsed time: %.2f minutes\n",plane_idx,toc(tplane)/60);
     if getenv("OS") == "Windows_NT"
