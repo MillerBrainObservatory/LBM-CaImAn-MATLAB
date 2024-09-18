@@ -1,9 +1,8 @@
 function convertScanImageTiffToVolume(data_path, varargin)
-% Convert ScanImage .tif files into a 4D volume.
+% Deinterleave and reassemble ScanImage .tif files into deinterleaved planar 2D timeseries.
 %
 % Convert raw scanimage multi-roi .tif files from a single session
-% into a single 4D volumetric time-series (x, y, z, t). It's designed to process files for the
-% ScanImage Version: 2016 software.
+% into separate planar 2D volumetric timeseries [x, y, t], saved to disk in HDF5 format.
 %
 % Parameters
 % ----------
@@ -16,13 +15,12 @@ function convertScanImageTiffToVolume(data_path, varargin)
 % ds : string, optional
 %     Name of the group (h5 dataset) to save the assembled data. Default is
 %     '/Y'. Must contain a leading slash.
-% debug_flag : double, logical, optional
+% debug_flag : logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
 % do_figures : logical, optional
 %     If set to 1, mean image and single frame figures are generated and
-%     saved to save_path. Defaults to 1. Note, figures will impact
-%     performance, particularly on datasets with many ROI's.
+%     saved to the given save_path. Defaults to 1.
 % overwrite : logical, optional
 %     Whether to overwrite existing files. In many instances, entire file
 %     will be deleted. Default is 1.
@@ -205,9 +203,9 @@ for file_idx = 1:num_files
     if file_idx > 1; offset_file = offset_file + num_frames; end
     tpf = tic;
     raw_tiff_file = fullfile(data_path, files(file_idx).name);
-
+    
     log_message(fid, 'Creating temporary file %d of %d...\n', file_idx, num_files);
-
+    
     hTif=ScanImageTiffReader(raw_tiff_file);
     hTif=hTif.data();
     size_y=size(hTif);
@@ -217,7 +215,7 @@ for file_idx = 1:num_files
     if z_plane_order
         hTif = hTif(:,:,z_plane_order,:);
     end
-
+    
     for pi = 1:num_planes
         tps = tic;
         raw_full_path = sprintf("raw_plane_%d.h5", pi);
@@ -246,21 +244,21 @@ tfile = tic;
 % - Should have the width of a single ROI * num_rois (variable held by raw_x)
 z_timeseries = zeros(raw_y_roi, raw_x, num_frames, data_type);
 for plane_idx = 1:num_planes
-
+    
     tplane = tic;
-
+    
     log_message(fid, 'Processing z-plane %d/%d...\n', plane_idx, num_planes);
-
+    
     p_str = sprintf("plane_%d", plane_idx);
     raw_p_str = sprintf("raw_%s", p_str);
     assembled_p_str = sprintf("assembled_%s", p_str);
     raw_full_path = sprintf("%s.h5",fullfile(save_path,raw_p_str));
     assembled_full_path = sprintf("%s.h5",fullfile(save_path,assembled_p_str));
-
+    
     if ~isfile(raw_full_path)
         error("Processing stopped due to missing temporary file. Try re-processing with overwrite=True to delete a corrupted file.")
     end
-
+    
     if isfile(assembled_full_path)
         warning("File:\n%s\n...already exists.")
         if overwrite
@@ -270,23 +268,23 @@ for plane_idx = 1:num_planes
             continue
         end
     end
-
+    
     vol = h5read(raw_full_path,'/Y');
     if fix_scan_phase
-
+        
         log_message(fid, "Correcting for scan phase...\n")
         plane_offset = returnScanOffset(vol,1,data_type);
         log_message(fid, "Optimal phase: %d px shift.\n", abs(plane_offset));
-
+        
         % new_min_size = (1+(abs(plane_offset)):osv-abs(plane_offset));
         vol = fixScanPhase(vol,plane_offset,1,data_type);
     end
-
+    
     % resize if our array had pixels trimmed
     trimmed_xslice = trimmed_xslice(trimmed_xslice <= size(vol, 2));
     vol = vol(:,trimmed_xslice,:);
     log_message(fid, "Post-offset corrected and trimmed movie contains %d x pixels...\n", size(vol, 2));
-
+    
     cnt = 1;
     offset_x = 0;
     raw_offset_y = 0;
@@ -295,17 +293,17 @@ for plane_idx = 1:num_planes
         if cnt > 1
             raw_offset_y = raw_offset_y + raw_y_roi + metadata.num_lines_between_scanfields;
         end
-
+        
         % assemble the **UNTRIMMED ROI**
         raw_yslice = (raw_offset_y + 1):(raw_offset_y + raw_y_roi);
         roi_arr = vol(raw_yslice, :, :);
-
+        
         % apply trim
         roi_arr = squeeze(roi_arr(trimmed_yslice, :, :));
         if cnt > 1 % wait until the new array size is calculated
             offset_x = offset_x + size(roi_arr, 2);
         end
-
+        
         % place this ROI in the final image
         z_timeseries( ...
             1: size(roi_arr,1), ...
@@ -319,14 +317,14 @@ for plane_idx = 1:num_planes
         any(z_timeseries, [2, 3]), ...
         any(z_timeseries, [1, 3]), ...
         :);
-
+    
     fsize = size(z_timeseries);
     z_timeseries=z_timeseries( ...
         1+t_top_image:fsize(1)-t_bottom_image, ...
         1+t_left_image:fsize(2)-t_right_image, ...
         : ...
         );
-
+    
     mean_img = mean(z_timeseries, 3);
     if do_figures
         img_frame = z_timeseries(:,:,2);
@@ -335,7 +333,7 @@ for plane_idx = 1:num_planes
         scale_full = calculate_scale(size(img_frame, 2), metadata.pixel_resolution);
         scales = {scale_full, scale_full};
         plane_save_path = fullfile(fig_save_path, sprintf('plane_%d.png', plane_idx));
-
+        
         write_images_to_tile( ...
             images, ...
             metadata, ...
@@ -389,7 +387,7 @@ if dim == 1
     if offset > 0
         dataOut(1:2:sy, 1:sx, :, :) = dataIn(1:2:sy, :, :, :);
         dataOut(2:2:sy, 1+offset:(offset+sx), :, :) = dataIn(2:2:sy, :, :, :);
-
+        
     elseif offset < 0
         offset = abs(offset);
         dataOut(1:2:sy, 1+offset:(offset+sx), :, :) = dataIn(1:2:sy, :, :, :);
@@ -416,30 +414,30 @@ switch dim
     case 1
         Iv1 = Iin(1:2:end,:);
         Iv2 = Iin(2:2:end,:);
-
+        
         Iv1 = Iv1(1:min([size(Iv1,1) size(Iv2,1)]),:);
         Iv2 = Iv2(1:min([size(Iv1,1) size(Iv2,1)]),:);
-
+        
         buffers = zeros(size(Iv1,1),n, dtype);
-
+        
         Iv1 = cat(2,buffers,Iv1,buffers);
         Iv2 = cat(2,buffers,Iv2,buffers);
-
+        
         Iv1 = reshape(Iv1',[],1);
         Iv2 = reshape(Iv2',[],1);
-
+        
     case 2
         Iv1 = Iin(:,1:2:end);
         Iv2 = Iin(:,2:2:end);
-
+        
         Iv1 = Iv1(:,1:min([size(Iv1,2) size(Iv2,2)]));
         Iv2 = Iv2(:,1:min([size(Iv1,2) size(Iv2,2)]),:);
-
+        
         buffers = zeros(n,size(Iv1,2), dtype);
-
+        
         Iv1 = cat(1,buffers,Iv1,buffers);
         Iv2 = cat(1,buffers,Iv2,buffers);
-
+        
         Iv1 = reshape(Iv1,[],1);
         Iv2 = reshape(Iv2,[],1);
 end

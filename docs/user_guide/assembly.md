@@ -1,11 +1,11 @@
 
-(pre_processing)=
-# Pre-Processing
+(assembly)=
+# Assembly
 
 Function for this step: {func}`convertScanImageTiffToVolume()`
 
 ```{note}
-Before beginning pre-processing, be sure to review {ref}`parameters` as they are the same for each step
+Before beginning assembling your images, be sure to review {ref}`parameters` as they are the same for each step
 in the pipeline and will not be covered in detail here.
 
 ..See {ref}`troubleshooting` for common issues you may encounter along the way.
@@ -15,13 +15,13 @@ in the pipeline and will not be covered in detail here.
 (pp_overview)=
 ## Overview
 
-Pre-processing LBM datasets consists of 2 main processing steps:
+Assembling reconstructed images from raw LBM datasets consists of 3 main processing steps:
 
 1. {ref}`De-interleave <ex_deinterleave>` z-planes and timesteps.
 2. {ref}`Correct Scan-Phase <ex_scanphase>` alignment for each ROI.
-3. {ref}`Re-tile <ex_retile>` vertically concatenated ROI's horizontally.
+3. {ref}`Re-tile <assembly_retiled>` vertically concatenated ROI's horizontally.
 
-```{thumbnail} ../_images/ex_diagram_test2.svg
+```{thumbnail} ../_images/assembly_stripped.svg
 
 ```
 
@@ -131,13 +131,13 @@ Output data are saved in `.h5` format, with the following characteristics:
 - **Groups**: h5 files can be thought of like directories where a 3D time-series is self contained within its own folder (or group).
 - **Attributes**: Attributes are special "tags" attached to a group. This is where we store metadata associated with each group and dataset. The result of calling `get_metadata(raw_path)` (see {ref}`scanimage metadata <primary_metadata>` for more information about the magic behind the scenes here).
 
-For pre-processing, two "groups" are saved: registered timeseries and mean image:
+Following image assembly, two "groups" are saved: registered timeseries and mean image:
 
 {code}`/Y`
-: The 3D final, re-tiled image.
+: A fully reconstructred 2D timeseries.
 
 {code}`/Ym`
-: The 2D {ref}`mean image <ex_meanimage>`
+: The 2D {ref}`mean image <ex_meanimage>` of your 2D timeseries.
   
 ````{admonition} How to: Preview file contents
 :class: dropdown
@@ -178,7 +178,7 @@ Use MATLAB functions [h5info](https://www.mathworks.com/help/matlab/ref/h5disp.h
 
 ```
 
-h5info takes the {code}`filename` and the {ref}`group <dataset_name>`, and displays the contents of the file:
+h5info takes the {code}`filename` and the {ref}`group <ds>`, and displays the contents of the file:
 
 ```{code-block} MATLAB
 
@@ -233,5 +233,5 @@ Taking the {term}`pixel resolution <pixel-resolution>` of $3μm$ from our metada
 
 We may then want to limit our {ref}`NoRMCorre Parameters <normcorre_params>` to only allow shifts of this size with {code}`max_shift=10/metadata.pixel_resolution`.
 
-To get a sense of how much motion is present in your timeseries, see {ref}`tips and tricks: exploring datasets in MATLAB <explore_data_matlab>`
+To get a sense of how much motion is present in your timeseries, see {ref}`tips and tricks: exploring datasets in MATLAB <explore_data_matlab>`.
 
