@@ -16,7 +16,7 @@ This pipeline centers around the segmentation algorithm **`Constrained Non-Negat
 
 At a high-level, the {term}`CNMF` algorithm works by:
 
-1. Breaking the full FOV into **patches** of `grid_size` with a set `overlap` in each direction.
+1. Breaking the full FOV into **patches** of `patch_size` with a set `overlap` in each direction.
 2. Looking for {code}`K` number of components in each patch.
 3. Filter false positives.
 4. Combine resulting neuron coordinates **(spatial components)** for each patch into a single structure: `A_keep` and `C_keep`.
