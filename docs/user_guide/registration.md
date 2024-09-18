@@ -69,7 +69,7 @@ The most important NoRMCorre parameters are:
 : The frame rate of our movie, which is likely different than the 30Hz default.
 
 4. {code}`correct_bidir`
-: Attempts to correct for bi-directional scan offsets, a step that was performed {ref}`in pre-processing <scan_phase>`.
+: Attempts to correct for bi-directional scan offsets, a step that was performed {ref}`in assembly <scan_phase>`.
 
 :::{admonition} A note on `max_shift`
 :class: dropdown
