@@ -75,7 +75,7 @@ for i = 1:num_images
     imagesc(img);
     axis image; axis tight; axis off; colormap('gray');
     if ~isempty(titles) > 0
-        title(titles{i}, 'FontSize', 12, 'FontWeight', 'bold', 'Color', 'black');
+        title(titles{i}, 'FontSize', 12, 'FontWeight', 'bold', 'Color', 'w');
     end
 
     if this_scale < size(img, 2) / 10 % make sure its not too small

@@ -54,7 +54,7 @@ p = inputParser;
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
 addParameter(p, 'save_path', '', @(x) ischar(x) || isstring(x));
 addParameter(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)));
-addParameter(p, 'debug_flag', 0, @(x) isnum/eric(x) || islogical(x));
+addParameter(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'do_figures', 1, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'overwrite', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
