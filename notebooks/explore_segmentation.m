@@ -1,26 +1,38 @@
-clc; clear;
-gcp;    % start a local cluster
+clear;
 
-% parent_path = fullfile('C:\Users\RBO\caiman_data\mk717\');
-% data_path = fullfile(parent_path, '1um_72hz');
-% filename = fullfile(data_path, "/extracted/extracted_plane_14.h5");
-% Y = read_file(fullfile(filename));
-%%
-% clear;
-parent_path = fullfile('C:\Users\RBO\caiman_data\high_res');
-filename = fullfile(parent_path, "/extracted_plane_1.h5");
-Y = read_file(fullfile(filename));
+tsub = 6;
 
-%%
+raw = "C://Users/RBO/caiman_data/animal_01/session_01/assembled/assembled_plane_26.h5";
+motion_corrected = "C://Users/RBO/caiman_data/animal_01/session_01/motion_corrected/motion_corrected_plane_26.h5";
+segmented = "C://Users/RBO/caiman_data/animal_01/session_01/segmented_2/segmented_plane_26.h5";
 
-[d1,d2,T] = size(Y);    % dimensions of file
-Y = Y - min(Y(:));      % remove negative offset
+Cn = h5read(segmented, '/Cn');
+rVals = h5read(segmented, '/rVals');
+T_keep = h5read(segmented, '/T_keep');
+C_keep = h5read(segmented, '/C_keep');
+Ac_keep = h5read(segmented, '/Ac_keep');
+acm = h5read(segmented, '/acm');
+acx = h5read(segmented, '/acx');
+acy = h5read(segmented, '/acy');
+b = h5read(segmented, '/b');
+f = h5read(segmented, '/f');
 
-minY = quantile(Y(1:1e7),0.0005);
-maxY = quantile(Y(1:1e7),1-0.0005);
+Km = h5read(segmented, '/Km');
+
+Y_raw = h5read(raw, '/Y');
+Y_raw = downsample_data(Y_raw, 'time', tsub);
+Ym_raw = h5read(raw, '/Ym');
+
+Y_mc = h5read(motion_corrected, '/Y');
+Y_mc = downsample_data(Y_mc, 'time', tsub);
+Ym_raw = h5read(motion_corrected, '/Ym');
 
 %%  view data
-% figure;play_movie({Y},{'raw data'},minY,maxY);
+figure;play_movie({Y_raw, Y_mc},{'raw data', 'motion-corrected data'});
+    
+%% save data
+filename = "C://Users/RBO/caiman_data/animal_01/session_01/motion_corrected/raw_mc_plane_26.mp4";
+figure;write_frames_to_mp4([Y_raw Y_mc], filename, 30);
 
 %% perform motion correction (start with rigid)
 % parameters motion correction
@@ -39,7 +51,9 @@ M_rgs = downsample_data(M_rg,'time',tsub);
 %%
 play_movie_save({Y_sub,M_rgs},{'raw data','rigid'},minY,maxY,1,savename);
 
-%% perform non-rigid motion correction
+play_movie({Y_sub,M_rgs},{'raw data','rigid'});
+
+%% perform non-rigid motion correction    
 % parameters motion correction
 % 'd1','d2': size FOV movie
 % 'grid_size','overlap_pre': parameters regulating size of patch (size patch ~ (grid_size + 2*overlap_pre))
@@ -108,18 +122,17 @@ overlap = [8,8];                        % amount of overlap in each dimension (o
 patches = construct_patches(sizY(1:end-1),patch_size,overlap);
 K = 4;                                            % number of components to be found
 tau = 4;                                          % std of gaussian kernel (half size of neuron)
-p = 0;                                            % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
+p = 2;                                            % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
 
 options = CNMFSetParms(...
-    'd1',sizY(1),'d2',sizY(2),...
-    'temporal_iter',2,...                       % number of block-coordinate descent steps
-    'ssub',1,...                                % downsample in space
-    'tsub',2,...                                % downsample in time
-    'merge_thr',0.8,...                         % merging threshold
+    'd1',sizY(1), ...
+    'd2',sizY(2),...
+    'ssub',1,...                % downsample in space (NO)
+    'tsub',2,...                % downsample in time
+    'merge_thr',0.8,...         % correlation threshold for merging
     'gSig',tau,...
-    'gnb',2,...                                 % number of background components
-    'spatial_method','regularized'...
-    );
+    'gnb',2,...                 % number of background components
+);
 
 %% run CNMF algorithm on patches and combine
 tic;
@@ -128,10 +141,25 @@ tic;
 toc
 
 %% a simple GUI
-Cn = correlation_image_max(M_nr);
-Coor = plot_contours(A,Cn,options,1);
+mat_segmented = fullfile("C://Users/RBO/caiman_data/animal_01/session_01/segmented_2/caiman_output_plane_26.mat");
+mat_segmented = open(mat_segmented);
+
+h5_segmented = fullfile("C://Users/RBO/caiman_data/animal_01/session_01/segmented_2/segmented_plane_26.h5");
+h5_segmented = h5read(h5_segmented, '/T_keep');
+
+Coor = plot_contours(A,Cn,options,1); close;
 
 %%
+h5_segmented_jeff = fullfile("D://Jeffs LBM paper data/Fig4a-c/20191121/MH70/caiman_output_plane_26.mat");
+h5_segmented_jeff = open(h5_segmented_jeff);
+
+x = 2; 
+
+%% Classify / validate components
+
+h5_segmented = fullfile("C://Users/RBO/caiman_data/animal_01/session_01/segmented_2/segmented_plane_26.h5");
+h5_segmented = h5read(h5_segmented, '/T_keep');
+
 pixel_resolution = metadata.pixel_resolution;
 frame_rate = metadata.frame_rate;
 [d1,d2,T] = size(M_nr);
@@ -158,7 +186,9 @@ C_keep = C(keep,:);
 Km = size(C_keep,1); % total number of components
 
 rVals = rval_space(keep);
-%% view contour plots of selected and rejected components (optional)
+
+%% view contour plots of selected and rejected components
+
 throw = ~keep;
 figure;
 ax1 = subplot(121); plot_contours(A(:,keep),Cn,options,0,[],Coor,1,find(keep)); title('Selected components','fontweight','bold','fontsize',14);
@@ -167,14 +197,11 @@ linkaxes([ax1,ax2],'xy')
 
 %% inspect components
 plot_components_GUI(M_nr,A(:,keep),C(keep,:),b,f,Cn,options);
-
-
 plot_components_GUI(Yr,A_or,C_or,b2,f2,Cn,options);
 
 %% make movie
 
 make_patch_video(A(:,keep),C(keep,:),b,f,M_nr,Coor,options)
-
 
 %% refine temporal components
 A_keep = A(:,keep);
@@ -186,9 +213,9 @@ C_keep = C(keep,:);
 df_percentile = 30;
 window = 1000;
 
-F = diag(sum(A_keep.^2))*(C2 + YrA2);  % fluorescence
-Fd = prctfilt(F,df_percentile,window);                      % detrended fluorescence
-Bc = prctfilt((A_keep'*b)*f2,30,1000,300,0) + (F-Fd);       % background + baseline for each component
+F = diag(sum(A_keep.^2))*(C2 + YrA2);                   % fluorescence
+Fd = prctfilt(F,df_percentile,window);                  % detrended fluorescence
+Bc = prctfilt((A_keep'*b)*f2,30,1000,300,0) + (F-Fd);   % background + baseline for each component
 F_dff = Fd./Bc;
 
 %% deconvolve data
@@ -215,8 +242,6 @@ title(['Component ',num2str(i)]);
 
 legend('Fluorescence DF/F','Deconvolved','Spikes')
 
-%%
-% Create a figure
 figure;
 imshow(Cn);
 hold on;
@@ -240,4 +265,3 @@ for k = 1:length(patches)
     end
 end
 
-hold off;
