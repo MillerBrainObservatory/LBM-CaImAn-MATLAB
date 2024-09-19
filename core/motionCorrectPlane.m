@@ -200,27 +200,28 @@ for plane_idx = start_plane:end_plane
         [cM2,mM2,~] = motion_metrics(M2,10);
         T = length(cY);
         
-        f = figure('Visible', 'on', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
+        f = figure('Visible', 'off', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
         
         ax1 = subplot(2, 3, 1); imagesc(mY); axis equal; axis tight; axis off;
-        title('Mean raw', 'fontsize',10,'fontweight','bold', 'Color', 'k');
+        title('Mean raw', 'fontsize',10,'fontweight','bold', 'Color', 'w');
         
         ax2 = subplot(2, 3, 2); imagesc(mM1); axis equal; axis tight; axis off;
-        title('Mean rigid template', 'fontsize',10,'fontweight','bold', 'Color', 'k');
+        title('Mean rigid template', 'fontsize',10,'fontweight','bold', 'Color', 'w');
         
         ax3 = subplot(2, 3, 3); imagesc(mM2); axis equal; axis tight; axis off;
-        title('mean non-rigid corrected', 'Color', 'black', 'FontWeight', 'bold');
-        subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('raw data', 'rigid', 'non-rigid');
-        title('correlation coefficients', 'Color', 'black', 'FontWeight', 'bold');
+        title('Mean Registered', 'Color', 'w', 'FontWeight', 'bold');
+        
+        subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('Raw', 'Template', 'Registration');
+        title('correlation coefficients', 'Color', 'w', 'FontWeight', 'bold');
         subplot(2, 3, 5); scatter(cY, cM1); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        title('Template vs Mean Image Correlation','fontsize',10,'fontweight','bold', 'Color', 'k');
-        xlabel('Raw data correlation', 'fontsize',10,'fontweight','bold', 'Color', 'k');
-        ylabel('Rigid template correlation', 'fontsize',10,'fontweight','bold', 'Color', 'k');
+        title('Template vs Mean Image Correlation','fontsize',10,'fontweight','bold', 'Color', 'w');
+        xlabel('Raw data correlation', 'fontsize',10,'fontweight','bold', 'Color', 'w');
+        ylabel('Rigid template correlation', 'fontsize',10,'fontweight','bold', 'Color', 'w');
         
         subplot(2, 3, 6); scatter(cM1, cM2,  'MarkerEdgeColor', 'w'); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        xlabel('rigid template', 'Color', 'black', 'FontWeight', 'bold'); ylabel('non-rigid correlation', 'Color', 'black', 'FontWeight', 'bold');
+        xlabel('rigid template', 'Color', 'w', 'FontWeight', 'bold'); ylabel('non-rigid correlation', 'Color', 'w', 'FontWeight', 'bold');
         linkaxes([ax1, ax2, ax3], 'xy');
         savefig(metrics_name_fig)
         exportgraphics(f, metrics_name_png, 'Resolution', 600);
@@ -238,15 +239,18 @@ for plane_idx = start_plane:end_plane
         
         shifts_name_png = sprintf("%s_shifts.png", fig_plane_name);
         shifts_name_fig = sprintf("%s_shifts.fig", fig_plane_name);
+        
         f = figure;
         ax1 = subplot(311); plot(1:T,cY,1:T,cM1,1:T,cM2);
-        title('correlation coefficients', 'Color', 'black', 'FontWeight', 'bold');
-        legend('raw data','registered data','non-rigid', 'Color', 'black', 'FontWeight', 'bold');
+        
+        title('Correlation coefficients', 'Color', 'w', 'FontWeight', 'bold');
+        
+        legend('Raw data','Template','Registered', 'Color', 'w', 'FontWeight', 'bold');
         set(gca,'Xtick',[])
-        ax2 = subplot(312); plot(shifts_x, 'LineWidth',.2); title('displacements along x', 'Color', 'black', 'FontWeight', 'bold')
+        ax2 = subplot(312); plot(shifts_x, 'LineWidth',.2); title('displacements along x', 'Color', 'w', 'FontWeight', 'bold')
         set(gca,'Xtick',[])
-        ax3 = subplot(313); plot(shifts_y); title('displacements along y', 'Color', 'black', 'FontWeight', 'bold')
-        xlabel('timestep', 'Color', 'black', 'FontWeight', 'bold')
+        ax3 = subplot(313); plot(shifts_y); title('displacements along y', 'Color', 'w', 'FontWeight', 'bold')
+        xlabel('timestep', 'Color', 'w', 'FontWeight', 'bold')
         linkaxes([ax1,ax2,ax3],'x')
         exportgraphics(f,shifts_name_png, 'Resolution', 600);
         savefig(shifts_name_fig);
