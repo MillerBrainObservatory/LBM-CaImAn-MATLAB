@@ -6,7 +6,7 @@
 % subpackages to path" or via the startup.m file. Both methods described in
 % more detail in the README.
 %% Two %'s lets you run code section-by-section via the Run Section button or pressing cntl+enter
-clc
+
 
 %% RUN THIS WITH THE PLAY BUTTON, NOT "RUN SECTION"
 % When ran as a script (the "Run" button), this will automatically add the
@@ -32,10 +32,8 @@ shifts_um = [5, 20, 40];
 grid_sizes = [64, 128];
 
 for i=1:size(shifts_um)
-    disp(i);
     max_shift = shifts_um(i);
     for j=1:size(grid_sizes)
-        disp(j);
         grid_size = grid_sizes(j);
 
         % use variables to save the file

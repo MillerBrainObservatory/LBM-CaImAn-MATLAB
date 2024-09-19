@@ -125,18 +125,17 @@ overlap = [8,8];                        % amount of overlap in each dimension (o
 patches = construct_patches(sizY(1:end-1),patch_size,overlap);
 K = 4;                                            % number of components to be found
 tau = 4;                                          % std of gaussian kernel (half size of neuron)
-p = 0;                                            % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
+p = 2;                                            % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
 
 options = CNMFSetParms(...
-    'd1',sizY(1),'d2',sizY(2),...
-    'temporal_iter',2,...                       % number of block-coordinate descent steps
-    'ssub',1,...                                % downsample in space
-    'tsub',2,...                                % downsample in time
-    'merge_thr',0.8,...                         % merging threshold
+    'd1',sizY(1), ...
+    'd2',sizY(2),...
+    'ssub',1,...                % downsample in space (NO)
+    'tsub',2,...                % downsample in time
+    'merge_thr',0.8,...         % correlation threshold for merging
     'gSig',tau,...
-    'gnb',2,...                                 % number of background components
-    'spatial_method','regularized'...
-    );
+    'gnb',2,...                 % number of background components
+);
 
 %% run CNMF algorithm on patches and combine
 tic;
@@ -159,6 +158,16 @@ h5_segmented_jeff = open(h5_segmented_jeff);
 
 x = 2;
 %%
+h5_segmented_jeff = fullfile("D://Jeffs LBM paper data/Fig4a-c/20191121/MH70/caiman_output_plane_26.mat");
+h5_segmented_jeff = open(h5_segmented_jeff);
+
+x = 2; 
+
+%% Classify / validate components
+
+h5_segmented = fullfile("C://Users/RBO/caiman_data/animal_01/session_01/segmented_2/segmented_plane_26.h5");
+h5_segmented = h5read(h5_segmented, '/T_keep');
+
 pixel_resolution = metadata.pixel_resolution;
 frame_rate = metadata.frame_rate;
 [d1,d2,T] = size(M_nr);
@@ -185,7 +194,9 @@ C_keep = C(keep,:);
 Km = size(C_keep,1); % total number of components
 
 rVals = rval_space(keep);
-%% view contour plots of selected and rejected components (optional)
+
+%% view contour plots of selected and rejected components
+
 throw = ~keep;
 figure;
 ax1 = subplot(121); plot_contours(A(:,keep),Cn,options,0,[],Coor,1,find(keep)); title('Selected components','fontweight','bold','fontsize',14);
@@ -194,14 +205,11 @@ linkaxes([ax1,ax2],'xy')
 
 %% inspect components
 plot_components_GUI(M_nr,A(:,keep),C(keep,:),b,f,Cn,options);
-
-
 plot_components_GUI(Yr,A_or,C_or,b2,f2,Cn,options);
 
 %% make movie
 
 make_patch_video(A(:,keep),C(keep,:),b,f,M_nr,Coor,options)
-
 
 %% refine temporal components
 A_keep = A(:,keep);
@@ -242,8 +250,6 @@ title(['Component ',num2str(i)]);
 
 legend('Fluorescence DF/F','Deconvolved','Spikes')
 
-%%
-% Create a figure
 figure;
 imshow(Cn);
 hold on;
