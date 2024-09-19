@@ -18,7 +18,7 @@ function segmentPlane(data_path, save_path, varargin)
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
 % overwrite : logical, optional
-%     Whether to overwrite existing files (default is 1).
+%     Whether to overwrite existing files (default is 0).
 % num_cores : double, integer, positive
 %     Number of cores to use for computation. The value is limited to a maximum
 %     of 24 cores.
@@ -73,7 +73,7 @@ addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
 addParameter(p, 'save_path', '', @(x) ischar(x) || isstring(x));
 addParameter(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)));
 addParameter(p, 'debug_flag', 0, @(x) isscalar(x) || islogical(x));
-addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'overwrite', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x));
 addParameter(p, 'end_plane', 2, @(x) isnumeric(x) && x >= p.Results.start_plane);
@@ -176,15 +176,14 @@ for plane_idx = start_plane:end_plane
     mx = ceil(pi.*(1.33.*tau).^2);
     mn = floor(pi.*(tau.*0.5).^2); % SHRINK IF FOOTPRINTS ARE TOO SMALL
     sizY = size(data);
-    % patch_size = [100,100];
-    % overlap = [10,10];
-    % patches = construct_patches(sizY(1:end-1),patch_size,overlap);
-    % K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2);
-    patch_size = [64,64];                   % size of each patch along each dimension (optional, default: [32,32])
-    overlap = [16,16];                        % amount of overlap in each dimension (optional, default: [4,4])
-    
+    patch_size = [100,100];
+    overlap = [10,10];
+
+    % size of each patch along each dimension (optional, default: [32,32])
     patches = construct_patches(sizY(1:end-1),patch_size,overlap);
-    K = 7;                                            % number of components to be found / patch
+    K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2);
+    patch_size = [64,64];                   
+    overlap = [16,16];                       
     tau = 8;                                          % std of gaussian kernel (half size of neuron) 
     p = 2;                                            % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
 
@@ -227,11 +226,7 @@ for plane_idx = start_plane:end_plane
             'min_size_thr',mn,...                       % minimum size of each component in pixels (default: 9)
             'refine_flag',0,...
             'rolling_length',ceil(frame_rate*5),...
-            'fr', frame_rate, ...
-            'plot_df', 1, ...
-            'make_gif', 1, ...
-            'save_avi', 1, ...
-            'name', fullfile(fig_save_path, 'segmented.avi') ...
+            'fr', frame_rate ...
         );
     end
     h5create(plane_name_save, '/cnmf', size(options));

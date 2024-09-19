@@ -4,7 +4,7 @@ function motionCorrectPlane(data_path, varargin)
 % Parameters
 % ----------
 % data_path : char
-%     Path to the directory containing the files extracted via convertScanImageTiffToVolume.
+%     Path to the directory containing the files assembled via convertScanImageTiffToVolume.
 % save_path : char
 %     Path to the directory to save the motion vectors.
 % ds : char, optional
@@ -66,9 +66,9 @@ options = p.Results.options;
 
 if ~isfolder(data_path); error("Data path:\n %s\n ..does not exist", data_path); end
 
-% Make the save path in data_path/extracted, if not given
+% Make the save path in data_path/assembled, if not given
 if isempty(save_path)
-    save_path = fullfile(data_path, 'extracted');
+    save_path = fullfile(data_path, 'assembled');
     if ~isfolder(save_path); mkdir(save_path);
         warning('Creating save path since one was not provided, located: %s', save_path);
     end
@@ -78,7 +78,7 @@ end
 
 if debug_flag == 1; dir([data_path '/' '*.h*']); return; end
 
-files = dir(fullfile(data_path, '*extracted_plane_*.h*'));
+files = dir(fullfile(data_path, '*assembled_plane_*.h*'));
 if isempty(files)
     error('No suitable data files found in: \n  %s', data_path);
 end
@@ -105,7 +105,7 @@ for plane_idx = start_plane:end_plane
     log_message(fid, 'Beginning plane %d\n', plane_idx);
 
     z_str = sprintf('plane_%d', plane_idx);
-    plane_name = sprintf("%s/extracted_%s.h5", data_path, z_str);
+    plane_name = sprintf("%s/assembled_%s.h5", data_path, z_str);
     plane_name_save = sprintf("%s/motion_corrected_%s.h5", save_path, z_str);
 
     if plane_idx == start_plane
@@ -170,7 +170,7 @@ for plane_idx = start_plane:end_plane
             'd2', d2,...
             'bin_width', 20,...
             'grid_size', [128,128], ...
-            'max_shift', round(100/pixel_resolution),...
+            'max_shift', round(20/pixel_resolution),...
             'us_fac', 5,...
             'init_batch', 200,...
             'iter', 1, ...
@@ -197,7 +197,7 @@ for plane_idx = start_plane:end_plane
         [cM2,mM2,~] = motion_metrics(M2,10);
         T = length(cY);
 
-        f = figure('Visible', 'on', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
+        f = figure('Visible', 'off', 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
 
         ax1 = subplot(2, 3, 1); imagesc(mY); axis equal; axis tight; axis off;
         title('Mean raw', 'fontsize',10,'fontweight','bold', 'Color', 'k');
