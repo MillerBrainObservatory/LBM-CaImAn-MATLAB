@@ -110,7 +110,7 @@ If this parameter is not included, they will be calculated for you based on the 
 
 - For example, {code}`Tau` is a widely talked about parameter being the half-size of your neuron.
 
-This is calculated by default as :math:`7.5/pixel_resolution`.
+This is calculated by default as `7.5/pixel_resolution`.
 
 This makes sense if we assume an ~neuron size of $14μm$.
 

@@ -2,7 +2,7 @@
 # Image Gallery
 
 <!-- Extraction -->
-## Pre-Processing / Extraction
+## Image Assembly
 
 [Back to Guide](https://cerodell.github.io/sphinx-quickstart-guide/build/html/addtoindx.html)
 
