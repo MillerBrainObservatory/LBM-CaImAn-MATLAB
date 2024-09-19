@@ -1,4 +1,4 @@
-function segmentPlane(data_path, save_path, varargin)
+function segmentPlane(data_path, varargin)
 % Segment imaging data using CaImAn CNMF.
 %
 % This function applies the CaImAn algorithm to segment neurons from
@@ -20,7 +20,7 @@ function segmentPlane(data_path, save_path, varargin)
 % do_figures : double, integer, positive
 %     If true, correlation metrics will be saved to save_path/figures.
 % overwrite : logical, optional
-%     Whether to overwrite existing files (default is 1).
+%     Whether to overwrite existing files (default is 0).
 % num_cores : double, integer, positive
 %     Number of cores to use for computation. The value is limited to a maximum
 %     of 24 cores.
@@ -72,13 +72,13 @@ addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
 addParameter(p, 'save_path', '', @(x) ischar(x) || isstring(x));
 addParameter(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)));
 addParameter(p, 'debug_flag', 0, @(x) isscalar(x) || islogical(x));
-addParameter(p, 'overwrite', 1, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'overwrite', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x));
-addParameter(p, 'end_plane', 2, @(x) isnumeric(x) && x >= p.Results.start_plane);
-addParameter(p, 'options', {}, @(x) isstruct(x));
+addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
 addParameter(p, 'do_figures', 1, @(x) isnumeric(x) || islogical(x));
-parse(p, data_path, save_path, varargin{:});
+addParameter(p, 'options', {}, @(x) isstruct(x));
+parse(p, data_path, varargin{:});
 
 data_path = p.Results.data_path;
 save_path = p.Results.save_path;
