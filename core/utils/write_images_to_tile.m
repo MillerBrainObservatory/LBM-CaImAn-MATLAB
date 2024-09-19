@@ -110,7 +110,7 @@ if ~isempty(fig_title)
     fig_title = strrep(fig_title, '_', ' ');
     fig_title = regexprep(fig_title, '(\<\w)', '${upper($1)}');
 
-    sgtitle(fig_title, 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'black');
+    sgtitle(fig_title, 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'w');
 end
 
 if ~isempty(save_name)
