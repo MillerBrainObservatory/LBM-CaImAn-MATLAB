@@ -1,26 +1,13 @@
-%% Example script that will run the full pipeline.
-% This code block adds all modules inside the "core" directory to the
-% matlab path.
-% This isn't needed if the path to this package is added to the MATLAB path
-% manually by right clicking caiman_matlab folder and "add packages and
-% subpackages to path" or via the startup.m file. Both methods described in
-% more detail in the README.
-%% Two %'s lets you run code section-by-section via the Run Section button or pressing cntl+enter
-
-
-%% RUN THIS WITH THE PLAY BUTTON, NOT "RUN SECTION"
-% When ran as a script (the "Run" button), this will automatically add the
-% core and packages folders to your MATLAB path
-% Not needed if the project code is stored in the Documents/MATLAB folder
-clc, clear; % !! Careful, this will clear all variables from memory
-[fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
-addpath(genpath(fullfile(fpath, 'core'))); addpath(genpath(fullfile(fpath, 'packages')));
+%% Motion Correction Grid Search
 
 %% POINT THIS PATH TO YOUR ASSEMBLED TIFF FILES
+
 save_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01\assembled');
 mc_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01\motion_corrected');
 
-filename = fullfile(save_path, "assembled_plane_1.h5");
+filename = fullfile(save_path, "assembled_plane_26.h5");
+
+%%
 metadata = read_h5_metadata(filename, '/Y');
 
 % data_size = metadata.data_size;
@@ -31,11 +18,12 @@ data_size = data_size.ChunkSize(1:2);
 shifts_um = [5, 20, 40];
 grid_sizes = [64, 128];
 
-for i=1:size(shifts_um)
+%%
+for i=1:numel(shifts_um)
     disp(i);
     disp(size(shifts_um))
     max_shift = shifts_um(i);
-    for j=1:size(grid_sizes)
+    for j=1:numel(grid_sizes)
         grid_size = grid_sizes(j);
 
         % use variables to save the file
@@ -57,9 +45,9 @@ for i=1:size(shifts_um)
             'debug_flag', 0, ...
             'overwrite', 1, ...
             'num_cores', 23, ...
-            'start_plane', 1, ...
-            'end_plane', 1,  ...
+            'start_plane', 26, ...
+            'end_plane', 26,  ...
             'options', options ...
-            );
+        );
     end
 end

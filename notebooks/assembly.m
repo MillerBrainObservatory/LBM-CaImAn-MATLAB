@@ -1,4 +1,4 @@
-%% Test different pixel trimming values
+%% Assembly Grid Search
 clc;
 
 % set a typical directory structure
@@ -7,7 +7,7 @@ assembly_path = fullfile(tiff_path, 'assembled');
 
 metadata = get_metadata(fullfile(tiff_path, "MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif"));
 
-%%
+%% After assembly, collect all images
 num_planes = 30;
 
 % Load and normalize images
