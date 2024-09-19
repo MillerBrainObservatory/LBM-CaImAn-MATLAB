@@ -1,5 +1,6 @@
 function [] = collatePlanes(data_path, varargin)
-% COLLATEPLANES Analyzes and processes imaging data by extracting and correcting features across multiple planes.
+% Correct for lateral offsets between z-planes and merge highly correlated
+% neurons.
 %
 % Parameters
 % ----------
@@ -15,7 +16,7 @@ function [] = collatePlanes(data_path, varargin)
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
 % overwrite : logical, optional
-%     Whether to overwrite existing files (default is 1).
+%     Whether to overwrite existing files (default is 0).
 % start_plane : double, integer, positive
 %     The starting plane index for processing.
 % end_plane : double, integer, positive

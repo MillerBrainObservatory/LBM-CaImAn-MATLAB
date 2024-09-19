@@ -32,6 +32,8 @@ shifts_um = [5, 20, 40];
 grid_sizes = [64, 128];
 
 for i=1:size(shifts_um)
+    disp(i);
+    disp(size(shifts_um))
     max_shift = shifts_um(i);
     for j=1:size(grid_sizes)
         grid_size = grid_sizes(j);

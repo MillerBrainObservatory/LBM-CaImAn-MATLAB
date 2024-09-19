@@ -19,7 +19,7 @@ function [offsets] = calculateZOffset(data_path, varargin)
 %     start_plane. Default is 2.
 % num_features : double, integer, positive
 %     The number of features to identify and use in each plane for
-%     calculating offsets. Default is 3 features/neurons compared across
+%     calculating offsets. Default is 3 features (neurons) compared across
 %     z-plane/z-plane+1.
 %
 %
