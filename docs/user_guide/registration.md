@@ -151,7 +151,7 @@ Just like {ref}`pre-processing outputs <extraction_inputs>`, registration output
 Registration outputs have the following groups:
 
 {code}`/Y`
-: Takes the name of the {ref}`ds <dataset_name>` parameter. This group contains the 3D timeseries.
+: Takes the name of the {ref}`ds <ds>` parameter. This group contains the 3D timeseries.
 
 {code}`/Ym`
 : The mean image of the motion-corrected movie. Each image is averaged over time to produce the mean pixel intensity.

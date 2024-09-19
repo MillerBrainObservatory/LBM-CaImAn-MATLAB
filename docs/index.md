@@ -13,7 +13,7 @@ There are 4 core steps in this pipeline:
 1. {func}`convertScanImageTiffToVolume()`
 2. {func}`motionCorrectPlane()`
 3. {func}`segmentPlane()`
-4. {func}`calculateZOffset()`
+4. {func}`collatePlanes()`
 
 ```{note}
 The core functions used to initiate this pipeline are `camelCase` (lowerUpperCase).
@@ -21,7 +21,7 @@ Every **non-core (helper/utility)** function you may use, such as {func}`play_mo
 
 ```
 
-```{thumbnail} _images/ex_diagram.png
+```{thumbnail} _images/assembly_stripped.svg
 ---
 width: 800
 align: center

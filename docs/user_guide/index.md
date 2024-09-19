@@ -9,10 +9,10 @@ caption: Usage
 numbered: 3
 ---
 
-pre_processing
+assembly
 registration
 segmentation
-offset_correction
+collation
 tips_tricks
 troubleshooting
 ```

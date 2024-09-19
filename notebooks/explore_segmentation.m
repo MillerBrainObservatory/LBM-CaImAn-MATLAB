@@ -6,7 +6,10 @@ raw = "C://Users/RBO/caiman_data/animal_01/session_01/assembled/assembled_plane_
 motion_corrected = "C://Users/RBO/caiman_data/animal_01/session_01/motion_corrected/motion_corrected_plane_26.h5";
 segmented = "C://Users/RBO/caiman_data/animal_01/session_01/segmented_2/segmented_plane_26.h5";
 
+h5disp(segmented);
+
 Cn = h5read(segmented, '/Cn');
+rVals = h5read(segmented, '/rVals');
 rVals = h5read(segmented, '/rVals');
 T_keep = h5read(segmented, '/T_keep');
 C_keep = h5read(segmented, '/C_keep');
@@ -149,6 +152,11 @@ h5_segmented = h5read(h5_segmented, '/T_keep');
 
 Coor = plot_contours(A,Cn,options,1); close;
 
+%%
+h5_segmented_jeff = fullfile("D://Jeffs LBM paper data/Fig4a-c/20191121/MH70/caiman_output_plane_26.mat");
+h5_segmented_jeff = open(h5_segmented_jeff);
+
+x = 2;
 %%
 h5_segmented_jeff = fullfile("D://Jeffs LBM paper data/Fig4a-c/20191121/MH70/caiman_output_plane_26.mat");
 h5_segmented_jeff = open(h5_segmented_jeff);

@@ -1,9 +1,9 @@
-(offset_correction)=
-# Axial-Offset Correction
+(collation)=
+# Axial Collation and Correction
 
-Use pollen calibration data to spatially align each z-plane.
+Use pollen calibration data to spatially align each z-plane and merge across planes.
 
-Core function(s): {func}`calculateZOffset()`
+Core function(s): {func}`collatePlanes()`
 
 ```{note}
 Before the session being processed, you should have collected a cailbration file (i.e. {code}`pollen_calibration_00001.tif`}).
