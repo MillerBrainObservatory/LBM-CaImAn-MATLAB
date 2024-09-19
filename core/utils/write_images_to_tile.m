@@ -43,7 +43,6 @@ if isempty(scales) || length(scales) ~= num_images
 end
 
 f = figure('Visible', 'off');
-sgtitle(fig_title, 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'w');
 
 switch layout
     case 'horizontal'
@@ -89,12 +88,29 @@ for i = 1:num_images
         scale_length_pixels = mod_scale / metadata.pixel_resolution;
 
         hold on;
-        scale_bar_x = [size(img, 2) - scale_length_pixels - 3, size(img, 2) - 3];
-        scale_bar_y = [size(img, 1) - 3, size(img, 1) - 3];
-        line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 5);
-        text(mean(scale_bar_x), scale_bar_y(1), sprintf('%d µm', mod_scale), 'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
+        % Move the scale bar up and to the left by a fraction of the image height and width
+        y_offset = size(img, 1) * 0.1; % 10% of the image height
+        x_offset = size(img, 2) * 0.1; % 10% of the image width
+        scale_bar_x = [size(img, 2) - scale_length_pixels - 3 - x_offset, size(img, 2) - 3 - x_offset];
+        scale_bar_y = [size(img, 1) - y_offset, size(img, 1) - y_offset];
+
+        % TODO: Scale line width with image resolution
+        line(scale_bar_x, scale_bar_y, 'Color', 'r', 'LineWidth', 3);
+
+        % Adjust text position to match the new scale bar location
+        text(mean(scale_bar_x), scale_bar_y(1) - 5, sprintf('%d µm', mod_scale), ...
+            'Color', 'r', 'FontSize', 12, 'FontWeight', 'bold', ...
+            'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
         hold off;
     end
+
+end
+if ~isempty(fig_title)
+    % underscores make subscripts, replace with a space and capitalize
+    fig_title = strrep(fig_title, '_', ' ');
+    fig_title = regexprep(fig_title, '(\<\w)', '${upper($1)}');
+
+    sgtitle(fig_title, 'FontSize', 14, 'FontWeight', 'bold', 'Color', 'w');
 end
 
 if ~isempty(save_name)
