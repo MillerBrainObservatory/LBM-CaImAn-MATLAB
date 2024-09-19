@@ -19,7 +19,7 @@ function motionCorrectPlane(data_path, varargin)
 % do_figures : double, integer, positive
 %     If true, correlation metrics will be saved to save_path/figures.
 % overwrite : logical, optional
-%     Whether to overwrite existing files (default is 1).
+%     Whether to overwrite existing files (default is 0).
 % num_cores : double, integer, positive
 %     Number of cores to use for computation. The value is limited to a maximum
 %     of 24 cores.
@@ -44,7 +44,7 @@ addParameter(p, 'save_path', '', @(x) ischar(x) || isstring(x));
 addParameter(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)));
 addParameter(p, 'debug_flag', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'do_figures', 1, @(x) isnumeric(x) || islogical(x));
-addParameter(p, 'overwrite', true, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'overwrite', 0, @(x) isnumeric(x) || islogical(x));
 addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 
 %% additional parameters for motion correction

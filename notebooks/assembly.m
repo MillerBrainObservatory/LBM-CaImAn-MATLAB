@@ -95,8 +95,7 @@ if compute
             'trim_pixels', [n_trim_px n_trim_px 17 0], ... % default, num pixels to trim for each roi
             'overwrite', 1 ...
             );
-    end
-end
+
 
 %% output images of these trimmed images
 clc;

@@ -27,7 +27,6 @@ if ~exist('loc', 'var'); loc='/'; end
 fields = fieldnames(metadata);
 
 for f = fields'
-    disp(f{1});
     value = metadata.(f{1});
     if isstruct(value)
         % Flatten struct fields that aren't supported by hdf5
