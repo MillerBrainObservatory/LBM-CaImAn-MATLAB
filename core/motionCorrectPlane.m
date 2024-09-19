@@ -209,19 +209,20 @@ for plane_idx = start_plane:end_plane
         title('Mean rigid template', 'fontsize',10,'fontweight','bold', 'Color', 'w');
         
         ax3 = subplot(2, 3, 3); imagesc(mM2); axis equal; axis tight; axis off;
-        title('Mean Registered', 'Color', 'w', 'FontWeight', 'bold');
+        title('Mean registered', 'Color', 'w', 'FontWeight', 'bold');
         
-        subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('Raw', 'Template', 'Registration');
-        title('correlation coefficients', 'Color', 'w', 'FontWeight', 'bold');
+        subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('Raw', 'Template', 'Registered');
+        title('Correlation coefficients', 'Color', 'w', 'FontWeight', 'bold');
         subplot(2, 3, 5); scatter(cY, cM1); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        title('Template vs Mean Image Correlation','fontsize',10,'fontweight','bold', 'Color', 'w');
+        title('Template vs Raw Correlation','fontsize',10,'fontweight','bold', 'Color', 'w');
         xlabel('Raw data correlation', 'fontsize',10,'fontweight','bold', 'Color', 'w');
-        ylabel('Rigid template correlation', 'fontsize',10,'fontweight','bold', 'Color', 'w');
+        ylabel('Template data correlation', 'fontsize',10,'fontweight','bold', 'Color', 'w');
         
         subplot(2, 3, 6); scatter(cM1, cM2,  'MarkerEdgeColor', 'w'); hold on;
+        title('Registered vs Template Correlation','fontsize',10,'fontweight','bold', 'Color', 'w');
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        xlabel('rigid template', 'Color', 'w', 'FontWeight', 'bold'); ylabel('non-rigid correlation', 'Color', 'w', 'FontWeight', 'bold');
+        xlabel('Rigid template', 'Color', 'w', 'FontWeight', 'bold'); ylabel('Non-rigid correlation', 'Color', 'w', 'FontWeight', 'bold');
         linkaxes([ax1, ax2, ax3], 'xy');
         savefig(metrics_name_fig)
         exportgraphics(f, metrics_name_png, 'Resolution', 600);
