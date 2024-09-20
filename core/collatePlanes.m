@@ -114,7 +114,7 @@ for ijk = start_plane:end_plane
 
     disp(['Beginning calculation for plane ' num2str(ijk)])
     pm = load([data_path '/' 'caiman_output_plane_' num2str(ijk) '.mat']);
-    pmh = h5read(fullfile(data_path,"segmented_plane_1.h5"), "/T_keep");
+    % pmh = h5read(fullfile(data_path,"segmented_plane_1.h5"), "/T_keep");
 
     % Tinit = pm.T_keep;
     Tinit = h5read(fullfile(data_path,"segmented_plane_1.h5"), "/T_keep");

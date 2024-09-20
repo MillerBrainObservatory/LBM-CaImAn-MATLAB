@@ -14,8 +14,8 @@ function play_movie_save(movie_cell_array,labels_cell_array,min_mov,max_mov, fil
 %
 % Examples
 % --------
-% play_movie({movie1, movie2}, {'Movie 1', 'Movie 2'}, 0, 255)
-% play_movie(movie, 'Sample Movie')
+% play_movie_save({movie1, movie2}, {'Movie 1', 'Movie 2'}, 0, 255)
+% play_movie_save(movie, 'Sample Movie')
 if ~iscell(movie_cell_array)
     movie_cell_array = {movie_cell_array};
 end
