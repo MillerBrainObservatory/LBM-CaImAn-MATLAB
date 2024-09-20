@@ -143,11 +143,11 @@ metadata.trim_roi = [t_left, t_right, t_top, t_bottom]; % store the number of pi
 metadata.trim_edge = [t_left_image, t_right_image, t_top_image, t_bottom_image]; % store the number of pixels to trim
 
 % Calculate ROI dims and Image dims
-raw_x_roi = metadata.num_pixel_xy(1);
+raw_x_roi = metadata.roi_width_px;
 raw_x_roi = min(raw_x_roi, tiff_width);
 raw_x = raw_x_roi * num_rois;
 
-raw_y_roi = metadata.num_pixel_xy(2);
+raw_y_roi = metadata.roi_height_px;
 raw_y_roi = min(raw_y_roi, metadata.tiff_length);
 
 % ROI slices
@@ -337,7 +337,9 @@ for plane_idx = 1:num_planes
         labels = {'Second Frame', 'Mean Image'};
         scale_full = calculate_scale(size(img_frame, 2), metadata.pixel_resolution);
         scales = {scale_full, scale_full};
+
         plane_save_path = fullfile(fig_save_path, sprintf('plane_%d.png', plane_idx));
+        plane_save_path_fig = fullfile(fig_save_path, sprintf('plane_%d.fig', plane_idx));
 
         write_images_to_tile( ...
             images, ...
@@ -347,6 +349,8 @@ for plane_idx = 1:num_planes
             'scales', scales, ...
             'save_name', plane_save_path ...
             );
+
+        savefig(plane_save_path_fig);
     end
     write_frames_3d(assembled_full_path, z_timeseries,ds,multifile,4);
     try
