@@ -102,9 +102,9 @@ tau = ceil(7.5./pixel_resolution);  % (a little smaller than) half-size of neuro
 
 % USER-SET VARIABLES - CHANGE THESE TO IMPROVE SEGMENTATION
 
-merge_thresh = 0.8;                 % threshold for merging
-min_SNR = 1.4;                      % 1.4 is liberal,
-space_thresh = 0.2;                 % threhsold for selection of neurons by space
+merge_thresh = 0.8;                 % how temporally correlated any two neurons need to be to be merged
+min_SNR = 1.4;                      % signal-noise ratio needed to accept this neuron as initialized (1.4 is liberal)
+space_thresh = 0.2;                 % how spatially correlated nearby px need to be to be considered for segmentation
 sz = 0.1;                           % If masks are too large, increase sz, if too small, decrease. 0.1 lowest.
 p = 2;                              % order of dynamics
 
