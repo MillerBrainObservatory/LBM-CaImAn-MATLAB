@@ -7,7 +7,7 @@ assembly_path = fullfile(tiff_path, 'assembled');
 
 metadata = get_metadata(fullfile(tiff_path, "MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif"));
 
-%% After assembly, collect all images
+%% After assembly, collect a single frame from each assembled image
 num_planes = 30;
 
 % Load and normalize images
@@ -94,7 +94,7 @@ if compute
             'fix_scan_phase', 1, ... % default, keep to 1
             'trim_pixels', [n_trim_px n_trim_px 17 0], ... % default, num pixels to trim for each roi
             'overwrite', 1 ...
-            );
+);
 
 
 %% output images of these trimmed images
