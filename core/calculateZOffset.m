@@ -1,4 +1,4 @@
-function [offsets] = calculateZOffset(data_path, varargin)
+function [offsets, metadata] = calculateZOffset(data_path, varargin)
 % Parameters
 % ----------
 % data_path : string
@@ -6,20 +6,20 @@ function [offsets] = calculateZOffset(data_path, varargin)
 %     The function expects to find 'pollen_sample_xy_calibration.mat' in this directory along with each caiman_output_plane_N.
 % motion_corrected_path: string
 %     Path to motion corrected data. Default is
-%     data_path/../motion_corrected/
+%     data_path/../motion_corrected/,
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Default is 0.
 % overwrite : logical, optional
-%     Whether to overwrite existing files. Default is 1.
+%     Whether to overwrite existing files. Default is 0.
 % start_plane : double, integer, positive
 %     The starting plane index for processing. Default is 1.
 % end_plane : double, integer, positive
 %     The ending plane index for processing. Must be greater than or equal to
-%     start_plane. Default is 2.
+%     start_plane. Default is 1.
 % num_features : double, integer, positive
 %     The number of features to identify and use in each plane for
-%     calculating offsets. Default is 3 features (neurons) compared across
+%     calculating offsets. Default is 2 features (neurons) compared across
 %     z-plane/z-plane+1.
 %
 %
@@ -30,6 +30,8 @@ function [offsets] = calculateZOffset(data_path, varargin)
 %     of planes processed. Each row corresponds to a plane, and the two columns
 %     represent the calculated offset in pixels along the x and y directions,
 %     respectively.
+%
+% metadata: struct
 %
 % Notes
 % -----
@@ -43,7 +45,7 @@ function [offsets] = calculateZOffset(data_path, varargin)
 %
 % Examples
 % --------
-% offsets = calculateZOffset('C:/data/images/', metadata, 1, 10, 5);
+% [offsets, metadata] = calculateZOffset('C:/data/images/', metadata, 1, 10, 5);
 %
 
 p = inputParser;
@@ -85,7 +87,7 @@ if debug_flag == 1
     return; 
 end
 
-if ~(start_plane<end_plane); error("Start plane must be < end plane"); end
+if ~(start_plane<=end_plane); error("Start plane must be < end plane"); end
 
 log_file_name = sprintf("%s_axial_offset_correction.log", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 log_full_path = fullfile(data_path, log_file_name);
@@ -140,11 +142,7 @@ for plane_idx = start_plane:end_plane
 
     plane_name = sprintf("%s/motion_corrected_plane_%d.h5",motion_corrected_path,plane_idx);
     plane_name_next = sprintf("%s/motion_corrected_plane_%d.h5",motion_corrected_path,plane_idx + 1);
-
-    if plane_idx == end_plane
-        log_message(fid, "Reached final plane: %d\n", end_plane);
-        continue;
-    end
+    
 
     plane_name_save = sprintf("%s/axial_corrected_plane_%d.h5", data_path, plane_idx);
     if isfile(plane_name_save)
@@ -172,6 +170,11 @@ for plane_idx = start_plane:end_plane
     offsets = zeros(metadata.num_planes, 2);
     p1 = h5read(plane_name, '/Ym');
     p2 = h5read(plane_name_next, '/Ym');
+
+    if ~isfile(plane_name_next)
+        disp('Final plane reached.')
+        continue
+    end
 
     gix = nan(1, num_features);
     giy = gix;
