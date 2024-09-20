@@ -1,26 +1,32 @@
 function [] = collatePlanes(data_path, varargin)% Parameters
 % Parameters
 % ----------
-% data_path : string
-%     Path to the directory containing the image data and calibration files.
-%     The function expects to find 'pollen_sample_xy_calibration.mat' in this directory along with each caiman_output_plane_N.
+% data_path : char
+%     Path to the directory containing the files assembled via convertScanImageTiffToVolume.
+% save_path : char
+%     Path to the directory to save the motion vectors.
+% ds : string, optional
+%     Group path within the hdf5 file that contains raw data.
+% debug_flag : double, logical, optional
+%     If set to 1, the function displays the files in the command window and does
+%     not continue processing. Defaults to 0.
+% do_figures : double, integer, positive
+%     If true, correlation metrics will be saved to save_path/figures.
+% overwrite : logical, optional
+%     Whether to overwrite existing files (default is 0).
+% num_cores : double, integer, positive
+%     Number of cores to use for computation. The value is limited to a maximum
+%     of 24 cores.
+% start_plane : double, integer, positive
+%     The starting plane index for processing.
+% end_plane : double, integer, positive
+%     The ending plane index for processing. Must be greater than or equal to
+%     start_plane.
+% options : struct
+%     Struct containing key-value pairs for 'min_SNR' and 'merge_thresh'.
 % motion_corrected_path: string
 %     Path to motion corrected data. Default is
 %     data_path/../motion_corrected/,
-% debug_flag : double, logical, optional
-%     If set to 1, the function displays the files in the command window and does
-%     not continue processing. Default is 0.
-% overwrite : logical, optional
-%     Whether to overwrite existing files. Default is 0.
-% start_plane : double, integer, positive
-%     The starting plane index for processing. Default is 1.
-% end_plane : double, integer, positive
-%     The ending plane index for processing. Must be greater than or equal to
-%     start_plane. Default is 1.
-% num_features : double, integer, positive
-%     The number of features to identify and use in each plane for
-%     calculating offsets. Default is 2 features (neurons) compared across
-%     z-plane/z-plane+1.
 
 % Correct for lateral offsets between z-planes and merge highly correlated
 % neurons. Ensure pollen calibration files are found in data_path!
