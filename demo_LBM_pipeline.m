@@ -7,6 +7,9 @@
 % more detail in the README.
 %% Two %'s lets you run code section-by-section via the Run Section button or pressing cntl+enter
 
+% Make sure figures will show
+set(groot, 'DefaultFigureVisible', 'on');
+
 
 %% RUN THIS WITH THE PLAY BUTTON, NOT "RUN SECTION"
 % When ran as a script (the "Run" button), this will automatically add the
@@ -16,23 +19,23 @@ clc, clear; % !! Careful, this will clear all variables from memory
 [fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
 addpath(genpath(fullfile(fpath, 'core'))); addpath(genpath(fullfile(fpath, 'packages')));
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%% Assembly %%%%%%%%%%
-%%
-
-%% POINT THIS PATH TO WHERE YOUR TIFF FILES LIVE
-data_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01');
-
 % To preview metadata for this file without assembling it
 % metadata = get_metadata(fullfile(data_path, "filename.tif");
 % This happens internally in convertScanImageTiffToVolume()
 metadata = get_metadata(fullfile(data_path, "MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif"));
 disp(metadata);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% Assembly %%%%%%%%%%
 %%
+
+
+%% POINT THIS PATH TO WHERE YOUR TIFF FILES LIVE
+data_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01');
+
 % by default, results are saved in the parent directory /function_step
 % directory
-save_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01\assembled_default\');
+save_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01\assembled\');
 convertScanImageTiffToVolume( ...
     data_path, ...
     'save_path', save_path, ... 
@@ -52,6 +55,7 @@ convertScanImageTiffToVolume( ...
 %%%%% Motion Correction %%%
 %%
 
+% We want to fetch the size of the dataset from the first assembled file
 filename = fullfile(save_path, "assembled_plane_1.h5");
 metadata = read_h5_metadata(filename, '/Y');
 
@@ -62,20 +66,20 @@ options = NoRMCorreSetParms(...
     'd2', data_size(2),...
     'grid_size', [64,64], ...
     'bin_width', 100,... % number of frames to avg when updating template
-    'max_shift', round(20/metadata.pixel_resolution),... % 20 microns
+    'max_shift', round(20/metadata.pixel_resolution),... % Size of a large neuron mouse cortex
     'correct_bidir', false... % defaults to true, this was already done in step 1
 );
 
 motionCorrectPlane( ...
-    parent_path, ... % we used this to save extracted data
-    mc_path, ... % save registered data here
-    'dataset_name', '/Y', ... % where we saved the last step in h5
+    fullfile(data_path, "assembled"), ... % we used this to save extracted data
+    'save_path', fullfile(data_path, "corrected/"), ... % save registered data here
+    'ds', '/Y', ... % where we saved the last step in h5
     'debug_flag', 0, ...
-    'overwrite', 1, ...
+    'overwrite', 0, ...
     'num_cores', 23, ...
     'start_plane', 1, ...
-    'end_plane', 1,  ...
-    'options_nonrigid', options ...
+    'end_plane', metadata.num_planes,  ...
+    'options', options ...
     );
 
 %% 3) CNMF Plane-by-plane Segmentation
@@ -87,16 +91,19 @@ segmentPlane( ...
     'overwrite', 0, ...
     'num_cores', 23, ...
     'start_plane', 1, ...
-    'end_plane', 1  ...
+    'end_plane', metadata.num_planes  ...
 );
 
 %% 4) Collate z-planes and merge spatially overlapping highly-correlated neurons
 
 collatePlanes( ...
-    'C:/Users/RBO/Documents/data/high_res/results', ... % data_path
-    'dataset_name', '/Y', ... % where we saved the last step in h5
+    'C:/Users/RBO/caiman_data/animal_01/session_01/segmented', ... % data_path
+    'ds', '/Y', ... % where we saved the last step in h5
     'debug_flag', 0, ...
     'overwrite', 0, ...
     'start_plane', 1, ...
-    'end_plane', 30  ...
+    'end_plane', 2,  ...
+    'num_features', 1 ...
 );
+
+
