@@ -135,7 +135,7 @@ for t = 1:skp:T
             end
             hold off;            
         end
-    subplot(4,6,[5,6,11,12]); imagesc(Y(:,:,t)-C_rec(:,:,t),[-mC/2,mC/2]);
+    subplot(4,6,[5,6,11,12]); imagesc(double(Y(:,:,t))-C_rec(:,:,t),[-mC/2,mC/2]);
         title('Residual 2x','fontweight','bold','fontsize',16);
         axis equal; axis tight; axis off;
     subplot(4,6,[13,14,19,20]); imagesc(C_np(:,:,t),[0,mB]);

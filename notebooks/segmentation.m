@@ -1,5 +1,5 @@
 %% Interactive Segmentation
-
+clear;
 %% POINT THIS TO YOUR DESIRED PLANE and MOTION-CORRECTED FILEPATH
 plane = 26;
 motion_corrected_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01\motion_corrected');
@@ -7,10 +7,11 @@ motion_corrected_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01\
 %%
 
 motion_corrected_filename = fullfile(motion_corrected_path, sprintf("motion_corrected_plane_%d.h5", plane));
-metadata = read_h5_metadata(motion_corrected_filename, '/Y');
 
 %%
 % data_size = metadata.data_size;
+
+data = h5read(motion_corrected_filename, '/Y'); % you can get size from h5 as well
 data_size = h5info(motion_corrected_filename, '/Y').ChunkSize(1:2); % you can get size from h5 as well
 
 %%
@@ -21,28 +22,85 @@ metadata = read_h5_metadata(motion_corrected_filename, '/Y');
 data_size = h5info(motion_corrected_filename, '/Y').ChunkSize(1:2);
 pixel_resolution = metadata.pixel_resolution;
 frame_rate = metadata.frame_rate;
+d1=data_size(1);d2=data_size(2);
 d = data_size(1)*data_size(2);      % total number of samples
 T = metadata.num_frames;
+tau = ceil(7.5/metadata.pixel_resolution);
 
-tau = ceil(7.5./pixel_resolution);  % (a little smaller than) half-size of neuron
 
-% USER-SET VARIABLES - CHANGE THESE TO IMPROVE SEGMENTATION
+% 
+% tau = ceil(7.5./pixel_resolution);  % (a little smaller than) half-size of neuron
+% 
+% % USER-SET VARIABLES - CHANGE THESE TO IMPROVE SEGMENTATION
+% 
+% merge_thresh = 0.8;                 % how temporally correlated any two neurons need to be to be merged
+% min_SNR = 1.4;                      % signal-noise ratio needed to accept this neuron as initialized (1.4 is liberal)
+% space_thresh = 0.2;                 % how spatially correlated nearby px need to be to be considered for segmentation
+% sz = 0.1;                           % If masks are too large, increase sz, if too small, decrease. 0.1 lowest.
+% p = 2;                              % order of dynamics
+% 
+% mx = ceil(pi.*(1.33.*tau).^2);
+% mn = floor(pi.*(tau.*0.5).^2);     
+% 
+% % patch set up; basing it on the ~600 um strips of the 2pRAM, +50 um overlap between patches
+% fov = metadata.fov(1);
+% patch_size = round(fov/4.5).*[1,1];
+% overlap = [1,1].*ceil(30./pixel_resolution);
+% patches = construct_patches(data_size,patch_size,overlap);
+% 
+% 
 
-merge_thresh = 0.8;                 % how temporally correlated any two neurons need to be to be merged
-min_SNR = 1.4;                      % signal-noise ratio needed to accept this neuron as initialized (1.4 is liberal)
-space_thresh = 0.2;                 % how spatially correlated nearby px need to be to be considered for segmentation
-sz = 0.1;                           % If masks are too large, increase sz, if too small, decrease. 0.1 lowest.
-p = 2;                              % order of dynamics
-
+merge_thresh = 0.8; % threshold for merging
+min_SNR = 1.4; % liberal threshold, can tighten up in additional post-processing
+space_thresh = 0.2; % threhsold for selection of neurons by space
+time_thresh = 0.0;
+sz = 0.1; % IF FOOTPRINTS ARE TOO SMALL, CONSIDER sz = 0.1
 mx = ceil(pi.*(1.33.*tau).^2);
-mn = floor(pi.*(tau.*0.5).^2);     
+mn = floor(pi.*(tau.*0.5).^2); % SHRINK IF FOOTPRINTS ARE TOO SMALL
+p = 2; % order of dynamics
 
 % patch set up; basing it on the ~600 um strips of the 2pRAM, +50 um overlap between patches
-fov = metadata.fov(1);
-patch_size = round(fov/4.5).*[1,1];
-overlap = [1,1].*ceil(30./pixel_resolution);
-patches = construct_patches(data_size,patch_size,overlap);
+sizY = data_size;
+patch_size = round(650/pixel_resolution).*[1,1];
+overlap = [1,1].*ceil(50./pixel_resolution);
+patches = construct_patches(sizY,patch_size,overlap);
 
+K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2); % number of components based on assumption of 9.2e4 neurons/mm^3
+
+% Set caiman parameters
+options = CNMFSetParms(...   
+'d1',d1,'d2',d2,...                         % dimensionality of the FOV
+'deconv_method','constrained_foopsi',...    % neural activity deconvolution method
+'temporal_iter',3,...                       % number of block-coordinate descent steps 
+'maxIter',15,...                            % number of NMF iterations during initialization
+'spatial_method','regularized',...          % method for updating spatial components
+'df_prctile',20,...                         % take the median of background fluorescence to compute baseline fluorescence 
+'p',p,...                                   % order of AR dynamics    
+'gSig',tau,...                              % half size of neuron
+'merge_thr',merge_thresh,...                % merging threshold  
+'nb',1,...                                  % number of background components  
+'gnb',3,...         
+'min_SNR',min_SNR,...                       % minimum SNR threshold
+'space_thresh',space_thresh ,...            % space correlation threshold
+'decay_time',0.5,...                        % decay time of transients, GCaMP6s
+'size_thr', sz, ...
+'search_method','ellipse',...
+'min_size', round(tau), ...                 % minimum size of ellipse axis (default: 3)
+'max_size', 2*round(tau), ....              % maximum size of ellipse axis (default: 8)
+'dist', 1.25, ...                           % expansion factor of ellipse (default: 3)
+'max_size_thr',mx,...                       % maximum size of each component in pixels (default: 300)
+'time_thresh',time_thresh,...
+'min_size_thr',mn,...                       % minimum size of each component in pixels (default: 9)
+'refine_flag',0,...
+'rolling_length',ceil(frame_rate*5),...
+'fr', frame_rate);
+
+% Run patched caiman
+disp('Beginning patched, volumetric CNMF...')
+[A,b,C,f,S,P,~,YrA] = run_CNMF_patches(data,K,patches,tau,p,options);
+date = datetime(now,'ConvertFrom','datenum');
+
+            %%
 % Visualize Patches
 
 figure;
@@ -72,7 +130,7 @@ end
 
 %%
 % number of components based on assumption of 9.2e4 neurons/mm^3
-K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2);
+% K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2);
 
 % Set caiman parameters
  options = CNMFSetParms(...
@@ -104,7 +162,7 @@ K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2);
 tic;
 motion_corrected_data = h5read(motion_corrected_filename, '/Y');
 [A,b,C,f,S,P,RESULTS,YrA] = run_CNMF_patches(motion_corrected_data,K,patches,tau,p,options);
-[ROIvars.rval_space,ROIvars.rval_time,ROIvars.max_pr,ROIvars.sizeA,keep] = classify_components(motion_corrected_data,A,C,b,f,YrA,options);
+[ROIvars.rval_space,ROIvars.rval_time,ROIvars.max_pr,ROIvars.sizeA,keep] = classify_components_jeff(motion_corrected_data,A,C,b,f,YrA,options);
 toc
 
 %% Preview neurons aft
@@ -143,7 +201,6 @@ plot_components_GUI(motion_corrected_data,A(:,keep),C(keep,:),b,f,Cn,options);
 % plot_components_GUI(YrA,A_or,C_or,b2,f2,Cn,options);
 
 %% make movie
-
 make_patch_video(A(:,keep),C(keep,:),b,f,motion_corrected_data,Coor,options);
 
 %% refine temporal components
