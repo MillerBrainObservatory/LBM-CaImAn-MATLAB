@@ -22,6 +22,9 @@ function [] = collatePlanes(data_path, varargin)% Parameters
 % end_plane : double, integer, positive
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
+% num_features : double, positive
+%     The number of neurons to select for the lateral offset correction
+%     between z-planes. Default is 1 feature/neuron.
 % options : struct
 %     Struct containing key-value pairs for 'min_SNR' and 'merge_thresh'.
 % motion_corrected_path: string
