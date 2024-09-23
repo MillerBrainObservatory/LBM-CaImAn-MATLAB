@@ -243,9 +243,6 @@ title(['Component ',num2str(i)]);
 
 legend('Fluorescence DF/F','Deconvolved','Spikes')
 
-%%
-
-
 %% Load variables for inspection
 
 tsub = 6; % temporally downsampling the video helps with visualization
