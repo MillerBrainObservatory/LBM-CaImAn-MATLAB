@@ -1,45 +1,34 @@
-%% Example script that will run the full pipeline.
-% This code block adds all modules inside the "core" directory to the
-% matlab path.
-% This isn't needed if the path to this package is added to the MATLAB path
-% manually by right clicking caiman_matlab folder and "add packages and
-% subpackages to path" or via the startup.m file. Both methods described in
-% more detail in the README.
-%% Two %'s lets you run code section-by-section via the Run Section button or pressing cntl+enter
+%% Motion Correction Grid Search
+clear
+%% POINT THIS PATH TO YOUR DESIRED PLANE, ASSEMBLED FILES, AND REGISTERED FILES
+plane = 26;
 
+assembled_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01\assembled');
+motion_corrected_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01\motion_corrected');
 
-%% RUN THIS WITH THE PLAY BUTTON, NOT "RUN SECTION"
-% When ran as a script (the "Run" button), this will automatically add the
-% core and packages folders to your MATLAB path
-% Not needed if the project code is stored in the Documents/MATLAB folder
-clc, clear; % !! Careful, this will clear all variables from memory
-[fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
-addpath(genpath(fullfile(fpath, 'core'))); addpath(genpath(fullfile(fpath, 'packages')));
+%%
 
-%% POINT THIS PATH TO YOUR ASSEMBLED TIFF FILES
-save_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01\assembled');
-mc_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01\motion_corrected');
+raw_filename = fullfile(assembled_path, sprintf("assembled_plane_%d.h5", plane));
+metadata = read_h5_metadata(raw_filename, '/Y');
 
-filename = fullfile(save_path, "assembled_plane_1.h5");
-metadata = read_h5_metadata(filename, '/Y');
-
-% data_size = metadata.data_size;
-data_size = h5info(filename, '/Y');
-data_size = data_size.ChunkSize(1:2);
+%%
+data_size = metadata.data_size;
+% data_size = h5info(filename, '/Y').ChunkSize(1:2); % you can get size from h5 as well
 
 % Put any variables you want to search inside [], separated by a comma
 shifts_um = [5, 20, 40];
 grid_sizes = [64, 128];
 
-for i=1:size(shifts_um)
-    disp(i);
-    disp(size(shifts_um))
+for i=1:numel(shifts_um)
     max_shift = shifts_um(i);
-    for j=1:size(grid_sizes)
+    for j=1:numel(grid_sizes)
         grid_size = grid_sizes(j);
 
         % use variables to save the file
-        grid_search_savepath = sprintf("%s/max_shift_%d_grid_size_%dx%d",save_path,max_shift,grid_size(1), grid_size(1));
+        grid_search_savepath = sprintf( ...
+                "%s/plane_%d_max_shift_%d_grid_size_%dx%d", ...
+                plane,assembled_path,max_shift,grid_size(1), grid_size(1) ...
+        );
 
         options = NoRMCorreSetParms(...
             'd1', data_size(1),...
@@ -51,15 +40,29 @@ for i=1:size(shifts_um)
         );
         
         motionCorrectPlane( ...
-            save_path, ... % we used this to save extracted data
+            assembled_path, ... % we used this to save extracted data
             'save_path', grid_search_savepath, ... % save registered data here
             'ds', '/Y', ... % where we saved the last step in h5
             'debug_flag', 0, ...
             'overwrite', 1, ...
             'num_cores', 23, ...
-            'start_plane', 1, ...
-            'end_plane', 1,  ...
+            'start_plane', plane, ...
+            'end_plane', plane,  ...
             'options', options ...
-            );
+        );
     end
 end
+
+%% Play registration movie alongside raw movie
+
+motion_corrected_filename = fullfile(motion_corrected_path, sprintf("motion_corrected_plane_%d.h5", plane));
+raw_movie = h5read(raw_filename, '/Y');
+motion_corrected_data = h5read(raw_filename, '/Y');
+
+play_movie({raw_movie, motion_corrected_data})
+
+%% Save registration movie alongside raw movie
+
+write_frames_to_mp4(raw_movie, motion_corrected_path, metadata.frame_rate);
+write_frames_to_avi(raw_movie, motion_corrected_path, metadata.frame_rate);
+write_frames_to_gif(raw_movie, motion_corrected_path, metadata.frame_rate);

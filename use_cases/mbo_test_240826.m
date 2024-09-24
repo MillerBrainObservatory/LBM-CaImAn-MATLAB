@@ -10,16 +10,14 @@ addpath(genpath(fullfile(fpath, 'core', 'utils')));
 % This does not check for package access on your path.
 
 result = validate_toolboxes();
-% if ischar(result)
-%     error(result);
-% else
-%     disp('Proceeding with execution...');
-% end
+if ischar(result)
+    error(result);
+else
+    disp('Proceeding with execution...');
+end
 
 parent_path = fullfile('C:\Users\RBO\caiman_data\mk717\');
 data_path = fullfile(parent_path, '1um_72hz');
-
-%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Extraction %%%%%%%%

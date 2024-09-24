@@ -138,10 +138,12 @@ for plane_idx = start_plane:end_plane
     d1 = volume_size(1);
     d2 = volume_size(2);
     pixel_resolution = metadata.pixel_resolution;
+    frame_rate = metadata.frame_rate;
     
     options_rigid = NoRMCorreSetParms(...
         'd1',d1,...
         'd2',d2,...
+        'fr', frame_rate, ...
         'bin_width',200,...
         'max_shift', round(20/pixel_resolution),...        % Max shift in px
         'us_fac',20,...                   % upsample factor
@@ -171,6 +173,7 @@ for plane_idx = start_plane:end_plane
         options = NoRMCorreSetParms(...
             'd1', d1,...
             'd2', d2,...
+            'fr', frame_rate, ...
             'bin_width', 20,...
             'grid_size', [128,128], ...
             'max_shift', round(100/pixel_resolution),...
@@ -209,19 +212,20 @@ for plane_idx = start_plane:end_plane
         title('Mean rigid template', 'fontsize',10,'fontweight','bold', 'Color', 'w');
         
         ax3 = subplot(2, 3, 3); imagesc(mM2); axis equal; axis tight; axis off;
-        title('Mean Registered', 'Color', 'w', 'FontWeight', 'bold');
+        title('Mean registered', 'Color', 'w', 'FontWeight', 'bold');
         
-        subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('Raw', 'Template', 'Registration');
-        title('correlation coefficients', 'Color', 'w', 'FontWeight', 'bold');
+        subplot(2, 3, 4); plot(1:T, cY, 1:T, cM1, 1:T, cM2); legend('Raw', 'Template', 'Registered');
+        title('Correlation coefficients', 'Color', 'w', 'FontWeight', 'bold');
         subplot(2, 3, 5); scatter(cY, cM1); hold on;
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        title('Template vs Mean Image Correlation','fontsize',10,'fontweight','bold', 'Color', 'w');
+        title('Template vs Raw Correlation','fontsize',10,'fontweight','bold', 'Color', 'w');
         xlabel('Raw data correlation', 'fontsize',10,'fontweight','bold', 'Color', 'w');
-        ylabel('Rigid template correlation', 'fontsize',10,'fontweight','bold', 'Color', 'w');
+        ylabel('Template data correlation', 'fontsize',10,'fontweight','bold', 'Color', 'w');
         
         subplot(2, 3, 6); scatter(cM1, cM2,  'MarkerEdgeColor', 'w'); hold on;
+        title('Registered vs Template Correlation','fontsize',10,'fontweight','bold', 'Color', 'w');
         plot([0.9 * min(cY), 1.05 * max(cM1)], [0.9 * min(cY), 1.05 * max(cM1)], '--r'); axis square;
-        xlabel('rigid template', 'Color', 'w', 'FontWeight', 'bold'); ylabel('non-rigid correlation', 'Color', 'w', 'FontWeight', 'bold');
+        xlabel('Rigid template', 'Color', 'w', 'FontWeight', 'bold'); ylabel('Non-rigid correlation', 'Color', 'w', 'FontWeight', 'bold');
         linkaxes([ax1, ax2, ax3], 'xy');
         savefig(metrics_name_fig)
         exportgraphics(f, metrics_name_png, 'Resolution', 600);
@@ -245,7 +249,15 @@ for plane_idx = start_plane:end_plane
         
         title('Correlation coefficients', 'Color', 'w', 'FontWeight', 'bold');
         
-        legend('Raw data','Template','Registered', 'Color', 'w', 'FontWeight', 'bold');
+        % Set the figure background to black
+        set(gcf, 'Color', 'black');
+        
+        % Set the axes background to black, axis lines and labels to white, and add a white border
+        set(gca, 'Color', 'black', 'XColor', 'white', 'YColor', 'white', 'Box', 'on', 'LineWidth', 1);
+        
+        % Adjust the legend properties
+        legend('Raw data', 'Template', 'Registered', ...
+            'TextColor', 'white', 'EdgeColor', 'white', 'FontSize', 8, 'Color', 'black', 'FontWeight', 'bold');
         set(gca,'Xtick',[])
         ax2 = subplot(312); plot(shifts_x, 'LineWidth',.2); title('displacements along x', 'Color', 'w', 'FontWeight', 'bold')
         set(gca,'Xtick',[])

@@ -29,7 +29,7 @@ function segmentPlane(data_path, varargin)
 % end_plane : double, integer, positive
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
-% options : dictionary, mapping
+% options : struct
 %     key:value pairs of all of your CNMF parameters.
 %     See the example parameters in the LBM_demo_pipeline.
 %
@@ -196,7 +196,8 @@ for plane_idx = start_plane:end_plane
     log_message(fid, "Using default CNMF parameters.\n")
     
     % Set caiman parameters
-    options = CNMFSetParms(...
+    if isempty(options)
+         options = CNMFSetParms(...
         'd1',d1,'d2',d2,...                         % dimensionality of the FOV
         'deconv_method','constrained_foopsi',...    % neural activity deconvolution method
         'temporal_iter',3,...                       % number of block-coordinate descent steps
@@ -222,7 +223,8 @@ for plane_idx = start_plane:end_plane
         'refine_flag',0,...
         'rolling_length',ceil(frame_rate*5),...
         'fr', frame_rate);                                      % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
-    
+    end
+   
     poolobj = gcp('nocreate'); % create a parallel pool
     if isempty(poolobj)
         disp('Starting the parallel pool...')

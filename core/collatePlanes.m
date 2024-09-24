@@ -1,54 +1,41 @@
-function [] = collatePlanes(data_path, varargin)
-% Correct for lateral offsets between z-planes and merge highly correlated
-% neurons.
-%
+function [] = collatePlanes(data_path, varargin)% Parameters
 % Parameters
 % ----------
-% data_path : string
-%     Path to the directory containing the image data and calibration files.
-%     The function expects to find 'pollen_sample_xy_calibration.mat' in this directory along with each caiman_output_plane_N.
+% data_path : char
+%     Path to the directory containing the files assembled via convertScanImageTiffToVolume.
 % save_path : char
 %     Path to the directory to save the motion vectors.
-% ds : char, optional
+% ds : string, optional
 %     Group path within the hdf5 file that contains raw data.
-%     Default is '/Y'.
 % debug_flag : double, logical, optional
 %     If set to 1, the function displays the files in the command window and does
 %     not continue processing. Defaults to 0.
+% do_figures : double, integer, positive
+%     If true, correlation metrics will be saved to save_path/figures.
 % overwrite : logical, optional
 %     Whether to overwrite existing files (default is 0).
+% num_cores : double, integer, positive
+%     Number of cores to use for computation. The value is limited to a maximum
+%     of 24 cores.
 % start_plane : double, integer, positive
 %     The starting plane index for processing.
 % end_plane : double, integer, positive
 %     The ending plane index for processing. Must be greater than or equal to
 %     start_plane.
-%
-% Returns
-% -------
-% offsets : Nx2 array
-%     An array of offsets between consecutive planes, where N is the number
-%     of planes processed. Each row corresponds to a plane, and the two columns
-%     represent the calculated offset in pixels along the x and y directions,
-%     respectively.
-%
-% Notes
-% -----
-% - This function requires calibration data in input datapath:
-%   - pollen_sample_xy_calibration.mat
-% - The function uses MATLAB's `ginput` function for manual feature selection
-%   on the images. It expects the user to manually select the corresponding
-%   points on each plane.
-% - The function assumes that the consecutive images will have some overlap
-%   and that features will be manually identifiable and trackable across planes.
-%
-% Examples
-% --------
-% offsets = calculateZOffset('C:/data/images/', metadata, 1, 10, 5);
-%
+% num_features : double, positive
+%     The number of neurons to select for the lateral offset correction
+%     between z-planes. Default is 1 feature/neuron.
+% options : struct
+%     Struct containing key-value pairs for 'min_SNR' and 'merge_thresh'.
+% motion_corrected_path: string
+%     Path to motion corrected data. Default is
+%     data_path/../motion_corrected/,
+
+% Correct for lateral offsets between z-planes and merge highly correlated
+% neurons. Ensure pollen calibration files are found in data_path!
 
 p = inputParser;
 addRequired(p, 'data_path', @(x) ischar(x) || isstring(x));
-addParameter(p, 'motion_corrected_path', '', @(x) ischar(x) || isstring(x));
 addParameter(p, 'save_path', '', @(x) ischar(x) || isstring(x));
 addParameter(p, 'ds', "/Y", @(x) (ischar(x) || isstring(x)));
 addParameter(p, 'debug_flag', 0, @(x) isnumeric(x) && isscalar(x));
@@ -57,10 +44,11 @@ addParameter(p, 'overwrite', 1, @(x) isnumeric(x) && isscalar(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x) && x > 0);
 addParameter(p, 'end_plane', 2, @(x) isnumeric(x) && x > 0); % Remove dependence on start_plane
 addParameter(p, 'num_features', 3, @(x) isnumeric(x) && isPositiveIntegerValuedNumeric(x));
+addParameter(p, 'motion_corrected_path', '', @(x) ischar(x) || isstring(x));
 
 parse(p, data_path, varargin{:});
 
-% ensure end_plane is greater than or equal to start_plane
+% Ensure end_plane is greater than or equal to start_plane
 if p.Results.end_plane < p.Results.start_plane
     error('end_plane must be greater than or equal to start_plane.');
 end
@@ -68,13 +56,13 @@ end
 data_path = p.Results.data_path;
 save_path = p.Results.save_path;
 do_figures = p.Results.do_figures;
-
 motion_corrected_path = p.Results.motion_corrected_path;
 debug_flag = p.Results.debug_flag;
 overwrite = p.Results.overwrite;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
 dataset_name = p.Results.ds;
+num_features = p.Results.num_features;
 
 if ~isfolder(data_path); error("%s does not exist", data_path); end
 
@@ -84,6 +72,7 @@ if debug_flag == 1
     dir([data_path '/' '*.fig*'])
     return;
 end
+
 if isempty(motion_corrected_path)
     motion_corrected_path = fullfile(data_path, '..', 'motion_corrected');
     if ~isfolder(motion_corrected_path)
@@ -92,7 +81,7 @@ if isempty(motion_corrected_path)
 end
 
 if isempty(save_path)
-    save_path = fullfile(data_path, '../', 'corrected');
+    save_path = fullfile(data_path, '../', 'collated');
     if ~isfolder(save_path); mkdir(save_path);
         warning('Creating save path since one was not provided, located: %s', save_path);
     end
@@ -105,9 +94,9 @@ if do_figures
     if ~isfolder(fig_save_path); mkdir(fig_save_path); end
 end
 
-if ~(start_plane<end_plane); error("Start plane must be < end plane"); end
+if ~(start_plane<=end_plane); error("Start plane must be < end plane"); end
 
-log_file_name = sprintf("%s_offset_correction.log", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
+log_file_name = sprintf("%s_collation.log", datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 log_full_path = fullfile(data_path, log_file_name);
 fid = fopen(log_full_path, 'w');
 if fid == -1
@@ -116,111 +105,12 @@ else
     fprintf('Log file created: %s\n', log_full_path);
 end
 
-calib_files = dir(fullfile(data_path, 'pollen*'));
-if length(calib_files) < 2
-    error("Missing pollen calibration files in folder:\n%s\n", data_path);
-else
-    for i=length(calib_files)
-        calib = fullfile(calib_files(i).folder, calib_files(i).name);
-        if calib_files(i).name == "pollen_sample_xy_calibration.mat"
-            pollen_offsets = matfile(calib);
-            diffx = pollen_offsets.diffx;
-            diffy = pollen_offsets.diffy;
-        end
-        fprintf("Loaded calibration file:\n");
-        fprintf("%s\n",fullfile(calib_files(i).folder, calib_files(i).name));
-    end
+offsets_file = fullfile(data_path, sprintf('mean_%d_neuron_offsets.mat', num_features));
+if overwrite || ~isfile(offsets_file)
+    calculateZOffset(data_path, 'motion_corrected_path', motion_corrected_path, 'debug_flag', debug_flag, 'overwrite', overwrite, 'start_plane', start_plane, 'end_plane', end_plane, 'num_features', num_features);
 end
 
-if ~exist("diffx", "var")
-    error("Missing or incorrect pollen calibration file supplied.");
-end
-
-fprintf(fid, '%s : Beginning offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
-fprintf('%s : Beginning offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
-
-%% --------------------------------------------------------------------
-plane_name = sprintf("%s/motion_corrected_plane_1.h5",motion_corrected_path);
-h5_segmented = sprintf("%s/segmented_plane_1.h5",data_path);
-
-metadata = read_h5_metadata(plane_name, '/');
-if isempty(fieldnames(metadata)); error("No metadata found for this filepath."); end
-log_struct(fid,metadata,'metadata', log_full_path);
-
-pixel_resolution = metadata.pixel_resolution;
-frameRate = metadata.frame_rate;
-
-r_thr = 0.4;
-min_snr = 1.5;
-merge_thr = 0.2;
-
-FOVx = 600;
-FOVy = 600*0.97;
-
-tau = ceil(7.5/pixel_resolution);
-
-Kms = zeros(30,1);
-num_corr_no_ovp = 0;
-num_ovlpd = 0;
-
-Ac_keep = h5read(h5_segmented, '/Ac_keep');
-T_keep = h5read(h5_segmented, '/T_keep');
-
-Ym = h5read(plane_name, '/Ym');
-Cn = h5read(h5_segmented, '/Cn');
-C_keep = h5read(h5_segmented, '/C_keep');
-Km = h5read(h5_segmented, '/Km');
-acm = h5read(h5_segmented, '/acm');
-acx = h5read(h5_segmented, '/acx');
-acy = h5read(h5_segmented, '/acy');
-f = h5read(h5_segmented, '/f');
-b = h5read(h5_segmented, '/b');
-rVals = h5read(h5_segmented, '/rVals');
-
-num_traces_pre = size(T_keep, 1);
-
-% rVals = p.rVals;
-
-Tinit = T_keep;
-decay_time = 0.5;
-Nsamples = ceil(decay_time*frameRate);
-min_fitness = log(normcdf(-min_snr))*Nsamples;
-[fitness] = compute_event_exceptionality(Tinit,Nsamples,0);
-
-clear Tinit
-
-if size(rVals)>0
-    kp = logical(rVals>r_thr & fitness<min_fitness);
-
-    T = T_keep(kp,:);
-    C = C_keep(kp,:);
-
-    A = Ac_keep(:,:,kp);
-    K = size(T,1);
-    Kms(1) = K;
-    N = zeros(K,4);
-    N(:,1) = acm(kp)';
-    N(:,2) = acy(kp)';
-    N(:,3) = acx(kp)';
-    N(:,4) = 1;
-
-else
-    fff = f;
-    bbb = b;
-    T = NaN(1,size(fff,2));
-    C = NaN(1,size(fff,2));
-    Y = Ym;
-    A = NaN(size(bbb,1),1);
-    K = 1;
-    Kms(1) = K;
-    N = zeros(K,4);
-end
-
-T_all = T;
-N_all = N;
-C_all = C;
-
-c = load([data_path '/' 'mean_3_neuron_offsets.mat'],'offsets');
+c = load(offsets_file, 'offsets');
 offsets = round(c.offsets);
 
 xo = cumsum(-offsets(:,2));
@@ -233,8 +123,10 @@ for ijk = start_plane:end_plane
 
     disp(['Beginning calculation for plane ' num2str(ijk)])
     pm = load([data_path '/' 'caiman_output_plane_' num2str(ijk) '.mat']);
+    % pmh = h5read(fullfile(data_path,"segmented_plane_1.h5"), "/T_keep");
 
-    Tinit = pm.T_keep;
+    % Tinit = pm.T_keep;
+    Tinit = h5read(fullfile(data_path,"segmented_plane_1.h5"), "/T_keep");
     [fitness] = compute_event_exceptionality(Tinit,Nsamples,0);
 
     clear Tinit
