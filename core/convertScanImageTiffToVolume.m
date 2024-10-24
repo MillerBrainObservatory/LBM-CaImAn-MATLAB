@@ -42,9 +42,10 @@ function convertScanImageTiffToVolume(data_path, varargin)
 
 % Add necessary paths
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath')));
+addpath(genpath(fullfile(currpath, '../packages/')));
 addpath(genpath(fullfile(currpath, '../packages/ScanImage/')));
-addpath(genpath("utils"));
-addpath(genpath("internal"));
+addpath(genpath(fullfile(currpath, 'utils'));
+addpath(genpath(fullfile(currpath, 'internal'));
 
 import ScanImageTiffReader.*
 
@@ -135,7 +136,6 @@ num_frames = metadata.num_frames;
 data_type = metadata.sample_format;
 tiff_width = metadata.tiff_width;
 
-
 [t_left, t_right, t_top, t_bottom] = deal(trim_roi(1), trim_roi(2), trim_roi(3), trim_roi(4));
 [t_left_image, t_right_image, t_top_image, t_bottom_image] = deal(trim_image(1), trim_image(2), trim_image(3), trim_image(4));
 
@@ -214,6 +214,7 @@ for file_idx = 1:num_files
     hTif=ScanImageTiffReader(raw_tiff_file);
     hTif=hTif.data();
     size_y=size(hTif);
+
     hTif=reshape(hTif, [size_y(1), size_y(2), num_planes, num_frames]);
     hTif=permute(hTif, [2 1 3 4]);
     
