@@ -43,8 +43,8 @@ function convertScanImageTiffToVolume(data_path, varargin)
 % Add necessary paths
 [currpath, ~, ~] = fileparts(fullfile(mfilename('fullpath')));
 addpath(genpath(fullfile(currpath, '../packages/')));
-addpath(genpath(fullfile(currpath, 'utils'));
-addpath(genpath(fullfile(currpath, 'internal'));
+addpath(genpath(fullfile(currpath, 'utils')));
+addpath(genpath(fullfile(currpath, 'internal')));
 
 import ScanImageTiffReader.*
 
