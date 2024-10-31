@@ -10,7 +10,6 @@
 % Make sure figures will show
 set(groot, 'DefaultFigureVisible', 'on');
 
-
 %% RUN THIS WITH THE PLAY BUTTON, NOT "RUN SECTION"
 % When ran as a script (the "Run" button), this will automatically add the
 % core and packages folders to your MATLAB path
@@ -18,6 +17,9 @@ set(groot, 'DefaultFigureVisible', 'on');
 clc, clear; % !! Careful, this will clear all variables from memory
 [fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
 addpath(genpath(fullfile(fpath, 'core'))); addpath(genpath(fullfile(fpath, 'packages')));
+
+%% POINT THIS PATH TO WHERE YOUR TIFF FILES LIVE
+data_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01');
 
 % To preview metadata for this file without assembling it
 % metadata = get_metadata(fullfile(data_path, "filename.tif");
@@ -27,13 +29,7 @@ disp(metadata);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Assembly %%%%%%%%%%
-%%
 
-
-%% POINT THIS PATH TO WHERE YOUR TIFF FILES LIVE
-data_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01');
-
-%%
 % by default, results are saved in the parent directory /function_step
 % directory
 save_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01\assembled\');
@@ -146,7 +142,7 @@ K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2);
 
 segmentPlane( ...
     fullfile(data_path, 'motion_corrected/'), ... % we used this to save extracted data
-    'dataset_name', '/Y', ... % where we saved the last step in h5 (default)
+    'ds', '/Y', ... % where we saved the last step in h5 (default)
     'debug_flag', 0, ...
     'overwrite', 0, ...
     'num_cores', 23, ...
