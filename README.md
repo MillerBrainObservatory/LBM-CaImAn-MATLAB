@@ -36,7 +36,7 @@ For the last step in the pipeline, you will need 2 calibration files aquired bef
 ### Requirements
 
 - MATLAB (Tested on 2023a, 2024a)
-- Windows 10 or Ubuntu 22.04
+- Windows 10/11
 - Toolboxes:
   - Parallel Computing Toolbox
   - Statistics and Machine Learning Toolbox
@@ -44,7 +44,7 @@ For the last step in the pipeline, you will need 2 calibration files aquired bef
   - Signal Processing Toolbox
 
 
-The pipeline won't work with MacOS without the correct `mex` binaries. If this needed, submit an issue.
+The first step of this pipeline won't work with MacOS/Linux without the correct `mex` binaries compiled with the ScanImageTiffReader. If this needed, submit an issue.
 
 The most up to date mexfiles are always kept in the [releases](https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/releases/tag/v2.1.0-mex>) on Github.
 
