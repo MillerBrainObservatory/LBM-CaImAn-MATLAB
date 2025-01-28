@@ -77,6 +77,8 @@ addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x));
 addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
 addParameter(p, 'do_figures', 1, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'patches', []);
+addParameter(p, 'K', 1, @(x) isnumeric(x));
 addParameter(p, 'options', {}, @(x) isstruct(x));
 parse(p, data_path, varargin{:});
 
@@ -89,6 +91,8 @@ num_cores = p.Results.num_cores;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
 do_figures = p.Results.do_figures;
+patches = p.Results.patches;
+K = p.Results.K;
 options = p.Results.options;
 
 data_path = convertStringsToChars(data_path);
@@ -184,19 +188,28 @@ for plane_idx = start_plane:end_plane
     mn = floor(pi.*(tau.*0.5).^2); % SHRINK IF FOOTPRINTS ARE TOO SMALL
     p = 2; % order of dynamics
     
-    % patch set up; basing it on the ~600 um strips of the 2pRAM, +50 um overlap between patches
-    sizY = size(data);
-    patch_size = round(650/pixel_resolution).*[1,1];
-    overlap = [1,1].*ceil(50./pixel_resolution);
-    patches = construct_patches(sizY(1:end-1),patch_size,overlap);
+    if isempty(patches)
+        log_message(fid, "Creating default patches.\n")
+
+        % patch set up; basing it on the ~600 um strips of the 2pRAM, +50 um overlap between patches
+        sizY = size(data);
     
-    K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2); % number of components based on assumption of 9.2e4 neurons/mm^3
-    
-    % Set caiman parameters
-    log_message(fid, "Using default CNMF parameters.\n")
-    
+        patch_size = round(650/pixel_resolution).*[1,1];
+        overlap = [1,1].*ceil(50./pixel_resolution);
+        patches = construct_patches(sizY(1:end-1),patch_size,overlap);
+    end
+
+    if isempty(K)
+        % number of components based on assumption of 9.2e4 neurons/mm^3
+        K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2); 
+    end
+
     % Set caiman parameters
     if isempty(options)
+
+        % Set caiman parameters
+        log_message(fid, "Setting default CNMF parameters.\n")
+    
          options = CNMFSetParms(...
         'd1',d1,'d2',d2,...                         % dimensionality of the FOV
         'deconv_method','constrained_foopsi',...    % neural activity deconvolution method
@@ -223,6 +236,12 @@ for plane_idx = start_plane:end_plane
         'refine_flag',0,...
         'rolling_length',ceil(frame_rate*5),...
         'fr', frame_rate);                                      % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
+    else
+        % Validate that options.nb is 1, cnmf will fail otherwise
+        if options.nb ~= 1
+            disp(options.nb)
+            error('The value of options.nb must be 1.');
+        end
     end
    
     poolobj = gcp('nocreate'); % create a parallel pool
@@ -281,6 +300,7 @@ for plane_idx = start_plane:end_plane
     [C_keep,f,~,~,R_keep] = update_temporal_components(reshape(data,d,T),A_keep,b,C_keep,f,P,options);
     log_message(fid, 'Temporal components updates. Process took: %.2f seconds.\nDetrending from raw traces ...',toc(t_update));
     log_message(fid, "--------------------------------------------------\n");
+    options.nb = 1;
     
     %% Detrend
     t_detrend = tic;
@@ -368,7 +388,7 @@ for plane_idx = start_plane:end_plane
     
     savefast(fullfile(save_path, ['caiman_output_plane_' num2str(plane_idx) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Cn','b','f','acx','acy','acm')
     log_message(fid, "Data saved. Elapsed time: %.2f seconds.\n",toc(t_save));
-    clearvars -except poolobj tmpDir numworkers *path fid num_cores t_all files ds start_plane end_plane options plane_idx
+    clearvars -except poolobj tmpDir numworkers *path fid num_cores t_all files ds start_plane end_plane options plane_idx patches K options
 end
 fprintf(fid, 'Routine complete for %d planes. Total Completion time: %.2f hours.\n',((end_plane-start_plane)+1),toc(t_all)./3600);
 end
