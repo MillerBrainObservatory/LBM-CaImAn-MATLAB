@@ -1,10 +1,8 @@
 %% Interactive Segmentation
 clear;
 %% POINT THIS TO YOUR DESIRED PLANE and MOTION-CORRECTED FILEPATH
-plane = 26;
-motion_corrected_path = fullfile('C:\Users\RBO\caiman_data\animal_01\session_01\motion_corrected');
-
-%%
+plane = 5;
+motion_corrected_path = fullfile('E:\W2_archive\demas_2021\high_resolution\matlab\registered');
 
 motion_corrected_filename = fullfile(motion_corrected_path, sprintf("motion_corrected_plane_%d.h5", plane));
 
@@ -27,34 +25,13 @@ d = data_size(1)*data_size(2);      % total number of samples
 T = metadata.num_frames;
 tau = ceil(7.5/metadata.pixel_resolution);
 
-
 % 
 % tau = ceil(7.5./pixel_resolution);  % (a little smaller than) half-size of neuron
-% 
-% % USER-SET VARIABLES - CHANGE THESE TO IMPROVE SEGMENTATION
-% 
-% merge_thresh = 0.8;                 % how temporally correlated any two neurons need to be to be merged
-% min_SNR = 1.4;                      % signal-noise ratio needed to accept this neuron as initialized (1.4 is liberal)
-% space_thresh = 0.2;                 % how spatially correlated nearby px need to be to be considered for segmentation
-% sz = 0.1;                           % If masks are too large, increase sz, if too small, decrease. 0.1 lowest.
-% p = 2;                              % order of dynamics
-% 
-% mx = ceil(pi.*(1.33.*tau).^2);
-% mn = floor(pi.*(tau.*0.5).^2);     
-% 
-% % patch set up; basing it on the ~600 um strips of the 2pRAM, +50 um overlap between patches
-% fov = metadata.fov(1);
-% patch_size = round(fov/4.5).*[1,1];
-% overlap = [1,1].*ceil(30./pixel_resolution);
-% patches = construct_patches(data_size,patch_size,overlap);
-% 
-% 
-
-merge_thresh = 0.8; % threshold for merging
-min_SNR = 1.4; % liberal threshold, can tighten up in additional post-processing
-space_thresh = 0.2; % threhsold for selection of neurons by space
+merge_thresh = 0.8;                 % how temporally correlated any two neurons need to be to be merged
+min_SNR = 1.4;                      % signal-noise ratio needed to accept this neuron as initialized (1.4 is liberal)
+space_thresh = 0.2;                 % how spatially correlated nearby px need to be to be considered for segmentation
 time_thresh = 0.0;
-sz = 0.1; % IF FOOTPRINTS ARE TOO SMALL, CONSIDER sz = 0.1
+sz = 0.1;                           % IF FOOTPRINTS ARE TOO LARGE, CONSIDER sz = 0.2
 mx = ceil(pi.*(1.33.*tau).^2);
 mn = floor(pi.*(tau.*0.5).^2); % SHRINK IF FOOTPRINTS ARE TOO SMALL
 p = 2; % order of dynamics
@@ -94,7 +71,6 @@ options = CNMFSetParms(...
 'refine_flag',0,...
 'rolling_length',ceil(frame_rate*5),...
 'fr', frame_rate);
-
 % Run patched caiman
 disp('Beginning patched, volumetric CNMF...')
 [A,b,C,f,S,P,~,YrA] = run_CNMF_patches(data,K,patches,tau,p,options);
