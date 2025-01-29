@@ -19,7 +19,7 @@ clc, clear; % !! Careful, this will clear all variables from memory
 addpath(genpath(fullfile(fpath, 'core'))); addpath(genpath(fullfile(fpath, 'packages')));
 
 %% POINT THIS PATH TO WHERE YOUR TIFF FILES LIVE
-data_path = fullfile('E:\W2_archive\demas_2021\high_resolution');
+data_path = fullfile('E:\W2_archive\demas_2021\single_hemisphere');
 %%
 % To preview metadata for this file without assembling it
 % metadata = get_metadata(fullfile(data_path, "filename.tif");
@@ -32,7 +32,10 @@ data_path = fullfile('E:\W2_archive\demas_2021\high_resolution');
 
 % by default, results are saved in the parent directory /function_step
 % directory
-save_path = fullfile('E:\W2_archive\demas_2021\high_resolution\matlab\assembled');
+order = [1 5:10 2 11:17 3 18:23 4 24:30];
+order = fliplr(order);
+
+save_path = fullfile('E:\W2_archive\demas_2021\single_hemisphere\matlab\assembled');
 convertScanImageTiffToVolume( ...
     data_path, ...
     'save_path', save_path, ... 
@@ -43,7 +46,7 @@ convertScanImageTiffToVolume( ...
     'fix_scan_phase', 1, ...
     'trim_roi', [0 0 0 0], ... % num pixels to trim for each roi
     'trim_image', [0 0 0 0], ... % num pixels to trim for each roi
-    'z_plane_order', [] ... % reshape the planes according to this vector.
+    'z_plane_order', order ... % reshape the planes according to this vector.
     ...                     % num values should match num planes
 );
 
@@ -151,23 +154,98 @@ segmentPlane( ...
     'overwrite', 1, ...
     'num_cores', 23, ...
     'start_plane', 9, ...
-    'end_plane', metadata.num_planes, ...
+    'end_plane', 9, ...
     'options', options, ...
     'patches', patches, ...
     'K', K ...
 );
 
 %% 4) Collate z-planes and merge spatially overlapping highly-correlated neuronss
+
+% fpath = "E:\W2_archive\demas_2021\high_resolution\matlab\registered\";
+% 
+% reorder_h5_files(fpath, order);
+
+%%
+
 thresh_options = {'min_SNR', 1.5, 'merge_thr', 0.95};
 collatePlanes( ...
-    'C:/Users/RBO/caiman_data/animal_01/session_01/segmented', ... % data_path = segmentation results
+    'E:\W2_archive\demas_2021\single_hemisphere\matlab\segmented', ... % data_path = segmentation results
+    'save_path', 'E:\W2_archive\demas_2021\single_hemisphere\matlab\collated', ... % data_path = segmentation results
     'ds', '/Y', ...
     'debug_flag', 0, ...
     'overwrite', 0, ...
     'start_plane', 1, ...
     'end_plane', metadata.num_planes,  ...
     'num_features', 1, ...
-    'motion_correction_path', fullfile(data_path, 'motion_corrected/'), ...
+    'motion_corrected_path', fullfile(data_path, 'matlab/registered'), ...
     'options', thresh_options ...
 );
+%%
+
+col_fpath = "E:\W2_archive\demas_2021\high_resolution\matlab\collated\collated_planes.h5";
+T_all = h5read(col_fpath, '/T_all');
+% T_all = movmean(T_all./(max(T_all,[],2)*ones(1,size(T_all,2))),5,2);
+
+% C_all = h5read(col_fpath, '/C_all');
+% nx = h5read(col_fpath, '/nx');
+% ny = h5read(col_fpath, '/ny');
+% nz = h5read(col_fpath, '/nz');
+
+% Compute total activity for each neuron (sum across time)
+total_activity = sum(T_all, 2);
+
+% Sort neurons by descending activity
+[~, sorted_indices] = sort(total_activity, 'descend');
+top_100_traces = T_all(sorted_indices(1:100), :);
+
+% Normalize each neuron's activity (row-wise)
+top_100_traces = top_100_traces - min(top_100_traces, [], 2);
+top_100_traces = top_100_traces ./ max(top_100_traces, [], 2);
+
+% Plot heatmap
+figure;
+imagesc(top_100_traces);
+colormap hot; % Use a heat colormap
+colorbar;
+xlabel('Frames (Time)');
+ylabel('Top 100 Most Active Neurons');
+title('Neuronal Activity Heatmap');
+
+
+%%
+
+load('thresholds.mat')
+
+[~,srt] = sort(Rsa,'descend');
+
+T_all = T_all(srt,:);
+
+Tt = uint8(255.*ind2rgb(uint8(T_all.*255),parula(256)));
+
+bx = 255.*ones(size(Tt,1),200,3,'uint8');
+
+Ttp = cat(2,bx,Tt,bx);
+
+by = 255.*ones(200,size(Ttp,2),3,'uint8');
+
+Ttp = cat(1,by,Ttp,by);
+
+Ttp(201:2000:207230,200,2) = 0;
+Ttp(201:2000:207230,200,3) = 0;
+
+Ttp(200,201+round([0:281.333:2532]),2) = 0;
+Ttp(200,201+round([0:281.333:2532]),3) = 0;
+
+Ttp = flipud(Ttp);
+
+test = Ttp(1:2900,:,:);
+figure;
+imagesc(test); set(gca,'YDir','normal')
+
+imwrite(Ttp,[spath 'SFig7.tif'])
+% imwrite(Ttp,[spath 'SFig7.png'])
+
+imwrite(Ttp(1:2900,:,:),[spath 'test.tif'])
+imwrite(Ttp(1:2900,:,:),[spath 'test.png'])
 
