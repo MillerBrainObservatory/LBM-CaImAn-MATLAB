@@ -33,7 +33,7 @@ function reorder_h5_files(h5path, order)
 if isstring(h5path)
     h5path = convertStringsToChars(h5path);
 end
-files = dir([h5path '/assembled_plane_*.h5']);
+files = dir([h5path '/*plane*.h5']);
 if isempty(files)
     fprintf('No files found in %s\n', h5path);
     return;
