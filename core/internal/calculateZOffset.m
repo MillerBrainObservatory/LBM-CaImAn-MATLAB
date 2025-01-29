@@ -130,8 +130,12 @@ end
 fprintf(fid, '%s : Beginning axial offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 fprintf('%s : Beginning axial offset correction...\n', datestr(datetime('now'), 'yyyy_mm_dd_HH_MM_SS'));
 
-tall = tic;
 for plane_idx = start_plane:end_plane
+
+    if plane_idx == end_plane
+        disp('Plane_idx == end_plane, resuming...')
+        continue
+    end
 
       % Check if the figure was closed
     if ~isvalid(h1)
@@ -142,7 +146,6 @@ for plane_idx = start_plane:end_plane
 
     plane_name = sprintf("%s/motion_corrected_plane_%d.h5",motion_corrected_path,plane_idx);
     plane_name_next = sprintf("%s/motion_corrected_plane_%d.h5",motion_corrected_path,plane_idx + 1);
-    
 
     plane_name_save = sprintf("%s/axial_corrected_plane_%d.h5", data_path, plane_idx);
     if isfile(plane_name_save)
