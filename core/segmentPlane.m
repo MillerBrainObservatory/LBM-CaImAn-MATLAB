@@ -161,6 +161,7 @@ for plane_idx = start_plane:end_plane
     
     %% Load in data
     data = h5read(plane_name, ds);
+    Ym = h5read(plane_name, "/Ym");
     if ~isa(data, 'single'); data=single(data); end
     metadata.movie_path = plane_name;
     
@@ -359,6 +360,7 @@ for plane_idx = start_plane:end_plane
     h5create(plane_name_save,"/Ac_keep",size(Ac_keep));
     h5create(plane_name_save,"/C_keep",size(C_keep));
     h5create(plane_name_save,"/Km",size(Km));
+    h5create(plane_name_save,"/Ym",size(Ym));
     
     h5create(plane_name_save,"/rVals",size(rVals));
     h5create(plane_name_save,"/Cn",size(Cn));
@@ -373,6 +375,8 @@ for plane_idx = start_plane:end_plane
     h5write(plane_name_save,"/Ac_keep",Ac_keep);
     h5write(plane_name_save,"/C_keep",C_keep);
     h5write(plane_name_save,"/Km",Km);
+    h5write(plane_name_save,"/Km",Km);
+
     
     h5write(plane_name_save,"/rVals",rVals);
     h5write(plane_name_save,"/Cn",Cn);
