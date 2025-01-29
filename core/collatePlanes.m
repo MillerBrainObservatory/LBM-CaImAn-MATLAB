@@ -381,4 +381,26 @@ xlabel('r (mm)')
 saveas(gcf,fullfile(fig_save_path, 'all_neuron_r_distribution.fig'))
 
 disp('Planes collated. Saving data...')
-savefast([fig_save_path '/' 'collated_caiman_output_minSNR_' strrep(num2str(min_snr),'.','p') '.mat'],'T_all','nx','ny','nz','C_all','offsets')
+% savefast([fig_save_path '/' 'collated_caiman_output_minSNR_' strrep(num2str(min_snr),'.','p') '.mat'],'T_all','nx','ny','nz','C_all','offsets')
+
+save_path = fullfile(save_path, sprintf("collated_planes.h5"));
+try
+    h5create(save_path, "/T_all",size(T_all));
+catch
+    delete(save_path)
+    h5create(save_path, "/T_keep",size(T_keep));
+end
+
+h5create(save_path,"/nx",size(nx));
+h5create(save_path,"/ny",size(ny));
+h5create(save_path,"/nz",size(nz));
+h5create(save_path,"/C_all",size(C_all));
+h5create(save_path,"/offsets",size(offsets));
+h5create(save_path,"/min_snr",size(min_snr));
+
+h5write(save_path,"/T_all",C_all);
+h5write(save_path,"/nx",nx);
+h5write(save_path,"/ny",ny);
+h5write(save_path,"/nz",nz);
+h5write(save_path,"/C_all",C_all);
+h5write(save_path,"/offsets",offsets);
