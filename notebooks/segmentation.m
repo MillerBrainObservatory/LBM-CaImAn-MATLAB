@@ -135,17 +135,18 @@ end
 
 
 %% run CNMF algorithm on patches and combine
-tic;
+% tic;
 motion_corrected_data = h5read(motion_corrected_filename, '/Y');
-[A,b,C,f,S,P,RESULTS,YrA] = run_CNMF_patches(motion_corrected_data,K,patches,tau,p,options);
-[ROIvars.rval_space,ROIvars.rval_time,ROIvars.max_pr,ROIvars.sizeA,keep] = classify_components_jeff(motion_corrected_data,A,C,b,f,YrA,options);
-toc
+% [A,b,C,f,S,P,RESULTS,YrA] = run_CNMF_patches(motion_corrected_data,K,patches,tau,p,options);
+% [ROIvars.rval_space,ROIvars.rval_time,ROIvars.max_pr,ROIvars.sizeA,keep] = classify_components_jeff(motion_corrected_data,A,C,b,f,YrA,options);
+% toc
 
 %% Preview neurons aft
-
+tic;
+figure;
 Cn =  correlation_image(motion_corrected_data);
 Coor = plot_contours(A,Cn,options);
-
+toc
 %% Classify / validate components
 
 [rval_space,~,~,sizeA,~,~,traces] = classify_components_jeff(motion_corrected_data,A,C,b,f,YrA,options);
@@ -165,12 +166,29 @@ Km = size(C_keep,1); % total number of components
 rVals = rval_space(keep);
 
 %% view contour plots of selected and rejected components
+plane_idx = 5;
+fig_save_path = "E:\W2_archive\demas_2021\high_resolution\matlab\segmented\figures";
+component_save_path = fullfile(fig_save_path, sprintf("plane_%d_accepted_rejected_neurons.png", plane_idx));
 
 throw = ~keep;
 figure;
-ax1 = subplot(121); plot_contours(A(:,keep),Cn,options,0,[],Coor,1,find(keep)); title('Selected components','fontweight','bold','fontsize',14);
-ax2 = subplot(122); plot_contours(A(:,throw),Cn,options,0,[],Coor,1,find(throw));title('Rejected components','fontweight','bold','fontsize',14);
-linkaxes([ax1,ax2],'xy')
+set(gcf, 'Color', 'k'); % Set figure background to black
+set(gcf, 'InvertHardcopy', 'off'); % Prevents MATLAB from inverting colors on save
+
+ax1 = subplot(121); 
+plot_contours(A(:,keep), Cn, options, 0, [], Coor, 1, find(keep)); 
+set(ax1, 'Color', 'k', 'XColor', 'w', 'YColor', 'w'); % Make axis background black, text white
+title('Selected components', 'FontWeight', 'bold', 'FontSize', 14, 'Color', 'w');
+
+ax2 = subplot(122); 
+plot_contours(A(:,throw), Cn, options, 0, [], Coor, 1, find(throw)); 
+set(ax2, 'Color', 'k', 'XColor', 'w', 'YColor', 'w');
+title('Rejected components', 'FontWeight', 'bold', 'FontSize', 14, 'Color', 'w');
+
+linkaxes([ax1, ax2],'xy');
+
+saveas(gcf, component_save_path); % Save as PNG
+close(gcf);
 
 %% inspect components
 plot_components_GUI(motion_corrected_data,A(:,keep),C(keep,:),b,f,Cn,options);
@@ -182,7 +200,6 @@ make_patch_video(A(:,keep),C(keep,:),b,f,motion_corrected_data,Coor,options);
 %% refine temporal components
 A_keep = A(:,keep);
 C_keep = C(keep,:);
-% [C2,f2,P2,S2,YrA2] = update_temporal_components(reshape(motion_corrected_data,d,T),A_keep,b,C_keep,f,P,options);
 [C2,f2,P2,S2,YrA2] = update_temporal_components(reshape(motion_corrected_data,d,[]),A_keep,b,C_keep,f,P,options);
 
 %% detrend fluorescence and extract DF/F values
