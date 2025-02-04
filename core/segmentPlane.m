@@ -292,6 +292,29 @@ for plane_idx = start_plane:end_plane
     rVals = rval_space(keep);
     log_message(fid, 'Spatial acceptance and event exceptionality tests complete. Process took: %.2f seconds\nUpdating tamporal components...', toc(t_test));
     log_message(fid, "--------------------------------------------------\n");
+
+    component_save_path = fullfile(fig_save_path, sprintf("plane_%d_accepted_rejected_neurons.png", plane_idx));
+    
+    Coor = plot_contours(A,Cn,options);
+    throw = ~keep;
+    figure;
+    set(gcf, 'Color', 'k'); % Set figure background to black
+    set(gcf, 'InvertHardcopy', 'off'); % Prevents MATLAB from inverting colors on save
+    
+    ax1 = subplot(121); 
+    plot_contours(A(:,keep), Cn, options, 0, [], Coor, 1, find(keep)); 
+    set(ax1, 'Color', 'k', 'XColor', 'w', 'YColor', 'w'); % Make axis background black, text white
+    title('Selected components', 'FontWeight', 'bold', 'FontSize', 14, 'Color', 'w');
+    
+    ax2 = subplot(122); 
+    plot_contours(A(:,throw), Cn, options, 0, [], Coor, 1, find(throw)); 
+    set(ax2, 'Color', 'k', 'XColor', 'w', 'YColor', 'w');
+    title('Rejected components', 'FontWeight', 'bold', 'FontSize', 14, 'Color', 'w');
+    
+    linkaxes([ax1, ax2],'xy');
+    
+    saveas(gcf, component_save_path); % Save as PNG
+    close(gcf);
     
     %% Update temporal components
     P.p = 0;
@@ -377,7 +400,6 @@ for plane_idx = start_plane:end_plane
     h5write(plane_name_save,"/Km",Km);
     h5write(plane_name_save,"/Km",Km);
 
-    
     h5write(plane_name_save,"/rVals",rVals);
     h5write(plane_name_save,"/Cn",Cn);
     h5write(plane_name_save,"/b",b);
@@ -388,9 +410,12 @@ for plane_idx = start_plane:end_plane
     h5write(plane_name_save,"/acm",acm);
     
     write_metadata_h5(metadata, plane_name_save, '/');
+
     % write_metadata_h5(options, plane_name_save, '/opts');
-    
-    savefast(fullfile(save_path, ['caiman_output_plane_' num2str(plane_idx) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Cn','b','f','acx','acy','acm')
+    sp = fullfile(save_path, "top_500_traces.png");
+    num_traces = min(size(T_keep, 1), 500); % Get the minimum of 500 or available traces
+    plot_traces(T_keep, num_traces, sp);
+
     log_message(fid, "Data saved. Elapsed time: %.2f seconds.\n",toc(t_save));
     clearvars -except poolobj tmpDir numworkers *path fid num_cores t_all files ds start_plane end_plane options plane_idx patches K options
 end
