@@ -262,9 +262,9 @@ for plane_idx = start_plane:end_plane
         
         % Correlation Coefficients Plot
         ax1 = subplot(3, 1, 1); 
-        plot(1:T, cY, 'w', 'LineWidth', 1.5); hold on;
-        plot(1:T, cM1, 'c', 'LineWidth', 1.5);
-        plot(1:T, cM2, 'm', 'LineWidth', 1.5);
+        plot(1:T, cY, 'r', 'LineWidth', .5); hold on;
+        plot(1:T, cM1, 'c', 'LineWidth', .5);
+        plot(1:T, cM2, 'w', 'LineWidth', .8);
         hold off;
         
         title('Correlation Coefficients', 'Color', 'w', 'FontWeight', 'bold');
@@ -276,15 +276,15 @@ for plane_idx = start_plane:end_plane
         
         % Displacements Along X
         ax2 = subplot(3, 1, 2);
-        plot(mean(shifts_x, 1), 'w', 'LineWidth', 0.5);
-        title('Displacements Along X', 'Color', 'w', 'FontWeight', 'bold');
+        plot(mean(shifts_x, 2), 'w', 'LineWidth', 0.5);
+        title('Mean X Displacements (per-patch)', 'Color', 'w', 'FontWeight', 'bold');
         set(gca, 'Color', 'k', 'XColor', 'w', 'YColor', 'w', 'LineWidth', 1);
         set(gca, 'XTick', []);
         
         % Displacements Along Y
         ax3 = subplot(3, 1, 3);
-        plot(mean(shifts_y, 1), 'w', 'LineWidth', 0.5);
-        title('Displacements Along Y', 'Color', 'w', 'FontWeight', 'bold');
+        plot(mean(shifts_y, 2), 'w', 'LineWidth', 0.5);
+        title('Mean Y Displacements (per-patch)', 'Color', 'w', 'FontWeight', 'bold');
         xlabel('Timestep', 'Color', 'w', 'FontWeight', 'bold');
         set(gca, 'Color', 'k', 'XColor', 'w', 'YColor', 'w', 'LineWidth', 1);
         
@@ -319,3 +319,4 @@ for plane_idx = start_plane:end_plane
 end
 log_message(fid, "Processing complete. Time: %.2f hours\n",toc(tall)/3600);
 close('all');
+fclose('all');

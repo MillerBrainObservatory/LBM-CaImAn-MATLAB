@@ -117,7 +117,7 @@ elseif ~isfolder(save_path)
     mkdir(save_path);
 end
 
-fig_save_path = fullfile(save_path, "figures");
+fig_save_path = fullfile(save_path, "segmentation_figs");
 if ~isfolder(fig_save_path); mkdir(fig_save_path); end
 
 files = dir([fullfile(data_path, '*.h*')]);
@@ -265,12 +265,12 @@ for plane_idx = start_plane:end_plane
     t_cnmf = tic;
     [A,b,C,f,~,P,~,YrA] = run_CNMF_patches(data,K,patches,tau,p,options);
     
-    log_message(fid, 'Initialized CNMF patches complete.  Process took: %.2f seconds\Classifying components ...\n',toc(t_cnmf));
+    log_message(fid, 'Initialized CNMF patches complete.  Process took: %.2f seconds\nClassifying components ...\n',toc(t_cnmf));
     log_message(fid, "--------------------------------------------------\n");
     
     t_class = tic;
     [rval_space,~,~,sizeA,~,~,traces] = classify_components_jeff(data,A,C,b,f,YrA,options);
-    log_message(fid, 'Classification complete. Process took: %.2f seconds\Running spatial/temporal acceptance tests...\n', toc(t_class));
+    log_message(fid, 'Classification complete. Process took: %.2f seconds\nRunning spatial/temporal acceptance tests...\n', toc(t_class));
     log_message(fid, "--------------------------------------------------\n");
     
     t_test = tic;
@@ -304,7 +304,7 @@ for plane_idx = start_plane:end_plane
     ax1 = subplot(121); 
     plot_contours(A(:,keep), Cn, options, 0, [], Coor, 1, find(keep)); 
     set(ax1, 'Color', 'k', 'XColor', 'w', 'YColor', 'w'); % Make axis background black, text white
-    title('Selected components', 'FontWeight', 'bold', 'FontSize', 14, 'Color', 'w');
+    title('Accepted components', 'FontWeight', 'bold', 'FontSize', 14, 'Color', 'w');
     
     ax2 = subplot(122); 
     plot_contours(A(:,throw), Cn, options, 0, [], Coor, 1, find(throw)); 
