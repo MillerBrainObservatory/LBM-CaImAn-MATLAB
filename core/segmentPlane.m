@@ -275,6 +275,7 @@ for plane_idx = start_plane:end_plane
     
     t_test = tic;
     Cn =  correlation_image(data);
+    
     % Spatial acceptance test:
     ind_corr = (rval_space > space_thresh) & (sizeA >= options.min_size_thr) & (sizeA <= options.max_size_thr);
     
@@ -294,6 +295,7 @@ for plane_idx = start_plane:end_plane
     log_message(fid, "--------------------------------------------------\n");
 
     component_save_path = fullfile(fig_save_path, sprintf("plane_%d_accepted_rejected_neurons.png", plane_idx));
+    component_save_path2 = fullfile(fig_save_path, sprintf("plane_%d_accepted_rejected_neurons_p.png", plane_idx));
     
     Coor = plot_contours(A,Cn,options);
     throw = ~keep;
@@ -304,16 +306,17 @@ for plane_idx = start_plane:end_plane
     ax1 = subplot(121); 
     plot_contours(A(:,keep), Cn, options, 0, [], Coor, 1, find(keep)); 
     set(ax1, 'Color', 'k', 'XColor', 'w', 'YColor', 'w'); % Make axis background black, text white
-    title('Accepted components', 'FontWeight', 'bold', 'FontSize', 14, 'Color', 'w');
+    title(sprintf('Accepted Components: count=%d', sum(keep)), 'FontWeight', 'bold', 'FontSize', 14, 'Color', 'w');
     
     ax2 = subplot(122); 
     plot_contours(A(:,throw), Cn, options, 0, [], Coor, 1, find(throw)); 
     set(ax2, 'Color', 'k', 'XColor', 'w', 'YColor', 'w');
-    title('Rejected components', 'FontWeight', 'bold', 'FontSize', 14, 'Color', 'w');
+    title(sprintf('Rejected Components: count=%d', sum(throw)), 'FontWeight', 'bold', 'FontSize', 14, 'Color', 'w');
     
     linkaxes([ax1, ax2],'xy');
     
     saveas(gcf, component_save_path); % Save as PNG
+    print(gcf, component_save_path2, '-dpng', '-r600'); 
     close(gcf);
     
     %% Update temporal components
@@ -411,9 +414,8 @@ for plane_idx = start_plane:end_plane
     
     write_metadata_h5(metadata, plane_name_save, '/');
 
-    % write_metadata_h5(options, plane_name_save, '/opts');
-    sp = fullfile(save_path, "top_500_traces.png");
     num_traces = min(size(T_keep, 1), 500); % Get the minimum of 500 or available traces
+    sp = fullfile(save_path, sprintf("top_%d_traces.png", num_traces));
     plot_traces(T_keep, num_traces, sp);
 
     log_message(fid, "Data saved. Elapsed time: %.2f seconds.\n",toc(t_save));

@@ -57,29 +57,26 @@ top_traces = T_all(sorted_indices(1:num_neurons), :);
 top_traces = top_traces - min(top_traces, [], 2);
 top_traces = top_traces ./ max(top_traces, [], 2);
 
-% Create figure with black background
 figure_handle = figure;
-set(figure_handle, 'Color', 'k'); % Set figure background to black
-set(figure_handle, 'InvertHardcopy', 'off'); % Ensures saved figure keeps the black background
+set(figure_handle, 'Color', 'k');
+set(figure_handle, 'InvertHardcopy', 'off');
 
 % Plot heatmap
 imagesc(top_traces);
 colormap hot;
 c = colorbar;
-c.Color = 'w'; % Make colorbar text white
+c.Color = 'w';
 
 % Set axis properties
 ax = gca;
-ax.XColor = 'w'; % Set X-axis color to white
-ax.YColor = 'w'; % Set Y-axis color to white
-ax.Color = 'k';  % Set axis background to black
+ax.XColor = 'w';
+ax.YColor = 'w';
+ax.Color = 'k';
 
-% Add labels and title with bold white text
 xlabel('Frames (Time)', 'FontWeight', 'bold', 'Color', 'w');
 ylabel(sprintf('Top %d Most Active Neurons', num_neurons), 'FontWeight', 'bold', 'Color', 'w');
 title('Neuronal Activity Heatmap', 'FontWeight', 'bold', 'Color', 'w');
 
-% Save figure if a path is provided
 if ~isempty(save_path)
     % Ensure save_path ends in '.png'
     if ~endsWith(save_path, '.png', 'IgnoreCase', true)
