@@ -1,1 +1,0 @@
-"%MATLAB%" -nosplash -nodesktop -nojvm -noFigureWindows -wait -log -r test

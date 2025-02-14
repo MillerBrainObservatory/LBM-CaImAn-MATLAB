@@ -1,41 +1,22 @@
-%% Example script that will run the full pipeline.
-% This code block adds all modules inside the "core" directory to the
-% matlab path.
-% This isn't needed if the path to this package is added to the MATLAB path
-% manually by right clicking caiman_matlab folder and "add packages and
-% subpackages to path" or via the startup.m file. Both methods described in
-% more detail in the README.
-%% Two %'s lets you run code section-by-section via the Run Section button or pressing cntl+enter
+%% mk302, 01.30.25
 
-% Make sure figures will show
 set(groot, 'DefaultFigureVisible', 'on');
-
-%% RUN THIS WITH THE PLAY BUTTON, NOT "RUN SECTION"
-% When ran as a script (the "Run" button), this will automatically add the
-% core and packages folders to your MATLAB path
-% Not needed if the project code is stored in the Documents/MATLAB folder
 clc, clear; % !! Careful, this will clear all variables from memory
 [fpath, fname, ~] = fileparts(fullfile(mfilename('fullpath'))); % path to this script
 addpath(genpath(fullfile(fpath, 'core'))); addpath(genpath(fullfile(fpath, 'packages')));
 
 %% POINT THIS PATH TO WHERE YOUR TIFF FILES LIVE
-data_path = fullfile('E:\W2_archive\demas_2021\single_hemisphere');
+data_path = fullfile('D:\W2_DATA\kbarber\2025_01_30_GCaMP8s_tdtomato_mk303\mk303_mbo_2umpx_2roi_448umx896um_17p07_green_14planes_00001');
 %%
 % To preview metadata for this file without assembling it
 % metadata = get_metadata(fullfile(data_path, "filename.tif");
 % This happens internally in convertScanImageTiffToVolume()
-% metadata = get_metadata(fullfile(data_path, "MH70_0p6mm_FOV_50_550um_depth_som_stim_199mW_3min_M1_00001_00001.tif"));
+metadata = get_metadata(fullfile(data_path, "mk303_mbo_2umpx_2roi_448umx896um_17p07_green_14planes_00001.tif"));
 % disp(metadata);
+%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%% Assembly %%%%%%%%%%
-
-% by default, results are saved in the parent directory /function_step
-% directory
-order = [1 5:10 2 11:17 3 18:23 4 24:30];
-order = fliplr(order);
-
-save_path = fullfile('E:\W2_archive\demas_2021\single_hemisphere\matlab\assembled');
+save_path = fullfile('D:\W2_DATA\2025_01_30_GCaMP8s_tdtomato_mk303\mk303_mbo_2umpx_2roi_448umx896um_17p07_green_14planes_00001\matlab\assembled');
+%%
 convertScanImageTiffToVolume( ...
     data_path, ...
     'save_path', save_path, ... 
@@ -46,7 +27,7 @@ convertScanImageTiffToVolume( ...
     'fix_scan_phase', 1, ...
     'trim_roi', [0 0 0 0], ... % num pixels to trim for each roi
     'trim_image', [0 0 0 0], ... % num pixels to trim for each roi
-    'z_plane_order', order ... % reshape the planes according to this vector.
+    'z_plane_order', [] ... % reshape the planes according to this vector.
     ...                     % num values should match num planes
 );
 
@@ -54,6 +35,7 @@ convertScanImageTiffToVolume( ...
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Motion Correction %%%
 %%
+t1 = tic;
 
 % We want to fetch the size of the dataset from the first assembled file
 filename = fullfile(save_path, "assembled_plane_1.h5");
@@ -75,20 +57,20 @@ options = NoRMCorreSetParms(...
 
 motionCorrectPlane( ...
     fullfile(save_path), ... % tiff_path / assembled
-    'save_path', fullfile(data_path, "matlab/registered/"), ... % default used internally
+    'save_path', fullfile(data_path, "matlab/processed/"), ... % default used internally
     'ds', '/Y', ... 
     'debug_flag', 0, ...
-    'overwrite', 0, ...
+    'overwrite', 1, ...
     'num_cores', 23, ... % "matlab workers" not exactly cpu cores
-    'start_plane', 5, ...
-    'end_plane', 30,  ...
+    'start_plane', 1, ...
+    'end_plane', metadata.num_planes,  ...
     'options', options ...
     );
 
 %% 3) CNMF Plane-by-plane Segmentation
 
 % Pull metadata from a single file
-filename = fullfile(data_path, 'matlab/registered/', "motion_corrected_plane_1.h5");
+filename = fullfile(data_path, 'matlab/processed/', "motion_corrected_plane_1.h5");
 
 % Gather relevnt metadata
 metadata = read_h5_metadata(filename, '/Y');
@@ -148,42 +130,42 @@ options = CNMFSetParms(...
 );   
 
 segmentPlane( ...
-    fullfile(data_path, 'matlab/registered/'), ... % we used this to save extracted data
+    fullfile(data_path, 'matlab/processed/'), ... % we used this to save extracted data
+    'save_path', fullfile(data_path, "matlab/processed/"), ... % default used internally
     'ds', '/Y', ... % where we saved the last step in h5 (default)
     'debug_flag', 0, ...
     'overwrite', 1, ...
     'num_cores', 23, ...
-    'start_plane', 9, ...
-    'end_plane', 9, ...
+    'start_plane', 1, ...
+    'end_plane', 30, ...
     'options', options, ...
     'patches', patches, ...
     'K', K ...
 );
 
+t2 = toc(t1);
+disp(t2);
+
 %% 4) Collate z-planes and merge spatially overlapping highly-correlated neuronss
-
-% fpath = "E:\W2_archive\demas_2021\high_resolution\matlab\registered\";
-% 
-% reorder_h5_files(fpath, order);
-
-%%
 
 thresh_options = {'min_SNR', 1.5, 'merge_thr', 0.95};
 collatePlanes( ...
-    'E:\W2_archive\demas_2021\single_hemisphere\matlab\segmented', ... % data_path = segmentation results
-    'save_path', 'E:\W2_archive\demas_2021\single_hemisphere\matlab\collated', ... % data_path = segmentation results
+    fullfile(data_path, 'matlab/segmented'), ... % data_path = segmentation results
+    'save_path', fullfile(data_path, 'matlab/collated'), ... % data_path = segmentation results
     'ds', '/Y', ...
     'debug_flag', 0, ...
     'overwrite', 0, ...
     'start_plane', 1, ...
     'end_plane', metadata.num_planes,  ...
     'num_features', 1, ...
-    'motion_corrected_path', fullfile(data_path, 'matlab/registered'), ...
+    'motion_corrected_path', fullfile(data_path, 'matlab/processed'), ...
     'options', thresh_options ...
 );
+
 %%
 
-col_fpath = "E:\W2_archive\demas_2021\high_resolution\matlab\collated\collated_planes.h5";
+col_fpath = "E:\W2_archive\demas_2021\high_resolution\matlab\processed\collated_planes.h5";
+
 T_all = h5read(col_fpath, '/T_all');
 % T_all = movmean(T_all./(max(T_all,[],2)*ones(1,size(T_all,2))),5,2);
 
@@ -212,40 +194,8 @@ xlabel('Frames (Time)');
 ylabel('Top 100 Most Active Neurons');
 title('Neuronal Activity Heatmap');
 
-
 %%
 
-load('thresholds.mat')
-
-[~,srt] = sort(Rsa,'descend');
-
-T_all = T_all(srt,:);
-
-Tt = uint8(255.*ind2rgb(uint8(T_all.*255),parula(256)));
-
-bx = 255.*ones(size(Tt,1),200,3,'uint8');
-
-Ttp = cat(2,bx,Tt,bx);
-
-by = 255.*ones(200,size(Ttp,2),3,'uint8');
-
-Ttp = cat(1,by,Ttp,by);
-
-Ttp(201:2000:207230,200,2) = 0;
-Ttp(201:2000:207230,200,3) = 0;
-
-Ttp(200,201+round([0:281.333:2532]),2) = 0;
-Ttp(200,201+round([0:281.333:2532]),3) = 0;
-
-Ttp = flipud(Ttp);
-
-test = Ttp(1:2900,:,:);
-figure;
-imagesc(test); set(gca,'YDir','normal')
-
-imwrite(Ttp,[spath 'SFig7.tif'])
-% imwrite(Ttp,[spath 'SFig7.png'])
-
-imwrite(Ttp(1:2900,:,:),[spath 'test.tif'])
-imwrite(Ttp(1:2900,:,:),[spath 'test.png'])
+save_path = "E:\W2_archive\demas_2021\high_resolution\matlab\processed\figures\traces.png";
+plot_traces(T_all, 100, save_path);
 

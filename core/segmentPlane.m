@@ -77,6 +77,8 @@ addParameter(p, 'num_cores', 1, @(x) isnumeric(x));
 addParameter(p, 'start_plane', 1, @(x) isnumeric(x));
 addParameter(p, 'end_plane', 1, @(x) isnumeric(x) && x >= p.Results.start_plane);
 addParameter(p, 'do_figures', 1, @(x) isnumeric(x) || islogical(x));
+addParameter(p, 'patches', []);
+addParameter(p, 'K', 1, @(x) isnumeric(x));
 addParameter(p, 'options', {}, @(x) isstruct(x));
 parse(p, data_path, varargin{:});
 
@@ -89,6 +91,8 @@ num_cores = p.Results.num_cores;
 start_plane = p.Results.start_plane;
 end_plane = p.Results.end_plane;
 do_figures = p.Results.do_figures;
+patches = p.Results.patches;
+K = p.Results.K;
 options = p.Results.options;
 
 data_path = convertStringsToChars(data_path);
@@ -113,7 +117,7 @@ elseif ~isfolder(save_path)
     mkdir(save_path);
 end
 
-fig_save_path = fullfile(save_path, "figures");
+fig_save_path = fullfile(save_path, "segmentation_figs");
 if ~isfolder(fig_save_path); mkdir(fig_save_path); end
 
 files = dir([fullfile(data_path, '*.h*')]);
@@ -157,6 +161,7 @@ for plane_idx = start_plane:end_plane
     
     %% Load in data
     data = h5read(plane_name, ds);
+    Ym = h5read(plane_name, "/Ym");
     if ~isa(data, 'single'); data=single(data); end
     metadata.movie_path = plane_name;
     
@@ -184,19 +189,28 @@ for plane_idx = start_plane:end_plane
     mn = floor(pi.*(tau.*0.5).^2); % SHRINK IF FOOTPRINTS ARE TOO SMALL
     p = 2; % order of dynamics
     
-    % patch set up; basing it on the ~600 um strips of the 2pRAM, +50 um overlap between patches
-    sizY = size(data);
-    patch_size = round(650/pixel_resolution).*[1,1];
-    overlap = [1,1].*ceil(50./pixel_resolution);
-    patches = construct_patches(sizY(1:end-1),patch_size,overlap);
+    if isempty(patches)
+        log_message(fid, "Creating default patches.\n")
+
+        % patch set up; basing it on the ~600 um strips of the 2pRAM, +50 um overlap between patches
+        sizY = size(data);
     
-    K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2); % number of components based on assumption of 9.2e4 neurons/mm^3
-    
-    % Set caiman parameters
-    log_message(fid, "Using default CNMF parameters.\n")
-    
+        patch_size = round(650/pixel_resolution).*[1,1];
+        overlap = [1,1].*ceil(50./pixel_resolution);
+        patches = construct_patches(sizY(1:end-1),patch_size,overlap);
+    end
+
+    if isempty(K)
+        % number of components based on assumption of 9.2e4 neurons/mm^3
+        K = ceil(9.2e4.*20e-9.*(pixel_resolution.*patch_size(1)).^2); 
+    end
+
     % Set caiman parameters
     if isempty(options)
+
+        % Set caiman parameters
+        log_message(fid, "Setting default CNMF parameters.\n")
+    
          options = CNMFSetParms(...
         'd1',d1,'d2',d2,...                         % dimensionality of the FOV
         'deconv_method','constrained_foopsi',...    % neural activity deconvolution method
@@ -223,6 +237,12 @@ for plane_idx = start_plane:end_plane
         'refine_flag',0,...
         'rolling_length',ceil(frame_rate*5),...
         'fr', frame_rate);                                      % order of autoregressive system (p = 0 no dynamics, p=1 just decay, p = 2, both rise and decay)
+    else
+        % Validate that options.nb is 1, cnmf will fail otherwise
+        if options.nb ~= 1
+            disp(options.nb)
+            error('The value of options.nb must be 1.');
+        end
     end
    
     poolobj = gcp('nocreate'); % create a parallel pool
@@ -245,16 +265,17 @@ for plane_idx = start_plane:end_plane
     t_cnmf = tic;
     [A,b,C,f,~,P,~,YrA] = run_CNMF_patches(data,K,patches,tau,p,options);
     
-    log_message(fid, 'Initialized CNMF patches complete.  Process took: %.2f seconds\Classifying components ...\n',toc(t_cnmf));
+    log_message(fid, 'Initialized CNMF patches complete.  Process took: %.2f seconds\nClassifying components ...\n',toc(t_cnmf));
     log_message(fid, "--------------------------------------------------\n");
     
     t_class = tic;
     [rval_space,~,~,sizeA,~,~,traces] = classify_components_jeff(data,A,C,b,f,YrA,options);
-    log_message(fid, 'Classification complete. Process took: %.2f seconds\Running spatial/temporal acceptance tests...\n', toc(t_class));
+    log_message(fid, 'Classification complete. Process took: %.2f seconds\nRunning spatial/temporal acceptance tests...\n', toc(t_class));
     log_message(fid, "--------------------------------------------------\n");
     
     t_test = tic;
     Cn =  correlation_image(data);
+    
     % Spatial acceptance test:
     ind_corr = (rval_space > space_thresh) & (sizeA >= options.min_size_thr) & (sizeA <= options.max_size_thr);
     
@@ -272,6 +293,31 @@ for plane_idx = start_plane:end_plane
     rVals = rval_space(keep);
     log_message(fid, 'Spatial acceptance and event exceptionality tests complete. Process took: %.2f seconds\nUpdating tamporal components...', toc(t_test));
     log_message(fid, "--------------------------------------------------\n");
+
+    component_save_path = fullfile(fig_save_path, sprintf("plane_%d_accepted_rejected_neurons.png", plane_idx));
+    component_save_path2 = fullfile(fig_save_path, sprintf("plane_%d_accepted_rejected_neurons_p.png", plane_idx));
+    
+    Coor = plot_contours(A,Cn,options);
+    throw = ~keep;
+    figure;
+    set(gcf, 'Color', 'k'); % Set figure background to black
+    set(gcf, 'InvertHardcopy', 'off'); % Prevents MATLAB from inverting colors on save
+    
+    ax1 = subplot(121); 
+    plot_contours(A(:,keep), Cn, options, 0, [], Coor, 1, find(keep)); 
+    set(ax1, 'Color', 'k', 'XColor', 'w', 'YColor', 'w'); % Make axis background black, text white
+    title(sprintf('Accepted Components: count=%d', sum(keep)), 'FontWeight', 'bold', 'FontSize', 14, 'Color', 'w');
+    
+    ax2 = subplot(122); 
+    plot_contours(A(:,throw), Cn, options, 0, [], Coor, 1, find(throw)); 
+    set(ax2, 'Color', 'k', 'XColor', 'w', 'YColor', 'w');
+    title(sprintf('Rejected Components: count=%d', sum(throw)), 'FontWeight', 'bold', 'FontSize', 14, 'Color', 'w');
+    
+    linkaxes([ax1, ax2],'xy');
+    
+    saveas(gcf, component_save_path); % Save as PNG
+    print(gcf, component_save_path2, '-dpng', '-r600'); 
+    close(gcf);
     
     %% Update temporal components
     P.p = 0;
@@ -281,6 +327,7 @@ for plane_idx = start_plane:end_plane
     [C_keep,f,~,~,R_keep] = update_temporal_components(reshape(data,d,T),A_keep,b,C_keep,f,P,options);
     log_message(fid, 'Temporal components updates. Process took: %.2f seconds.\nDetrending from raw traces ...',toc(t_update));
     log_message(fid, "--------------------------------------------------\n");
+    options.nb = 1;
     
     %% Detrend
     t_detrend = tic;
@@ -339,6 +386,7 @@ for plane_idx = start_plane:end_plane
     h5create(plane_name_save,"/Ac_keep",size(Ac_keep));
     h5create(plane_name_save,"/C_keep",size(C_keep));
     h5create(plane_name_save,"/Km",size(Km));
+    h5create(plane_name_save,"/Ym",size(Ym));
     
     h5create(plane_name_save,"/rVals",size(rVals));
     h5create(plane_name_save,"/Cn",size(Cn));
@@ -353,7 +401,8 @@ for plane_idx = start_plane:end_plane
     h5write(plane_name_save,"/Ac_keep",Ac_keep);
     h5write(plane_name_save,"/C_keep",C_keep);
     h5write(plane_name_save,"/Km",Km);
-    
+    h5write(plane_name_save,"/Km",Km);
+
     h5write(plane_name_save,"/rVals",rVals);
     h5write(plane_name_save,"/Cn",Cn);
     h5write(plane_name_save,"/b",b);
@@ -364,11 +413,13 @@ for plane_idx = start_plane:end_plane
     h5write(plane_name_save,"/acm",acm);
     
     write_metadata_h5(metadata, plane_name_save, '/');
-    % write_metadata_h5(options, plane_name_save, '/opts');
-    
-    savefast(fullfile(save_path, ['caiman_output_plane_' num2str(plane_idx) '.mat']),'T_keep','Ac_keep','C_keep','Km','rVals','Cn','b','f','acx','acy','acm')
+
+    num_traces = min(size(T_keep, 1), 500); % Get the minimum of 500 or available traces
+    sp = fullfile(save_path, sprintf("top_%d_traces.png", num_traces));
+    plot_traces(T_keep, num_traces, sp);
+
     log_message(fid, "Data saved. Elapsed time: %.2f seconds.\n",toc(t_save));
-    clearvars -except poolobj tmpDir numworkers *path fid num_cores t_all files ds start_plane end_plane options plane_idx
+    clearvars -except poolobj tmpDir numworkers *path fid num_cores t_all files ds start_plane end_plane options plane_idx patches K options
 end
 fprintf(fid, 'Routine complete for %d planes. Total Completion time: %.2f hours.\n',((end_plane-start_plane)+1),toc(t_all)./3600);
 end
