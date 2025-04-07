@@ -1,0 +1,803 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3. Segmentation &#8212; LBM-CaImAn-MATLAB  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=475cc00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2b91c5f0"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
+    <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+    <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+    <script defer="defer" src="../_static/tippy/user_guide/segmentation.243e4f01-70bb-4a0a-afe6-5c70f6c6b74e.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/segmentation';</script>
+    <link rel="icon" href="../_static/lbm_mat_favicon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4. Axial Collation and Correction" href="collation.html" />
+    <link rel="prev" title="2. Registration" href="registration.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_caiman_matlab_with_icon.png" class="logo__image only-light" alt="LBM-CaImAn-MATLAB  documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo_caiman_matlab_with_icon.png" class="logo__image only-dark" alt="LBM-CaImAn-MATLAB  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://millerbrainobservatory.github.io/" title="MBO User Hub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src=".././_static/icon_mbo_home.png" class="icon-link-image" alt="MBO User Hub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MillerBrainObservatory/" title="MBO Github" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">MBO Github</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://mbo.rockefeller.edu/contact/" title="Connect with MBO" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-regular fa-address-card fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Connect with MBO</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../first_steps/index.html">First Steps</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/setup.html">0.1. Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/overview.html">0.2. Pipeline Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="assembly.html">1. Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registration.html">2. Registration</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">3. Segmentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="collation.html">4. Axial Collation and Correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tips_tricks.html">5. Tips and Tricks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html">6. Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/registration_tutorial.html">1. Explained: Registration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/segmentation_tutorial.html">2. Explained: Source Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/axial_correction_tutorial.html">3. Explained: Axial Offset Correction</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/core.html">1. Core Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/utility.html">2. Utility Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/internal.html">3. Internal Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../image_gallery.html">Image Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/blob/master/docs/user_guide/segmentation.md?plain=1" target="_blank"
+   class="btn btn-sm btn-source-file-button dropdown-item"
+   title="Show source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">Show source</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/edit/master/docs/user_guide/segmentation.md" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/new?title=Issue%20on%20page%20%2Fuser_guide/segmentation.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/user_guide/segmentation.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Segmentation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#segmentation-overview">3.1. Segmentation Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inputs">3.2. Inputs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tuning-cnmf">3.3. Tuning CNMF</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#merge-thresh">3.3.1. <code class="code docutils literal notranslate"><span class="pre">merge_thresh</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#min-snr">3.3.2. <code class="code docutils literal notranslate"><span class="pre">min_SNR</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tau">3.3.3. <code class="code docutils literal notranslate"><span class="pre">Tau</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#p">3.3.4. <code class="code docutils literal notranslate"><span class="pre">P</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#segmentation-outputs">3.4. Segmentation Outputs</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#h5-groups">3.4.1. H5 Groups</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="segmentation">
+<span id="ug-source-extraction"></span><h1><span class="section-number">3. </span>Segmentation<a class="headerlink" href="#segmentation" title="Permalink to this heading">#</a></h1>
+<p>Function for this step: <a class="reference internal" href="../api/core.html#segmentPlane" title="segmentPlane"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">segmentPlane()</span></code></a></p>
+<section id="segmentation-overview">
+<h2><span class="section-number">3.1. </span>Segmentation Overview<a class="headerlink" href="#segmentation-overview" title="Permalink to this heading">#</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><a class="reference internal" href="../api/core.html#segmentPlane" title="segmentPlane"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">segmentPlane()</span></code></a> will take significantly longer than the previous steps.</p>
+</div>
+<p>Much of work is about separating “good activity”, the flourescence changes that we can attribute to a single cell, vs “noise, which is everything else (including signal from other neurons).</p>
+<p>To do this, we take advantage of the fact that a <em>slow calcium signal is typically similar between adjacent frames</em>.</p>
+<p>The <em>speed of transients</em>, or the time it takes for the neuron to fully glow (rise time) and unglow (decay time), is a very important metric used to calculate several of the parameters for CNMF.</p>
+<p>In particular, speed of transients relative to the frame rate can be thought of in terms of “how many frames does it take my calcium indicator to undergo a complete transients cycle”.</p>
+<p>The flourescence of the proteins in our neurons is <strong>correlated</strong> with how active the neuron is.
+Turning this flourescence into “spikes” relies on several mathmatical operations to:</p>
+<ul class="simple">
+<li><p>isolate neuronal activity from background activity (segmentation).</p></li>
+<li><p>infer the times of action potentials from the fluorescence traces (deconvolution).</p></li>
+</ul>
+<!-- ```{image} ../_images/seg_traces.png -->
+<!-- ``` -->
+<div class="dropdown admonition">
+<p class="admonition-title">A note on noisy data</p>
+<p>Much of work is about separating “good activity”, the flourescence changes that we can attribute to a single cell, vs “noise, which is everything else (including signal from other neurons).</p>
+<p>To do this, we take advantage of the fact that the slow calcium signal is typically very similar between adjacent frames.</p>
+<p>See <a class="reference external" href="https://gcamp6f.com/2024/04/24/why-your-two-photon-images-are-noisier-than-you-expect">this blog post</a> for a nice discussion on shot noise calculations and poisson processes.</p>
+</div>
+</section>
+<section id="inputs">
+<span id="seg-definitions"></span><h2><span class="section-number">3.2. </span>Inputs<a class="headerlink" href="#inputs" title="Permalink to this heading">#</a></h2>
+<p>Inputs are consistent with <a class="reference internal" href="registration.html#registration"><span class="std std-ref">Registration</span></a>, substituting::</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>NoRMCorreSetParams -&gt; CNMFSetParams
+</pre></div>
+</div>
+<p>All of the parameters and options fed into the code<code class="docutils literal notranslate"><span class="pre">CNMF</span></code> pipeline are contained within a single <a class="reference external" href="https://www.mathworks.com/help/matlab/ref/struct.html">MATLAB struct</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There is an example file describing CNMF parameters at the root of this project. <code class="xref mat mat-scpt docutils literal notranslate"><span class="pre">demo_CNMF_params</span></code>.</p>
+</div>
+</section>
+<section id="tuning-cnmf">
+<span id="seg-tuning"></span><h2><span class="section-number">3.3. </span>Tuning CNMF<a class="headerlink" href="#tuning-cnmf" title="Permalink to this heading">#</a></h2>
+<p>To get an idea of the default parameters (what happens if you use <code class="code docutils literal notranslate"><span class="pre">CNMFSetParams()</span></code> with no arguments),
+you can run the following code to see the defaults:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">opts</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CNMFSetParams</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>There are several different thresholds that correlation coefficients must cross to be considered a “valid” neuron or a “valid” transient signal.</p>
+<p>Below are the <a class="reference internal" href="../glossary.html#term-CNMF"><span class="xref std std-term">CNMF</span></a> parameters that control these thresholds and allow tuning the algorithm to your dataset.</p>
+<section id="merge-thresh">
+<span id="seg-merge-thresh"></span><h3><span class="section-number">3.3.1. </span><code class="code docutils literal notranslate"><span class="pre">merge_thresh</span></code><a class="headerlink" href="#merge-thresh" title="Permalink to this heading">#</a></h3>
+<p>A correlation coefficient determining the amount of correlation between pixels in time needed to consider two neurons the same neuron.</p>
+<ul class="simple">
+<li><p>The lower your resolution, the more “difficult” it is for CNMF to distinguish between two tight neurons, thus use a lower merge threshold.</p></li>
+<li><p>This parameter heavily effects the number of neurons processed. It’s always better to have to many neurons vs too few, as you can never get a lost neuron back, but you can invalidate neurons in post-processing.</p></li>
+</ul>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/seg_traces_highcorr1.svg"
+               title="Example of highly correlated traces"
+               data-title="Example of highly correlated traces"
+               
+               ><img src="../_images/seg_traces_highcorr1.svg"
+                     class=""
+                     width="100%"
+                     height="auto"
+                     alt=""/>
+                </a></section>
+<section id="min-snr">
+<span id="seg-minsnr"></span><h3><span class="section-number">3.3.2. </span><code class="code docutils literal notranslate"><span class="pre">min_SNR</span></code><a class="headerlink" href="#min-snr" title="Permalink to this heading">#</a></h3>
+<p>The minimum <a class="reference external" href="https://en.wikipedia.org/wiki/Signal-to-noise_ratio">signal-noise ratio</a> needed for the algorithm to accept a neurons initialization (accept it as valid).</p>
+<p>This value is used for an event exceptionality test, which tests the probabilty if some “exceptional events” (like a spike).</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p><strong>If this value is low, even a very slight deviation in signal will be considered exceptional and many background-neurons will be accepted</strong>.</p>
+</div>
+<ul class="simple">
+<li><p>The likeihood of observing the actual trace value over N samples given an estimated noise distribution.</p></li>
+<li><p>The function first estimates the noise distribution by considering the dispersion around the mode.</p></li>
+</ul>
+<p>This probability is used to order the components according to “most likely to be exceptional”.</p>
+</section>
+<section id="tau">
+<span id="seg-tau"></span><h3><span class="section-number">3.3.3. </span><code class="code docutils literal notranslate"><span class="pre">Tau</span></code><a class="headerlink" href="#tau" title="Permalink to this heading">#</a></h3>
+<p>Half-size of your neurons.</p>
+<ul class="simple">
+<li><p>Tau is the <code class="code docutils literal notranslate"><span class="pre">half-size</span></code> of a neuron. If a neuron is <span class="math notranslate nohighlight">\(10μm\)</span>, <code class="code docutils literal notranslate"><span class="pre">Tau</span></code> will be a <span class="math notranslate nohighlight">\(5μm\)</span>.</p></li>
+<li><p>In general, round up.</p></li>
+<li><p>This changes depending on the area of the brain you’re in and should be adjusted to match the ~cell size of the brain region.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If this parameter is not included, they will be calculated for you based on the <code class="code docutils literal notranslate"><span class="pre">pixel_resolution</span></code>, frame rate and image size in the metadata.</p>
+</div>
+<ul class="simple">
+<li><p>For example, <code class="code docutils literal notranslate"><span class="pre">Tau</span></code> is a widely talked about parameter being the half-size of your neuron.</p></li>
+</ul>
+<p>This is calculated by default as <code class="docutils literal notranslate"><span class="pre">7.5/pixel_resolution</span></code>.</p>
+<p>This makes sense if we assume an ~neuron size of <span class="math notranslate nohighlight">\(14μm\)</span>.</p>
+</section>
+<section id="p">
+<span id="seg-p"></span><h3><span class="section-number">3.3.4. </span><code class="code docutils literal notranslate"><span class="pre">P</span></code><a class="headerlink" href="#p" title="Permalink to this heading">#</a></h3>
+<p>This is the autoregressive order of the system.</p>
+<ul class="simple">
+<li><p>It is a measure of how the signal changes with respect to time.</p></li>
+<li><p>This value will always be 1 or 2, depending on the frame rate of the video and the dynamics of the calcium indicator.</p></li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>In general, <strong>If your indicator takes &gt;1 frame to rise/decay, P=2 (slow)</strong>
+otherwise, P=1 (fast)</p>
+</div>
+</section>
+</section>
+<section id="segmentation-outputs">
+<span id="seg-outputs"></span><h2><span class="section-number">3.4. </span>Segmentation Outputs<a class="headerlink" href="#segmentation-outputs" title="Permalink to this heading">#</a></h2>
+<p>The <code class="code docutils literal notranslate"><span class="pre">.h5</span></code> output for segmentation contains several groups.
+You will not find any movies, those are stored in the <a class="reference internal" href="registration.html#reg-output"><span class="std std-ref">registration outputs</span></a>.</p>
+<section id="h5-groups">
+<h3><span class="section-number">3.4.1. </span>H5 Groups<a class="headerlink" href="#h5-groups" title="Permalink to this heading">#</a></h3>
+<p>The output of the analysis includes several key variables that describe the segmented neuronal components and their corresponding activities.</p>
+<p>Below is a description of each output variable, along with an example of how to use them and what they represent.</p>
+<ol class="arabic simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">T_all</span></code>: Neuronal time-series</p>
+<ul class="simple">
+<li><p>The fluorescence time-series data for each detected neuronal component. Each row corresponds to a different neuron, and each column corresponds to a different time point.</p></li>
+<li><p>This data can be used to analyze the temporal dynamics of neuronal activity, such as identifying patterns of activation over time.</p></li>
+</ul>
+</li>
+</ol>
+<div class="dropdown admonition">
+<p class="admonition-title">Example: Plot all neuronal traces</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="nb">plot</span><span class="p">(</span><span class="n">T_all</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">:));</span><span class="w"> </span><span class="c">% Plot the time-series for the first neuron</span>
+<span class="nb">xlabel</span><span class="p">(</span><span class="s">&#39;Time (frames)&#39;</span><span class="p">);</span>
+<span class="nb">ylabel</span><span class="p">(</span><span class="s">&#39;Fluorescence (dF/F)&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p><code class="docutils literal notranslate"><span class="pre">C_all</span></code>: Deconvolved neuronal activity</p></li>
+</ol>
+<ul class="simple">
+<li><p>The deconvolved activity traces, which represent the estimated underlying neuronal firing rates. This data is derived from <code class="docutils literal notranslate"><span class="pre">T_all</span></code> through a deconvolution process that attempts to remove the effects of calcium dynamics.</p></li>
+<li><p>This data can be used to study the inferred spiking activity of neurons, which is often more directly related to neuronal communication than raw fluorescence data.</p></li>
+</ul>
+<div class="dropdown admonition">
+<p class="admonition-title">Example: Plot deconvolved activity</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="nb">plot</span><span class="p">(</span><span class="n">C_all</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">:));</span><span class="w"> </span><span class="c">% Plot the deconvolved activity for the first neuron</span>
+<span class="nb">xlabel</span><span class="p">(</span><span class="s">&#39;Time (frames)&#39;</span><span class="p">);</span>
+<span class="nb">ylabel</span><span class="p">(</span><span class="s">&#39;Deconvolved activity&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p><code class="docutils literal notranslate"><span class="pre">N_all</span></code>: Neuronal spatial coordinates mapped to X/Y coordinates</p></li>
+</ol>
+<ul class="simple">
+<li><p>A matrix where each row represents a neuron, and the columns contain properties such as the neuron’s integrated fluorescence (<code class="code docutils literal notranslate"><span class="pre">acm</span></code>), x-coordinate (<code class="code docutils literal notranslate"><span class="pre">acx</span></code>), y-coordinate (<code class="code docutils literal notranslate"><span class="pre">acy</span></code>), and z-coordinate (<code class="code docutils literal notranslate"><span class="pre">plane_index</span></code>).</p></li>
+<li><p>This data can be used to analyze the spatial distribution of neurons within the imaging field and correlate spatial properties with functional data.</p></li>
+</ul>
+<div class="dropdown admonition">
+<p class="admonition-title">Example: Plot spatial neuron distribution</p>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="nb">scatter</span><span class="p">(</span><span class="n">N_all</span><span class="p">(:,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">N_all</span><span class="p">(:,</span><span class="w"> </span><span class="mi">3</span><span class="p">));</span><span class="w"> </span><span class="c">% Plot the spatial distribution of neurons in the xy-plane</span>
+<span class="nb">xlabel</span><span class="p">(</span><span class="s">&#39;x-coordinate&#39;</span><span class="p">);</span>
+<span class="nb">ylabel</span><span class="p">(</span><span class="s">&#39;y-coordinate&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p><code class="docutils literal notranslate"><span class="pre">Ac_keep</span></code>: Neuronal footprints</p></li>
+</ol>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/seg_ac_keep1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/seg_ac_keep1.png"
+                     class="align-right"
+                     width="200"
+                     height="auto"
+                     alt=""/>
+                </a><ul class="simple">
+<li><p>The spatial footprints of the detected neurons. Each neuron is represented by a 2D matrix showing its spatial extent and intensity within the imaging field.</p></li>
+<li><p>This data can be used to visualize the spatial arrangement and morphology of neuronal components.</p></li>
+</ul>
+<div class="dropdown admonition">
+<p class="admonition-title">Example: Plot accepted neurons only</p>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="nb">figure</span><span class="p">;</span>
+<span class="nb">imagesc</span><span class="p">(</span><span class="n">Ac_keep</span><span class="p">(:,:,</span><span class="mi">1</span><span class="p">));</span>
+<span class="n">axis</span><span class="w"> </span><span class="s">image</span><span class="p">;</span>
+<span class="n">axis</span><span class="w"> </span><span class="s">tight</span><span class="p">;</span><span class="w"> </span><span class="n">axis</span><span class="w"> </span><span class="s">off</span><span class="p">;</span><span class="w"> </span><span class="n">colormap</span><span class="w"> </span><span class="s">gray</span><span class="p">;</span>
+<span class="nb">title</span><span class="p">(</span><span class="s">&quot;Single Spatial Component&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p><code class="docutils literal notranslate"><span class="pre">Cn</span></code>: Correlation image</p></li>
+</ol>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/seg_cn1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/seg_cn1.png"
+                     class="align-right"
+                     width="200"
+                     height="auto"
+                     alt=""/>
+                </a><ul class="simple">
+<li><p>A 2D image showing the correlation of each pixel’s time-series with its neighboring pixels, highlighting areas of correlated activity.</p></li>
+<li><p>This image can be used to identify regions of interest and assess the overall quality of the motion correction and segmentation process.</p></li>
+</ul>
+<div class="dropdown admonition">
+<p class="admonition-title">Example: Plot accepted neurons only</p>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">figure</span><span class="p">;</span><span class="w"> </span><span class="nb">imagesc</span><span class="p">(</span><span class="n">Cn</span><span class="p">);</span><span class="w"> </span><span class="n">axis</span><span class="w"> </span><span class="s">image</span><span class="p">;</span><span class="w"> </span><span class="n">axis</span><span class="w"> </span><span class="s">tight</span><span class="p">;</span><span class="w"> </span><span class="n">axis</span><span class="w"> </span><span class="s">off</span><span class="p">;</span><span class="w"> </span><span class="n">colormap</span><span class="w"> </span><span class="s">gray</span><span class="p">;</span><span class="w"> </span><span class="nb">title</span><span class="p">(</span><span class="s">&quot;Single Spatial Component&quot;</span><span class="p">);</span>
+<span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">size</span><span class="p">(</span><span class="n">Cn</span><span class="p">)</span><span class="w"> </span><span class="c">% [Y, X]</span>
+
+<span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
+
+<span class="w">    </span><span class="mi">583</span><span class="w"> </span><span class="mi">528</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="registration.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">2. </span>Registration</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="collation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">4. </span>Axial Collation and Correction</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#segmentation-overview">3.1. Segmentation Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inputs">3.2. Inputs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tuning-cnmf">3.3. Tuning CNMF</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#merge-thresh">3.3.1. <code class="code docutils literal notranslate"><span class="pre">merge_thresh</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#min-snr">3.3.2. <code class="code docutils literal notranslate"><span class="pre">min_SNR</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tau">3.3.3. <code class="code docutils literal notranslate"><span class="pre">Tau</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#p">3.3.4. <code class="code docutils literal notranslate"><span class="pre">P</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#segmentation-outputs">3.4. Segmentation Outputs</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#h5-groups">3.4.1. H5 Groups</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Elizabeth R. Miller Brain Observatory | The Rockefeller University. All Rights Reserved.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

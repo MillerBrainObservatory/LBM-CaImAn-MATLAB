@@ -1,0 +1,22 @@
+selector_to_html = {"a[href=\"#convertScanImageTiffToVolume\"]": "<dt class=\"sig sig-object mat\" id=\"convertScanImageTiffToVolume\">\n<span class=\"sig-name descname\"><span class=\"pre\">convertScanImageTiffToVolume</span></span><span class=\"sig-paren\">(</span><em class=\"sig-param\"><span class=\"pre\">data_path</span></em>, <em class=\"sig-param\"><span class=\"pre\">varargin</span></em><span class=\"sig-paren\">)</span></dt><dd><p>Convert ScanImage .tif files into a 4D volume.</p><p>Convert raw scanimage multi-roi .tif files from a single session\ninto a single 4D volumetric time-series (x, y, z, t). It\u2019s designed to process files for the\nScanImage Version: 2016 software.</p></dd>", "a[href=\"#collatePlanes\"]": "<dt class=\"sig sig-object mat\" id=\"collatePlanes\">\n<span class=\"sig-name descname\"><span class=\"pre\">collatePlanes</span></span><span class=\"sig-paren\">(</span><em class=\"sig-param\"><span class=\"pre\">data_path</span></em>, <em class=\"sig-param\"><span class=\"pre\">varargin</span></em><span class=\"sig-paren\">)</span></dt><dd></dd>", "a[href=\"#segmentPlane\"]": "<dt class=\"sig sig-object mat\" id=\"segmentPlane\">\n<span class=\"sig-name descname\"><span class=\"pre\">segmentPlane</span></span><span class=\"sig-paren\">(</span><em class=\"sig-param\"><span class=\"pre\">data_path</span></em>, <em class=\"sig-param\"><span class=\"pre\">varargin</span></em><span class=\"sig-paren\">)</span></dt><dd><p>Segment imaging data using CaImAn CNMF.</p><p>This function applies the CaImAn algorithm to segment neurons from\nmotion-corrected, pre-processed and ROI re-assembled MAxiMuM data.\nThe processing is conducted for specified planes, and the results\nare saved to disk.</p><p class=\"rubric\">Notes</p><p><code class=\"code docutils literal notranslate\"><span class=\"pre\">T_keep</span></code>\n:  neuronal time series [Km, T]. <code class=\"code docutils literal notranslate\"><span class=\"pre\">single</span></code></p><p><code class=\"code docutils literal notranslate\"><span class=\"pre\">Ac_keep</span></code>\n:  neuronal footprints [2*tau+1, 2*tau+1, Km]. <code class=\"code docutils literal notranslate\"><span class=\"pre\">single</span></code></p><p><code class=\"code docutils literal notranslate\"><span class=\"pre\">C_keep</span></code>\n:  denoised time series [Km, T]. <code class=\"code docutils literal notranslate\"><span class=\"pre\">single</span></code></p></dd>", "a[href=\"#core\"]": "<h1 class=\"tippy-header\" style=\"margin-top: 0;\"><span class=\"section-number\">1. </span>Core<a class=\"headerlink\" href=\"#core\" title=\"Permalink to this heading\">#</a></h1><p>Core functions used to run the pipeline.</p>", "a[href=\"#motionCorrectPlane\"]": "<dt class=\"sig sig-object mat\" id=\"motionCorrectPlane\">\n<span class=\"sig-name descname\"><span class=\"pre\">motionCorrectPlane</span></span><span class=\"sig-paren\">(</span><em class=\"sig-param\"><span class=\"pre\">data_path</span></em>, <em class=\"sig-param\"><span class=\"pre\">varargin</span></em><span class=\"sig-paren\">)</span></dt><dd><p>Perform motion correction on imaging data.</p><p>Each motion-corrected plane is saved as a .h5 group containing the 2D\nshift vectors in x and y. The raw movie is saved in \u2018/Y\u2019 and the</p><p class=\"rubric\">Notes</p></dd>", "a[href=\"#calculateZOffset\"]": "<dt class=\"sig sig-object mat\" id=\"calculateZOffset\">\n<span class=\"sig-name descname\"><span class=\"pre\">calculateZOffset</span></span><span class=\"sig-paren\">(</span><em class=\"sig-param\"><span class=\"pre\">data_path</span></em>, <em class=\"sig-param\"><span class=\"pre\">varargin</span></em><span class=\"sig-paren\">)</span></dt><dd><p class=\"rubric\">Notes</p><p class=\"rubric\">Examples</p><p>[offsets, metadata] = calculateZOffset(\u2018C:/data/images/\u2019, metadata, 1, 10, 5);</p></dd>"}
+skip_classes = ["headerlink", "sd-stretched-link"]
+
+window.onload = function () {
+    for (const [select, tip_html] of Object.entries(selector_to_html)) {
+        const links = document.querySelectorAll(` ${select}`);
+        for (const link of links) {
+            if (skip_classes.some(c => link.classList.contains(c))) {
+                continue;
+            }
+
+            tippy(link, {
+                content: tip_html,
+                allowHTML: true,
+                arrow: true,
+                placement: 'auto-start', maxWidth: 500, interactive: false,
+
+            });
+        };
+    };
+    console.log("tippy tips loaded!");
+};

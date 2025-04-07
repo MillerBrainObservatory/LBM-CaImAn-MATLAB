@@ -1,0 +1,1181 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2. Utility &#8212; LBM-CaImAn-MATLAB  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=475cc00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2b91c5f0"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
+    <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+    <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+    <script defer="defer" src="../_static/tippy/api/utility.69800ca4-41e2-49e6-ad41-eca6e866cdf7.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/utility';</script>
+    <link rel="icon" href="../_static/lbm_mat_favicon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3. Internals" href="internal.html" />
+    <link rel="prev" title="1. Core" href="core.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_caiman_matlab_with_icon.png" class="logo__image only-light" alt="LBM-CaImAn-MATLAB  documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo_caiman_matlab_with_icon.png" class="logo__image only-dark" alt="LBM-CaImAn-MATLAB  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://millerbrainobservatory.github.io/" title="MBO User Hub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src=".././_static/icon_mbo_home.png" class="icon-link-image" alt="MBO User Hub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MillerBrainObservatory/" title="MBO Github" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">MBO Github</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://mbo.rockefeller.edu/contact/" title="Connect with MBO" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-regular fa-address-card fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Connect with MBO</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../first_steps/index.html">First Steps</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/setup.html">0.1. Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/overview.html">0.2. Pipeline Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../user_guide/index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/assembly.html">1. Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/registration.html">2. Registration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/segmentation.html">3. Segmentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/collation.html">4. Axial Collation and Correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/tips_tricks.html">5. Tips and Tricks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/troubleshooting.html">6. Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/registration_tutorial.html">1. Explained: Registration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/segmentation_tutorial.html">2. Explained: Source Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/axial_correction_tutorial.html">3. Explained: Axial Offset Correction</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="core.html">1. Core Functions</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2. Utility Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal.html">3. Internal Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../image_gallery.html">Image Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/blob/master/docs/api/utility.md?plain=1" target="_blank"
+   class="btn btn-sm btn-source-file-button dropdown-item"
+   title="Show source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">Show source</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/edit/master/docs/api/utility.md" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/new?title=Issue%20on%20page%20%2Fapi/utility.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/api/utility.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Utility</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#readers">2.1. Readers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writers">2.2. Writers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization">2.3. Visualization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#validation">2.4. Validation</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="utility">
+<span id="utility-api"></span><h1><span class="section-number">2. </span>Utility<a class="headerlink" href="#utility" title="Permalink to this heading">#</a></h1>
+<p>Functions used by the pipeline that users can take advantage of to further process LBM datasets.</p>
+<section id="readers">
+<h2><span class="section-number">2.1. </span>Readers<a class="headerlink" href="#readers" title="Permalink to this heading">#</a></h2>
+<dl class="mat function">
+<dt class="sig sig-object mat" id="read_h5_metadata">
+<span class="sig-name descname"><span class="pre">read_h5_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">h5_fullfile</span></em>, <em class="sig-param"><span class="pre">loc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#read_h5_metadata" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads metadata from an HDF5 file.</p>
+<p>Reads the metadata attributes from a specified location within an HDF5 file
+and returns them as a structured array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>h5_fullfile</strong><span class="classifier">char</span></dt><dd><p>Full path to the HDF5 file from which to read metadata.</p>
+</dd>
+<dt><strong>loc</strong><span class="classifier">char, optional</span></dt><dd><p>Location within the HDF5 file from which to read attributes. Defaults to ‘/’.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>metadata</strong><span class="classifier">struct</span></dt><dd><p>A structured array containing the metadata attributes and their values
+read from the HDF5 file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The function uses <cite>h5info</cite> to retrieve information about the specified location
+within the HDF5 file and <cite>h5readatt</cite> to read attribute values. The attribute names
+are converted to valid MATLAB field names using <cite>matlab.lang.makeValidName</cite>.</p>
+<p class="rubric">Examples</p>
+<dl class="simple">
+<dt>Read metadata from the root location of an HDF5 file:</dt><dd><p>metadata = read_h5_metadata(‘example.h5’);</p>
+</dd>
+<dt>Read metadata from a specific group within an HDF5 file:</dt><dd><p>metadata = read_h5_metadata(‘example.h5’, ‘/group1’);</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="read_plane">
+<span class="sig-name descname"><span class="pre">read_plane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">path</span></em>, <em class="sig-param"><span class="pre">ds</span></em>, <em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#read_plane" title="Permalink to this definition">#</a></dt>
+<dd><p>Read a specific plane from an HDF5 or MAT file and return the data. If
+input is a MAT file, a matfile object is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>path</strong><span class="classifier">str, optional</span></dt><dd><p>Path to the HDF5 or MAT file or the directory containing plane files. If empty, a file selection dialog will open.</p>
+</dd>
+<dt><strong>ds</strong><span class="classifier">str, optional</span></dt><dd><p>Dataset group name within the HDF5 file. If empty, the function will attempt to find a valid dataset or prompt the user.</p>
+</dd>
+<dt><strong>plane</strong><span class="classifier">int, optional</span></dt><dd><p>Plane number to read from the file. User is prompted if not given.</p>
+</dd>
+<dt><strong>frames</strong><span class="classifier">str or int, optional</span></dt><dd><p>Frames to read from the dataset. Can be ‘all’, a scalar frame number
+i.e. 2, a slice i.e. 1:400, vector of size 2 with the start and stop
+index i.e. [5 400]. Default is ‘all’.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Y_out</strong><span class="classifier">array-like or MAT-file object</span></dt><dd><p>The data read from the specified plane and frames in the file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function interactively prompts the user for input if any required
+parameter is not provided. It handles various errors and prompts the
+user again for correct input.</p>
+<p class="rubric">Examples</p>
+<dl class="simple">
+<dt>Use dialog and prompts only:</dt><dd><p>Y_out = read_plane();</p>
+</dd>
+<dt>Read all frames from a file givin the full filepath:</dt><dd><p>Y_out = read_plane(‘data.h5’);</p>
+</dd>
+<dt>Use plane argument to read from a folder of files with _plane_ in the name:</dt><dd><p>Y_out = read_plane(‘C:/data/extracted_files’, ‘plane’, 4);</p>
+</dd>
+<dt>Read specific frames from a dataset in a folder:</dt><dd><p>Y_out = read_plane(‘data.h5’, 4, ‘all’);</p>
+</dd>
+<dt>Read specific frames from a dataset in a file:</dt><dd><p>Y_out = read_plane(‘path/to/file.h5’, ‘/Y’, [], 1:10);</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="get_metadata">
+<span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filename</span></em><span class="sig-paren">)</span><a class="headerlink" href="#get_metadata" title="Permalink to this definition">#</a></dt>
+<dd><p>Extract metadata from a ScanImage TIFF file.</p>
+<p>Read and parse Tiff metadata stored in the .tiff header
+and ScanImage metadata stored in the ‘Artist’ tag which contains roi sizes/locations and scanning configuration
+details in a JSON format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">char</span></dt><dd><p>The full path to the TIFF file from which metadata will be extracted.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>metadata_out</strong><span class="classifier">struct</span></dt><dd><p>A struct containing metadata such as center and size of the scan field,
+pixel resolution, image dimensions, number of frames, frame rate, and
+additional roi data extracted from the TIFF file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>metadata = get_metadata(“path/to/file.tif”);</p>
+</dd></dl>
+
+</section>
+<section id="writers">
+<h2><span class="section-number">2.2. </span>Writers<a class="headerlink" href="#writers" title="Permalink to this heading">#</a></h2>
+<dl class="mat function">
+<dt class="sig sig-object mat" id="write_frames_2d">
+<span class="sig-name descname"><span class="pre">write_frames_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">filename</span></em>, <em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">dataset_name</span></em>, <em class="sig-param"><span class="pre">overwrite</span></em>, <em class="sig-param"><span class="pre">append</span></em><span class="sig-paren">)</span><a class="headerlink" href="#write_frames_2d" title="Permalink to this definition">#</a></dt>
+<dd><p>get the size of the data</p>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="write_frames_3d">
+<span class="sig-name descname"><span class="pre">write_frames_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">file</span></em>, <em class="sig-param"><span class="pre">Y_in</span></em>, <em class="sig-param"><span class="pre">ds</span></em>, <em class="sig-param"><span class="pre">append</span></em>, <em class="sig-param"><span class="pre">chunk_mb</span></em><span class="sig-paren">)</span><a class="headerlink" href="#write_frames_3d" title="Permalink to this definition">#</a></dt>
+<dd><p>Write in-memory 3D or 4D data to an HDF5 file in chunks.</p>
+<p>This function writes a multidimensional array <cite>Y_in</cite> to an HDF5 file specified
+by <cite>file</cite> in chunks. It creates a dataset within the HDF5 file and writes the
+data in specified chunk sizes. If <cite>dataset_name</cite> is not provided, it defaults
+to ‘/Y’. If target_chunk_mb size is not provided, it defaults to 4MB.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>file</strong><span class="classifier">char</span></dt><dd><p>The name of the HDF5 file to write to.</p>
+</dd>
+<dt><strong>Y_in</strong><span class="classifier">array</span></dt><dd><p>The multidimensional array to be written to the HDF5 file.</p>
+</dd>
+<dt><strong>ds</strong><span class="classifier">char, optional</span></dt><dd><p>The name of the dataset group within the HDF5 file. Default is ‘/Y’.</p>
+</dd>
+<dt><strong>append</strong><span class="classifier">logical, optional</span></dt><dd><p>Whether to append to an existing HDF5 dataset. Dims must match.
+Default is false.</p>
+</dd>
+<dt><strong>chunk_mb</strong><span class="classifier">int, optional</span></dt><dd><p>In MB, the chunk_size to include in each HDF5 write. Default is 4MB.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function trims the last frame of each chunk if the chunk size
+exceeds the remaining data size.</p>
+<p class="rubric">Examples</p>
+<p>Write a 3D array to an HDF5 file with default chunk size and dataset name:</p>
+<blockquote>
+<div><p>write_frames(‘data.h5’, my_data);</p>
+</div></blockquote>
+<p>Write a 4D array to an HDF5 file with a specified chunk size:</p>
+<blockquote>
+<div><p>write_frames(‘data.h5’, my_data, 2); % 2MB chunks</p>
+</div></blockquote>
+<p>Write a 3D array to an HDF5 file with a specified dataset name:</p>
+<blockquote>
+<div><p>write_frames(‘data.h5’, my_data, ‘/Y’, 2, true, false);</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="write_frames_to_avi">
+<span class="sig-name descname"><span class="pre">write_frames_to_avi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">filename</span></em>, <em class="sig-param"><span class="pre">frame_rate</span></em>, <em class="sig-param"><span class="pre">x</span></em>, <em class="sig-param"><span class="pre">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#write_frames_to_avi" title="Permalink to this definition">#</a></dt>
+<dd><p>Write a 3D array to an AVI video file.</p>
+<p>This function takes a 3D numeric array <cite>data</cite> and writes it to an AVI video
+file specified by <cite>filename</cite>. The video is created with the specified frame
+rate and spatial dimensions <cite>x</cite> and <cite>y</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">numeric array</span></dt><dd><p>A 3D array containing the data to be written to the video file.</p>
+</dd>
+<dt><strong>filename</strong><span class="classifier">char</span></dt><dd><p>The name of the output AVI video file.</p>
+</dd>
+<dt><strong>frame_rate</strong><span class="classifier">double, optional</span></dt><dd><p>The frame rate of the video. Default is 1.</p>
+</dd>
+<dt><strong>x</strong><span class="classifier">double array, optional</span></dt><dd><p>The x-coordinates for the spatial dimensions of the data. Default is
+1:size(data,2).</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">double array, optional</span></dt><dd><p>The y-coordinates for the spatial dimensions of the data. Default is
+1:size(data,1).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The function normalizes the data, applies a moving mean filter, and writes
+the frames to an uncompressed AVI video file. It also sets up the figure
+properties for visualization and adjusts the color axis limits.</p>
+<p class="rubric">Examples</p>
+<p>Write a 3D array to an AVI file with default settings:</p>
+<blockquote>
+<div><p>write_frames_to_avi(my_data, ‘output.avi’);</p>
+</div></blockquote>
+<p>Write a 3D array to an AVI file with a specified frame rate:</p>
+<blockquote>
+<div><p>write_frames_to_avi(my_data, ‘output.avi’, 10);</p>
+</div></blockquote>
+<p>Write a 3D array to an AVI file with specified spatial dimensions:</p>
+<blockquote>
+<div><p>write_frames_to_avi(my_data, ‘output.avi’, 10, 1:256, 1:256);</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="write_frames_to_gif">
+<span class="sig-name descname"><span class="pre">write_frames_to_gif</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">array_3D</span></em>, <em class="sig-param"><span class="pre">gif_filename</span></em>, <em class="sig-param"><span class="pre">size_mb</span></em><span class="sig-paren">)</span><a class="headerlink" href="#write_frames_to_gif" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a GIF from a 3D array with a target size in MB.</p>
+<p>This function converts a 3D array (height x width x frames) into a GIF
+file with a specified maximum size in megabytes. The function normalizes
+each frame, converts it to grayscale, and writes it to the GIF file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>array_3D</strong><span class="classifier">3D array</span></dt><dd><p>The 3D array to convert to a GIF, with dimensions (height x width x frames).</p>
+</dd>
+<dt><strong>gif_filename</strong><span class="classifier">char</span></dt><dd><p>The name of the output GIF file.</p>
+</dd>
+<dt><strong>size_mb</strong><span class="classifier">numeric</span></dt><dd><p>The target size of the GIF in megabytes. The number of frames will be
+adjusted to fit within this size, rounding down to the nearest whole frame.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Frames are normalized to [0, 1] and converted to grayscale before being written to the GIF file.
+This will result in the final image being smaller than the original, as will the resulting gif.</p>
+<p class="rubric">Examples</p>
+<dl class="simple">
+<dt>Example 1:</dt><dd><p>% Create a GIF from a 3D array with a target size of 45 MB
+array_3D = rand(100, 100, 500); % Example 3D array
+write_frames_to_gif(array_3D, ‘output.gif’, 45);</p>
+</dd>
+<dt>Example 2:</dt><dd><p>% Create a GIF from a 3D array loaded from a file with a target size of 25 MB
+array_3D = h5read(‘data.h5’, ‘/dataset’); % Load 3D array from file
+write_frames_to_gif(array_3D, ‘output_25mb.gif’, 25);</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="write_frames_to_h5">
+<span class="sig-name descname"><span class="pre">write_frames_to_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">file</span></em>, <em class="sig-param"><span class="pre">Y_in</span></em>, <em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#write_frames_to_h5" title="Permalink to this definition">#</a></dt>
+<dd><p>Write in-memory 3D or 4D data to an HDF5 file in chunks.</p>
+<p>This function writes a multidimensional array <cite>Y_in</cite> to an HDF5 file specified
+by <cite>file</cite> in chunks. It creates a dataset within the HDF5 file and writes the
+data in specified chunk sizes. If <cite>dataset_name</cite> is not provided, it defaults
+to ‘/Y’. If target_chunk_mb size is not provided, it defaults to 2000.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>file</strong><span class="classifier">char</span></dt><dd><p>The name of the HDF5 file to write to.</p>
+</dd>
+<dt><strong>Y_in</strong><span class="classifier">array</span></dt><dd><p>The multidimensional array to be written to the HDF5 file.</p>
+</dd>
+<dt><strong>ds</strong><span class="classifier">char, optional</span></dt><dd><p>The name of the dataset group within the HDF5 file. Default is ‘/Y’.</p>
+</dd>
+<dt><strong>target_chunk_mb</strong><span class="classifier">int, optional</span></dt><dd><p>In MB, the chunk_size to include in each h5 write. Default is 4MB.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The function handles 3D or 4D arrays and writes them incrementally to the HDF5
+file to manage memory usage efficiently. It also trims the last frame of each
+chunk if the chunk size exceeds the remaining data size.</p>
+<p class="rubric">Examples</p>
+<p>Write a 3D array to an HDF5 file with default chunk size and dataset name:</p>
+<blockquote>
+<div><p>write_frames_to_h5(‘data.h5’, my_data);</p>
+</div></blockquote>
+<p>Write a 4D array to an HDF5 file with a specified chunk size:</p>
+<blockquote>
+<div><p>write_frames_to_h5(‘data.h5’, my_data);</p>
+</div></blockquote>
+<p>Write a 3D array to an HDF5 file with a specified dataset name:</p>
+<blockquote>
+<div><p>write_frames_to_h5(‘data.h5’, my_data,’/Y’);</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="write_frames_to_tiff">
+<span class="sig-name descname"><span class="pre">write_frames_to_tiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#write_frames_to_tiff" title="Permalink to this definition">#</a></dt>
+<dd><p>Write image to TIFF file with specified datatype.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>imgdata</strong><span class="classifier">numeric array</span></dt><dd><p>Image data to be exported. It must be a numeric array.</p>
+</dd>
+<dt><strong>imfile</strong><span class="classifier">char</span></dt><dd><p>Name of the output TIFF file.</p>
+</dd>
+<dt><strong>datatype</strong><span class="classifier">char</span></dt><dd><p>Data type for the export. Supported data types include ‘uint16’ and ‘int16’.</p>
+</dd>
+<dt><strong>hTiff</strong><span class="classifier">Tiff object</span></dt><dd><p>Tiff object containing metadata tags.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>To avoid errors such as ‘??? Error using ==&gt; tifflib The value for
+MaxSampleValue must be …’, override the tag MaxSampleValue with MATLAB
+supported values or simply remove the tag from the header.</p>
+<p>Overwriting of the existing image files is not checked. Be cautious
+with the export image file name.</p>
+<p class="rubric">Examples</p>
+<p>imgdata = imread(‘ngc6543a.jpg’);
+header  = imfinfo(‘ngc6543a.jpg’);
+write_frames_to_tiff(imgdata,header,’new_zplane_1.tif’,’uint16’);</p>
+<p>imgdata = imread(‘mri.tif’);
+write_frames_to_tiff(imgdata,[],’new_mri.tif’,’int32’,’Copyright’,’MRI’,
+‘Compression’,1);</p>
+<p>More information can be found by searching for ‘Exporting Image Data
+and Metadata to TIFF Files’ in MATLAB Help.</p>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="write_images_to_gif">
+<span class="sig-name descname"><span class="pre">write_images_to_gif</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">image_files</span></em>, <em class="sig-param"><span class="pre">save_name</span></em>, <em class="sig-param"><span class="pre">delay_time</span></em><span class="sig-paren">)</span><a class="headerlink" href="#write_images_to_gif" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates an animated GIF from a series of images <strong>on disk</strong>.</p>
+<p>This function generates an animated GIF from a series of images specified
+by their file paths. The images are read, converted to indexed color, and
+sequentially written to a GIF file with a specified delay between frames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>image_files</strong><span class="classifier">cell array of strings</span></dt><dd><p>A cell array containing the file paths of the images to be included in the GIF.</p>
+</dd>
+<dt><strong>save_name</strong><span class="classifier">string</span></dt><dd><p>The directory and filename where the output GIF file will be saved.</p>
+</dd>
+<dt><strong>delay_time</strong><span class="classifier">int, optional</span></dt><dd><p>Time, in seconds, to delay each frame of the GIF. Defaults to 0.5 seconds.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The function reads each image file, converts it to an indexed color map, and writes
+it to the GIF file. The first image initializes the GIF file, and subsequent images
+are appended. If the delay_time parameter is not specified, it defaults to 0.5 seconds
+between frames. The function checks for valid input types and existence of image files
+before proceeding with the GIF creation.</p>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="write_images_to_tile">
+<span class="sig-name descname"><span class="pre">write_images_to_tile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">images</span></em>, <em class="sig-param"><span class="pre">metadata</span></em>, <em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#write_images_to_tile" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates a tiled figure with scale bars and specified titles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>images</strong><span class="classifier">cell array</span></dt><dd><p>Cell array of 2D or 3D images to be tiled.</p>
+</dd>
+<dt><strong>metadata</strong><span class="classifier">struct</span></dt><dd><p>Metadata structure containing necessary information.</p>
+</dd>
+<dt><strong>titles</strong><span class="classifier">cell array, optional</span></dt><dd><p>Cell array of titles for each image.</p>
+</dd>
+<dt><strong>scales</strong><span class="classifier">cell array, optional</span></dt><dd><p>Cell array of sizes for the scale bar, in micron.
+If empty or 0, no scale is drawn.</p>
+</dd>
+<dt><strong>fig_title</strong><span class="classifier">char, optional</span></dt><dd><p>Title for the entire figure.</p>
+</dd>
+<dt><strong>save_name</strong><span class="classifier">char, optional</span></dt><dd><p>Name to save the figure.</p>
+</dd>
+<dt><strong>layout</strong><span class="classifier">char, optional</span></dt><dd><p>Layout for the tiles (‘horizontal’, ‘vertical’, ‘square’).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="write_mean_images_to_png">
+<span class="sig-name descname"><span class="pre">write_mean_images_to_png</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">directory</span></em><span class="sig-paren">)</span><a class="headerlink" href="#write_mean_images_to_png" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a grid of mean-images from HDF5 datasets in the specified directory.</p>
+<p>This function reads HDF5 files from a specified directory, extracts the ‘/Ym’
+dataset (assumed to be a 2D image) from each file, and creates a 5x6 grid of
+these images with no padding or tile spacing. The function processes up to
+30 HDF5 files in the directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>directory</strong><span class="classifier">char</span></dt><dd><p>The directory containing the HDF5 files.</p>
+</dd>
+<dt><strong>ds</strong><span class="classifier">char, optional</span></dt><dd><p>The group/dataset name. Default is ‘/Y’.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The function processes up to 30 HDF5 files. If there are fewer than 30 files,
+it will process all available files.</p></li>
+<li><p>The function uses MATLAB’s tiled layout feature to create a 5x6 grid of images
+with no padding or tile spacing.</p></li>
+</ul>
+<p class="rubric">Examples</p>
+<dl class="simple">
+<dt>Example 1:</dt><dd><p>% Create an image grid from HDF5 files in a specified directory
+write_image_grid(‘path/to/hdf5/files’);</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="reorder_h5_files">
+<span class="sig-name descname"><span class="pre">reorder_h5_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">h5path</span></em>, <em class="sig-param"><span class="pre">order</span></em><span class="sig-paren">)</span><a class="headerlink" href="#reorder_h5_files" title="Permalink to this definition">#</a></dt>
+<dd><p>Reorder and rename HDF5 files based on a specified order.</p>
+<p>This function reorders and renames HDF5 files in a specified directory (<cite>h5path</cite>)
+based on the provided <cite>order</cite> array. It temporarily renames files to avoid conflicts,
+updates the HDF5 attributes to store the original order, and saves the original order
+as a .mat file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>h5path</strong><span class="classifier">char or string</span></dt><dd><p>The path to the directory containing the HDF5 files to be reordered.</p>
+</dd>
+<dt><strong>order</strong><span class="classifier">array</span></dt><dd><p>An array specifying the new order of the HDF5 files. The length of this array
+must match the number of HDF5 files in the directory.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The function ensures that the HDF5 files are sorted, renames them to temporary names
+to avoid conflicts, and then renames them to their new ordered names. The original
+order is stored as an attribute in each HDF5 file and saved as a .mat file.</p>
+<p class="rubric">Examples</p>
+<p>Reorder HDF5 files in a directory based on a specified order:</p>
+<blockquote>
+<div><p>h5path = ‘path/to/h5/files’;
+order = [3, 1, 2, 4];
+reorder_h5_files(h5path, order);</p>
+</div></blockquote>
+</dd></dl>
+
+</section>
+<section id="visualization">
+<h2><span class="section-number">2.3. </span>Visualization<a class="headerlink" href="#visualization" title="Permalink to this heading">#</a></h2>
+<dl class="mat function">
+<dt class="sig sig-object mat" id="play_movie">
+<span class="sig-name descname"><span class="pre">play_movie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">movie_cell_array</span></em>, <em class="sig-param"><span class="pre">labels_cell_array</span></em>, <em class="sig-param"><span class="pre">min_mov</span></em>, <em class="sig-param"><span class="pre">max_mov</span></em><span class="sig-paren">)</span><a class="headerlink" href="#play_movie" title="Permalink to this definition">#</a></dt>
+<dd><p>Play a movie or list of movies with labels, press any key to stop  the movie from playing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>movie_cell_array</strong><span class="classifier">cell array</span></dt><dd><p>Cell array of movies. Each movie is a 3D array (height x width x frames).</p>
+</dd>
+<dt><strong>labels_cell_array</strong><span class="classifier">cell array, optional</span></dt><dd><p>Cell array of titles for the movies. If not provided, empty labels will be used.</p>
+</dd>
+<dt><strong>min_mov</strong><span class="classifier">numeric, optional</span></dt><dd><p>Minimum value for setting the color limits on the movies. If not provided, will be computed from the first movie.</p>
+</dd>
+<dt><strong>max_mov</strong><span class="classifier">numeric, optional</span></dt><dd><p>Maximum value for setting the color limits on the movies. If not provided, will be computed from the first movie.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>play_movie({movie1, movie2}, {‘Movie 1’, ‘Movie 2’}, 0, 255)
+play_movie(movie, ‘Sample Movie’)</p>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="set_caxis">
+<span class="sig-name descname"><span class="pre">set_caxis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">stack</span></em><span class="sig-paren">)</span><a class="headerlink" href="#set_caxis" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the color axis limits for an image stack.</p>
+<p>This function sets the color axis limits of the current figure based on
+the cumulative distribution function (CDF) of pixel values in the first
+image of the provided stack. The limits are set to the 0.5th and 99.5th
+percentiles to improve the contrast of the displayed images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stack</strong><span class="classifier">3D array</span></dt><dd><p>The input image stack (height x width x frames).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="calculate_scale">
+<span class="sig-name descname"><span class="pre">calculate_scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">img_size</span></em>, <em class="sig-param"><span class="pre">pixel_resolution</span></em><span class="sig-paren">)</span><a class="headerlink" href="#calculate_scale" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculates the appropriate scale bar size from an image size and pixel resolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>img_size</strong><span class="classifier">int</span></dt><dd><p>Width of the image in pixels.</p>
+</dd>
+<dt><strong>pixel_resolution</strong><span class="classifier">double</span></dt><dd><p>Pixel resolution in microns per pixel.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>scale_size</strong><span class="classifier">int</span></dt><dd><p>Calculated scale bar size in microns.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="get_central_indices">
+<span class="sig-name descname"><span class="pre">get_central_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">img</span></em>, <em class="sig-param"><span class="pre">margin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#get_central_indices" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the central indices of the image with a given margin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>img</strong><span class="classifier">2D array</span></dt><dd><p>The input image.</p>
+</dd>
+<dt><strong>margin</strong><span class="classifier">int</span></dt><dd><p>The margin around the central part.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>yind</strong><span class="classifier">array</span></dt><dd><p>Indices for the y-dimension.</p>
+</dd>
+<dt><strong>xind</strong><span class="classifier">array</span></dt><dd><p>Indices for the x-dimension.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="get_segmentation_metrics">
+<span class="sig-name descname"><span class="pre">get_segmentation_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">savePath</span></em>, <em class="sig-param"><span class="pre">T_all</span></em>, <em class="sig-param"><span class="pre">Nsamples</span></em><span class="sig-paren">)</span><a class="headerlink" href="#get_segmentation_metrics" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute and save segmentation metrics based on the ration of t Z-Score of the moving mean
+to the standard deviation of the difference between time-series data and
+the moving mean.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>savePath</strong><span class="classifier">char</span></dt><dd><p>Path where the resulting figures will be saved.</p>
+</dd>
+<dt><strong>T_all</strong><span class="classifier">numeric array</span></dt><dd><p>Time series data for all neurons.</p>
+</dd>
+<dt><strong>Nsamples</strong><span class="classifier">numeric</span></dt><dd><p>Number of samples for the moving mean calculation.</p>
+</dd>
+<dt><strong>This function calculates the Z-score for</strong></dt><dd></dd>
+<dt><strong>each neuron and plots histograms of the Z-scores and maximum</strong></dt><dd></dd>
+<dt><strong>DeltaF/F_0 (%) values. The resulting figures are saved to the specified</strong></dt><dd></dd>
+<dt><strong>save path.</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The Z-score is calculated as the ratio of the maximum moving mean to the
+standard deviation of the difference between the time series data and its
+moving mean.</p>
+<p class="rubric">Examples</p>
+<p>savePath = ‘results/’;
+T_all = randn(100, 1000); % Example time series data
+Nsamples = 10;
+get_segmentation_metrics(savePath, T_all, Nsamples);</p>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="translate_frames">
+<span class="sig-name descname"><span class="pre">translate_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">Y</span></em>, <em class="sig-param"><span class="pre">shifts_2D</span></em><span class="sig-paren">)</span><a class="headerlink" href="#translate_frames" title="Permalink to this definition">#</a></dt>
+<dd><p>Translate image frames based on provided translation vectors.</p>
+<p>This function applies 2D translations to an image time series based on
+a series of translation vectors, one per frame. Each frame is translated
+independently, and the result is returned as a 3D stack of
+(Height x Width x num_frames) translated frames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>Y - A 3D time series of image frames (Height x Width x Number of Frames).</strong></dt><dd></dd>
+<dt><strong>t_shifts - An Nx2 matrix of translation vectors for each frame (N is the number of frames).</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>translatedFrames - A 3D array of translated image frames, same size and type as Y.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="validation">
+<h2><span class="section-number">2.4. </span>Validation<a class="headerlink" href="#validation" title="Permalink to this heading">#</a></h2>
+<dl class="mat function">
+<dt class="sig sig-object mat" id="validate_toolboxes">
+<span class="sig-name descname"><span class="pre">validate_toolboxes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#validate_toolboxes" title="Permalink to this definition">#</a></dt>
+<dd><p>Report missing MATLAB toolboxes that are required to execute this pipeline.</p>
+</dd></dl>
+
+<dl class="mat function">
+<dt class="sig sig-object mat" id="display_dataset_names">
+<span class="sig-name descname"><span class="pre">display_dataset_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">h5_fullfile</span></em>, <em class="sig-param"><span class="pre">loc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#display_dataset_names" title="Permalink to this definition">#</a></dt>
+<dd><p>Display available datasets in an HDF5 file.</p>
+<p>This function displays the names, sizes, and datatypes of datasets in the
+provided group location in the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>h5_fullfile</strong><span class="classifier">char</span></dt><dd><p>Full path to the HDF5 file.</p>
+</dd>
+<dt><strong>loc</strong><span class="classifier">char</span></dt><dd><p>Dataset group name. Default is ‘/’.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="core.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">1. </span>Core</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="internal.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">3. </span>Internals</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#readers">2.1. Readers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writers">2.2. Writers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization">2.3. Visualization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#validation">2.4. Validation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Elizabeth R. Miller Brain Observatory | The Rockefeller University. All Rights Reserved.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,794 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>5. Tips and Tricks &#8212; LBM-CaImAn-MATLAB  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=475cc00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2b91c5f0"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
+    <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+    <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+    <script defer="defer" src="../_static/tippy/user_guide/tips_tricks.28d2fd38-425d-43f9-9ae9-cf3ca6f889f0.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/tips_tricks';</script>
+    <link rel="icon" href="../_static/lbm_mat_favicon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="6. Troubleshooting" href="troubleshooting.html" />
+    <link rel="prev" title="4. Axial Collation and Correction" href="collation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_caiman_matlab_with_icon.png" class="logo__image only-light" alt="LBM-CaImAn-MATLAB  documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo_caiman_matlab_with_icon.png" class="logo__image only-dark" alt="LBM-CaImAn-MATLAB  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://millerbrainobservatory.github.io/" title="MBO User Hub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src=".././_static/icon_mbo_home.png" class="icon-link-image" alt="MBO User Hub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MillerBrainObservatory/" title="MBO Github" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">MBO Github</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://mbo.rockefeller.edu/contact/" title="Connect with MBO" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-regular fa-address-card fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Connect with MBO</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../first_steps/index.html">First Steps</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/setup.html">0.1. Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/overview.html">0.2. Pipeline Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="assembly.html">1. Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registration.html">2. Registration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="segmentation.html">3. Segmentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="collation.html">4. Axial Collation and Correction</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">5. Tips and Tricks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html">6. Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/registration_tutorial.html">1. Explained: Registration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/segmentation_tutorial.html">2. Explained: Source Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/axial_correction_tutorial.html">3. Explained: Axial Offset Correction</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/core.html">1. Core Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/utility.html">2. Utility Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/internal.html">3. Internal Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../image_gallery.html">Image Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/blob/master/docs/user_guide/tips_tricks.rst?plain=1" target="_blank"
+   class="btn btn-sm btn-source-file-button dropdown-item"
+   title="Show source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">Show source</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/edit/master/docs/user_guide/tips_tricks.rst" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/new?title=Issue%20on%20page%20%2Fuser_guide/tips_tricks.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/user_guide/tips_tricks.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Tips and Tricks</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exploring-datasets-in-matlab">5.1. Exploring Datasets in MATLAB</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-data">5.1.1. Loading Data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mean-images">5.1.2. Mean Images</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#making-gifs">5.1.3. Making Gifs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-play-movies">5.1.4. Quick-play Movies</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fullfile">5.2. Fullfile</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#learn-about-functions">5.3. Learn about Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parallel-processing">5.4. Parallel Processing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#find-matlab-install-location">5.5. Find MATLAB Install Location</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="tips-and-tricks">
+<span id="id1"></span><h1><span class="section-number">5. </span>Tips and Tricks<a class="headerlink" href="#tips-and-tricks" title="Permalink to this heading">#</a></h1>
+<section id="exploring-datasets-in-matlab">
+<span id="explore-data-matlab"></span><h2><span class="section-number">5.1. </span>Exploring Datasets in MATLAB<a class="headerlink" href="#exploring-datasets-in-matlab" title="Permalink to this heading">#</a></h2>
+<p>There are several helper functions located in <code class="docutils literal notranslate"><span class="pre">core/utils</span></code>.</p>
+<section id="loading-data">
+<span id="tnt-loading-data"></span><h3><span class="section-number">5.1.1. </span>Loading Data<a class="headerlink" href="#loading-data" title="Permalink to this heading">#</a></h3>
+<p><a class="reference internal" href="../api/utility.html#read_plane" title="read_plane"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">read_plane()</span></code></a> is helper function that lets you quickly load a HDF5 plane without dealing with matlabs <a class="reference external" href="https://www.mathworks.com/help/matlab/ref/h5read.html">h5read</a> function.</p>
+<p>You can use it using prompts:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">Use</span><span class="w"> </span><span class="s">dialog</span><span class="w"> </span><span class="s">and</span><span class="w"> </span><span class="s">prompts</span><span class="w"> </span><span class="s">only:</span>
+<span class="w">    </span><span class="n">Y_out</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">read_plane</span><span class="p">();</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Make you you include the semi-colon ; after you call read_plane(), otherwise your command window will print every value in the dataset to the command window.</p>
+</div>
+<p>You can give it a folder containing H5 files, and you will be prompted for the plane and frames:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">Y_out</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">read_plane</span><span class="p">(</span><span class="s">&#39;path/to/h5&#39;</span><span class="p">);</span>
+
+<span class="n">Which</span><span class="w"> </span><span class="s">plane</span><span class="w"> </span><span class="s">do</span><span class="w"> </span><span class="s">you</span><span class="w"> </span><span class="s">want</span><span class="w"> </span><span class="s">to</span><span class="w"> </span><span class="s">read?</span><span class="w"> </span><span class="s">Enter</span><span class="w"> </span><span class="s">a</span><span class="w"> </span><span class="s">number</span><span class="w"> </span><span class="s">(e.g.</span><span class="w"> </span><span class="s">4)</span>
+
+<span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">4</span>
+
+<span class="n">Which</span><span class="w"> </span><span class="s">frames</span><span class="w"> </span><span class="s">do</span><span class="w"> </span><span class="s">you</span><span class="w"> </span><span class="s">want</span><span class="w"> </span><span class="s">to</span><span class="w"> </span><span class="s">read?</span><span class="w"> </span><span class="s">enter</span><span class="w"> </span><span class="s">a</span><span class="w"> </span><span class="s">slice,</span><span class="w"> </span><span class="s">vector</span><span class="w"> </span><span class="s">with</span><span class="w"> </span><span class="s">start/stop</span><span class="w"> </span><span class="s">or</span><span class="w"> </span><span class="s">&#39;all&#39;:</span>
+
+<span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="w"> </span><span class="mi">15</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>If you already know which plane you want to load, use that as a <cite>key-value pair</cite> (hence why you need to include <cite>plane</cite> before the value):</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">Y_out</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">read_plane</span><span class="p">(</span><span class="s">&#39;C:/data/extracted_files&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;plane&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Or just give a path to the fully qualified filename of the plane you wish to read (so you no longer need the ‘plane’:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">Y_out</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">read_plane</span><span class="p">(</span><span class="s">&#39;C:/data/extracted_files/data.h5&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Pick how many frames you want to load in a similar manner:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">Y_out</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">read_plane</span><span class="p">(</span><span class="s">&#39;data.h5&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;frames&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Or <code class="code docutils literal notranslate"><span class="pre">all</span></code> for everything:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">Y_out</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">read_plane</span><span class="p">(</span><span class="s">&#39;data.h5&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;all&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="mean-images">
+<span id="tnt-mean-images"></span><h3><span class="section-number">5.1.2. </span>Mean Images<a class="headerlink" href="#mean-images" title="Permalink to this heading">#</a></h3>
+<p>Mean images are a good way to see small artifacts that may appear in sparse areas.</p>
+<p>Quickly view a grid of mean images with <a class="reference internal" href="../api/utility.html#write_mean_images_to_png" title="write_mean_images_to_png"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">write_mean_images_to_png()</span></code></a>:</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/gen_mean_images1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/gen_mean_images1.png"
+                     class="align-center"
+                     width="100%"
+                     height="auto"
+                     alt=""/>
+                </a></section>
+<section id="making-gifs">
+<span id="tnt-making-gifs"></span><h3><span class="section-number">5.1.3. </span>Making Gifs<a class="headerlink" href="#making-gifs" title="Permalink to this heading">#</a></h3>
+<p><a class="reference internal" href="../api/utility.html#write_frames_to_gif" title="write_frames_to_gif"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">write_frames_to_gif()</span></code></a> lets you visualize your movie quickly at any stage.</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">500</span><span class="p">)</span>
+<span class="n">write_frames_to_gif</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;output.gif&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">45</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You want your input array to have dimensions <code class="code docutils literal notranslate"><span class="pre">height</span> <span class="pre">x</span> <span class="pre">width</span> <span class="pre">x</span> <span class="pre">frames</span></code>. For very large movies, use the <code class="code docutils literal notranslate"><span class="pre">size_mb</span></code> parameter to limit the resulting gif to that many megabytes.</p>
+</section>
+<section id="quick-play-movies">
+<span id="tnt-quickplay"></span><h3><span class="section-number">5.1.4. </span>Quick-play Movies<a class="headerlink" href="#quick-play-movies" title="Permalink to this heading">#</a></h3>
+<p><a class="reference internal" href="../api/utility.html#play_movie" title="play_movie"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">play_movie()</span></code></a>: Quickly view a movie of any plane.</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="c">% read in a motion-corrected plane</span>
+<span class="n">y_extracted</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">read_plane</span><span class="p">(</span><span class="s">&#39;C:/data/extraction/&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;plane&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="n">y_corrected</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">read_plane</span><span class="p">(</span><span class="s">&#39;C:/data/registration/&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;plane&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="n">play_movie</span><span class="p">({</span><span class="n">y_extracted</span><span class="p">,</span><span class="w"> </span><span class="n">y_corrected</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">&#39;Raw&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;Corrected&#39;</span><span class="p">},</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/plane_11.gif"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/plane_11.gif"
+                     class="align-center"
+                     width="100%"
+                     height="auto"
+                     alt=""/>
+                </a></section>
+</section>
+<section id="fullfile">
+<span id="tnt-fullfile"></span><h2><span class="section-number">5.2. </span>Fullfile<a class="headerlink" href="#fullfile" title="Permalink to this heading">#</a></h2>
+<p>Matlabs <a class="reference external" href="https://www.mathworks.com/help/matlab/ref/fullfile.html">fullfile</a> function makes it easy to search for a filename:</p>
+<img alt="../_images/gen_fullfile.png" src="../_images/gen_fullfile.png" />
+</section>
+<section id="learn-about-functions">
+<span id="tnt-functions"></span><span id="help-functions"></span><h2><span class="section-number">5.3. </span>Learn about Functions<a class="headerlink" href="#learn-about-functions" title="Permalink to this heading">#</a></h2>
+<div class="line-block">
+<div class="line">Run ‘help &lt;function&gt;’ in the command window for a detailed overview on function parameters, outputs and examples.</div>
+</div>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="n">convertScanImageTiffToVolume</span>
+<span class="w">  </span><span class="n">convertScanImageTiffToVolume</span><span class="w"> </span><span class="n">Convert</span><span class="w"> </span><span class="n">ScanImage</span><span class="w"> </span><span class="p">.</span><span class="n">tif</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">into</span><span class="w"> </span><span class="n">a</span><span class="w"> </span>4<span class="n">D</span><span class="w"> </span><span class="nb">volume</span><span class="p">.</span>
+
+<span class="w">   </span><span class="n">Convert</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span>`<span class="n">ScanImage</span>`<span class="n">_</span><span class="w"> </span><span class="n">multi</span><span class="o">-</span><span class="n">roi</span><span class="w"> </span><span class="p">.</span><span class="n">tif</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="nb">single</span><span class="w"> </span><span class="n">session</span>
+<span class="w">   </span><span class="n">into</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="nb">single</span><span class="w"> </span>4<span class="n">D</span><span class="w"> </span><span class="nb">volume</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">).</span><span class="w"> </span><span class="n">It</span><span class="o">&#39;</span><span class="n">s</span><span class="w"> </span><span class="n">designed</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">process</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">the</span>
+<span class="w">   </span><span class="n">ScanImage</span><span class="w"> </span><span class="n">Version</span><span class="p">:</span><span class="w"> </span><span class="mi">2016</span><span class="w"> </span><span class="n">software</span><span class="p">.</span>
+
+<span class="w">   </span><span class="n">Parameters</span>
+<span class="w">   </span><span class="o">----------</span>
+<span class="w">   </span><span class="n">filePath</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">char</span>
+<span class="w">       </span><span class="n">The</span><span class="w"> </span><span class="n">directory</span><span class="w"> </span><span class="n">containing</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="p">.</span><span class="n">tif</span><span class="w"> </span><span class="n">files</span><span class="p">.</span><span class="w"> </span><span class="n">Only</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="p">.</span><span class="n">tif</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">one</span>
+<span class="w">       </span><span class="n">session</span><span class="w"> </span><span class="n">should</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">directory</span><span class="p">.</span>
+<span class="w">   </span><span class="n">saveDirPath</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">char</span><span class="p">,</span><span class="w"> </span><span class="n">optional</span>
+<span class="w">       </span><span class="n">The</span><span class="w"> </span><span class="n">directory</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="n">processed</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">saved</span><span class="p">.</span><span class="w"> </span><span class="n">It</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">created</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="n">does</span>
+<span class="w">       </span><span class="n">not</span><span class="w"> </span><span class="nb">exist</span><span class="p">.</span><span class="w"> </span><span class="n">Defaults</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">filePath</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">not</span><span class="w"> </span><span class="n">provided</span><span class="p">.</span>
+<span class="w">   </span><span class="n">diagnosticFlag</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">double</span><span class="p">,</span><span class="w"> </span><span class="nb">logical</span><span class="p">,</span><span class="w"> </span><span class="n">optional</span>
+<span class="w">       </span><span class="n">If</span><span class="w"> </span><span class="nb">set</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">displays</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">command</span><span class="w"> </span><span class="n">window</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">does</span>
+<span class="w">       </span><span class="n">not</span><span class="w"> </span><span class="k">continue</span><span class="w"> </span><span class="n">processing</span><span class="p">.</span><span class="w"> </span><span class="n">Defaults</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="mf">0.</span>
+
+<span class="w">   </span><span class="n">Notes</span>
+<span class="w">   </span><span class="o">-----</span>
+<span class="w">   </span><span class="n">The</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">adds</span><span class="w"> </span><span class="n">necessary</span><span class="w"> </span><span class="n">paths</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">ScanImage</span><span class="w"> </span><span class="n">utilities</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">processes</span><span class="w"> </span><span class="n">each</span><span class="w"> </span><span class="p">.</span><span class="n">tif</span>
+<span class="w">   </span><span class="n">file</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">specified</span><span class="w"> </span><span class="n">directory</span><span class="p">.</span><span class="w"> </span><span class="n">It</span><span class="w"> </span><span class="n">checks</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">directory</span><span class="w"> </span><span class="n">exists</span><span class="p">,</span><span class="w"> </span><span class="n">handles</span>
+<span class="w">   </span><span class="n">multiple</span><span class="w"> </span><span class="n">or</span><span class="w"> </span><span class="nb">single</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="n">scenarios</span><span class="p">,</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">can</span><span class="w"> </span><span class="n">optionally</span><span class="w"> </span><span class="n">report</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">directory</span><span class="o">&#39;</span><span class="n">s</span><span class="w"> </span><span class="n">contents</span>
+<span class="w">   </span><span class="n">based</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">diagnosticFlag</span><span class="p">.</span>
+
+<span class="w">   </span><span class="n">Each</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="n">processed</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">logged</span><span class="p">,</span><span class="w"> </span><span class="n">assembled</span><span class="w"> </span><span class="n">into</span><span class="w"> </span><span class="n">a</span><span class="w"> </span>4<span class="n">D</span><span class="w"> </span><span class="nb">volume</span><span class="p">,</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">saved</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">specified</span>
+<span class="w">   </span><span class="n">directory</span><span class="w"> </span><span class="n">as</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="p">.</span><span class="n">mat</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">accompanying</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="n">also</span><span class="w"> </span><span class="n">manages</span><span class="w"> </span><span class="n">errors</span>
+<span class="w">   </span><span class="n">by</span><span class="w"> </span><span class="n">cleaning</span><span class="w"> </span><span class="n">up</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">providing</span><span class="w"> </span><span class="n">detailed</span><span class="w"> </span><span class="nb">error</span><span class="w"> </span><span class="n">messages</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">something</span><span class="w"> </span><span class="n">goes</span><span class="w"> </span><span class="n">wrong</span><span class="w"> </span><span class="n">during</span>
+<span class="w">   </span><span class="n">processing</span><span class="p">.</span>
+
+<span class="w">   </span><span class="n">Examples</span>
+<span class="w">   </span><span class="o">--------</span>
+<span class="w">   </span><span class="p">..</span><span class="w"> </span><span class="n">code</span><span class="o">-</span><span class="n">block</span><span class="p">::</span><span class="w"> </span><span class="n">MATLAB</span>
+
+<span class="w">         </span><span class="c">% Path to data, path to save data, diagnostic flag</span>
+<span class="w">         </span><span class="n">convertScanImageTiffToVolume</span><span class="p">(</span><span class="s">&#39;C:/data/session1/&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;C:/processed/&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">         </span><span class="n">convertScanImageTiffToVolume</span><span class="p">(</span><span class="s">&#39;C:/data/session1/&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;C:/processed/&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c">% just display files</span>
+
+<span class="w">   </span><span class="n">See</span><span class="w"> </span><span class="n">also</span><span class="w"> </span><span class="nb">fileparts</span><span class="p">,</span><span class="w"> </span><span class="nb">addpath</span><span class="p">,</span><span class="w"> </span><span class="nb">genpath</span><span class="p">,</span><span class="w"> </span><span class="nb">isfolder</span><span class="p">,</span><span class="w"> </span><span class="nb">dir</span><span class="p">,</span><span class="w"> </span><span class="nb">fullfile</span><span class="p">,</span><span class="w"> </span><span class="nb">error</span><span class="p">,</span><span class="w"> </span><span class="nb">regexp</span><span class="p">,</span><span class="w"> </span><span class="n">savefast</span>
+</pre></div>
+</div>
+</section>
+<section id="parallel-processing">
+<span id="tnt-num-cores"></span><h2><span class="section-number">5.4. </span>Parallel Processing<a class="headerlink" href="#parallel-processing" title="Permalink to this heading">#</a></h2>
+<p>The MATLAB <a class="reference external" href="https://www.mathworks.com/help/parallel-computing/parpool.html">parpool documentation</a> and imply that parpool uses the <strong>number of physical cores</strong> (rather than logical) by default.
+However, there are instances where the parpool shuts down due to requesting “too many logical cores”, suggesting the contrary to the documentation.
+You can avoid many parallel-processing related issues by <strong>reducing the number of workers to the actual number of physical cores</strong>:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">parpool</span><span class="p">;</span><span class="w">     </span><span class="c">% NOT RECOMMENDED, CaImAn will very likely run out of resources error</span>
+<span class="n">p</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">parpool</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span><span class="w">  </span><span class="c">% use only 2 parallel workers</span>
+</pre></div>
+</div>
+<p>This can vary greatly across programs and platforms.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You should first ensure the pipeline will run using &lt;1/2 available cores before increasing the compute demands.</p>
+</div>
+<p>We can get this value in Matlab using the undocumented feature(‘numcores’) function:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">numCores</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">feature</span><span class="p">(</span><span class="s">&#39;numcores&#39;</span><span class="p">);</span>
+<span class="n">p</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">parpool</span><span class="p">(</span><span class="n">numCores</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Running <code class="code docutils literal notranslate"><span class="pre">feature(‘numcores’)</span></code> without assigning its output displays some general debugging information:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">feature</span><span class="p">(</span><span class="s">&#39;numcores&#39;</span><span class="p">)</span>
+<span class="n">MATLAB</span><span class="w"> </span><span class="s">detected:</span><span class="w"> </span><span class="s">24</span><span class="w"> </span><span class="s">physical</span><span class="w"> </span><span class="s">cores.</span>
+<span class="n">MATLAB</span><span class="w"> </span><span class="s">detected:</span><span class="w"> </span><span class="s">32</span><span class="w"> </span><span class="s">logical</span><span class="w"> </span><span class="s">cores.</span>
+<span class="n">MATLAB</span><span class="w"> </span><span class="s">was</span><span class="w"> </span><span class="s">assigned:</span><span class="w"> </span><span class="s">32</span><span class="w"> </span><span class="s">logical</span><span class="w"> </span><span class="s">cores</span><span class="w"> </span><span class="s">by</span><span class="w"> </span><span class="s">the</span><span class="w"> </span><span class="s">OS.</span>
+<span class="n">MATLAB</span><span class="w"> </span><span class="s">is</span><span class="w"> </span><span class="s">using:</span><span class="w"> </span><span class="s">24</span><span class="w"> </span><span class="s">logical</span><span class="w"> </span><span class="s">cores.</span>
+<span class="n">MATLAB</span><span class="w"> </span><span class="s">is</span><span class="w"> </span><span class="s">not</span><span class="w"> </span><span class="s">using</span><span class="w"> </span><span class="s">all</span><span class="w"> </span><span class="s">logical</span><span class="w"> </span><span class="s">cores</span><span class="w"> </span><span class="s">because</span><span class="w"> </span><span class="s">hyper-threading</span><span class="w"> </span><span class="s">is</span><span class="w"> </span><span class="s">enabled.</span>
+
+<span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
+
+<span class="w">    </span><span class="mi">24</span>
+</pre></div>
+</div>
+<p>You can use this return value to decide how how much of your computers total processing power should be dedicated toward running this pipeline:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">feature</span><span class="p">(</span><span class="s">&#39;numcores&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="c">% leave 2 cores open for the rest of the system</span>
+
+<span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
+
+<span class="w">    </span><span class="mi">23</span>
+</pre></div>
+</div>
+<p>This is equally valid for parfor/eval loops and spmd blocks, since both of them use the pool of workers started by parpool.</p>
+</section>
+<section id="find-matlab-install-location">
+<span id="tnt-matlab-install-path"></span><h2><span class="section-number">5.5. </span>Find MATLAB Install Location<a class="headerlink" href="#find-matlab-install-location" title="Permalink to this heading">#</a></h2>
+<p>The location of the installation is often in <cite>~/Documents/MATLAB/</cite>.
+If you put the root directory elsewhere, you will need to navigate to that directory within the matlab GUI.</p>
+<p>Modern versions of MATLAB (2017+) solve most Linux/Windows filesystem conflicts.</p>
+<p>Generally, the main difference in matlab installations on unix vs windows systems is nothing more than the install path:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Windows</span> <span class="p">(</span><span class="mi">64</span><span class="o">-</span><span class="n">bit</span><span class="p">):</span>
+<span class="o">-</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Program</span> <span class="n">Files</span>\<span class="n">MATLAB</span>\<span class="n">R20XXx</span> <span class="p">(</span><span class="mi">64</span><span class="o">-</span><span class="n">bit</span> <span class="n">MATLAB</span><span class="p">)</span>
+<span class="o">-</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Program</span> <span class="n">Files</span> <span class="p">(</span><span class="n">x86</span><span class="p">)</span>\<span class="n">MATLAB</span>\<span class="n">R20XXx</span> <span class="p">(</span><span class="mi">32</span><span class="o">-</span><span class="n">bit</span> <span class="n">MATLAB</span><span class="p">)</span>
+<span class="n">Windows</span> <span class="p">(</span><span class="mi">32</span><span class="o">-</span><span class="n">bit</span><span class="p">):</span>
+<span class="o">-</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Program</span> <span class="n">Files</span>\<span class="n">MATLAB</span>\<span class="n">R20XXx</span>
+<span class="n">Linux</span><span class="p">:</span>
+<span class="o">-</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">MATLAB</span><span class="o">/</span><span class="n">R20XXx</span>
+<span class="n">Mac</span><span class="p">:</span>
+<span class="o">-</span> <span class="o">/</span><span class="n">Applications</span><span class="o">/</span><span class="n">MATLAB_R20XXx</span><span class="o">.</span><span class="n">app</span>
+</pre></div>
+</div>
+<p>To find your install location:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">matlabroot</span>
+<span class="w">    </span><span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
+<span class="w">        </span><span class="s">&#39;C:\Program Files\MATLAB\R2023b&#39;</span>
+</pre></div>
+</div>
+<p>Generally, MATLAB code should be stored in your <cite>userpath</cite>:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">userpath</span>
+<span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
+<span class="w">    </span><span class="s">&#39;C:\Users\RBO\Documents\MATLAB&#39;</span>
+</pre></div>
+</div>
+<p>You can add the path programmatically from within matlab:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nb">addpath</span><span class="p">(</span><span class="nb">genpath</span><span class="p">(</span><span class="s">&quot;path/to/caiman_matlab&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Otherwise, you can simply navigate to that directory within the matlab GUI or add the path to this repository as
+shown in the <a class="reference internal" href="../first_steps/setup.html#from-source"><span class="std std-ref">install from source</span></a> section.</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="collation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">4. </span>Axial Collation and Correction</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="troubleshooting.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">6. </span>Troubleshooting</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exploring-datasets-in-matlab">5.1. Exploring Datasets in MATLAB</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-data">5.1.1. Loading Data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mean-images">5.1.2. Mean Images</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#making-gifs">5.1.3. Making Gifs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-play-movies">5.1.4. Quick-play Movies</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fullfile">5.2. Fullfile</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#learn-about-functions">5.3. Learn about Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parallel-processing">5.4. Parallel Processing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#find-matlab-install-location">5.5. Find MATLAB Install Location</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Elizabeth R. Miller Brain Observatory | The Rockefeller University. All Rights Reserved.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

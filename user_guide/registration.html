@@ -1,0 +1,783 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2. Registration &#8212; LBM-CaImAn-MATLAB  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=475cc00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2b91c5f0"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
+    <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+    <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+    <script defer="defer" src="../_static/tippy/user_guide/registration.f2958a60-2c3d-4b17-b560-996761806f3a.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/registration';</script>
+    <link rel="icon" href="../_static/lbm_mat_favicon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3. Segmentation" href="segmentation.html" />
+    <link rel="prev" title="1. Assembly" href="assembly.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_caiman_matlab_with_icon.png" class="logo__image only-light" alt="LBM-CaImAn-MATLAB  documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo_caiman_matlab_with_icon.png" class="logo__image only-dark" alt="LBM-CaImAn-MATLAB  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://millerbrainobservatory.github.io/" title="MBO User Hub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src=".././_static/icon_mbo_home.png" class="icon-link-image" alt="MBO User Hub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MillerBrainObservatory/" title="MBO Github" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">MBO Github</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://mbo.rockefeller.edu/contact/" title="Connect with MBO" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-regular fa-address-card fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Connect with MBO</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../first_steps/index.html">First Steps</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/setup.html">0.1. Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../first_steps/overview.html">0.2. Pipeline Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">User Guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="assembly.html">1. Assembly</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">2. Registration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="segmentation.html">3. Segmentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="collation.html">4. Axial Collation and Correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tips_tricks.html">5. Tips and Tricks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html">6. Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/registration_tutorial.html">1. Explained: Registration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/segmentation_tutorial.html">2. Explained: Source Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/axial_correction_tutorial.html">3. Explained: Axial Offset Correction</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/core.html">1. Core Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/utility.html">2. Utility Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/internal.html">3. Internal Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../image_gallery.html">Image Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/blob/master/docs/user_guide/registration.md?plain=1" target="_blank"
+   class="btn btn-sm btn-source-file-button dropdown-item"
+   title="Show source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">Show source</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/edit/master/docs/user_guide/registration.md" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/new?title=Issue%20on%20page%20%2Fuser_guide/registration.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/user_guide/registration.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Registration</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">2.1. Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inputs">2.2. Inputs</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#normcorre-parameters">2.2.1. NoRMCorre Parameters</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rigid-registration">2.3. Rigid Registration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#non-rigid-registration">2.4. Non-rigid Registration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs">2.5. Outputs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#validate-outputs">2.6. Validate Outputs</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="registration">
+<span id="id1"></span><h1><span class="section-number">2. </span>Registration<a class="headerlink" href="#registration" title="Permalink to this heading">#</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The terms motion-correction and registration are often used interchangably.
+Similary, non-rigid and peicewise-rigid are often used interchangably.
+Here, peicewise-rigid registration is the <strong>method</strong> to correct for non-rigid motion.</p>
+</div>
+<p>We use <a class="reference external" href="https://en.wikipedia.org/wiki/Image_registration">image registration</a> to make sure that our neuron in the first frame is in the same spatial location as in frame N throughout the time-series.</p>
+<section id="overview">
+<span id="reg-overview"></span><h2><span class="section-number">2.1. </span>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h2>
+<p>Disturbances or movement in our timeseries cause variations in pixel locations between frames called <strong>motion artifacts</strong>.</p>
+<p>The motion artifacts present in our sample come in two flavors, <code class="docutils literal notranslate"><span class="pre">rigid</span></code> and <code class="docutils literal notranslate"><span class="pre">non-rigid</span></code>. See <a class="reference internal" href="../tutorials/registration_tutorial.html#tut-types-of-reg"><span class="std std-ref">Types of Registration</span></a> for more information.</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/reg_patches1.png"
+               title="width: 1440"
+               data-title="width: 1440"
+               
+               ><img src="../_images/reg_patches1.png"
+                     class=""
+                     width="100%"
+                     height="auto"
+                     alt=""/>
+                </a><hr class="docutils" />
+<p>First, a template image is created by averaging the first 200 frames. This image is used to align each and every frame in the timeseries. As frames are aligned, the template is updated to more closely match the pixel locations of the previous frames.</p>
+<p>A well motion-corrected movie will show that each frame is highly correlated with the mean image.</p>
+</section>
+<section id="inputs">
+<h2><span class="section-number">2.2. </span>Inputs<a class="headerlink" href="#inputs" title="Permalink to this heading">#</a></h2>
+<p>In addition to the default function inputs described in section <a class="reference internal" href="../first_steps/overview.html#parameters"><span class="std std-ref">Core Parameters</span></a>, registration has a few important additional parameters.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">start_plane</span></code>
+: The plane to start registration.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">end_plane</span></code>
+: The plane to end registration.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">options</span></code>
+: NormCorre Params Object</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All planes in between <code class="code docutils literal notranslate"><span class="pre">start_plane</span></code> and <code class="code docutils literal notranslate"><span class="pre">end_plane</span></code> will undergo registration <a class="reference external" href="https://www.merriam-webster.com/dictionary/sequential">sequentially</a>.</p>
+</div>
+<section id="normcorre-parameters">
+<span id="normcorre-params"></span><h3><span class="section-number">2.2.1. </span>NoRMCorre Parameters<a class="headerlink" href="#normcorre-parameters" title="Permalink to this heading">#</a></h3>
+<p>The last parameter for this step is a NoRMCorre parameters object.
+This is just a <a class="reference external" href="https://www.mathworks.com/help/matlab/ref/struct.html">MATLAB structured array</a> that expects specific values.</p>
+<p>NoRMCorre provides the algorithm for registration and dictates the values in that struct.</p>
+<p>There is an example parameters struct at the root of this project (<a class="reference external" href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/blob/master/demo_CNMF_params.m">Github</a>).</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Avoid the <code class="code docutils literal notranslate"><span class="pre">bidir</span></code> options as we correct for bi-directional scaling ourselves.</p>
+</div>
+<p>The most important NoRMCorre parameters are:</p>
+<ol class="arabic simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">grid_size</span></code>
+: Determines how many patches your image is split into. The smaller the patch, the <strong>more precise the registration</strong>, with a tradeoff being <strong>increased compute times</strong>.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">max_shift</span></code>
+: Determines the maximum number of pixels that your movie will be translated in X/Y.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">fr</span></code>
+: The frame rate of our movie, which is likely different than the 30Hz default.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">correct_bidir</span></code>
+: Attempts to correct for bi-directional scan offsets, a step that was performed <a class="reference internal" href="assembly.html#scan-phase"><span class="std std-ref">in assembly</span></a>.</p></li>
+</ol>
+<div class="dropdown admonition">
+<p class="admonition-title">A note on <code class="docutils literal notranslate"><span class="pre">max_shift</span></code></p>
+<p>For timeseries where the FOV is sparsely labeled or a frame is corrupted, the registration process of two neighboring patches can produce very different shifts, which can lead to corrupted registered frames.
+We limit the largest allowed shift with the <code class="code docutils literal notranslate"><span class="pre">max_shift</span></code> parameter.</p>
+</div>
+<p>If you see large single-frame spikes, try decreasing the <code class="code docutils literal notranslate"><span class="pre">max-shift</span></code> parameter (Default is <span class="math notranslate nohighlight">\(10μm\)</span>).</p>
+</section>
+</section>
+<section id="rigid-registration">
+<span id="ug-rigid-registration"></span><span id="id2"></span><h2><span class="section-number">2.3. </span>Rigid Registration<a class="headerlink" href="#rigid-registration" title="Permalink to this heading">#</a></h2>
+<p>Rigid registration is accomplished by giving NoRMCorre <strong>no variable for <code class="code docutils literal notranslate"><span class="pre">grid_size</span></code></strong>,
+so it defaults to the size of your image and thus only processing a single patch encompassing the entire field-of-view.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The pipeline uses rigid registration internally to first create a <code class="docutils literal notranslate"><span class="pre">template</span></code>. This template downsampled and used to obtain the most accurate mean image for alignment.</p>
+</div>
+<p>Ideally, you want registration parameters in units of <em>real-world values</em>.</p>
+<p>For example, rather than specifying a max_shift in units of pixels, use the <a class="reference internal" href="../glossary.html#term-pixel-resolution"><span class="xref std std-term">pixel-resolution</span></a> metadata to calculate a <code class="code docutils literal notranslate"><span class="pre">max_shift</span></code> as ~1/2 the size of the neuron:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">plane_name</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">fullfile</span><span class="p">(</span><span class="s">&quot;path/to/raw_tif&quot;</span><span class="p">);</span><span class="w"> </span>
+<span class="n">metadata</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">read_metadata</span><span class="p">(</span><span class="n">plane_name</span><span class="p">);</span>
+
+<span class="c">% assuming a typical cortical neuron size of $15μm$.</span>
+<span class="n">max_shift</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">7.5</span><span class="o">/</span><span class="n">metadata</span><span class="p">.</span><span class="n">pixel_resolution</span>
+</pre></div>
+</div>
+<p>We can then use this value in our own parameters struct with the help of <a class="reference internal" href="../api/utility.html#read_plane" title="read_plane"><code class="xref mat mat-func docutils literal notranslate"><span class="pre">read_plane()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>% default dataset name
+% depends on your input for the `ds` parameter in subsequent steps
+dataset_name = &#39;/Y&#39;; 
+plane_number = 1;
+
+Y = read_plane(plane_name, &#39;ds&#39;, dataset_name, &#39;plane&#39;, plane_number);
+
+% empty grid_size results in rigid-registration
+options_rigid = NoRMCorreSetParms(...
+   &#39;d1&#39;,size(Y, 1),... 
+   &#39;d2&#39;,size(Y, 2),...
+   &#39;bin_width&#39;,200,...   % number of frames to initialze the template
+   &#39;max_shift&#39;, round(7.5/pixel_resolution), ... % still useful in non-rigid
+);
+</pre></div>
+</div>
+</section>
+<section id="non-rigid-registration">
+<span id="ug-nonrigid-registration"></span><span id="nonrigid-registration"></span><h2><span class="section-number">2.4. </span>Non-rigid Registration<a class="headerlink" href="#non-rigid-registration" title="Permalink to this heading">#</a></h2>
+<p>To perform non-rigid registration, you must specify the size of the patches you want to split the FOV into.</p>
+<p>Typical patch sizes for <span class="math notranslate nohighlight">\(512x512\)</span> movies are <span class="math notranslate nohighlight">\(32x32\)</span>, which would lead to <span class="math notranslate nohighlight">\(512/32=16\)</span> blocks that will be motion-corrected in parallel.</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">options_rigid</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">NoRMCorreSetParms</span><span class="p">(</span><span class="k">...</span>
+<span class="w">   </span><span class="s">&#39;d1&#39;</span><span class="p">,</span><span class="nb">size</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="k">...</span><span class="c"> </span>
+<span class="w">   </span><span class="s">&#39;d2&#39;</span><span class="p">,</span><span class="nb">size</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="k">...</span>
+<span class="w">   </span><span class="s">&#39;bin_width&#39;</span><span class="p">,</span><span class="mi">200</span><span class="p">,</span><span class="k">...</span><span class="c">   % number of frames to initialze the template</span>
+<span class="w">   </span><span class="s">&#39;max_shift&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">round</span><span class="p">(</span><span class="mi">20</span><span class="o">/</span><span class="n">pixel_resolution</span><span class="p">),</span><span class="w"> </span><span class="k">...</span><span class="c"> % still useful in non-rigid</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="outputs">
+<span id="reg-output"></span><h2><span class="section-number">2.5. </span>Outputs<a class="headerlink" href="#outputs" title="Permalink to this heading">#</a></h2>
+<p>Just like <a class="reference internal" href="assembly.html#extraction-inputs"><span class="std std-ref">assembly outputs</span></a>, registration outputs to <code class="code docutils literal notranslate"><span class="pre">.h5</span></code> format.</p>
+<p>Registration outputs have the following groups:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">/Y</span></code>
+: Takes the name of the <a class="reference internal" href="../first_steps/overview.html#ds"><span class="std std-ref">ds</span></a> parameter. This group contains the 2D timeseries.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">/Ym</span></code>
+: The mean image of the motion-corrected movie. Each image is averaged over time to produce the mean pixel intensity.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">/shifts</span></code>
+: A <code class="code docutils literal notranslate"><span class="pre">2xN</span></code> column vector containing the number of pixels in X and Y that each frame was shifted.</p>
+<div class="dropdown admonition">
+<p class="admonition-title">Example: Plot X/Y Shifts in MATLAB:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">x_shifts</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shifts</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="c">% represent pixel-shifts in *x*</span>
+<span class="n">y_shifts</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">shifts</span><span class="p">(:,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="c">% represent pixel-shifts in *y*</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="validate-outputs">
+<span id="id3"></span><h2><span class="section-number">2.6. </span>Validate Outputs<a class="headerlink" href="#validate-outputs" title="Permalink to this heading">#</a></h2>
+<p>Validation metric figures are placed in your <code class="docutils literal notranslate"><span class="pre">save_path</span></code> as <code class="docutils literal notranslate"><span class="pre">figures/registration_metrics_plane_N</span></code>.</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/reg_figure_output1.png"
+               title="Registration Output Figures"
+               data-title="Registration Output Figures"
+               
+               ><img src="../_images/reg_figure_output1.png"
+                     class="align-right"
+                     width="50%"
+                     height="auto"
+                     alt=""/>
+                </a><p>The pipeline saves 4 files / z-plane for you to quickly evaluate registration results in your <code class="code docutils literal notranslate"><span class="pre">save_path/figures/</span></code> as <code class="code docutils literal notranslate"><span class="pre">registration_metrics_plane_N</span></code>.</p>
+<p>Internally, the pipeline first create a “template” using <a class="reference internal" href="../tutorials/registration_tutorial.html#tut-rigid"><span class="std std-ref">rigid registration</span></a>.</p>
+<p>Each frame of the timeseries is aligned to this frame.</p>
+<p>The distance needed to shift these pixels to most closely align with the template is computed by locating the maximum of the cross-correlation between the each and every frame and the template.</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/reg_correlation.png"
+               title="Correlation Metrics"
+               data-title="Correlation Metrics"
+               
+               ><img src="../_images/reg_correlation.png"
+                     class=""
+                     width="100%"
+                     height="auto"
+                     alt=""/>
+                </a><p>Pixels that are highly correlated over the timecourse of an experiment are stationary in the image. Proper registration should <strong>increase the correlation between neighboring pixels</strong>.</p>
+<div class="dropdown admonition">
+<p class="admonition-title">Validation metrics rely on good signal!</p>
+<p>The correlation metrics operate on each individual frame of the timeseries.
+As such, they depend on the quality of the registration and noise level but also on the level of neural activity.</p>
+<p>Be weary of correlation metrics showing good registration on data with lots of noise or little signal.</p>
+</div>
+<hr class="docutils" />
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/reg_corr_with_mean1.svg"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/reg_corr_with_mean1.svg"
+                     class=""
+                     width="100%"
+                     height="auto"
+                     alt=""/>
+                </a><p>The above image shows these correlations. Closer to 1 (the top of the graph) indicates high correlation and a more stationary image.</p>
+<p>The high degree of overlap between rigid/non-rigid registration indicates our movie did not benefit from non-rigid motion correction.</p>
+<p>This could be due to too large of a <code class="code docutils literal notranslate"><span class="pre">grid_size</span></code> or a general lack of non-uniform motion.</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/reg_correlation_zoom.png"
+               title="Correlation Metrics"
+               data-title="Correlation Metrics"
+               
+               ><img src="../_images/reg_correlation_zoom.png"
+                     class=""
+                     width="100%"
+                     height="auto"
+                     alt=""/>
+                </a><div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>A quick way to see if registration was effective is to compare the two mean images,
+looking for differences in the “blurryness” between them.</p>
+</div>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/reg_blurry1.svg"
+               title="Raw vs Registered Movie"
+               data-title="Raw vs Registered Movie"
+               
+               ><img src="../_images/reg_blurry1.svg"
+                     class=""
+                     width="100%"
+                     height="auto"
+                     alt=""/>
+                </a></section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="assembly.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">1. </span>Assembly</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="segmentation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">3. </span>Segmentation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">2.1. Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inputs">2.2. Inputs</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#normcorre-parameters">2.2.1. NoRMCorre Parameters</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rigid-registration">2.3. Rigid Registration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#non-rigid-registration">2.4. Non-rigid Registration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outputs">2.5. Outputs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#validate-outputs">2.6. Validate Outputs</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Elizabeth R. Miller Brain Observatory | The Rockefeller University. All Rights Reserved.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

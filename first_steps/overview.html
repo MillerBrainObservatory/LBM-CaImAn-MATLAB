@@ -1,0 +1,689 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>0.2. Pipeline Usage &#8212; LBM-CaImAn-MATLAB  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=475cc00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2b91c5f0"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
+    <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+    <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+    <script defer="defer" src="../_static/tippy/first_steps/overview.9400c2e2-89f8-4988-9a80-6c9d41ac33ea.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'first_steps/overview';</script>
+    <link rel="icon" href="../_static/lbm_mat_favicon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="User Guide" href="../user_guide/index.html" />
+    <link rel="prev" title="0.1. Project Setup" href="setup.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_caiman_matlab_with_icon.png" class="logo__image only-light" alt="LBM-CaImAn-MATLAB  documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo_caiman_matlab_with_icon.png" class="logo__image only-dark" alt="LBM-CaImAn-MATLAB  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://millerbrainobservatory.github.io/" title="MBO User Hub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src=".././_static/icon_mbo_home.png" class="icon-link-image" alt="MBO User Hub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MillerBrainObservatory/" title="MBO Github" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">MBO Github</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://mbo.rockefeller.edu/contact/" title="Connect with MBO" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-regular fa-address-card fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Connect with MBO</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">First Steps</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="setup.html">0.1. Project Setup</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">0.2. Pipeline Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../user_guide/index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/assembly.html">1. Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/registration.html">2. Registration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/segmentation.html">3. Segmentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/collation.html">4. Axial Collation and Correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/tips_tricks.html">5. Tips and Tricks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/troubleshooting.html">6. Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/registration_tutorial.html">1. Explained: Registration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/segmentation_tutorial.html">2. Explained: Source Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/axial_correction_tutorial.html">3. Explained: Axial Offset Correction</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/core.html">1. Core Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/utility.html">2. Utility Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/internal.html">3. Internal Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../image_gallery.html">Image Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/blob/master/docs/first_steps/overview.md?plain=1" target="_blank"
+   class="btn btn-sm btn-source-file-button dropdown-item"
+   title="Show source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">Show source</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/edit/master/docs/first_steps/overview.md" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/new?title=Issue%20on%20page%20%2Ffirst_steps/overview.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/first_steps/overview.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>0.2. Pipeline Usage</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-parameters">Core Parameters</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#required">Required</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional">Optional</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logging">Logging</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#to-file">To File</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#to-command-window">To Command Window</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="pipeline-usage">
+<h1>0.2. Pipeline Usage<a class="headerlink" href="#pipeline-usage" title="Permalink to this heading">#</a></h1>
+<p>The bare-minimum to use this pipeline involves calling four functions which have sensible default values for LBM recordings.</p>
+<p>The only <em>required</em> inputs to the pipeline are a path where your raw/previously processed data lives.</p>
+<p>This common interface is described here with the goal of avoiding redundancy through the rest of the documentation.</p>
+<section id="core-parameters">
+<span id="parameters"></span><h2>Core Parameters<a class="headerlink" href="#core-parameters" title="Permalink to this heading">#</a></h2>
+<p>For the <a class="reference internal" href="../api/core.html#core-api"><span class="std std-ref">Core</span></a> functions in this pipeline, the initial parameters are always the same.</p>
+<div class="admonition-parameters-and-arguments admonition">
+<p class="admonition-title">Parameters and Arguments</p>
+<p>The term “parameter” and “argument” used throughout this guide refer to the inputs to each function, what goes inside the paranthesis ().
+Running “help convertScanImageTiffToVolume” in the command window will show to you and describe the parameters of that function.</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/gen_param_v_arg1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/gen_param_v_arg1.png"
+                     class=""
+                     width="100%"
+                     height="auto"
+                     alt=""/>
+                </a></div>
+<section id="required">
+<h3>Required<a class="headerlink" href="#required" title="Permalink to this heading">#</a></h3>
+<p>The only required parameter is the data-path:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">data_path</span></code>
+: A filepath leading to the directory that contains the input files.</p>
+<p>This can be given as an argument without specifying the ‘name’:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">convertScanImageTiffToVolume</span><span class="p">(</span><span class="s">&quot;C:/Users/MBO/MATLAB/data/&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="optional">
+<h3>Optional<a class="headerlink" href="#optional" title="Permalink to this heading">#</a></h3>
+<p>The remaining parameters are optional:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">save_path</span></code>
+: A filepath leading to the directory where any results are saved.</p>
+<p id="ds"><code class="code docutils literal notranslate"><span class="pre">ds</span></code>
+: Dataset name/group path, a character or string (’’ or “”) array beginning with a foreward slash ‘’. For example, ‘/Y’, “/mov”, ‘/raw’.</p>
+<p id="debug-flag"><code class="code docutils literal notranslate"><span class="pre">debug_flag</span></code>
+: This is how you can skip a step in the pipeline. Set to 1 to print all files / datasets that would be processed, then stop before any processing occurs.</p>
+<p id="overwrite"><code class="code docutils literal notranslate"><span class="pre">overwrite</span></code>
+: Set to 1 to overwrite or delete pre-existing data. Setting to 0 will simply return without processing that file.</p>
+<p id="num-cores"><code class="code docutils literal notranslate"><span class="pre">num_cores</span></code>
+: Set to the number of CPU cores to use for parallel computing.</p>
+<p>Though <code class="code docutils literal notranslate"><span class="pre">num_cores</span></code> is an option in pre-processing, there are no parallel computations during this step so the value will be ignored.</p>
+<p>Optional parameters must be given a name for the function to parse:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">data_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;C:/Users/MBO/MATLAB/data/&quot;</span><span class="p">;</span>
+<span class="n">save_path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">fullfile</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;results&quot;</span><span class="p">);</span><span class="w"> </span><span class="c">% data_path/results</span>
+
+<span class="n">convertScanImageTiffToVolume</span><span class="p">(</span><span class="w"> </span><span class="k">...</span>
+<span class="w">    </span><span class="n">data_path</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c">  % required, parameter alone</span>
+<span class="w">    </span><span class="s">&#39;save_path&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">save_path</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c"> % optional, include the name</span>
+<span class="w">    </span><span class="s">&#39;ds&#39;</span><span class="p">,</span><span class="s">&#39;/Y&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="c"> </span>
+<span class="w">    </span><span class="s">&#39;debug_flag&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
+<span class="w">    </span><span class="s">&#39;trim_pixels&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="k">...</span><span class="c"> </span>
+<span class="w">    </span><span class="s">&#39;overwrite&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="k">...</span>
+<span class="w">    </span><span class="s">&#39;fix_scan_phase&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">...</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>See the included script <code class="xref mat mat-scpt docutils literal notranslate"><span class="pre">demo_LBM_pipeline</span></code> at the root of this repository for a working example.</p>
+</section>
+</section>
+<section id="logging">
+<h2>Logging<a class="headerlink" href="#logging" title="Permalink to this heading">#</a></h2>
+<section id="to-file">
+<h3>To File<a class="headerlink" href="#to-file" title="Permalink to this heading">#</a></h3>
+<p>A log file will be saved with every processing step.</p>
+<p>This logs the start time and duration of each computation, as well as storing metadata and function parameters.</p>
+<p>The pipeline step is prepended to the function name, followed by the data and time of the run.</p>
+<a class="dropdown"
+               data-lightbox="group-default"
+               href="../_images/reg_log_output1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/reg_log_output1.png"
+                     class=""
+                     width="100%"
+                     height="auto"
+                     alt=""/>
+                </a></section>
+<section id="to-command-window">
+<h3>To Command Window<a class="headerlink" href="#to-command-window" title="Permalink to this heading">#</a></h3>
+<p>Additionally, you will see metadata printed to the command window when a processing step is started:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">Log</span><span class="w"> </span><span class="s">file</span><span class="w"> </span><span class="s">created:</span><span class="w"> </span><span class="s">save_path\2024_08_02_11_21_05_segmentation.log</span>
+<span class="n">Beginning</span><span class="w"> </span><span class="s">registration</span><span class="w"> </span><span class="s">with</span><span class="w"> </span><span class="s">23</span><span class="w"> </span><span class="s">cores...</span>
+<span class="n">Beginning</span><span class="w"> </span><span class="s">plane:</span><span class="w"> </span><span class="s">13</span>
+<span class="n">metadata</span><span class="w"> </span><span class="s">contents:</span>
+<span class="w">    </span><span class="n">num_planes</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">28</span>
+<span class="w">    </span><span class="n">num_rois</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">    </span><span class="n">num_frames</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">3000</span>
+<span class="w">    </span><span class="n">frame_rate</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">10.5903059418262</span>
+<span class="w">    </span><span class="n">fov</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mi">1360</span><span class="p">;</span><span class="mi">2200</span><span class="p">]</span>
+<span class="w">    </span><span class="n">pixel_resolution</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">3.0205893832943</span>
+<span class="w">    </span><span class="n">sample_format</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">int16</span>
+<span class="w">    </span><span class="n">num_pixel_xy</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mi">224</span><span class="p">;</span><span class="mi">732</span><span class="p">]</span>
+<span class="w">    </span><span class="n">roi_width_px</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">224</span>
+<span class="w">    </span><span class="n">roi_height_px</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">732</span>
+<span class="w">    </span><span class="n">tiff_length</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1480</span>
+<span class="w">    </span><span class="n">tiff_width</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">224</span>
+<span class="w">    </span><span class="n">raw_filename</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">mk717_3umpx_10p59hz_224pxby732px_2mroi_350mw_50to550umdeep_00001</span>
+<span class="w">    </span><span class="n">raw_filepath</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">D</span><span class="p">:</span><span class="o">\</span><span class="n">DATA</span><span class="o">\</span><span class="mi">2024</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span>31<span class="n">_GCaMP8s_mk717</span><span class="o">\</span><span class="n">mk717_3umpx_10p59hz_224pxby732px_2mroi_350mw_50to550umdeep_00001</span>
+<span class="w">    </span><span class="n">raw_fullfile</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">D</span><span class="p">:</span><span class="o">\</span><span class="n">DATA</span><span class="o">\</span><span class="mi">2024</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span>31<span class="n">_GCaMP8s_mk717</span><span class="o">\</span><span class="n">mk717_3umpx_10p59hz_224pxby732px_2mroi_350mw_50to550umdeep_00001</span><span class="o">\</span><span class="n">mk717_3umpx_10p59hz_224pxby732px_2mroi_350mw_50to550umdeep_00001</span><span class="p">.</span><span class="n">tif</span>
+<span class="w">    </span><span class="n">num_lines_between_scanfields</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">16</span>
+<span class="w">    </span><span class="n">center_xy</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="o">-</span><span class="mf">3.779761905</span><span class="p">;</span><span class="mi">0</span><span class="p">]</span>
+<span class="w">    </span><span class="n">line_period</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">6.31189695116301e-05</span>
+<span class="w">    </span><span class="n">scan_frame_period</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">0.0944259783893986</span>
+<span class="w">    </span><span class="n">size_xy</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mf">7.792803117</span><span class="p">;</span><span class="mf">25.21201008</span><span class="p">]</span>
+<span class="w">    </span><span class="n">objective_resolution</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">87.26</span>
+<span class="w">    </span><span class="n">trim_pixels</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">;</span><span class="mi">0</span><span class="p">;</span><span class="mi">0</span><span class="p">;</span><span class="mi">0</span><span class="p">]</span>
+<span class="w">    </span><span class="n">multifile</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">    </span><span class="n">num_files</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">    </span><span class="n">dataset_name</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="o">/</span><span class="n">Y</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="setup.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">0.1. Project Setup</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../user_guide/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">User Guide</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-parameters">Core Parameters</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#required">Required</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional">Optional</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#logging">Logging</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#to-file">To File</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#to-command-window">To Command Window</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Elizabeth R. Miller Brain Observatory | The Rockefeller University. All Rights Reserved.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

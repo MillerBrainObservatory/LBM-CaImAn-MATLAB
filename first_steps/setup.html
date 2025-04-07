@@ -1,0 +1,753 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>0.1. Project Setup &#8212; LBM-CaImAn-MATLAB  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=475cc00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/css/lightbox.css?v=5c84f910" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2b91c5f0"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2/dist/js/lightbox-plus-jquery.min.js?v=ffc8af2d"></script>
+    <script src="../_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js?v=12818e64"></script>
+    <script defer="defer" src="https://unpkg.com/@popperjs/core@2"></script>
+    <script defer="defer" src="https://unpkg.com/tippy.js@6"></script>
+    <script defer="defer" src="../_static/tippy/first_steps/setup.97e289b1-e5b2-4d6b-88ff-f0db2100d3cd.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'first_steps/setup';</script>
+    <link rel="icon" href="../_static/lbm_mat_favicon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="0.2. Pipeline Usage" href="overview.html" />
+    <link rel="prev" title="First Steps" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_caiman_matlab_with_icon.png" class="logo__image only-light" alt="LBM-CaImAn-MATLAB  documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo_caiman_matlab_with_icon.png" class="logo__image only-dark" alt="LBM-CaImAn-MATLAB  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://millerbrainobservatory.github.io/" title="MBO User Hub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src=".././_static/icon_mbo_home.png" class="icon-link-image" alt="MBO User Hub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MillerBrainObservatory/" title="MBO Github" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">MBO Github</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://mbo.rockefeller.edu/contact/" title="Connect with MBO" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-regular fa-address-card fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Connect with MBO</span></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">First Steps</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">0.1. Project Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html">0.2. Pipeline Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../user_guide/index.html">User Guide</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/assembly.html">1. Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/registration.html">2. Registration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/segmentation.html">3. Segmentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/collation.html">4. Axial Collation and Correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/tips_tricks.html">5. Tips and Tricks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/troubleshooting.html">6. Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/registration_tutorial.html">1. Explained: Registration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/segmentation_tutorial.html">2. Explained: Source Extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/axial_correction_tutorial.html">3. Explained: Axial Offset Correction</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/index.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/core.html">1. Core Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/utility.html">2. Utility Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/internal.html">3. Internal Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../image_gallery.html">Image Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/blob/master/docs/first_steps/setup.md?plain=1" target="_blank"
+   class="btn btn-sm btn-source-file-button dropdown-item"
+   title="Show source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">Show source</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/edit/master/docs/first_steps/setup.md" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB/issues/new?title=Issue%20on%20page%20%2Ffirst_steps/setup.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/first_steps/setup.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>0.1. Project Setup</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#from-source">From Source</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#with-git">With git</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#windows">Windows</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#wsl2-windows-subsystem-for-linux">WSL2 (Windows Subsystem for Linux)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linux">Linux</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies">Dependencies</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#directory-structure">Directory Structure</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="project-setup">
+<span id="id1"></span><h1>0.1. Project Setup<a class="headerlink" href="#project-setup" title="Permalink to this heading">#</a></h1>
+<section id="installation">
+<span id="id2"></span><h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h2>
+<p>Users with <a class="reference external" href="https://git-scm.com/">git</a> experience are encouraged to skip to the <a class="reference internal" href="#installation-git"><span class="std std-ref">git installation section</span></a>.
+This option avoids the need repeat the download process each time a new version of the pipeline is produced.</p>
+<section id="from-source">
+<span id="id3"></span><h3>From Source<a class="headerlink" href="#from-source" title="Permalink to this heading">#</a></h3>
+<p>The easiest way to download the source code is to visit the
+<a class="reference external" href="https://github.com/MillerBrainObservatory/LBM-CaImAn-MATLAB">github repository</a>,
+download the project via the <a class="sd-sphinx-override sd-badge sd-outline-light sd-text-light reference external" href="Download ZIP"><span>Download ZIP</span></a> button.</p>
+<p>Move/extract the downloaded folder into a folder on your <code class="docutils literal notranslate"><span class="pre">userpath</span></code>.</p>
+<div class="dropdown admonition">
+<p class="admonition-title">Example: Find MATLAB <code class="docutils literal notranslate"><span class="pre">userpath</span></code></p>
+<p>In the MATLAB Command-Window:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="nb">userpath</span>
+
+<span class="nb">ans</span><span class="w"> </span><span class="p">=</span>
+<span class="w">    </span><span class="s">&#39;/home/&lt;username&gt;/Documents/MATLAB&#39;</span>
+</pre></div>
+</div>
+</div>
+<p>All files located in this path will be fully accessable.</p>
+<p>You can tell if the pipeline is added successfully to the path by looking at the file window.</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/gen_matlab_path_explorer1.png"
+               title=""
+               data-title=""
+               
+               ><img src="../_images/gen_matlab_path_explorer1.png"
+                     class="align-right"
+                     width="200"
+                     height="auto"
+                     alt=""/>
+                </a><p>Here, <code class="docutils literal notranslate"><span class="pre">/core</span></code> and <code class="docutils literal notranslate"><span class="pre">/packages</span></code> are both bright in the files window, this indicates those folders are properly in the MATLAB path.</p>
+<p>These two folders contain all of the code the pipeline needs to run and are the only two folders that <strong>must</strong> be on the path.</p>
+<p>If either of these folders is not bright, right-click on the folder and “Add to path -&gt; Selected Folders and Subfolders”</p>
+<p id="startup">Alternatively, you can create a <a class="reference external" href="https://www.mathworks.com/help/matlab/ref/startup.html">startup.m</a> file located in this same <code class="docutils literal notranslate"><span class="pre">userpath</span></code> directory: <code class="docutils literal notranslate"><span class="pre">~/Documents/MATLAB/startup.m</span></code> and add the following code snippet:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="c">% &lt;HOME&gt;/Documents/MATLAB/startum.m</span>
+<span class="c">% note &quot;fullfile&quot; isnt needed, but helpfully provides directory autocompletion</span>
+<span class="nb">addpath</span><span class="p">(</span><span class="nb">genpath</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="s">&quot;path/to/caiman_matlab&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>There is a sample setup.m file located at the root of this repository.</p>
+</section>
+<section id="with-git">
+<span id="installation-git"></span><h3>With git<a class="headerlink" href="#with-git" title="Permalink to this heading">#</a></h3>
+<p>Modern versions of matlab (2017+) solve most Linux/Windows filesystem conflicts. Installation is similar independent of OS.</p>
+</section>
+<section id="windows">
+<span id="installation-win"></span><h3>Windows<a class="headerlink" href="#windows" title="Permalink to this heading">#</a></h3>
+<p>The easiest method to download this repository with git is via <a class="reference external" href="https://gitforwindows.org/">mysys</a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you have MATLAB installed on Windows, you won’t be able to run commands from within WSL (i.e. //wsl.localhost/)
+due to the separate filesystems. Pay attention to which environment you install.</p>
+</div>
+</section>
+<section id="wsl2-windows-subsystem-for-linux">
+<span id="installation-wsl"></span><h3>WSL2 (Windows Subsystem for Linux)<a class="headerlink" href="#wsl2-windows-subsystem-for-linux" title="Permalink to this heading">#</a></h3>
+<p>Windows subsystem for Linux (WSL/WSL2) is a local environment on your windows machine that is capable of running linux commands using a separate filesystem.</p>
+<p>As of 2024, Mathworks does not officially support and is not planning support for MATLAB on WSL or WSL2.</p>
+<p>If you have MATLAB installed on Windows and wish to use this repository from a WSL instance, see <a class="reference external" href="https://ww2.mathworks.cn/matlabcentral/answers/1597219-can-microsoft-s-wslg-windows-subsystem-for-linux-gui-support-running-matlab">this discussion</a> on how to accomplish this.</p>
+<p>This means you will not be able to run matlab from the WSL filesystem (i.e. <code class="docutils literal notranslate"><span class="pre">//wsl.localhost/</span></code>), but you can use a mounted <code class="docutils literal notranslate"><span class="pre">C://</span></code> drive path like so:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/mnt/c/Users/&lt;Username&gt;/&lt;project-install-path&gt;
+</pre></div>
+</div>
+<p>This pipeline has been tested on WSL2, Ubuntu 22.04.</p>
+<p>Though any debian-based distribution should work.</p>
+</section>
+<section id="linux">
+<span id="installation-linux"></span><h3>Linux<a class="headerlink" href="#linux" title="Permalink to this heading">#</a></h3>
+<p>In Linux, WSL or mysys, clone this repository with the pre-installed git client:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd ~/Documents/MATLAB
+$ git clone https://github.com/ru-rbo/caiman_matlab.git
+$ cd caiman_matlab
+$ matlab
+</pre></div>
+</div>
+</section>
+</section>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this heading">#</a></h2>
+<p>Before running your first dataset, you should ensure that all dependencies of the pipeline are satisfied.</p>
+<p>This pipeline requires the parallel pool, statistics and machine learning, and image processing toolboxes.</p>
+<p>To see what toolboxes you have installed, use <code class="docutils literal notranslate"><span class="pre">ver</span></code> in the MATLAB command window:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ver</span>
+<span class="o">----------------------------------------------------------------------------------------------------------------</span>
+<span class="n">MATLAB</span> <span class="n">Version</span><span class="p">:</span> <span class="mf">24.1.0.2537033</span> <span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="n">MATLAB</span> <span class="n">License</span> <span class="n">Number</span><span class="p">:</span> <span class="mi">41007384</span>
+<span class="n">Operating</span> <span class="n">System</span><span class="p">:</span> <span class="n">Linux</span> <span class="mf">6.2.0</span><span class="o">-</span><span class="mi">36</span><span class="o">-</span><span class="n">generic</span> <span class="c1">#37~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Mon Oct  9 15:34:04 UTC 2 x86_64</span>
+<span class="n">Java</span> <span class="n">Version</span><span class="p">:</span> <span class="n">Java</span> <span class="mf">1.8.0_202</span><span class="o">-</span><span class="n">b08</span> <span class="k">with</span> <span class="n">Oracle</span> <span class="n">Corporation</span> <span class="n">Java</span> <span class="n">HotSpot</span><span class="p">(</span><span class="n">TM</span><span class="p">)</span> <span class="mi">64</span><span class="o">-</span><span class="n">Bit</span> <span class="n">Server</span> <span class="n">VM</span> <span class="n">mixed</span> <span class="n">mode</span>
+<span class="o">----------------------------------------------------------------------------------------------------------------</span>
+<span class="n">MATLAB</span>                                                <span class="n">Version</span> <span class="mf">24.1</span>        <span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="n">Computer</span> <span class="n">Vision</span> <span class="n">Toolbox</span>                               <span class="n">Version</span> <span class="mf">24.1</span>        <span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="n">Curve</span> <span class="n">Fitting</span> <span class="n">Toolbox</span>                                 <span class="n">Version</span> <span class="mf">24.1</span>        <span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="n">Global</span> <span class="n">Optimization</span> <span class="n">Toolbox</span>                           <span class="n">Version</span> <span class="mf">24.1</span>        <span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="n">Image</span> <span class="n">Processing</span> <span class="n">Toolbox</span>                              <span class="n">Version</span> <span class="mf">24.1</span>        <span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="n">Optimization</span> <span class="n">Toolbox</span>                                  <span class="n">Version</span> <span class="mf">24.1</span>        <span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="n">Parallel</span> <span class="n">Computing</span> <span class="n">Toolbox</span>                            <span class="n">Version</span> <span class="mf">24.1</span>        <span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="n">Signal</span> <span class="n">Processing</span> <span class="n">Toolbox</span>                             <span class="n">Version</span> <span class="mf">24.1</span>        <span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="n">Statistics</span> <span class="ow">and</span> <span class="n">Machine</span> <span class="n">Learning</span> <span class="n">Toolbox</span>               <span class="n">Version</span> <span class="mf">24.1</span>        <span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+<span class="n">Wavelet</span> <span class="n">Toolbox</span>                                       <span class="n">Version</span> <span class="mf">24.1</span>        <span class="p">(</span><span class="n">R2024a</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the user choses to split frames across multiple <code class="docutils literal notranslate"><span class="pre">.tiff</span></code> files, there will be multiple tiff files in ascending order
+of an suffix appended to the filename: <code class="docutils literal notranslate"><span class="pre">_000N</span></code>, where n=number of files chosen by the user.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>All output .tiff files for a single imaging session should be placed in the same directory.
+No other .tiff files should be in this directory. If this happens, an error will throw.</p>
+</div>
+</section>
+<section id="directory-structure">
+<span id="id4"></span><h2>Directory Structure<a class="headerlink" href="#directory-structure" title="Permalink to this heading">#</a></h2>
+<p>The following is an example of the directory hierarchy
+used for the demo.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>    Parent/
+    ├── raw/
+    │   └── basename_00001_0001.tiff
+    │   └── basename_00001_0002.tiff
+    │   └── basename_00001_00NN.tiff
+    ├── extraction/
+    │   └── basename_plane_1.h5
+    │   └── basename_plane_2.h5
+    │   └── basename_plane_NN.h5
+    │   └── figures/
+    │       └── scan_offset_validation.png
+    │       └── roi_1_offset_validation.png
+    │       └── roi_2_offset_validation.png
+    │       └── roi_N_offset_validation.png
+    ├── registration/
+    │   └── motion_corrected_plane_1.h5
+    │   └── motion_corrected_plane_2.h5
+    │   └── motion_corrected_plane_NN.h5
+    │   └── figures/
+    │       └── motion_corrected_metrics_plane_1.png
+    │       └── motion_corrected_metrics_plane_2.png
+    │       └── motion_corrected_metrics_plane_RR.png
+    └── segmentation/
+    │   └── segmented_plane_1.h5
+    │   └── segmented_plane_2.h5
+    │   └── segmented_plane_NN.h5
+    └── axial_correction/
+        └── collated_caiman_minSNR_1.h5
+
+*`N` = the number of `[Y, X, T]` planar time-series.
+*`R` = the number of `[Y, X, T]` ROI&#39;s per scanfield.
+</pre></div>
+</div>
+<p>Following the recommendation described in the <a class="reference internal" href="#installation"><span class="std std-ref">Installation</span></a> guide all necessary functions should already be on your MATLAB path.</p>
+<p>If “Undefined Function” error occurs, such as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Undefined</span> <span class="n">function</span> <span class="p">{</span><span class="n">code</span><span class="p">}</span><span class="s1">&#39;convertScanImageTiffToVolume&#39;</span> <span class="k">for</span> <span class="nb">input</span> <span class="n">arguments</span> <span class="n">of</span> <span class="nb">type</span> <span class="s1">&#39;char&#39;</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>This means the input is not on your MATLAB path.</p>
+<p>Add this to the top of the script you are running:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">fpath</span><span class="p">,</span><span class="w"> </span><span class="n">fname</span><span class="p">,</span><span class="w"> </span><span class="o">~</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">fileparts</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="nb">mfilename</span><span class="p">(</span><span class="s">&#39;fullpath&#39;</span><span class="p">)));</span><span class="w"> </span><span class="c">% path to this script</span>
+<span class="nb">addpath</span><span class="p">(</span><span class="nb">genpath</span><span class="p">(</span><span class="nb">fullfile</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;core/&#39;</span><span class="p">)));</span>
+</pre></div>
+</div>
+<p>You can make sure all of the requirements for the package are in the path with the following:</p>
+<div class="highlight-MATLAB notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">validate_toolboxes</span><span class="p">();</span><span class="w"> </span><span class="c">% make sure we have dependencies in accessible places</span>
+<span class="k">if</span><span class="w"> </span><span class="nb">ischar</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
+<span class="k">else</span>
+<span class="w">    </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Proceeding with execution...&#39;</span><span class="p">);</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>It is helpful to first set-up directories where youd like your results to go.</p>
+<p>Following the demo <a class="reference internal" href="#directory-structure"><span class="std std-ref">Directory Structure</span></a>:</p>
+<a class=""
+               data-lightbox="group-default"
+               href="../_images/gen_output_paths1.png"
+               title="Example Directory Structure"
+               data-title="Example Directory Structure"
+               
+               ><img src="../_images/gen_output_paths1.png"
+                     class=""
+                     width="200"
+                     height="auto"
+                     alt=""/>
+                </a></section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">First Steps</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="overview.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">0.2. Pipeline Usage</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#from-source">From Source</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#with-git">With git</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#windows">Windows</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#wsl2-windows-subsystem-for-linux">WSL2 (Windows Subsystem for Linux)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linux">Linux</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies">Dependencies</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#directory-structure">Directory Structure</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Elizabeth R. Miller Brain Observatory | The Rockefeller University. All Rights Reserved.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
